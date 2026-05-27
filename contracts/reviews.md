@@ -28,7 +28,7 @@ ReviewSubjectType = product | seller | service
 
 ---
 
-## Part V — Real-Time and Social
+## Part V -- Real-Time and Social
 
 ---
 

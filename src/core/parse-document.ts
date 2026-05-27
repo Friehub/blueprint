@@ -93,6 +93,8 @@ function parseModuleDocument(
   const invariants = collectTextSections(grouped.get("invariants") ?? [], "invariants");
   const providers = collectProviders(grouped.get("providers") ?? []);
   const integrations = collectTextSections(grouped.get("system-integrations") ?? [], "system-integrations");
+  const { hardDeps, softDeps } = extractDependencies(grouped.get("system-integrations") ?? []);
+  const coreInherits = extractCoreInherits(grouped.get("system-integrations") ?? []);
 
   const rawSections = sections;
 
@@ -114,6 +116,9 @@ function parseModuleDocument(
       invariants,
       providers,
       integrations,
+      hardDeps,
+      softDeps,
+      coreInherits,
       rawSections,
       profile: "module-v1",
       source: { file: envelope.source.file, startLine: 1, endLine: Math.max(1, sections.at(-1)?.endLine ?? 1) },
@@ -121,6 +126,8 @@ function parseModuleDocument(
     issues,
   };
 }
+
+const IMPLICIT_CORE_NAMES = new Set(["global_standards", "runtime_standards"]);
 
 function parseCoreDocument(
   envelope: DocumentEnvelope,
@@ -138,6 +145,7 @@ function parseCoreDocument(
       summary,
       sections,
       rawSections: sections,
+      implicit: IMPLICIT_CORE_NAMES.has(envelope.name),
       profile: "core-v1",
       source: { file: envelope.source.file, startLine: 1, endLine: Math.max(1, sections.at(-1)?.endLine ?? 1) },
     },
@@ -200,6 +208,78 @@ function collectProviders(sections: RawSection[]): string[] {
   }
 
   return items;
+}
+
+function extractDependencies(sections: RawSection[]): { hardDeps: string[]; softDeps: string[] } {
+  const hardDeps: string[] = [];
+  const softDeps: string[] = [];
+
+  for (const section of sections) {
+    const body = classifySectionBody(section.content, section.startLine, section.endLine);
+    for (const line of body.lines) {
+      const text = stripTextLine(line);
+      if (!text) continue;
+
+      const dependsMatch = text.match(/\*\*Depends On:\*\*\s*(.+)/i);
+      if (dependsMatch) {
+        const raw = dependsMatch[1]?.trim() ?? "";
+        if (raw && !raw.startsWith("(none")) {
+          hardDeps.push(...parseDepList(raw));
+        }
+        continue;
+      }
+
+      const recommendsMatch = text.match(/\*\*Recommends:\*\*\s*(.+)/i);
+      if (recommendsMatch) {
+        const raw = recommendsMatch[1]?.trim() ?? "";
+        if (raw && !raw.startsWith("(none")) {
+          softDeps.push(...parseDepList(raw));
+        }
+      }
+    }
+  }
+
+  return { hardDeps, softDeps };
+}
+
+function extractCoreInherits(sections: RawSection[]): string[] {
+  const inherits: string[] = [];
+
+  for (const section of sections) {
+    const body = classifySectionBody(section.content, section.startLine, section.endLine);
+    for (const line of body.lines) {
+      const text = stripTextLine(line);
+      if (!text) continue;
+
+      const runtimeMatch = text.match(/\*\*Runtime Standards:\*\*\s*Inherits\s+`([^`]+)`/i);
+      if (runtimeMatch) {
+        const rawPath = runtimeMatch[1] ?? "";
+        const name = rawPath.replace(/.*\//, "").replace(/\.md$/i, "");
+        if (name && !inherits.includes(name)) {
+          inherits.push(name);
+        }
+        continue;
+      }
+
+      const globalMatch = text.match(/\*\*Global Standards:\*\*\s*Inherits\s+`([^`]+)`/i);
+      if (globalMatch) {
+        const rawPath = globalMatch[1] ?? "";
+        const name = rawPath.replace(/.*\//, "").replace(/\.md$/i, "");
+        if (name && !inherits.includes(name)) {
+          inherits.push(name);
+        }
+      }
+    }
+  }
+
+  return inherits;
+}
+
+function parseDepList(raw: string): string[] {
+  return raw
+    .split(",")
+    .map((item) => item.replace(/\(.*?\)/g, "").trim())
+    .filter(Boolean);
 }
 
 function groupSections(sections: RawSection[]): Map<string, RawSection[]> {

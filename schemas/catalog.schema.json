@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://engineering-blueprinter.dev/schemas/catalog.json",
+  "title": "Engineering Blueprinter Catalog",
+  "description": "Output of `blueprinter build` — all parsed contracts from the contracts/ tree.",
+  "type": "object",
+  "required": ["modules", "core"],
+  "properties": {
+    "modules": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ModuleContract" }
+    },
+    "core": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/CoreContract" }
+    }
+  },
+  "$defs": {
+    "ModuleContract": {
+      "type": "object",
+      "required": ["name", "title", "functions", "types", "invariants", "providers", "integrations", "hardDeps", "softDeps", "coreInherits", "rawSections", "profile", "source"],
+      "properties": {
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "summary": { "type": ["string", "null"] },
+        "functions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ContractFunction" }
+        },
+        "types": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ContractType" }
+        },
+        "invariants": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "providers": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "integrations": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "hardDeps": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Modules this module requires at runtime."
+        },
+        "softDeps": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Modules recommended but not required."
+        },
+        "coreInherits": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Core contracts this module inherits (e.g. runtime_standards)."
+        },
+        "rawSections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RawSection" }
+        },
+        "profile": { "type": "string", "const": "module-v1" },
+        "source": { "$ref": "#/$defs/SourceRef" }
+      }
+    },
+    "CoreContract": {
+      "type": "object",
+      "required": ["name", "title", "sections", "rawSections", "implicit", "profile", "source"],
+      "properties": {
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "summary": { "type": ["string", "null"] },
+        "sections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RawSection" }
+        },
+        "rawSections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RawSection" }
+        },
+        "implicit": {
+          "type": "boolean",
+          "description": "If true, always included in resolved sets regardless of which modules are selected."
+        },
+        "profile": { "type": "string", "const": "core-v1" },
+        "source": { "$ref": "#/$defs/SourceRef" }
+      }
+    },
+    "ContractFunction": {
+      "type": "object",
+      "required": ["name", "params", "returns", "signature", "raw", "source"],
+      "properties": {
+        "name": { "type": "string" },
+        "params": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ContractParameter" }
+        },
+        "returns": { "type": "string" },
+        "signature": { "type": "string" },
+        "raw": { "type": "string" },
+        "source": { "$ref": "#/$defs/SourceRef" }
+      }
+    },
+    "ContractParameter": {
+      "type": "object",
+      "required": ["name", "type", "optional"],
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": ["string", "null"] },
+        "optional": { "type": "boolean" },
+        "defaultValue": { "type": "string" }
+      }
+    },
+    "ContractType": {
+      "type": "object",
+      "required": ["name", "raw", "source"],
+      "properties": {
+        "name": { "type": "string" },
+        "raw": { "type": "string" },
+        "source": { "$ref": "#/$defs/SourceRef" }
+      }
+    },
+    "RawSection": {
+      "type": "object",
+      "required": ["file", "name", "aliases", "kind", "content", "startLine", "endLine"],
+      "properties": {
+        "file": { "type": "string" },
+        "name": { "type": "string" },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "kind": { "type": "string", "enum": ["known", "unknown"] },
+        "content": { "type": "string" },
+        "startLine": { "type": "integer" },
+        "endLine": { "type": "integer" }
+      }
+    },
+    "SourceRef": {
+      "type": "object",
+      "required": ["file", "startLine", "endLine"],
+      "properties": {
+        "file": { "type": "string" },
+        "startLine": { "type": "integer" },
+        "endLine": { "type": "integer" }
+      }
+    }
+  }
+}

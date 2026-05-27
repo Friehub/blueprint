@@ -18,11 +18,11 @@
 
 1. **Role before task.** The system message establishes the agent's
    identity and behavioral constraints before describing the task.
-   This is not stylistic — it materially improves output reliability.
+   This is not stylistic -- it materially improves output reliability.
 
 2. **Output schema in the prompt.** The LLM must receive the TypeScript
    interface it is expected to produce. It must be told to output valid
-   JSON matching that schema — not markdown, not prose, not mixed.
+   JSON matching that schema -- not markdown, not prose, not mixed.
 
 3. **Negative constraints are explicit.** What the LLM must NOT do is
    stated directly. "Do not produce any text outside the JSON object."
@@ -38,7 +38,7 @@
 
 ---
 
-## Pass 1 — Extraction Prompt
+## Pass 1 -- Extraction Prompt
 
 ### System Message
 ```
@@ -53,7 +53,7 @@ Domain context: Fintech / Payment Systems.
 
 Hard constraints:
 - Every functional requirement must use MUST, SHOULD, or MAY.
-  No vague language like "handle" or "support" — expand these into
+  No vague language like "handle" or "support" -- expand these into
   explicit, verifiable statements.
 - Implicit fintech constraints are always applied:
   observability, immutable audit trail, secrets in env vars,
@@ -129,7 +129,7 @@ Do not repeat the same structural mistake.
 
 ---
 
-## Pass 2 — Decomposition Prompt
+## Pass 2 -- Decomposition Prompt
 
 ### System Message
 ```
@@ -146,7 +146,7 @@ Hard constraints:
   direct cross-service database access.
 - Every functional requirement must be traceable to exactly one service.
 - Detect and explicitly list any circular dependencies. Do not attempt
-  to resolve them — mark them and the pipeline will surface them.
+  to resolve them -- mark them and the pipeline will surface them.
 - Output ONLY valid JSON matching the schema. No prose outside the JSON.
 ```
 
@@ -197,7 +197,7 @@ Produce a JSON object matching this schema:
 
 ---
 
-## Pass 3 — Adversarial Prompt
+## Pass 3 -- Adversarial Prompt
 
 ### System Message
 ```
@@ -229,16 +229,16 @@ SYSTEM DECOMPOSITION:
 {decomposition_output_json}
 
 KNOWLEDGE BASE FAILURE MODES TO CHECK AGAINST:
-FM-001: Double Charge — applicable if any service performs payment mutations.
-FM-002: Stale Balance Read — applicable if any service reads then writes balance.
-FM-003: Partial Commit — applicable if any operation spans multiple services.
-FM-004: Ghost Transaction — applicable if external processor is called.
-FM-005: Retry Storm — applicable if any service calls another synchronously.
-FM-006: Currency Precision Loss — applicable if monetary amounts are handled.
-FM-007: Clock Skew — applicable if timestamps drive business logic.
-FM-008: Auth Expiry — applicable if authorization-then-capture flow exists.
-FM-009: Webhook Replay — applicable if webhooks are received from processors.
-FM-010: Regulatory Window — applicable if compliance rules exist.
+FM-001: Double Charge -- applicable if any service performs payment mutations.
+FM-002: Stale Balance Read -- applicable if any service reads then writes balance.
+FM-003: Partial Commit -- applicable if any operation spans multiple services.
+FM-004: Ghost Transaction -- applicable if external processor is called.
+FM-005: Retry Storm -- applicable if any service calls another synchronously.
+FM-006: Currency Precision Loss -- applicable if monetary amounts are handled.
+FM-007: Clock Skew -- applicable if timestamps drive business logic.
+FM-008: Auth Expiry -- applicable if authorization-then-capture flow exists.
+FM-009: Webhook Replay -- applicable if webhooks are received from processors.
+FM-010: Regulatory Window -- applicable if compliance rules exist.
 
 WORKED EXAMPLE of a failure scenario:
 {
@@ -248,9 +248,9 @@ WORKED EXAMPLE of a failure scenario:
   "failure_sequence": [
     "1. Client sends POST /payments with idempotency_key=abc123",
     "2. SVC-PAYMENT processes the charge and commits the ledger entry",
-    "3. Network timeout — client never receives 200 response",
+    "3. Network timeout -- client never receives 200 response",
     "4. Client retries with same body but no idempotency_key header",
-    "5. SVC-PAYMENT processes the charge again — second ledger entry created",
+    "5. SVC-PAYMENT processes the charge again -- second ledger entry created",
     "6. User is charged twice"
   ],
   "observable_consequence": "User balance debited twice. Total system money destroyed.",
@@ -271,7 +271,7 @@ Now produce the full adversarial report:
 
 ---
 
-## Pass 4 — Design Resolution Prompt
+## Pass 4 -- Design Resolution Prompt
 
 ### System Message
 ```
@@ -316,7 +316,7 @@ FM-008 → AUTH_CAPTURE_STATE_MACHINE (REQUIRES: EXPIRY_MONITOR background job)
 FM-009 → WEBHOOK_IDEMPOTENCY + HMAC_VERIFICATION
 FM-010 → COMPLIANCE_GATE (synchronous, < 50ms target)
 
-[IF VIOLATION FEEDBACK EXISTS — appended on retry only]:
+[IF VIOLATION FEEDBACK EXISTS -- appended on retry only]:
 The following invariant was violated in formal verification:
 INVARIANT: {invariant_statement}
 COUNTEREXAMPLE TRACE:
@@ -367,7 +367,7 @@ Produce the design output:
 
 ---
 
-## Pass 5 — Invariant Extraction Prompt
+## Pass 5 -- Invariant Extraction Prompt
 
 ### System Message
 ```
@@ -376,7 +376,7 @@ produce machine-checkable safety invariants in TLA+ syntax.
 
 Hard constraints:
 - Extract ONLY safety invariants (properties that must NEVER be violated).
-  Do not model liveness or fairness properties — these are out of scope.
+  Do not model liveness or fairness properties -- these are out of scope.
 - Group invariants by shared variable set. Invariants sharing no variables
   get separate model groups. This prevents state space explosion.
 - Every invariant must have a human-readable statement AND a TLA+ assertion.
@@ -423,7 +423,7 @@ Extract invariants and group them into model groups:
 ## Clarification Question Prompt
 
 This prompt is used when the Clarification Gate has blocking questions.
-It formats the questions for user presentation — not for the LLM.
+It formats the questions for user presentation -- not for the LLM.
 
 ### Format Template
 ```markdown
@@ -444,7 +444,7 @@ apply the most conservative default and document it as an assumption.
 ## Output Assembly Prompt
 
 Pass 5 outputs structured data. The final markdown assembly is a
-deterministic template render — it does not use the LLM.
+deterministic template render -- it does not use the LLM.
 
 The render maps:
 - `ExtractionOutput.functional_requirements` → Section 1.1

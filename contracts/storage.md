@@ -27,7 +27,7 @@ SignedUrl { url, expires_at, method: GET | PUT }
 
 **Invariants**
 - Signed upload URLs must enforce `content_type` and `max_size` constraints when provided
-- `deleteFile` must be idempotent — deleting a non-existent key must not throw
+- `deleteFile` must be idempotent -- deleting a non-existent key must not throw
 
 **Providers:** AWS S3, Cloudflare R2, Supabase Storage, MinIO, local disk
 
@@ -82,6 +82,6 @@ Object retention:
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — wraps external provider)
+* **Depends On:** (none -- wraps external provider)
 * **Emits To:** events
 * **Recommends:** audit_log

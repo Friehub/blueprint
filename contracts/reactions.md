@@ -23,7 +23,7 @@ ReactionType = like | love | laugh | angry | sad | fire | clap (configurable)
 
 **Invariants**
 - A user can have at most one reaction of each type per subject
-- `addReaction` must be upsert — calling it twice must not create a duplicate
+- `addReaction` must be upsert -- calling it twice must not create a duplicate
 
 ---
 

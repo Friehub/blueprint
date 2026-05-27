@@ -36,7 +36,7 @@ GiftCardStatus = active | partially_redeemed | redeemed | void | expired
 ```
 
 **Invariants**
-- `validateCoupon` must not mark the coupon as used — that is `markCouponUsed`'s job
+- `validateCoupon` must not mark the coupon as used -- that is `markCouponUsed`'s job
 - `markCouponUsed` must be idempotent for the same `(code, order_id)` pair
 - Gift card redemptions must not exceed available balance.
 - Gift card redemption must be idempotent for the same `(code, order_id, amount)` tuple.

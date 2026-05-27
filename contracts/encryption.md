@@ -26,7 +26,7 @@ KeyStatus = active | archived | compromised
 ```
 
 **Invariants**
-- `decrypt` must use the `key_id` embedded in `EncryptedData` — key rotation must not break old data
+- `decrypt` must use the `key_id` embedded in `EncryptedData` -- key rotation must not break old data
 - `hashPassword` must use a memory-hard algorithm (Argon2, bcrypt, scrypt)
 
 **Providers:** AWS KMS, HashiCorp Vault, libsodium, custom
@@ -82,6 +82,6 @@ Key retention:
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — infrastructure primitive / wraps external provider)
+* **Depends On:** (none -- infrastructure primitive / wraps external provider)
 * **Emits To:** events
 * **Recommends:** caching, audit_log

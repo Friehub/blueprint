@@ -1,11 +1,11 @@
 # Module: onboarding
 
 **Version:** 0.1.0
-**Part:** I — Identity and Access
+**Part:** I -- Identity and Access
 
 ## Purpose
 
-Defines the interface for managing multi-step user onboarding workflows. Onboarding is a bounded, stateful process that guides a newly created user or workspace through a sequence of required and optional steps before they reach an active, fully-functional state. This module owns the onboarding flow definition, step completion tracking, and readiness evaluation. It does not own the steps themselves — those are delegated to their respective domain modules (e.g., `kyc`, `users`, `billing`).
+Defines the interface for managing multi-step user onboarding workflows. Onboarding is a bounded, stateful process that guides a newly created user or workspace through a sequence of required and optional steps before they reach an active, fully-functional state. This module owns the onboarding flow definition, step completion tracking, and readiness evaluation. It does not own the steps themselves -- those are delegated to their respective domain modules (e.g., `kyc`, `users`, `billing`).
 
 ---
 
@@ -42,7 +42,7 @@ Transitions:
 Creates a named, versioned onboarding flow template with an ordered list of steps. Flow definitions are immutable once users are enrolled against them.
 
 ### `startOnboarding(input: StartOnboardingInput) → OnboardingSession`
-Enrolls a user or workspace into a flow, instantiating all steps in `NOT_STARTED` state. Idempotent — calling again returns the existing session.
+Enrolls a user or workspace into a flow, instantiating all steps in `NOT_STARTED` state. Idempotent -- calling again returns the existing session.
 
 ### `getSession(sessionId: OnboardingSessionId) → OnboardingSession`
 Returns the full session with all step states and the current readiness evaluation.
@@ -189,10 +189,10 @@ type ListSessionsInput = {
 - `onboarding.step.completed`
 - `onboarding.step.skipped`
 - `onboarding.step.failed`
-- `onboarding.blocked` — includes `stepId` and `failureReason`
+- `onboarding.blocked` -- includes `stepId` and `failureReason`
 - `onboarding.unblocked`
-- `onboarding.completed` — all required steps done
-- `onboarding.abandoned` — includes `reason` (`USER_INITIATED` | `TTL_EXPIRED`)
+- `onboarding.completed` -- all required steps done
+- `onboarding.abandoned` -- includes `reason` (`USER_INITIATED` | `TTL_EXPIRED`)
 
 ---
 

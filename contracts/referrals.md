@@ -1,11 +1,11 @@
 # Module: referrals
 
 **Version:** 0.1.0
-**Part:** VI — Platform Operations
+**Part:** VI -- Platform Operations
 
 ## Purpose
 
-Defines the interface for operating a referral and affiliate tracking system. A referral program allows an existing user (the referrer) to invite new users (the referees) and earn rewards when those referees complete qualifying actions. This module owns referral code issuance, attribution, conversion tracking, and reward triggering. It does not own the reward fulfillment itself — that is delegated to `billing`, `loyalty`, or `payments` based on reward type.
+Defines the interface for operating a referral and affiliate tracking system. A referral program allows an existing user (the referrer) to invite new users (the referees) and earn rewards when those referees complete qualifying actions. This module owns referral code issuance, attribution, conversion tracking, and reward triggering. It does not own the reward fulfillment itself -- that is delegated to `billing`, `loyalty`, or `payments` based on reward type.
 
 ---
 
@@ -202,11 +202,11 @@ type ReferralStats = {
 ## Events Emitted
 
 - `referral.code.issued`
-- `referral.attributed` — referee linked to referrer
-- `referral.converted` — qualifying action completed
+- `referral.attributed` -- referee linked to referrer
+- `referral.converted` -- qualifying action completed
 - `referral.conversion.validated`
-- `referral.conversion.invalidated` — includes `invalidationReason`
-- `referral.reward.issued` — includes recipient, `rewardType`, and value
+- `referral.conversion.invalidated` -- includes `invalidationReason`
+- `referral.reward.issued` -- includes recipient, `rewardType`, and value
 - `referral.expired`
 - `referral.program.deactivated`
 

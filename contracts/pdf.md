@@ -1,11 +1,11 @@
 # Module: pdf
 
 **Version:** 0.1.0
-**Part:** VI — Platform Operations
+**Part:** VI -- Platform Operations
 
 ## Purpose
 
-Defines the interface for generating PDF documents from structured sources. A PDF job accepts a source — an HTML string, a URL, or a rendered template output — and produces a binary PDF artifact stored in the `storage` module, accessible via a signed URL. This module owns the rendering job lifecycle and output delivery. It does not own the source content (that belongs to `templates`, `reporting`, or the calling domain) or the storage of the resulting file (that belongs to `storage`).
+Defines the interface for generating PDF documents from structured sources. A PDF job accepts a source -- an HTML string, a URL, or a rendered template output -- and produces a binary PDF artifact stored in the `storage` module, accessible via a signed URL. This module owns the rendering job lifecycle and output delivery. It does not own the source content (that belongs to `templates`, `reporting`, or the calling domain) or the storage of the resulting file (that belongs to `storage`).
 
 ---
 
@@ -138,7 +138,7 @@ type ListPdfJobsInput = {
 4. `retryJob` is only valid for `FAILED` jobs; calling it on `COMPLETED` or `QUEUED` jobs returns `JOB_NOT_RETRYABLE`.
 5. HTML source content must be sanitised to prevent SSRF attacks; the render worker must operate in a network-isolated sandbox with no access to internal services when rendering `URL` or `HTML_STRING` sources.
 6. `htmlContent` must not exceed 10MB; `URL` sources must respond within a configurable timeout (default 30 seconds) or the job transitions to `FAILED`.
-7. Artifacts are stored in `storage` under a namespaced path; the calling module does not control the storage path — the PDF module manages it internally.
+7. Artifacts are stored in `storage` under a namespaced path; the calling module does not control the storage path -- the PDF module manages it internally.
 8. `pageCount` and `fileSizeBytes` are populated only after successful rendering; they are null for non-`COMPLETED` jobs.
 
 ---
@@ -147,8 +147,8 @@ type ListPdfJobsInput = {
 
 - `pdf.job.queued`
 - `pdf.job.rendering_started`
-- `pdf.job.completed` — includes `fileSizeBytes`, `pageCount`
-- `pdf.job.failed` — includes `errorMessage`
+- `pdf.job.completed` -- includes `fileSizeBytes`, `pageCount`
+- `pdf.job.failed` -- includes `errorMessage`
 - `pdf.job.expired`
 
 ---

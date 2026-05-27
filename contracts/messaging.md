@@ -28,7 +28,7 @@ MessageContent { type: text | image | file | system, body, attachments? }
 ```
 
 **Invariants**
-- Deleted messages must show a tombstone, not disappear — the thread history must remain intact
+- Deleted messages must show a tombstone, not disappear -- the thread history must remain intact
 - A user cannot send a message to a thread they are not a participant of
 
 **Providers:** custom database, Stream Chat, Sendbird

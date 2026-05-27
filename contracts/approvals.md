@@ -1,11 +1,11 @@
 # Module: approvals
 
 **Version:** 0.1.0
-**Part:** IX — Workflows
+**Part:** IX -- Workflows
 
 ## Purpose
 
-Defines the interface for managing multi-step approval workflows. An approval workflow is a structured decision chain in which a subject (a document, expense report, access request, or any domain entity) must receive explicit sign-off from one or more designated reviewers before a downstream action is permitted. This module owns the workflow template, step assignment, reviewer decisions, and escalation. It does not own the subject entity itself — the subject is identified by reference and owned by its originating domain module.
+Defines the interface for managing multi-step approval workflows. An approval workflow is a structured decision chain in which a subject (a document, expense report, access request, or any domain entity) must receive explicit sign-off from one or more designated reviewers before a downstream action is permitted. This module owns the workflow template, step assignment, reviewer decisions, and escalation. It does not own the subject entity itself -- the subject is identified by reference and owned by its originating domain module.
 
 ---
 
@@ -223,14 +223,14 @@ type ListInstancesInput = {
 ## Events Emitted
 
 - `approval.submitted`
-- `approval.step.awaiting` — includes assigned reviewers and step name
-- `approval.step.approved` — includes `reviewerId` and `comment`
-- `approval.step.rejected` — includes `reviewerId` and `reason`
+- `approval.step.awaiting` -- includes assigned reviewers and step name
+- `approval.step.approved` -- includes `reviewerId` and `comment`
+- `approval.step.rejected` -- includes `reviewerId` and `reason`
 - `approval.step.skipped`
 - `approval.step.delegated`
-- `approval.escalated` — includes `escalationTier`
-- `approval.approved` — full workflow approved
-- `approval.rejected` — full workflow rejected
+- `approval.escalated` -- includes `escalationTier`
+- `approval.approved` -- full workflow approved
+- `approval.rejected` -- full workflow rejected
 - `approval.withdrawn`
 
 ---

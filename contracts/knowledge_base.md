@@ -1,11 +1,11 @@
 # Module: knowledge_base
 
 **Version:** 0.1.0
-**Part:** VI — Platform Operations
+**Part:** VI -- Platform Operations
 
 ## Purpose
 
-Defines the interface for managing a structured knowledge base — a hierarchical collection of help articles, FAQs, internal documentation, and policy documents. A knowledge base serves multiple audiences: end-users seeking self-service answers, support agents looking up procedures, and internal teams referencing policies. This module owns article authorship, categorisation, versioning, search integration, and feedback collection. It does not own rich text rendering or the search index itself — it publishes articles to the `search` module.
+Defines the interface for managing a structured knowledge base -- a hierarchical collection of help articles, FAQs, internal documentation, and policy documents. A knowledge base serves multiple audiences: end-users seeking self-service answers, support agents looking up procedures, and internal teams referencing policies. This module owns article authorship, categorisation, versioning, search integration, and feedback collection. It does not own rich text rendering or the search index itself -- it publishes articles to the `search` module.
 
 ---
 
@@ -45,7 +45,7 @@ Returns the full category tree or a subtree rooted at a given category.
 Creates a new article in `DRAFT` state.
 
 ### `updateArticle(input: UpdateArticleInput) → Article`
-Updates a draft article's content. Not available for published articles — updating a published article creates a new draft revision.
+Updates a draft article's content. Not available for published articles -- updating a published article creates a new draft revision.
 
 ### `createRevision(articleId: ArticleId) → Article`
 Creates a new `DRAFT` revision of a currently published article. The published version remains live until the revision is published.
@@ -204,7 +204,7 @@ type ListCategoriesInput = {
 ## Invariants
 
 1. Slugs are unique within a `(locale)` scope; two articles in the same locale cannot share a slug.
-2. `updateArticle` is only valid for articles in `DRAFT` state; calling it on a `PUBLISHED` article returns `ARTICLE_NOT_EDITABLE` — callers must use `createRevision` first.
+2. `updateArticle` is only valid for articles in `DRAFT` state; calling it on a `PUBLISHED` article returns `ARTICLE_NOT_EDITABLE` -- callers must use `createRevision` first.
 3. At most one draft revision may exist for a published article at any time.
 4. `publishArticle` must index the article in the `search` module synchronously or via an outbox event before returning.
 5. `archiveArticle` must remove the article from the `search` index and return a 404-equivalent from `getArticleBySlug`.
@@ -217,9 +217,9 @@ type ListCategoriesInput = {
 
 - `article.created`
 - `article.submitted_for_review`
-- `article.published` — triggers search indexing
+- `article.published` -- triggers search indexing
 - `article.deprecated`
-- `article.archived` — triggers search de-indexing
+- `article.archived` -- triggers search de-indexing
 - `article.viewed`
 - `article.feedback_submitted`
 

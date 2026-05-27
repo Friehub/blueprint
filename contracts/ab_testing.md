@@ -1,7 +1,7 @@
 # Module: ab_testing
 
 **Version:** 0.1.0
-**Part:** III — Data and State
+**Part:** III -- Data and State
 
 ## Purpose
 
@@ -55,7 +55,7 @@ Returns the full experiment definition, current status, and metric summary.
 Returns experiments filtered by status, target metric, or date range.
 
 ### `assignVariant(input: AssignVariantInput) → VariantAssignment`
-Assigns a subject to a variant deterministically based on the experiment's allocation strategy. If the subject is already assigned, returns the existing assignment. This is the hot-path operation — it must be sub-millisecond.
+Assigns a subject to a variant deterministically based on the experiment's allocation strategy. If the subject is already assigned, returns the existing assignment. This is the hot-path operation -- it must be sub-millisecond.
 
 ### `getAssignment(experimentId: ExperimentId, subjectId: string) → VariantAssignment`
 Returns the current variant assignment for a subject in an experiment. Returns `SUBJECT_NOT_ASSIGNED` if the subject has not been enrolled.
@@ -209,8 +209,8 @@ type ListExperimentsInput = {
 - `experiment.paused`
 - `experiment.resumed`
 - `experiment.stopped`
-- `experiment.concluded` — includes `winningVariantId`
-- `experiment.variant.assigned` — includes `subjectId`, `variantId`
+- `experiment.concluded` -- includes `winningVariantId`
+- `experiment.variant.assigned` -- includes `subjectId`, `variantId`
 - `experiment.variant.exposed`
 
 ---

@@ -29,7 +29,7 @@ UserStatus = active | banned | suspended | pending_verification
 ```
 
 **Invariants**
-- `deleteUser` must not physically delete — it must mark the record as deleted and anonymise PII
+- `deleteUser` must not physically delete -- it must mark the record as deleted and anonymise PII
 - `getUserByEmail` must be case-insensitive
 
 **Providers:** any user table, Clerk, Auth0 Management API
@@ -93,7 +93,7 @@ User soft-delete retention:
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — owns its own data)
+* **Depends On:** (none -- owns its own data)
 * **Emits To:** events
 * **Recommends:** audit_log, notifications, permissions
 * **Pagination Sort Key:** Uses cursor-based pagination sorting by `created_at DESC` on `searchUsers`.

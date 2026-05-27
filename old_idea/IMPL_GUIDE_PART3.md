@@ -1,4 +1,4 @@
-# Engineering Blueprinter — Implementation Guide
+# Engineering Blueprinter -- Implementation Guide
 ## Part 3: Pipeline Passes 1–3 and the Clarification Gate
 
 ---
@@ -78,7 +78,7 @@ Domain context: Fintech / Payment Systems.
 
 Hard constraints:
 - Every functional requirement must use MUST, SHOULD, or MAY.
-  No vague language — expand "handle" or "support" into explicit verifiable statements.
+  No vague language -- expand "handle" or "support" into explicit verifiable statements.
 - Implicit fintech constraints are always applied:
   observability, immutable audit trail, secrets in env vars,
   amounts in minor units, idempotency on all mutations, health checks.
@@ -102,7 +102,7 @@ ${rawPrompt}
 ADDITIONAL CONTEXT:
 ${userContext ?? "None provided"}
 
-FINTECH IMPLICIT CONSTRAINTS (always apply these — do not ask about them):
+FINTECH IMPLICIT CONSTRAINTS (always apply these -- do not ask about them):
 - ${implicitConstraints}
 
 DEFAULT NON-FUNCTIONAL REQUIREMENTS (apply if not specified in prompt):
@@ -224,7 +224,7 @@ Hard constraints:
 - Services communicate only through defined interfaces, never direct DB access.
 - Every functional requirement must be traceable to exactly one service.
 - Detect and explicitly list circular dependencies in circular_dependencies[].
-  Do NOT resolve them — mark them. The pipeline will surface them.
+  Do NOT resolve them -- mark them. The pipeline will surface them.
 - Output ONLY valid JSON matching the schema.`;
 
 export async function runPass2(
@@ -241,7 +241,7 @@ Rules:
 - Add, remove, or rename contexts based on actual requirements above.
 - Map every FR-xxx to exactly one service.
 - Classify every inter-service call as sync (caller needs result) or async (caller does not).
-- circular_dependencies MUST be empty to proceed. If any exist, list them — pipeline will stop.
+- circular_dependencies MUST be empty to proceed. If any exist, list them -- pipeline will stop.
 
 Produce JSON matching the DecompositionOutput schema.`;
 
@@ -299,7 +299,7 @@ Hard constraints:
 - Every async interaction generates at least 3 failure scenarios.
 - Output ONLY valid JSON matching the schema.`;
 
-// Applicability rules — used to pre-filter relevant failure modes before LLM call
+// Applicability rules -- used to pre-filter relevant failure modes before LLM call
 const FM_APPLICABILITY: Record<string, (d: DecompositionOutput) => boolean> = {
   "FM-001": (d) => d.services.some((s) => s.publishes.length > 0), // Any state change
   "FM-002": (d) => d.services.some((s) => s.owns.some((t) => t.toLowerCase().includes("balance") || t.toLowerCase().includes("account"))),
@@ -323,7 +323,7 @@ export async function runPass3(
   });
 
   const fmList = applicableFMs
-    .map((fm) => `${fm.id} (${fm.severity}): ${fm.name} — ${fm.description}`)
+    .map((fm) => `${fm.id} (${fm.severity}): ${fm.name} -- ${fm.description}`)
     .join("\n");
 
   const userPrompt = `SYSTEM DECOMPOSITION:

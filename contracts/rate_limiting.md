@@ -22,8 +22,8 @@ LimitWindow = second | minute | hour | day
 ```
 
 **Invariants**
-- `checkLimit` must not consume a token — it must be a read-only check
-- Limits must be enforced atomically — race conditions must not allow over-consumption
+- `checkLimit` must not consume a token -- it must be a read-only check
+- Limits must be enforced atomically -- race conditions must not allow over-consumption
 
 **Providers:** Redis (sliding window, token bucket), Upstash, custom
 

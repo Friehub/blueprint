@@ -1,11 +1,11 @@
 # Module: data_import
 
 **Version:** 0.1.0
-**Part:** VI — Platform Operations
+**Part:** VI -- Platform Operations
 
 ## Purpose
 
-Defines the interface for ingesting bulk structured data from external sources into the platform. A data import is an asynchronous, multi-phase operation: a file is uploaded, parsed, validated against a schema, and committed to the target domain module. Each phase produces structured feedback so the caller can observe progress, inspect errors row by row, and decide whether to commit, correct, or abort. This module owns the import lifecycle. It does not own the target domain data — it calls the target domain's write operations as the commit mechanism.
+Defines the interface for ingesting bulk structured data from external sources into the platform. A data import is an asynchronous, multi-phase operation: a file is uploaded, parsed, validated against a schema, and committed to the target domain module. Each phase produces structured feedback so the caller can observe progress, inspect errors row by row, and decide whether to commit, correct, or abort. This module owns the import lifecycle. It does not own the target domain data -- it calls the target domain's write operations as the commit mechanism.
 
 ---
 
@@ -185,12 +185,12 @@ type GetImportErrorsInput = {
 - `import.created`
 - `import.uploaded`
 - `import.parsing.started`
-- `import.parsing.completed` — includes `totalRows`
+- `import.parsing.completed` -- includes `totalRows`
 - `import.validation.started`
-- `import.validation.completed` — includes `validRows`, `errorRows`
-- `import.invalid` — error rate exceeded threshold
-- `import.committed` — includes `committedRows`
-- `import.partially_committed` — includes `committedRows`, `failedRows`
+- `import.validation.completed` -- includes `validRows`, `errorRows`
+- `import.invalid` -- error rate exceeded threshold
+- `import.committed` -- includes `committedRows`
+- `import.partially_committed` -- includes `committedRows`, `failedRows`
 - `import.failed`
 - `import.aborted`
 

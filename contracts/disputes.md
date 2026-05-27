@@ -1,11 +1,11 @@
 # Module: disputes
 
 **Version:** 0.1.0
-**Part:** VII — Security and Compliance
+**Part:** VII -- Security and Compliance
 
 ## Purpose
 
-Defines the interface for managing payment dispute and chargeback lifecycles. A dispute is initiated when a payer challenges a completed transaction — either through their bank (chargeback) or through a direct merchant mediation process. This module owns the dispute record, evidence submission, decision tracking, and financial resolution. It does not initiate refunds directly — resolution triggers a saga that coordinates with `payments` and `ledger`.
+Defines the interface for managing payment dispute and chargeback lifecycles. A dispute is initiated when a payer challenges a completed transaction -- either through their bank (chargeback) or through a direct merchant mediation process. This module owns the dispute record, evidence submission, decision tracking, and financial resolution. It does not initiate refunds directly -- resolution triggers a saga that coordinates with `payments` and `ledger`.
 
 ---
 
@@ -202,13 +202,13 @@ type DisputeStats = {
 ## Events Emitted
 
 - `dispute.opened`
-- `dispute.evidence_required` — includes `evidenceDeadline`
+- `dispute.evidence_required` -- includes `evidenceDeadline`
 - `dispute.evidence_submitted`
-- `dispute.accepted` — merchant forfeited
-- `dispute.won` — merchant prevailed
-- `dispute.lost` — merchant lost; refund to be issued
-- `dispute.closed` — financial settlement confirmed
-- `dispute.deadline_missed` — evidence deadline elapsed with no submission
+- `dispute.accepted` -- merchant forfeited
+- `dispute.won` -- merchant prevailed
+- `dispute.lost` -- merchant lost; refund to be issued
+- `dispute.closed` -- financial settlement confirmed
+- `dispute.deadline_missed` -- evidence deadline elapsed with no submission
 
 ---
 

@@ -3,7 +3,7 @@
 ---
 
 ### `auth`
-Authentication — who you are.
+Authentication -- who you are.
 
 **Functions**
 ```
@@ -91,11 +91,11 @@ signUp            → auth.user.registered      { user_id, email, provider }
 ```
 PasswordResetToken:
     max_duration:  1 hour
-    on_expiry:     token becomes invalid — user must request new reset
+    on_expiry:     token becomes invalid -- user must request new reset
 
   EmailVerificationToken:
     max_duration:  24 hours
-    on_expiry:     token becomes invalid — resendVerification available
+    on_expiry:     token becomes invalid -- resendVerification available
 
   Session (access_token):
     max_duration:  15 minutes (default, configurable)

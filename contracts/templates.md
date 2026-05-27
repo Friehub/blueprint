@@ -1,11 +1,11 @@
 # Module: templates
 
 **Version:** 0.1.0
-**Part:** II — Communication
+**Part:** II -- Communication
 
 ## Purpose
 
-Defines the interface for managing and rendering dynamic content templates. A template is a named, versioned document with variable placeholders that is rendered against a data context to produce a final output string or document. Templates serve emails, SMS messages, push notification bodies, PDF documents, webhook payloads, and any other content that is structurally stable but contextually variable. This module owns the template definition, versioning, and rendering. It does not own the delivery — rendered output is returned to the caller for dispatch via `emails`, `sms`, `notifications`, or `pdf`.
+Defines the interface for managing and rendering dynamic content templates. A template is a named, versioned document with variable placeholders that is rendered against a data context to produce a final output string or document. Templates serve emails, SMS messages, push notification bodies, PDF documents, webhook payloads, and any other content that is structurally stable but contextually variable. This module owns the template definition, versioning, and rendering. It does not own the delivery -- rendered output is returned to the caller for dispatch via `emails`, `sms`, `notifications`, or `pdf`.
 
 ---
 
@@ -177,10 +177,10 @@ type ListTemplatesInput = {
 ## Events Emitted
 
 - `template.created`
-- `template.published` — includes `version`, `deprecatedVersionId` if one was replaced
+- `template.published` -- includes `version`, `deprecatedVersionId` if one was replaced
 - `template.deprecated`
 - `template.archived`
-- `template.rendered` — includes `templateId`, `version`, `outputType` (not the rendered content)
+- `template.rendered` -- includes `templateId`, `version`, `outputType` (not the rendered content)
 
 ---
 

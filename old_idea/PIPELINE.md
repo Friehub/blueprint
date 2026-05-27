@@ -59,7 +59,7 @@ retries (up to 3 times) before failing with an explicit error.
 
 ---
 
-## Pass 1 — Extraction
+## Pass 1 -- Extraction
 
 ### Purpose
 Transform the raw user prompt into a structured requirements object. Surface
@@ -78,7 +78,7 @@ interface ExtractionInput {
 
 ### Processing Algorithm
 
-**Step 1.1 — Functional Requirement Extraction**
+**Step 1.1 -- Functional Requirement Extraction**
 
 Scan the prompt for explicit actions the system must perform. Each action
 becomes a `FunctionalRequirement`. The format is:
@@ -91,7 +91,7 @@ payments," this is expanded to explicit requirements:
 - "The system MUST authorize payment with a third-party processor."
 - "The system MUST record the outcome of every authorization attempt."
 
-**Step 1.2 — Non-Functional Requirement Extraction**
+**Step 1.2 -- Non-Functional Requirement Extraction**
 
 Extract explicit performance constraints. If not provided, apply domain
 defaults and document them as assumptions:
@@ -104,12 +104,12 @@ defaults and document them as assumptions:
 | Data durability | 99.999999% (eight nines) |
 | Consistency model | Strong (not configurable for payment balances) |
 
-**Step 1.3 — Implicit Constraint Injection**
+**Step 1.3 -- Implicit Constraint Injection**
 
 Apply all fintech implicit constraints from KNOWLEDGE_BASE.md Part 4
 automatically. These are never surfaced as questions.
 
-**Step 1.4 — Completeness Check (The Clarification Gate Pre-processor)**
+**Step 1.4 -- Completeness Check (The Clarification Gate Pre-processor)**
 
 Run the following checks. Each failure produces a candidate clarification
 question:
@@ -205,7 +205,7 @@ interpretation and documents it.
 
 ---
 
-## Pass 2 — Decomposition
+## Pass 2 -- Decomposition
 
 ### Purpose
 Break the system into bounded contexts. Assign data ownership. Define
@@ -217,7 +217,7 @@ design phase.
 
 ### Processing Algorithm
 
-**Step 2.1 — Bounded Context Identification**
+**Step 2.1 -- Bounded Context Identification**
 
 Group functional requirements into cohesive bounded contexts. Each context
 becomes a candidate service. Rules:
@@ -237,7 +237,7 @@ For the fintech domain, the standard bounded contexts are:
 | Notification | Alerts, receipts, confirmations | Event consumer (async) |
 | Settlement | Batch reconciliation, payout | Scheduled job + internal API |
 
-**Step 2.2 — Data Responsibility Assignment**
+**Step 2.2 -- Data Responsibility Assignment**
 
 For each context, define:
 - Which tables it owns exclusively.
@@ -245,7 +245,7 @@ For each context, define:
 - Which events it publishes.
 - Which events it consumes.
 
-**Step 2.3 — Circular Dependency Detection**
+**Step 2.3 -- Circular Dependency Detection**
 
 Build the dependency graph. If Service A calls Service B, which calls
 Service A (directly or transitively), this is a circular dependency.
@@ -255,7 +255,7 @@ The pipeline must:
    third service, or invert the dependency via an event).
 3. Require the circular dependency to be resolved before Pass 3.
 
-**Step 2.4 — Sync vs Async Classification**
+**Step 2.4 -- Sync vs Async Classification**
 
 For every inter-service interaction:
 - **Synchronous** if: the calling service needs the result to continue.
@@ -293,7 +293,7 @@ interface Service {
 
 ---
 
-## Pass 3 — Adversarial Stress Test
+## Pass 3 -- Adversarial Stress Test
 
 ### Purpose
 This pass has ONE job: find ways the proposed decomposition will fail in
@@ -305,7 +305,7 @@ The design happens in Pass 4, informed by this report.
 
 ### Processing Algorithm
 
-**Step 3.1 — Automatic Failure Mode Matching**
+**Step 3.1 -- Automatic Failure Mode Matching**
 
 Cross-reference the decomposition against KNOWLEDGE_BASE.md Part 1.
 For every service in the decomposition:
@@ -329,7 +329,7 @@ For every service in the decomposition:
 8. Check if compliance rules are defined.
    If yes: FM-010 (Regulatory Window Violation) is applicable.
 
-**Step 3.2 — Sequence Diagram Failure Injection**
+**Step 3.2 -- Sequence Diagram Failure Injection**
 
 For every synchronous interaction identified in Pass 2, generate three
 failure scenarios:
@@ -343,7 +343,7 @@ For every asynchronous interaction, generate:
 2. **Message Duplication**: The consumer receives the event twice.
 3. **Out-of-Order Delivery**: Events arrive in wrong sequence.
 
-**Step 3.3 — Severity Scoring**
+**Step 3.3 -- Severity Scoring**
 
 Each identified failure mode is scored:
 - `likelihood`: Based on the system's architecture (HIGH if no mitigations
@@ -380,7 +380,7 @@ interface MatchedFailureMode {
 
 ---
 
-## Pass 4 — Design Resolution
+## Pass 4 -- Design Resolution
 
 ### Purpose
 Produce the algorithmic engineering design that satisfies the requirements
@@ -392,10 +392,10 @@ patterns validated against the Knowledge Base.
 
 ### Processing Algorithm
 
-**Step 4.1 — Pattern Selection per Failure Mode**
+**Step 4.1 -- Pattern Selection per Failure Mode**
 
 For each `MUST_RESOLVE` failure mode, select the required mitigation from
-the Knowledge Base. The selection is not free-form — the engine picks from
+the Knowledge Base. The selection is not free-form -- the engine picks from
 the `SOLVES` edges in the graph:
 
 ```
@@ -416,7 +416,7 @@ to the design automatically. When a pattern `INTRODUCES` a new problem,
 that new problem is added to the adversarial report and a solution is
 selected.
 
-**Step 4.2 — Concurrency Model Selection**
+**Step 4.2 -- Concurrency Model Selection**
 
 Using the Decision Tree from BLUEPRINT.md Section 7:
 
@@ -430,7 +430,7 @@ Using the Decision Tree from BLUEPRINT.md Section 7:
 
 The selected concurrency model must be justified in the output.
 
-**Step 4.3 — Algorithmic Step Definition**
+**Step 4.3 -- Algorithmic Step Definition**
 
 For each core operation (e.g., "Initiate Payment Transfer"), define the
 algorithm as explicit numbered steps. No hand-waving. No "handle errors here."
@@ -458,7 +458,7 @@ algorithm as explicit numbered steps. No hand-waving. No "handle errors here."
 Every step is numbered. Every failure case is handled. Every async step
 is explicitly labeled as async.
 
-**Step 4.4 — Conflict Check**
+**Step 4.4 -- Conflict Check**
 
 Before finalizing the design, run the Conflict Matrix from KNOWLEDGE_BASE.md
 Part 3. If any two selected patterns appear as conflicting, the engine must:
@@ -502,12 +502,12 @@ interface AlgorithmStep {
 
 ---
 
-## Pass 5 — Invariant Extraction + Formal Verification
+## Pass 5 -- Invariant Extraction + Formal Verification
 
 ### Purpose
 Extract machine-checkable invariants from the design and verify them using
 a formal model checker. Each invariant is verified in its own isolated,
-minimal model — never in a single monolithic model. This is the architectural
+minimal model -- never in a single monolithic model. This is the architectural
 decision that prevents state space explosion from making formal verification
 practically useless.
 
@@ -516,7 +516,7 @@ practically useless.
 A monolithic TLA+ model covering all invariants simultaneously grows
 exponentially: N accounts × M transaction states × P retry states × Q
 outbox states = combinatorial explosion. A 120-second timeout on that
-model is not a solution — it is a gamble that the violating state is
+model is not a solution -- it is a gamble that the violating state is
 reachable early. It often is not.
 
 The correct approach:
@@ -534,7 +534,7 @@ The correct approach:
 
 ### Processing Algorithm
 
-**Step 5.1 — Invariant Extraction**
+**Step 5.1 -- Invariant Extraction**
 
 From the algorithmic designs and selected patterns, extract all invariants.
 Each invariant comes from one of three sources:
@@ -551,10 +551,10 @@ Each invariant is categorized:
 
 For MVP: Only **Safety** invariants are formally verified.
 Liveness and Fairness are documented with their logical justification
-but are not model-checked. This is an explicit, documented limitation —
+but are not model-checked. This is an explicit, documented limitation --
 not a silent fallback.
 
-**Step 5.2 — Invariant Decomposition into Model Groups**
+**Step 5.2 -- Invariant Decomposition into Model Groups**
 
 Group Safety invariants by their shared variable set. Invariants that
 share no variables are verified in completely independent models.
@@ -569,7 +569,7 @@ For the fintech domain, the standard decomposition is:
 | `StateMachine.tla` | Valid payment state transitions only | `payment_status` | Payments are symmetric |
 | `OutboxAtomicity.tla` | `outbox entry exists IFF tx committed` | `outbox`, `ledger`, `db_state` | None (order matters) |
 
-**Step 5.3 — TLA+ Model Generation Per Group**
+**Step 5.3 -- TLA+ Model Generation Per Group**
 
 Each model group generates a separate `.tla` file. The model structure:
 
@@ -577,7 +577,7 @@ Each model group generates a separate `.tla` file. The model structure:
 ---- MODULE BalanceSafety ----
 EXTENDS Naturals, FiniteSets
 
-(* Explicit bounds — not a timeout, a verified scope. *)
+(* Explicit bounds -- not a timeout, a verified scope. *)
 CONSTANTS MaxAccounts,   \ Symmetry: Accounts == 1..MaxAccounts
           MaxTransactions \ Bound: at most N transactions per run
 
@@ -614,7 +614,7 @@ INVARIANT TypeInvariant
 With symmetry reduction and these bounds, TLC exhausts the full state
 space for this model in seconds, not minutes.
 
-**Step 5.4 — Parallel Verification Execution**
+**Step 5.4 -- Parallel Verification Execution**
 
 All model groups run in parallel (not sequentially). The pipeline does
 not wait for one to finish before starting the next.
@@ -640,16 +640,16 @@ FOR EACH result IN results:
 **There is no timeout cutoff.** TLC either finishes (verified or
 counterexample found) or fails (process error). The bounds in the `.cfg`
 file ensure TLC always terminates. If the bounds need to be larger, we
-update the constants — we do not set a wall clock timer and hope.
+update the constants -- we do not set a wall clock timer and hope.
 
-**Step 5.5 — Violation Feedback Loop**
+**Step 5.5 -- Violation Feedback Loop**
 
 If any model reports a violation:
 1. Extract the full counterexample trace from TLC output.
 2. Translate the trace back to English:
    - `"State 1: account_1.balance = 100, account_2.balance = 50"`
    - `"State 2: debit(account_1, 60) committed"`
-   - `"State 3: credit(account_2, 60) NOT in ledger — balance destroyed"`
+   - `"State 3: credit(account_2, 60) NOT in ledger -- balance destroyed"`
 3. Feed this trace (not just the invariant) back to Pass 4.
 4. Re-run Pass 4 with the trace as a hard constraint.
 5. After Pass 4 produces a new design, re-run only the violated model.
@@ -705,7 +705,7 @@ following the fixed heading schema defined in BLUEPRINT.md Decision 3.
 ### The Final Spec Structure
 
 ```markdown
-# [System Name] — Engineering Specification
+# [System Name] -- Engineering Specification
 > Generated by Engineering Blueprinter | Fintech Domain
 > Formal Verification: VERIFIED | [date]
 
@@ -715,19 +715,19 @@ following the fixed heading schema defined in BLUEPRINT.md Decision 3.
 ### 1.3 Implicit Constraints (Auto-Applied)
 ## 2. Assumptions
 ## 3. Failure Mode Register
-> [from Pass 3 AdversarialReport — verbatim, not summarized]
+> [from Pass 3 AdversarialReport -- verbatim, not summarized]
 ## 4. Domain Decomposition
-> [from Pass 2 — service map, ownership, sync/async interactions]
+> [from Pass 2 -- service map, ownership, sync/async interactions]
 ## 5. Algorithms
-> [from Pass 4 — numbered step-by-step for each core operation]
+> [from Pass 4 -- numbered step-by-step for each core operation]
 ## 6. Invariants
-> [from Pass 5 — all invariants, verification status per invariant]
+> [from Pass 5 -- all invariants, verification status per invariant]
 ## 7. Formal Model
 > [TLA+ source, TLC verification output]
 ## 8. Implementation Order
-> [derived from dependency graph — what to build first]
+> [derived from dependency graph -- what to build first]
 ## 9. Code Scaffold (Optional)
-> [only if requested — stubs only, no logic]
+> [only if requested -- stubs only, no logic]
 ```
 
 ### Implementation Order Derivation
@@ -763,7 +763,7 @@ The pipeline must complete within predictable time bounds:
 | Pass | Target Duration | Basis |
 |------|----------------|-------|
 | Pass 1 (Extraction) | < 30 seconds | LLM inference |
-| Clarification Gate | Async (user-dependent) | — |
+| Clarification Gate | Async (user-dependent) | -- |
 | Pass 2 (Decomposition) | < 60 seconds | LLM inference |
 | Pass 3 (Adversarial) | < 45 seconds | Knowledge Base lookup + LLM |
 | Pass 4 (Design) | < 90 seconds | LLM inference |

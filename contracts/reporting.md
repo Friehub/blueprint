@@ -1,11 +1,11 @@
 # Module: reporting
 
 **Version:** 0.1.0
-**Part:** VI — Platform Operations
+**Part:** VI -- Platform Operations
 
 ## Purpose
 
-Defines the interface for generating, scheduling, and exporting structured reports from aggregated domain data. A report is a bounded, named query over one or more domain data sources, rendered into a consumable format. This module does not own the underlying data — it owns the report definition, execution lifecycle, and delivery.
+Defines the interface for generating, scheduling, and exporting structured reports from aggregated domain data. A report is a bounded, named query over one or more domain data sources, rendered into a consumable format. This module does not own the underlying data -- it owns the report definition, execution lifecycle, and delivery.
 
 ---
 
@@ -158,10 +158,10 @@ type ListReportRunsInput = {
 
 ## Events Emitted
 
-- `report.run.queued` — run enters the queue
-- `report.run.started` — worker begins execution
-- `report.run.completed` — artifact is ready
-- `report.run.failed` — execution failed; includes `errorMessage`
+- `report.run.queued` -- run enters the queue
+- `report.run.started` -- worker begins execution
+- `report.run.completed` -- artifact is ready
+- `report.run.failed` -- execution failed; includes `errorMessage`
 - `report.schedule.created`
 - `report.schedule.cancelled`
 

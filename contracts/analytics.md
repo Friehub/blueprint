@@ -26,7 +26,7 @@ DataPoint { timestamp, value }
 ```
 
 **Invariants**
-- `trackEvent` must never throw — analytics must not cause application errors
+- `trackEvent` must never throw -- analytics must not cause application errors
 - Events must be buffered and sent asynchronously
 
 **Providers:** PostHog, Mixpanel, Amplitude, custom ClickHouse
@@ -82,6 +82,6 @@ Buffer retention:
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — fire and forget)
+* **Depends On:** (none -- fire and forget)
 * **Emits To:** (none)
 * **Recommends:** queues (for buffered ingestion)

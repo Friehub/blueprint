@@ -9,12 +9,12 @@ Every backend system ever built is an assembly of the same recurring domain prob
 
 A notification system for a fintech startup and a notification system for a healthcare platform both need `sendEmail`, `sendSMS`, `getNotificationHistory`, and `updatePreferences`. The implementations differ. The interface does not.
 
-This catalogue formally defines those interfaces — function signatures, type shapes, and error contracts — for every recurring backend domain problem. Each definition is:
+This catalogue formally defines those interfaces -- function signatures, type shapes, and error contracts -- for every recurring backend domain problem. Each definition is:
 
-- **Provider-agnostic** — the contract does not name Stripe, Twilio, or S3
-- **Language-portable** — the contract transpiles to TypeScript types, Rust traits, Python protocols, Go interfaces
-- **AI-consumable** — an agent given the contract cannot invent a wrong interface
-- **Versioned** — contracts change with semver discipline; adapters declare which version they implement
+- **Provider-agnostic** -- the contract does not name Stripe, Twilio, or S3
+- **Language-portable** -- the contract transpiles to TypeScript types, Rust traits, Python protocols, Go interfaces
+- **AI-consumable** -- an agent given the contract cannot invent a wrong interface
+- **Versioned** -- contracts change with semver discipline; adapters declare which version they implement
 
 The boundary rule for inclusion: a module belongs in this catalogue if and only if it represents a domain problem that recurs across at least three different application types and whose interface is stable across provider implementations. Infrastructure configuration (how you deploy, how you scale) does not belong here. Domain operations (what your system does) do.
 
@@ -23,17 +23,17 @@ The boundary rule for inclusion: a module belongs in this catalogue if and only 
 ## How to Read Each Module
 
 Each module lists:
-- **Functions** — the operations the module exposes
-- **Types** — the data structures the module owns
-- **Invariants** — behavioral constraints an implementation must satisfy
-- **Providers** — examples of things an adapter might wrap (not exhaustive)
+- **Functions** -- the operations the module exposes
+- **Types** -- the data structures the module owns
+- **Invariants** -- behavioral constraints an implementation must satisfy
+- **Providers** -- examples of things an adapter might wrap (not exhaustive)
 
 ---
 
-## Part I — Identity and Access
+## Part I -- Identity and Access
 
 ### `auth`
-Authentication — who you are.
+Authentication -- who you are.
 
 **Functions**
 ```
@@ -92,7 +92,7 @@ UserStatus = active | banned | suspended | pending_verification
 ```
 
 **Invariants**
-- `deleteUser` must not physically delete — it must mark the record as deleted and anonymise PII
+- `deleteUser` must not physically delete -- it must mark the record as deleted and anonymise PII
 - `getUserByEmail` must be case-insensitive
 
 **Providers:** any user table, Clerk, Auth0 Management API
@@ -180,7 +180,7 @@ ApiKeyValidation { valid, user_id?, scopes?, reason? }
 
 ---
 
-## Part II — Communication
+## Part II -- Communication
 
 ### `notifications`
 Multi-channel message delivery.
@@ -209,8 +209,8 @@ DeliveryStatus = queued | sent | delivered | failed | bounced
 ```
 
 **Invariants**
-- `sendEmail` must respect `NotificationPreferences` — if email is disabled, it must not deliver
-- `sendPush` must not throw if the user has no registered push tokens — it must return a no-op result
+- `sendEmail` must respect `NotificationPreferences` -- if email is disabled, it must not deliver
+- `sendPush` must not throw if the user has no registered push tokens -- it must return a no-op result
 
 **Providers:** Resend/SendGrid (email), Twilio/Termii (SMS), FCM/APNs (push)
 
@@ -242,7 +242,7 @@ MessageContent { type: text | image | file | system, body, attachments? }
 ```
 
 **Invariants**
-- Deleted messages must show a tombstone, not disappear — the thread history must remain intact
+- Deleted messages must show a tombstone, not disappear -- the thread history must remain intact
 - A user cannot send a message to a thread they are not a participant of
 
 **Providers:** custom database, Stream Chat, Sendbird
@@ -327,7 +327,7 @@ DeliveryStatus = pending | success | failed
 
 ---
 
-## Part III — Data and State
+## Part III -- Data and State
 
 ### `storage`
 File and object storage.
@@ -354,7 +354,7 @@ SignedUrl { url, expires_at, method: GET | PUT }
 
 **Invariants**
 - Signed upload URLs must enforce `content_type` and `max_size` constraints when provided
-- `deleteFile` must be idempotent — deleting a non-existent key must not throw
+- `deleteFile` must be idempotent -- deleting a non-existent key must not throw
 
 **Providers:** AWS S3, Cloudflare R2, Supabase Storage, MinIO, local disk
 
@@ -384,7 +384,7 @@ CacheStats { hits, misses, keys, memory_used }
 ```
 
 **Invariants**
-- `getOrSet` must be atomic — concurrent calls with the same key must not invoke `factory` more than once (cache stampede prevention)
+- `getOrSet` must be atomic -- concurrent calls with the same key must not invoke `factory` more than once (cache stampede prevention)
 
 **Providers:** Redis, Memcached, Upstash, in-memory (node-cache)
 
@@ -415,7 +415,7 @@ IndexStats { document_count, index_size, last_updated }
 ```
 
 **Invariants**
-- `indexDocument` must be idempotent — re-indexing the same document must update, not duplicate
+- `indexDocument` must be idempotent -- re-indexing the same document must update, not duplicate
 
 **Providers:** Typesense, Algolia, Meilisearch, Elasticsearch, PostgreSQL full-text
 
@@ -446,7 +446,7 @@ JobOptions { delay?, priority?, max_attempts?, backoff? }
 ```
 
 **Invariants**
-- A failed job must not be lost — it must transition to `failed` state with the error recorded
+- A failed job must not be lost -- it must transition to `failed` state with the error recorded
 - `cancelJob` on an active job must be a best-effort operation, not a guarantee
 
 **Providers:** BullMQ, Inngest, Quirrel, AWS SQS, Sidekiq
@@ -503,8 +503,8 @@ LimitWindow = second | minute | hour | day
 ```
 
 **Invariants**
-- `checkLimit` must not consume a token — it must be a read-only check
-- Limits must be enforced atomically — race conditions must not allow over-consumption
+- `checkLimit` must not consume a token -- it must be a read-only check
+- Limits must be enforced atomically -- race conditions must not allow over-consumption
 
 **Providers:** Redis (sliding window, token bucket), Upstash, custom
 
@@ -533,13 +533,13 @@ ExportFormat = json | csv
 
 **Invariants**
 - Audit events must never be deleted or modified after creation
-- `recordEvent` must be non-blocking — it must not add latency to the calling operation
+- `recordEvent` must be non-blocking -- it must not add latency to the calling operation
 
 **Providers:** custom append-only table, Axiom, Datadog, custom event stream
 
 ---
 
-## Part IV — Commerce
+## Part IV -- Commerce
 
 ### `catalog`
 Product and variant management.
@@ -597,7 +597,7 @@ StockAdjustment { id, variant_id, delta, reason, created_at }
 
 **Invariants**
 - `available = on_hand - reserved` at all times
-- `confirmStock` must be idempotent — confirming twice must not double-decrement
+- `confirmStock` must be idempotent -- confirming twice must not double-decrement
 - Reservations must expire automatically if not confirmed
 
 ---
@@ -657,7 +657,7 @@ PromotionType = percentage | fixed_amount | free_shipping | buy_x_get_y
 ```
 
 **Invariants**
-- `validateCoupon` must not mark the coupon as used — that is `markCouponUsed`'s job
+- `validateCoupon` must not mark the coupon as used -- that is `markCouponUsed`'s job
 - `markCouponUsed` must be idempotent for the same `(code, order_id)` pair
 
 ---
@@ -691,7 +691,7 @@ ReturnRequest { id, order_id, lines, reason, status }
 ```
 
 **Invariants**
-- Status transitions must follow the defined state machine — invalid transitions must throw
+- Status transitions must follow the defined state machine -- invalid transitions must throw
 - A cancelled order must release all stock reservations
 
 ---
@@ -724,7 +724,7 @@ PaymentStatus = pending | processing | completed | failed | refunded | disputed
 ```
 
 **Invariants**
-- `creditWallet` with the same `reference` must be idempotent — double-crediting must not occur
+- `creditWallet` with the same `reference` must be idempotent -- double-crediting must not occur
 - `debitWallet` must not reduce balance below zero unless `allow_negative: true` is explicitly passed
 
 ---
@@ -784,7 +784,7 @@ ReviewSubjectType = product | seller | service
 
 ---
 
-## Part V — Real-Time and Social
+## Part V -- Real-Time and Social
 
 ### `presence`
 Online/offline state tracking.
@@ -914,7 +914,7 @@ ReactionType = like | love | laugh | angry | sad | fire | clap (configurable)
 
 **Invariants**
 - A user can have at most one reaction of each type per subject
-- `addReaction` must be upsert — calling it twice must not create a duplicate
+- `addReaction` must be upsert -- calling it twice must not create a duplicate
 
 ---
 
@@ -939,12 +939,12 @@ FollowCounts { followers, following }
 ```
 
 **Invariants**
-- `follow` must be idempotent — following twice must not create a duplicate relation
+- `follow` must be idempotent -- following twice must not create a duplicate relation
 - Self-follows must be rejected
 
 ---
 
-## Part VI — Platform Operations
+## Part VI -- Platform Operations
 
 ### `billing`
 Subscription and plan management.
@@ -1056,7 +1056,7 @@ DataPoint { timestamp, value }
 ```
 
 **Invariants**
-- `trackEvent` must never throw — analytics must not cause application errors
+- `trackEvent` must never throw -- analytics must not cause application errors
 - Events must be buffered and sent asynchronously
 
 **Providers:** PostHog, Mixpanel, Amplitude, custom ClickHouse
@@ -1166,7 +1166,7 @@ HealthEvent { service, status, message, timestamp }
 
 ---
 
-## Part VII — Security and Compliance
+## Part VII -- Security and Compliance
 
 ### `encryption`
 Data encryption and key management.
@@ -1192,7 +1192,7 @@ KeyStatus = active | archived | compromised
 ```
 
 **Invariants**
-- `decrypt` must use the `key_id` embedded in `EncryptedData` — key rotation must not break old data
+- `decrypt` must use the `key_id` embedded in `EncryptedData` -- key rotation must not break old data
 - `hashPassword` must use a memory-hard algorithm (Argon2, bcrypt, scrypt)
 
 **Providers:** AWS KMS, HashiCorp Vault, libsodium, custom
@@ -1249,7 +1249,7 @@ ThreatScore { score, level, signals }
 
 ---
 
-## Part VIII — Industry Verticals
+## Part VIII -- Industry Verticals
 
 ### `appointments` (Healthcare, Services)
 Booking and scheduling management.
@@ -1376,13 +1376,13 @@ CampaignStats { raised, donor_count, goal, percentage_funded }
 
 The catalogue stops at the domain operation layer. A module belongs here if it satisfies four conditions simultaneously:
 
-**It is a named domain problem** — `payments`, not `database transactions`. The name describes what it does for the business, not how it does it technically.
+**It is a named domain problem** -- `payments`, not `database transactions`. The name describes what it does for the business, not how it does it technically.
 
-**It recurs across at least three different application types** — `notifications` appears in e-commerce, healthcare, social, SaaS, and fintech. `donations` appears in non-profit, crowdfunding, and community platforms. `kyc` appears in fintech, hiring platforms, and regulated marketplaces.
+**It recurs across at least three different application types** -- `notifications` appears in e-commerce, healthcare, social, SaaS, and fintech. `donations` appears in non-profit, crowdfunding, and community platforms. `kyc` appears in fintech, hiring platforms, and regulated marketplaces.
 
-**Its interface is stable across providers** — `sendEmail` takes the same inputs whether the provider is Resend, SendGrid, or Mailgun. `initiatePayment` takes the same inputs whether the adapter wraps Stripe or Paystack.
+**Its interface is stable across providers** -- `sendEmail` takes the same inputs whether the provider is Resend, SendGrid, or Mailgun. `initiatePayment` takes the same inputs whether the adapter wraps Stripe or Paystack.
 
-**It cannot be trivially derived from a CRUD operation on a single table** — `getUser` is not in this catalogue because it is just a database read. `transitionOrderStatus` is in this catalogue because it enforces a state machine with business rules.
+**It cannot be trivially derived from a CRUD operation on a single table** -- `getUser` is not in this catalogue because it is just a database read. `transitionOrderStatus` is in this catalogue because it enforces a state machine with business rules.
 
 What is excluded: infrastructure configuration, deployment, database schema design, ORM setup, HTTP routing, middleware, and anything that is framework-specific. The catalogue defines what your system does. How it runs is out of scope.
 
@@ -1392,9 +1392,9 @@ What is excluded: infrastructure configuration, deployment, database schema desi
 
 Each module in this catalogue represents a fixed interface. When an AI agent is given the contract for `payments` before generating an adapter, three things change:
 
-The function names are fixed. The AI cannot invent `processPayment` or `makePayment` — the contract says `initiatePayment`.
+The function names are fixed. The AI cannot invent `processPayment` or `makePayment` -- the contract says `initiatePayment`.
 
-The type shapes are fixed. The AI cannot return `{ success: true, data: ... }` — the contract says `Payment`.
+The type shapes are fixed. The AI cannot return `{ success: true, data: ... }` -- the contract says `Payment`.
 
 The invariants are enforceable. The AI's implementation can be checked by GenSense's CSA rules against the contract it claims to fulfill. A `validateCoupon` implementation that cannot return an invalid state violates the contract and is caught automatically.
 
@@ -1402,5 +1402,5 @@ The reliability gain is not that AI becomes smarter. It is that the creative sur
 
 ---
 
-*Version 0.1 — Domain Contract Catalogue*
+*Version 0.1 -- Domain Contract Catalogue*
 *This document is the specification. Adapters, language bindings, and tooling are separate artifacts.*

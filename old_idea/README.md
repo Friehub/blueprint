@@ -31,8 +31,8 @@ AI coding tools convert a prompt to code. This is fast but dangerous for
 systems where correctness matters: payments, financial state, anything
 that touches money or permanent records.
 
-The failure modes that destroy financial systems — double charges, partial
-commits, stale balance reads, silent authorization expiry — are not bugs
+The failure modes that destroy financial systems -- double charges, partial
+commits, stale balance reads, silent authorization expiry -- are not bugs
 in the code. They are bugs in the design. They appear in code review as
 "this looks right" and in production as "our books don't balance."
 
@@ -73,7 +73,7 @@ Pass 4: Design algorithms that survive the adversary.
     ↓
 Pass 5: Extract safety invariants. Generate one TLA+ model per invariant
         group. Run TLC in parallel with symmetry reduction and explicit
-        bounds. No timeout fallback — bounds ensure termination.
+        bounds. No timeout fallback -- bounds ensure termination.
         If violated: full counterexample trace fed back to Pass 4.
     ↓
 Output Assembly: Deterministic markdown render. No LLM in this step.
@@ -119,40 +119,40 @@ Full rationale for each decision is in [BLUEPRINT.md](./BLUEPRINT.md) §9.
 When implementation begins, follow this order. Each phase depends on the
 previous being complete and tested.
 
-1. **Knowledge Base loader** — Parse `KNOWLEDGE_BASE.md` into an in-memory
+1. **Knowledge Base loader** -- Parse `KNOWLEDGE_BASE.md` into an in-memory
    graph. Write unit tests verifying graph consistency (no circular REQUIRES
    edges, all SOLVES targets exist as nodes).
 
-2. **Pass output schemas** — Implement the TypeScript interfaces from
+2. **Pass output schemas** -- Implement the TypeScript interfaces from
    `PIPELINE.md` as validated Zod schemas. The pipeline's correctness
    depends on these being exact.
 
-3. **Pass 1 (Extraction)** — Implement with prompt from `PROMPTS.md`.
+3. **Pass 1 (Extraction)** -- Implement with prompt from `PROMPTS.md`.
    Validate against 20 diverse fintech prompts manually before proceeding.
 
-4. **Pass 3 (Adversarial)** — Implement before Pass 4. Build the adversary
+4. **Pass 3 (Adversarial)** -- Implement before Pass 4. Build the adversary
    before the designer. If you build the designer first, it optimizes for
    happy-path outputs.
 
-5. **Pass 2 (Decomposition)** and **Pass 4 (Design)** — Implement together.
+5. **Pass 2 (Decomposition)** and **Pass 4 (Design)** -- Implement together.
    They are closely coupled: decomposition is Pass 4's structural input.
 
-6. **TLA+ model generator** — The most technically demanding component.
+6. **TLA+ model generator** -- The most technically demanding component.
    Implement the per-model decomposition logic, symmetry declarations, and
    `.cfg` generation. Test against the 4 standard fintech model groups in
    `PIPELINE.md` §Pass 5.
 
-7. **Pass 5 (Verification)** — Wire the TLA+ generator to TLC subprocess
+7. **Pass 5 (Verification)** -- Wire the TLA+ generator to TLC subprocess
    execution. Implement parallel model execution and violation feedback loop.
 
-8. **Output Assembly** — Template rendering. Deterministic. No LLM.
+8. **Output Assembly** -- Template rendering. Deterministic. No LLM.
 
-9. **Storage layer** — Implement the schema from `STORAGE.md`. Ensure
+9. **Storage layer** -- Implement the schema from `STORAGE.md`. Ensure
    atomic completion invariant: `completed` status only set when
    `rendered_specs` row exists.
 
-10. **API layer** — Implement endpoints from `API.md`. SSE stream for
+10. **API layer** -- Implement endpoints from `API.md`. SSE stream for
     progress events. Test with `test_` environment tokens.
 
-11. **Scaffold generator** — Final component. Follows rules from
+11. **Scaffold generator** -- Final component. Follows rules from
     `SCAFFOLD.md`. Must compile clean (`cargo check` / `tsc --noEmit`).

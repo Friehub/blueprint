@@ -29,8 +29,8 @@ DeliveryStatus = queued | sent | delivered | failed | bounced
 ```
 
 **Invariants**
-- `sendEmail` must respect `NotificationPreferences` — if email is disabled, it must not deliver
-- `sendPush` must not throw if the user has no registered push tokens — it must return a no-op result
+- `sendEmail` must respect `NotificationPreferences` -- if email is disabled, it must not deliver
+- `sendPush` must not throw if the user has no registered push tokens -- it must return a no-op result
 
 **Providers:** Resend/SendGrid (email), Twilio/Termii (SMS), FCM/APNs (push)
 

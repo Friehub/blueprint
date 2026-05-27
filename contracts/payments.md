@@ -30,7 +30,7 @@ PaymentStatus = pending | processing | completed | failed | refunded | disputed
 ```
 
 **Invariants**
-- `creditWallet` with the same `reference` must be idempotent — double-crediting must not occur
+- `creditWallet` with the same `reference` must be idempotent -- double-crediting must not occur
 - `debitWallet` must not reduce balance below zero unless `allow_negative: true` is explicitly passed
 
 ---
@@ -126,7 +126,7 @@ gensense_payments_initiation_total           { method, currency, result }
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — wraps external provider + owns wallet)
+* **Depends On:** (none -- wraps external provider + owns wallet)
 * **Emits To:** events
 * **Recommends:** audit_log, notifications, fraud_detection
 * **Pagination Sort Key:** Uses cursor-based pagination sorting by `created_at DESC` on `getWalletTransactions`.

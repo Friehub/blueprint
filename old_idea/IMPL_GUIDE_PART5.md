@@ -1,4 +1,4 @@
-# Engineering Blueprinter — Implementation Guide
+# Engineering Blueprinter -- Implementation Guide
 ## Part 5: Orchestrator, Storage, API, SSE, and Scaffold Rules
 
 ---
@@ -189,7 +189,7 @@ export const sseEmitter = new SseEmitter();
 
 ---
 
-## storage/spec-runs.ts (representative — same pattern for other tables)
+## storage/spec-runs.ts (representative -- same pattern for other tables)
 
 ```typescript
 import { db } from "../db";
@@ -239,7 +239,7 @@ import * as specController from "./spec-controller";
 
 export async function registerRoutes(app: FastifyInstance): Promise<void> {
 
-  // POST /specs — create and start pipeline
+  // POST /specs -- create and start pipeline
   app.post("/v1/specs", {
     schema: {
       body: {
@@ -254,22 +254,22 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
     },
   }, specController.createSpec);
 
-  // GET /specs/:id/stream — SSE stream
+  // GET /specs/:id/stream -- SSE stream
   app.get("/v1/specs/:spec_id/stream", specController.streamSpec);
 
-  // POST /specs/:id/clarifications — resume paused pipeline
+  // POST /specs/:id/clarifications -- resume paused pipeline
   app.post("/v1/specs/:spec_id/clarifications", specController.submitClarifications);
 
-  // GET /specs/:id/result — get final markdown or JSON
+  // GET /specs/:id/result -- get final markdown or JSON
   app.get("/v1/specs/:spec_id/result", specController.getResult);
 
-  // GET /specs/:id/formal-models — download TLA+ files as ZIP
+  // GET /specs/:id/formal-models -- download TLA+ files as ZIP
   app.get("/v1/specs/:spec_id/formal-models", specController.getFormalModels);
 
-  // GET /specs/:id — get spec metadata
+  // GET /specs/:id -- get spec metadata
   app.get("/v1/specs/:spec_id", specController.getSpec);
 
-  // GET /specs — list user's specs with filtering
+  // GET /specs -- list user's specs with filtering
   app.get("/v1/specs", specController.listSpecs);
 }
 ```
@@ -303,7 +303,7 @@ export async function authMiddleware(
 
 ---
 
-## Scaffold Anti-Patterns — What to NEVER Generate
+## Scaffold Anti-Patterns -- What to NEVER Generate
 
 The scaffold generator must detect and refuse these patterns:
 
@@ -329,7 +329,7 @@ Before declaring the scaffold complete, verify:
 1. Every FR-xxx maps to at least one function signature.
 2. Every MUST_RESOLVE failure mode maps to at least one type constraint.
 3. Every algorithm step requiring a specific pattern has a `// SPEC[...]` comment.
-4. No function body contains actual business logic — only `todo!()` / `throw` / `revert()`.
+4. No function body contains actual business logic -- only `todo!()` / `throw` / `revert()`.
 5. All modules compile clean: `tsc --noEmit` / `cargo check` / `forge build`.
 
 ---
@@ -430,7 +430,7 @@ CREATE TABLE spec_artifacts (
 - [ ] Pass 3 built and tested before Pass 4
 - [ ] TLC binary path is configurable via env var
 - [ ] TLA+ model generation produces syntactically valid TLA+ (test against TLC directly)
-- [ ] No wall-clock timeout on TLC — only `.cfg` bounds control termination
+- [ ] No wall-clock timeout on TLC -- only `.cfg` bounds control termination
 - [ ] `output-assembler.ts` has zero LLM calls
 - [ ] `status = completed` only set inside same DB transaction as `rendered_specs` INSERT
 - [ ] All API endpoints require `Authorization: Bearer ebp_*` header

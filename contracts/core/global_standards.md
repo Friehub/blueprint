@@ -33,7 +33,7 @@ When `idempotency_key` is provided:
 - If the key has not been seen before: execute the operation, store the result, return the result
 - If the key has been seen and the operation completed: return the stored result without re-executing
 - If the key has been seen and the operation is in progress: return `409 Conflict` with `retry_after`
-- If the key has been seen but with different parameters: return `422 Unprocessable` — the key is bound to its first set of parameters
+- If the key has been seen but with different parameters: return `422 Unprocessable` -- the key is bound to its first set of parameters
 
 ### Key Retention Period
 Idempotency keys must be retained for a minimum of 24 hours. For financial operations (`payments`, `wallet`), keys must be retained for 7 days.
@@ -95,10 +95,10 @@ EventActor {
 ```
 
 ### Delivery Guarantee
-All events in this catalogue use **at-least-once** delivery. Consumers must be idempotent — processing the same event twice must produce the same result. The `id` field is the deduplication key.
+All events in this catalogue use **at-least-once** delivery. Consumers must be idempotent -- processing the same event twice must produce the same result. The `id` field is the deduplication key.
 
 ### Consumer Conventions
-A module that consumes another module's events must declare its subscription in its adapter documentation. The consuming module must not call the emitting module's functions in response to events — it must handle the event payload directly. This prevents circular dependencies at runtime.
+A module that consumes another module's events must declare its subscription in its adapter documentation. The consuming module must not call the emitting module's functions in response to events -- it must handle the event payload directly. This prevents circular dependencies at runtime.
 
 All required data must be in the event payload to prevent secondary lookup cycles.
 
@@ -171,7 +171,7 @@ Tier 4 (depends on Tier 0-3):
   orders, reviews
 
 Tier 5 (depends on Tier 0-4):
-  (all sagas — deployed as orchestration services, not modules)
+  (all sagas -- deployed as orchestration services, not modules)
 ```
 
 ---

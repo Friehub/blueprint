@@ -1,11 +1,11 @@
 # Module: config
 
 **Version:** 0.1.0
-**Part:** III — Data and State
+**Part:** III -- Data and State
 
 ## Purpose
 
-Defines the interface for managing runtime application configuration. A configuration entry is a named key-value pair that controls application behaviour at runtime, without requiring a code deployment. This module is distinct from `feature_flags`, which manages boolean on/off toggles with user-segment targeting. Config manages structured, typed, non-binary values — timeouts, limits, service endpoints, rate values, and algorithm parameters — that must be changeable at runtime across a distributed system.
+Defines the interface for managing runtime application configuration. A configuration entry is a named key-value pair that controls application behaviour at runtime, without requiring a code deployment. This module is distinct from `feature_flags`, which manages boolean on/off toggles with user-segment targeting. Config manages structured, typed, non-binary values -- timeouts, limits, service endpoints, rate values, and algorithm parameters -- that must be changeable at runtime across a distributed system.
 
 ---
 
@@ -41,7 +41,7 @@ Transitions:
 Creates or updates a configuration key. If the key is marked `requiresApproval`, the change enters `PENDING_APPROVAL` state and does not take effect immediately.
 
 ### `getConfig(key: ConfigKey) → ConfigEntry`
-Returns the current resolved value for a key. This is the hot path — must be low-latency and cacheable.
+Returns the current resolved value for a key. This is the hot path -- must be low-latency and cacheable.
 
 ### `getConfigs(keys: ConfigKey[]) → ConfigEntry[]`
 Batch read for multiple keys. Returns an entry per key; missing keys return a typed absence, not an error.
@@ -170,12 +170,12 @@ type ValidationResult = {
 
 ## Events Emitted
 
-- `config.set` — new key created
-- `config.updated` — existing key value changed; includes `previousValue` (redacted if SECRET)
+- `config.set` -- new key created
+- `config.updated` -- existing key value changed; includes `previousValue` (redacted if SECRET)
 - `config.change.pending_approval`
 - `config.change.approved`
 - `config.change.rejected`
-- `config.rolled_back` — includes `restoredVersion`
+- `config.rolled_back` -- includes `restoredVersion`
 - `config.deprecated`
 - `config.deleted`
 

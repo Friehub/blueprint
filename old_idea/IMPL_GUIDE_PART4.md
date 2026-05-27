@@ -1,4 +1,4 @@
-# Engineering Blueprinter — Implementation Guide
+# Engineering Blueprinter -- Implementation Guide
 ## Part 4: Passes 4–5, TLA+ Generator, TLC Runner, Output Assembly
 
 ---
@@ -73,7 +73,7 @@ ADVERSARIAL REPORT: ${JSON.stringify(adversarialOutput, null, 2)}
 
 MUST RESOLVE failure modes: ${adversarialOutput.must_resolve.join(", ")}
 
-REQUIRED PATTERNS (from Knowledge Base — must appear in selected_patterns):
+REQUIRED PATTERNS (from Knowledge Base -- must appear in selected_patterns):
 ${expandedPatterns.map((p) => `- ${p}`).join("\n")}
 
 PATTERN → FAILURE MODE MAPPINGS:
@@ -133,7 +133,7 @@ export interface GeneratedModel {
 
 /**
  * Generates .tla and .cfg files for each model group.
- * This is a deterministic string template function — NO LLM.
+ * This is a deterministic string template function -- NO LLM.
  */
 export async function generateModels(input: Pass5Input): Promise<GeneratedModel[]> {
   const workDir = await fs.mkdtemp(path.join(os.tmpdir(), "blueprinter-tla-"));
@@ -178,7 +178,7 @@ function buildTlaModule(group: ModelGroup): string {
   return `---- MODULE ${model_id} ----
 EXTENDS Naturals, FiniteSets, Sequences
 
-(* Explicit bounds — not a timeout, a verified scope *)
+(* Explicit bounds -- not a timeout, a verified scope *)
 CONSTANTS ${constants}
 ${symmetryDecl}
 
@@ -230,7 +230,7 @@ export interface TlcResult {
 const config = loadConfig();
 
 /**
- * Runs TLC on a single model. Returns a result — never throws.
+ * Runs TLC on a single model. Returns a result -- never throws.
  * All model groups MUST be run in parallel via Promise.all.
  * There is NO timeout. Bounds in .cfg ensure TLC terminates.
  */
@@ -284,7 +284,7 @@ function extractCounterexample(output: string): string {
 
 /**
  * Translates a TLC counterexample trace into plain English.
- * This IS an LLM call — the trace is fed to a lightweight model.
+ * This IS an LLM call -- the trace is fed to a lightweight model.
  */
 export async function translateTrace(trace: string, invariantStatement: string): Promise<string> {
   const { generateText } = await import("ai");
@@ -329,7 +329,7 @@ from the algorithmic design and group them into minimal model groups.
 Hard constraints:
 - Extract ONLY safety invariants (must NEVER be violated). Skip liveness and fairness.
 - Group invariants by shared variable set. Invariants with no shared variables → separate models.
-- This prevents state space explosion — each model is minimal and bounded.
+- This prevents state space explosion -- each model is minimal and bounded.
 - Every TLA+ formal_assertion must be syntactically valid TLA+.
 - Output ONLY valid JSON matching the schema.`;
 
@@ -367,7 +367,7 @@ Produce JSON matching the Pass5Input schema (model_groups array).`;
   // Step 5.3: Generate TLA+ files (deterministic, no LLM)
   const generatedModels = await generateModels(pass5Input);
 
-  // Step 5.4: Run ALL models in parallel — never sequentially
+  // Step 5.4: Run ALL models in parallel -- never sequentially
   const tlcResults = await Promise.all(
     generatedModels.map((m) => runTlc(m.modelId, m.tlaPath, m.cfgPath))
   );
@@ -456,7 +456,7 @@ export function assembleSpec(
     `## 3. Failure Mode Register`,
     ...adversarial.matched_failure_modes.map(
       (fm) => [
-        `### ${fm.failure_mode_id} — ${fm.affected_service}`,
+        `### ${fm.failure_mode_id} -- ${fm.affected_service}`,
         `- **Likelihood**: ${fm.likelihood} | **Severity**: ${fm.severity} | **Risk Score**: ${fm.risk_score}`,
         `- **Consequence**: ${fm.observable_consequence}`,
         `- **Sequence**:`,
@@ -492,7 +492,7 @@ export function assembleSpec(
     `## 6. Invariants`,
     ...verification.map(
       (v) => [
-        `### Model: ${v.modelId} — ${v.status}`,
+        `### Model: ${v.modelId} -- ${v.status}`,
         `- **Bounds**: ${JSON.stringify(v.verificationBounds)}`,
         `- **Duration**: ${v.durationMs}ms`,
         v.status === "VIOLATED" && v.translatedTrace

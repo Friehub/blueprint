@@ -1,11 +1,11 @@
 # Module: secrets
 
 **Version:** 0.1.0
-**Part:** VII — Security and Compliance
+**Part:** VII -- Security and Compliance
 
 ## Purpose
 
-Defines the interface for storing, rotating, and auditing secrets — credentials, API keys, certificates, and any high-sensitivity values that must be encrypted at rest, access-controlled per caller, and versioned with rotation history. This module is distinct from `config` (which manages typed, non-sensitive runtime configuration) and `encryption` (which provides cryptographic primitives). Secrets owns the full credential lifecycle: creation, versioning, rotation, access grants, and revocation.
+Defines the interface for storing, rotating, and auditing secrets -- credentials, API keys, certificates, and any high-sensitivity values that must be encrypted at rest, access-controlled per caller, and versioned with rotation history. This module is distinct from `config` (which manages typed, non-sensitive runtime configuration) and `encryption` (which provides cryptographic primitives). Secrets owns the full credential lifecycle: creation, versioning, rotation, access grants, and revocation.
 
 ---
 
@@ -37,7 +37,7 @@ Transitions:
 ## Functions
 
 ### `createSecret(input: CreateSecretInput) → SecretMetadata`
-Creates a new named secret with an initial value. Returns metadata only — the value is never returned after creation except via `getSecretValue`.
+Creates a new named secret with an initial value. Returns metadata only -- the value is never returned after creation except via `getSecretValue`.
 
 ### `getSecretMetadata(secretId: SecretId) → SecretMetadata`
 Returns metadata (name, version, status, rotation schedule) without the secret value.
@@ -175,7 +175,7 @@ type ListSecretsInput = {
 ## Invariants
 
 1. Secret values are never returned in `listSecrets`, `getSecretMetadata`, or `listVersions`; only `getSecretValue` returns plaintext.
-2. Every `getSecretValue` call must write an immutable entry to `audit_log` with the caller identity, timestamp, and secret ID — regardless of success or failure.
+2. Every `getSecretValue` call must write an immutable entry to `audit_log` with the caller identity, timestamp, and secret ID -- regardless of success or failure.
 3. Access to `getSecretValue` requires an active `SecretGrant` for the calling identity; callers without a grant receive `ACCESS_DENIED`, not `SECRET_NOT_FOUND`.
 4. `revokeSecret` is irreversible at the contract level; no `unrevokeSecret` function exists.
 5. Secret names are unique within a namespace; duplicate creation within the same namespace returns the existing secret's metadata.
@@ -188,14 +188,14 @@ type ListSecretsInput = {
 ## Events Emitted
 
 - `secret.created`
-- `secret.value_updated` — includes `secretId`, `newVersion` (no value)
+- `secret.value_updated` -- includes `secretId`, `newVersion` (no value)
 - `secret.rotation_initiated`
-- `secret.rotation_confirmed` — includes `newVersion`, `deprecatedVersion`
-- `secret.revoked` — includes `reason`
+- `secret.rotation_confirmed` -- includes `newVersion`, `deprecatedVersion`
+- `secret.revoked` -- includes `reason`
 - `secret.access_granted`
 - `secret.access_revoked`
 - `secret.expired`
-- `secret.accessed` — emitted to audit_log only, not the event bus
+- `secret.accessed` -- emitted to audit_log only, not the event bus
 
 ---
 

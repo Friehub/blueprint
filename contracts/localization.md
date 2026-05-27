@@ -76,6 +76,6 @@ Translation cache:
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — infrastructure primitive / wraps external provider)
+* **Depends On:** (none -- infrastructure primitive / wraps external provider)
 * **Emits To:** (none)
 * **Recommends:** (none)

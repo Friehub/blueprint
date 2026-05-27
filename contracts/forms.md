@@ -1,11 +1,11 @@
 # Module: forms
 
 **Version:** 0.1.0
-**Part:** VI — Platform Operations
+**Part:** VI -- Platform Operations
 
 ## Purpose
 
-Defines the interface for building, publishing, and collecting submissions from structured data collection forms. A form is a schema-driven interface that accepts typed user input, validates it, and stores the resulting submission as a structured record. Forms may embed conditional logic, serve multiple audiences via access controls, integrate with webhooks for downstream processing, and support multi-step flows. This module does not own the rendering of form UI — it owns the schema, submission lifecycle, and data contract.
+Defines the interface for building, publishing, and collecting submissions from structured data collection forms. A form is a schema-driven interface that accepts typed user input, validates it, and stores the resulting submission as a structured record. Forms may embed conditional logic, serve multiple audiences via access controls, integrate with webhooks for downstream processing, and support multi-step flows. This module does not own the rendering of form UI -- it owns the schema, submission lifecycle, and data contract.
 
 ---
 
@@ -243,9 +243,9 @@ type ListSubmissionsInput = {
 - `form.published`
 - `form.closed`
 - `form.archived`
-- `form.submission.received` — includes `submissionId`, `formId`
+- `form.submission.received` -- includes `submissionId`, `formId`
 - `form.submission.accepted`
-- `form.submission.rejected` — includes `rejectionReason`
+- `form.submission.rejected` -- includes `rejectionReason`
 - `form.submission.deleted`
 
 ---

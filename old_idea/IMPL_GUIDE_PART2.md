@@ -1,4 +1,4 @@
-# Engineering Blueprinter — Implementation Guide
+# Engineering Blueprinter -- Implementation Guide
 ## Part 2: Data Models, Zod Schemas, and Knowledge Base
 
 ---
@@ -138,7 +138,7 @@ export class KnowledgeGraph {
           errors.push(`Node ${id} REQUIRES unknown node ${req}`);
         }
       }
-      // No circular REQUIRES (simple check — full DFS if needed)
+      // No circular REQUIRES (simple check -- full DFS if needed)
       if (node.requires.includes(id)) {
         errors.push(`Node ${id} has circular REQUIRES (self-reference)`);
       }
@@ -156,7 +156,7 @@ export class KnowledgeGraph {
 
 ---
 
-## pipeline/schemas.ts — All Pass I/O Schemas
+## pipeline/schemas.ts -- All Pass I/O Schemas
 
 This file is the pipeline's contract. Every pass imports its schema from here.
 

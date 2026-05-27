@@ -1,11 +1,11 @@
 # Module: activity_feed
 
 **Version:** 0.1.0
-**Part:** V — Real-Time and Social
+**Part:** V -- Real-Time and Social
 
 ## Purpose
 
-Defines the interface for aggregating and serving a cross-domain activity timeline. An activity feed is a chronological stream of significant events produced by other domain modules, projected into a human-readable feed for a specific audience — a user's own actions, the actions of users they follow, or the activity within a shared workspace. This module is a read-optimised projection layer. It does not originate events — it consumes events from other modules and stores denormalised feed entries for low-latency retrieval.
+Defines the interface for aggregating and serving a cross-domain activity timeline. An activity feed is a chronological stream of significant events produced by other domain modules, projected into a human-readable feed for a specific audience -- a user's own actions, the actions of users they follow, or the activity within a shared workspace. This module is a read-optimised projection layer. It does not originate events -- it consumes events from other modules and stores denormalised feed entries for low-latency retrieval.
 
 ---
 
@@ -27,7 +27,7 @@ Entry visibility: VISIBLE → HIDDEN (via moderation or privacy change)
 Declares a named activity type that this feed recognises. Maps an event name from a source domain to a human-readable template and an audience strategy.
 
 ### `ingestEvent(input: IngestEventInput) → void`
-Accepts a domain event and writes one or more feed entries based on the registered activity type's audience strategy. This is the write path — called by event consumers, not by end users.
+Accepts a domain event and writes one or more feed entries based on the registered activity type's audience strategy. This is the write path -- called by event consumers, not by end users.
 
 ### `getFeed(input: GetFeedInput) → PaginatedList<FeedEntry>`
 Returns the activity feed for a given audience context (a user's personal feed, a workspace feed, or a public profile feed), ordered by most recent first.

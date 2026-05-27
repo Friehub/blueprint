@@ -32,7 +32,7 @@ saga place_order
 
   steps:
     1. inventory.reserveStock(variant_id, quantity, order_id) → ReservationToken
-       on_failure: abort — no compensation needed, nothing committed
+       on_failure: abort -- no compensation needed, nothing committed
 
     2. payments.initiatePayment(order_id, amount, currency, method) → Payment
        on_failure: inventory.releaseStock(reservation_token)
@@ -42,7 +42,7 @@ saga place_order
                    inventory.releaseStock(reservation_token)
 
     4. notifications.sendEmail(user_id, "order_confirmed", variables) → DeliveryResult
-       on_failure: log and continue — notification failure must not reverse a confirmed order
+       on_failure: log and continue -- notification failure must not reverse a confirmed order
 
   invariant: at no point may payment be completed and stock unreserved
              at no point may order be confirmed and payment not completed
@@ -65,7 +65,7 @@ saga process_refund
 
     2. inventory.updateStockOnHand(variant_id, +quantity, location_id) → void
        on_failure: orders.transitionOrderStatus(order_id, "return_failed")
-                   — alert operations team
+                   -- alert operations team
 
     3. payments.initiateRefund(payment_id, amount, "return_approved") → Refund
        on_failure: inventory.adjustStock(variant_id, -quantity, "refund_failed_reversal")
@@ -103,7 +103,7 @@ saga cancel_subscription
        on_failure: log and continue
 
     5. audit_log.recordEvent({ actor, action: "subscription.cancelled", resource: user_id }) → void
-       on_failure: log and continue — audit failure must not reverse cancellation
+       on_failure: log and continue -- audit failure must not reverse cancellation
 
   invariant: entitlement must not be active when subscription is cancelled
   timeout: 15 seconds
@@ -113,16 +113,16 @@ saga cancel_subscription
 
 ### Cross-Module Contract Rules
 
-**Rule 1 — Compensation is required for every step with external side effects.**
-A step has external side effects if it mutates state in any module. Notification delivery is an exception — it must never block or reverse business operations.
+**Rule 1 -- Compensation is required for every step with external side effects.**
+A step has external side effects if it mutates state in any module. Notification delivery is an exception -- it must never block or reverse business operations.
 
-**Rule 2 — Compensation must be idempotent.**
+**Rule 2 -- Compensation must be idempotent.**
 `releaseStock`, `initiateRefund`, and all other compensation operations will be called at least once. They must handle duplicate calls without producing incorrect state.
 
-**Rule 3 — The saga orchestrator must be the single source of truth.**
+**Rule 3 -- The saga orchestrator must be the single source of truth.**
 No individual module knows it is part of a saga. The orchestrating service holds the saga state. If the orchestrator crashes, the saga must be resumable from the last committed step.
 
-**Rule 4 — Notification failures never reverse business operations.**
+**Rule 4 -- Notification failures never reverse business operations.**
 Email, SMS, and push delivery failures are operational concerns, not domain failures. A confirmed order remains confirmed even if the confirmation email fails.
 
 ---

@@ -1,4 +1,4 @@
-# Part IX — System-Level Contracts
+# Part IX -- System-Level Contracts
 
 This section defines the ten concerns that every enterprise system must address but that per-module function signatures alone cannot express. These concerns apply across all modules in the catalogue. Each concern is defined as a formal specification, followed by worked examples using modules already defined in Parts I–VIII.
 
@@ -38,7 +38,7 @@ saga place_order
 
   steps:
     1. inventory.reserveStock(variant_id, quantity, order_id) → ReservationToken
-       on_failure: abort — no compensation needed, nothing committed
+       on_failure: abort -- no compensation needed, nothing committed
 
     2. payments.initiatePayment(order_id, amount, currency, method) → Payment
        on_failure: inventory.releaseStock(reservation_token)
@@ -48,7 +48,7 @@ saga place_order
                    inventory.releaseStock(reservation_token)
 
     4. notifications.sendEmail(user_id, "order_confirmed", variables) → DeliveryResult
-       on_failure: log and continue — notification failure must not reverse a confirmed order
+       on_failure: log and continue -- notification failure must not reverse a confirmed order
 
   invariant: at no point may payment be completed and stock unreserved
              at no point may order be confirmed and payment not completed
@@ -71,7 +71,7 @@ saga process_refund
 
     2. inventory.updateStockOnHand(variant_id, +quantity, location_id) → void
        on_failure: orders.transitionOrderStatus(order_id, "return_failed")
-                   — alert operations team
+                   -- alert operations team
 
     3. payments.initiateRefund(payment_id, amount, "return_approved") → Refund
        on_failure: inventory.adjustStock(variant_id, -quantity, "refund_failed_reversal")
@@ -109,7 +109,7 @@ saga cancel_subscription
        on_failure: log and continue
 
     5. audit_log.recordEvent({ actor, action: "subscription.cancelled", resource: user_id }) → void
-       on_failure: log and continue — audit failure must not reverse cancellation
+       on_failure: log and continue -- audit failure must not reverse cancellation
 
   invariant: entitlement must not be active when subscription is cancelled
   timeout: 15 seconds
@@ -119,16 +119,16 @@ saga cancel_subscription
 
 ### Cross-Module Contract Rules
 
-**Rule 1 — Compensation is required for every step with external side effects.**
-A step has external side effects if it mutates state in any module. Notification delivery is an exception — it must never block or reverse business operations.
+**Rule 1 -- Compensation is required for every step with external side effects.**
+A step has external side effects if it mutates state in any module. Notification delivery is an exception -- it must never block or reverse business operations.
 
-**Rule 2 — Compensation must be idempotent.**
+**Rule 2 -- Compensation must be idempotent.**
 `releaseStock`, `initiateRefund`, and all other compensation operations will be called at least once. They must handle duplicate calls without producing incorrect state.
 
-**Rule 3 — The saga orchestrator must be the single source of truth.**
+**Rule 3 -- The saga orchestrator must be the single source of truth.**
 No individual module knows it is part of a saga. The orchestrating service holds the saga state. If the orchestrator crashes, the saga must be resumable from the last committed step.
 
-**Rule 4 — Notification failures never reverse business operations.**
+**Rule 4 -- Notification failures never reverse business operations.**
 Email, SMS, and push delivery failures are operational concerns, not domain failures. A confirmed order remains confirmed even if the confirmation email fails.
 
 ---
@@ -137,7 +137,7 @@ Email, SMS, and push delivery failures are operational concerns, not domain fail
 
 ### What They Are
 
-Every function in the catalogue has a success path. Every function also has a failure taxonomy — a named set of domain errors that are not exceptions but expected outcomes with precise semantics. Callers must handle each named error differently. If the error contract is unspecified, every adapter invents error codes and every caller handles them inconsistently.
+Every function in the catalogue has a success path. Every function also has a failure taxonomy -- a named set of domain errors that are not exceptions but expected outcomes with precise semantics. Callers must handle each named error differently. If the error contract is unspecified, every adapter invents error codes and every caller handles them inconsistently.
 
 ### Specification Format
 
@@ -272,7 +272,7 @@ When a saga step fails with a domain error, the error must propagate to the saga
 
 ### What They Are
 
-Every module operates under a consistency model that determines what a caller can assume after a successful call. This is not an implementation detail — it determines how callers must be written and what tests are valid.
+Every module operates under a consistency model that determines what a caller can assume after a successful call. This is not an implementation detail -- it determines how callers must be written and what tests are valid.
 
 ### Consistency Model Definitions
 
@@ -302,7 +302,7 @@ causal:            Causally related operations are seen in order by all observer
 | `audit_log` | eventual | Query results may lag by up to 5 seconds; `recordEvent` is durable |
 | `analytics` | eventual | Event tracking is best-effort; metrics may lag by minutes |
 | `search` | eventual | Index updates are eventually reflected in search results |
-| `caching` | eventual | By definition — cache invalidation is asynchronous |
+| `caching` | eventual | By definition -- cache invalidation is asynchronous |
 | `feature_flags` | eventual | Flag changes propagate within the flag evaluation TTL |
 | `presence` | eventual | Presence state converges within the TTL window |
 | `queues` | causal | A job enqueued after another must not execute before it in the same queue |
@@ -312,7 +312,7 @@ causal:            Causally related operations are seen in order by all observer
 
 ### Consistency Enforcement Rule
 
-A module declaring `strong` consistency must enforce it at the data layer — not via caching, not via optimistic reads. A module declaring `eventual` consistency must declare the maximum lag bound in its adapter documentation. Any caller that reads immediately after writing to an `eventual` module must be written to tolerate stale data.
+A module declaring `strong` consistency must enforce it at the data layer -- not via caching, not via optimistic reads. A module declaring `eventual` consistency must declare the maximum lag bound in its adapter documentation. Any caller that reads immediately after writing to an `eventual` module must be written to tolerate stale data.
 
 ---
 
@@ -332,7 +332,7 @@ When `idempotency_key` is provided:
 - If the key has not been seen before: execute the operation, store the result, return the result
 - If the key has been seen and the operation completed: return the stored result without re-executing
 - If the key has been seen and the operation is in progress: return `409 Conflict` with `retry_after`
-- If the key has been seen but with different parameters: return `422 Unprocessable` — the key is bound to its first set of parameters
+- If the key has been seen but with different parameters: return `422 Unprocessable` -- the key is bound to its first set of parameters
 
 ### Key Retention Period
 
@@ -480,7 +480,7 @@ EventActor {
 
 ### Delivery Guarantee
 
-All events in this catalogue use **at-least-once** delivery. Consumers must be idempotent — processing the same event twice must produce the same result. The `id` field is the deduplication key.
+All events in this catalogue use **at-least-once** delivery. Consumers must be idempotent -- processing the same event twice must produce the same result. The `id` field is the deduplication key.
 
 ### Module Event Emission Specifications
 
@@ -595,9 +595,9 @@ events emitted by consent:
 
 ### Consumer Conventions
 
-A module that consumes another module's events must declare its subscription in its adapter documentation. The consuming module must not call the emitting module's functions in response to events — it must handle the event payload directly. This prevents circular dependencies at runtime.
+A module that consumes another module's events must declare its subscription in its adapter documentation. The consuming module must not call the emitting module's functions in response to events -- it must handle the event payload directly. This prevents circular dependencies at runtime.
 
-Example: `billing` consumes `auth.user.registered` to create a default free-tier subscription. It handles the event payload directly. It does not call `auth.getUser` to get additional data — all required data must be in the event payload.
+Example: `billing` consumes `auth.user.registered` to create a default free-tier subscription. It handles the event payload directly. It does not call `auth.getUser` to get additional data -- all required data must be in the event payload.
 
 This means event payloads must be self-contained. An event that requires a secondary lookup to be useful is an incomplete event contract.
 
@@ -631,11 +631,11 @@ temporal inventory
     on_expiry:     auto-release reservation
                    emit inventory.stock.released { reason: "expired" }
                    transition order to "reservation_expired" if not confirmed
-    warning_at:    80% (12 minutes) — emit inventory.stock.reservation_expiring_soon
+    warning_at:    80% (12 minutes) -- emit inventory.stock.reservation_expiring_soon
 
   confirmStock:
     max_duration:  5 seconds
-    on_expiry:     return timeout error — caller must retry with same idempotency key
+    on_expiry:     return timeout error -- caller must retry with same idempotency key
 ```
 
 ---
@@ -656,11 +656,11 @@ temporal payments
 
   initiatePayment:
     max_duration:  10 seconds per attempt
-    on_expiry:     return timeout error — caller must retry with same idempotency key
+    on_expiry:     return timeout error -- caller must retry with same idempotency key
 
   Refund (pending state):
     max_duration:  5 business days
-    on_expiry:     alert operations team — do not auto-cancel
+    on_expiry:     alert operations team -- do not auto-cancel
 ```
 
 ---
@@ -695,11 +695,11 @@ temporal orders
 temporal auth
   PasswordResetToken:
     max_duration:  1 hour
-    on_expiry:     token becomes invalid — user must request new reset
+    on_expiry:     token becomes invalid -- user must request new reset
 
   EmailVerificationToken:
     max_duration:  24 hours
-    on_expiry:     token becomes invalid — resendVerification available
+    on_expiry:     token becomes invalid -- resendVerification available
 
   Session (access_token):
     max_duration:  15 minutes (default, configurable)
@@ -765,8 +765,8 @@ temporal queues
 temporal caching
   CacheEntry:
     ttl:            set by caller in CacheOptions
-    on_expiry:      evict silently — next get() returns null
-    maximum_ttl:    24 hours — entries with longer TTL must use explicit invalidation instead
+    on_expiry:      evict silently -- next get() returns null
+    maximum_ttl:    24 hours -- entries with longer TTL must use explicit invalidation instead
 ```
 
 ---
@@ -777,7 +777,7 @@ temporal api_keys
   ApiKey (with expires_at set):
     on_expiry:      transition to expired
                     validateApiKey returns { valid: false, reason: "expired" }
-    warning:        7 days before expiry — emit api_key.expiring_soon to owner
+    warning:        7 days before expiry -- emit api_key.expiring_soon to owner
 ```
 
 ---
@@ -786,7 +786,7 @@ temporal api_keys
 ```
 temporal feature_flags
   Flag evaluation cache:
-    max_age:        30 seconds (default) — flag evaluation must not serve data older than this
+    max_age:        30 seconds (default) -- flag evaluation must not serve data older than this
     on_expiry:      refetch from source
 
   Flag (with time-based rollout rule):
@@ -949,7 +949,7 @@ auth
   recommends:     audit_log, rate_limiting, notifications
 
 users
-  depends_on:     (none — owns its own data)
+  depends_on:     (none -- owns its own data)
   emits_to:       events
   recommends:     audit_log, notifications, permissions
 
@@ -979,22 +979,22 @@ messaging
   recommends:     notifications (for new message alerts), storage (for attachments)
 
 storage
-  depends_on:     (none — wraps external provider)
+  depends_on:     (none -- wraps external provider)
   emits_to:       events
   recommends:     audit_log
 
 caching
-  depends_on:     (none — infrastructure primitive)
+  depends_on:     (none -- infrastructure primitive)
   emits_to:       (none)
   recommends:     (none)
 
 queues
-  depends_on:     (none — infrastructure primitive)
+  depends_on:     (none -- infrastructure primitive)
   emits_to:       (none)
   recommends:     audit_log
 
 search
-  depends_on:     (none — wraps external provider)
+  depends_on:     (none -- wraps external provider)
   emits_to:       (none)
   recommends:     (none)
 
@@ -1009,12 +1009,12 @@ rate_limiting
   recommends:     caching
 
 audit_log
-  depends_on:     (none — must be dependency-free to avoid circular dependencies)
+  depends_on:     (none -- must be dependency-free to avoid circular dependencies)
   emits_to:       (none)
   recommends:     (none)
 
 analytics
-  depends_on:     (none — fire and forget)
+  depends_on:     (none -- fire and forget)
   emits_to:       (none)
   recommends:     queues (for buffered ingestion)
 
@@ -1044,7 +1044,7 @@ orders
   recommends:     notifications, audit_log, shipping
 
 payments
-  depends_on:     (none — wraps external provider + owns wallet)
+  depends_on:     (none -- wraps external provider + owns wallet)
   emits_to:       events
   recommends:     audit_log, notifications, fraud_detection
 
@@ -1084,7 +1084,7 @@ kyc
   recommends:     audit_log, notifications, storage (for document storage)
 
 fraud_detection
-  depends_on:     (none — wraps external provider or rules engine)
+  depends_on:     (none -- wraps external provider or rules engine)
   emits_to:       events
   recommends:     audit_log, ip_intelligence, rate_limiting
 
@@ -1128,7 +1128,7 @@ Tier 4 (depends on Tier 0-3):
   orders, reviews
 
 Tier 5 (depends on Tier 0-4):
-  (all sagas — deployed as orchestration services, not modules)
+  (all sagas -- deployed as orchestration services, not modules)
 ```
 
 ### Blast Radius Analysis
@@ -1144,11 +1144,11 @@ If `inventory` is unavailable:
 - `cart.addToCart` cannot check availability (degrades gracefully if stock check is optional)
 
 If `notifications` is unavailable:
-- All sagas continue — notification steps are non-blocking
-- Users do not receive confirmations — operational concern, not domain failure
+- All sagas continue -- notification steps are non-blocking
+- Users do not receive confirmations -- operational concern, not domain failure
 
 If `audit_log` is unavailable:
-- No module fails — audit_log is `recommends`, not `depends_on`, for all modules
+- No module fails -- audit_log is `recommends`, not `depends_on`, for all modules
 - Events are buffered and replayed when audit_log recovers
 
 ---
@@ -1229,8 +1229,8 @@ An adapter declaring contract version `1.2.0` is **not** guaranteed to:
 A function or field may be deprecated before removal. Deprecation must be announced in a MINOR version. Removal happens in the next MAJOR version. The minimum time between deprecation announcement and removal is one MAJOR version cycle.
 
 ```
-1.3.0 — deprecate payments.getPaymentByOrder (replaced by payments.getPayment with order_id filter)
-2.0.0 — remove payments.getPaymentByOrder
+1.3.0 -- deprecate payments.getPaymentByOrder (replaced by payments.getPayment with order_id filter)
+2.0.0 -- remove payments.getPaymentByOrder
 ```
 
 During the deprecation window, the function must remain fully functional and must not emit warnings that break callers.
@@ -1251,24 +1251,24 @@ After migration window: v1 schema is retired. All consumers must have updated to
 
 ## How to Read Each Module (Revised)
 
-The full module specification includes all ten concerns. Not every module documents all ten concerns exhaustively — the catalogue focuses on the concerns most relevant to each module. The universal rules in this Part IX apply to all modules.
+The full module specification includes all ten concerns. Not every module documents all ten concerns exhaustively -- the catalogue focuses on the concerns most relevant to each module. The universal rules in this Part IX apply to all modules.
 
 Each module entry may include:
 
-- **Functions** — operation signatures with idempotency key where required
-- **Types** — data structures including full error taxonomy
-- **State Machine** — valid state transitions and terminal states
-- **Invariants** — behavioral constraints an implementation must satisfy
-- **Consistency Model** — strong, read_your_writes, eventual, or causal
-- **Events Emitted** — typed domain events with payload shapes
-- **Temporal Constraints** — maximum durations, expiry behaviors, deadlines
-- **Errors** — named domain error taxonomy per function
-- **Cross-Module Contracts** — sagas this module participates in
-- **Observability** — required spans, metrics, and log fields
-- **Contract Version** — current version and deprecation notices
-- **Providers** — examples of what an adapter might wrap
+- **Functions** -- operation signatures with idempotency key where required
+- **Types** -- data structures including full error taxonomy
+- **State Machine** -- valid state transitions and terminal states
+- **Invariants** -- behavioral constraints an implementation must satisfy
+- **Consistency Model** -- strong, read_your_writes, eventual, or causal
+- **Events Emitted** -- typed domain events with payload shapes
+- **Temporal Constraints** -- maximum durations, expiry behaviors, deadlines
+- **Errors** -- named domain error taxonomy per function
+- **Cross-Module Contracts** -- sagas this module participates in
+- **Observability** -- required spans, metrics, and log fields
+- **Contract Version** -- current version and deprecation notices
+- **Providers** -- examples of what an adapter might wrap
 
 ---
 
-*Part IX added to Version 0.2 — Domain Contract Catalogue*
+*Part IX added to Version 0.2 -- Domain Contract Catalogue*
 *Parts I–VIII remain unchanged. This section supersedes the original "How to Read Each Module" preamble.*

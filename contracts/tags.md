@@ -1,11 +1,11 @@
 # Module: tags
 
 **Version:** 0.1.0
-**Part:** III — Data and State
+**Part:** III -- Data and State
 
 ## Purpose
 
-Defines the interface for a cross-domain tagging and labeling system. Tags are arbitrary, user-defined string labels that can be attached to any domain entity by reference. The tags module does not own the entities it labels — it owns only the label-to-entity associations and the tag taxonomy. Tags enable cross-cutting classification, filtering, and grouping of entities across domain boundaries without coupling the entity's domain module to the classification logic.
+Defines the interface for a cross-domain tagging and labeling system. Tags are arbitrary, user-defined string labels that can be attached to any domain entity by reference. The tags module does not own the entities it labels -- it owns only the label-to-entity associations and the tag taxonomy. Tags enable cross-cutting classification, filtering, and grouping of entities across domain boundaries without coupling the entity's domain module to the classification logic.
 
 ---
 
@@ -24,7 +24,7 @@ Resolves a tag by its normalised name and optional namespace. Case-insensitive.
 Lists all declared tags, optionally filtered by namespace, colour, or usage count.
 
 ### `attachTag(input: AttachTagInput) → TagAttachment`
-Associates a tag with an entity. If the tag does not exist and auto-creation is permitted, the tag is created. Idempotent — duplicate attachments return the existing attachment.
+Associates a tag with an entity. If the tag does not exist and auto-creation is permitted, the tag is created. Idempotent -- duplicate attachments return the existing attachment.
 
 ### `detachTag(input: DetachTagInput) → void`
 Removes the association between a tag and an entity.
@@ -150,9 +150,9 @@ type MergeTagInput = {
 
 - `tag.created`
 - `tag.renamed`
-- `tag.attached` — includes `tagId`, `entityRef`, `attachedBy`
-- `tag.detached` — includes `tagId`, `entityRef`
-- `tag.merged` — includes `sourceTagId`, `targetTagId`, `attachmentsMigrated`
+- `tag.attached` -- includes `tagId`, `entityRef`, `attachedBy`
+- `tag.detached` -- includes `tagId`, `entityRef`
+- `tag.merged` -- includes `sourceTagId`, `targetTagId`, `attachmentsMigrated`
 - `tag.deprecated`
 - `tag.deleted`
 

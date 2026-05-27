@@ -26,7 +26,7 @@ ThreatScore { score, level, signals }
 
 ---
 
-## Part VIII — Industry Verticals
+## Part VIII -- Industry Verticals
 
 ---
 
@@ -55,6 +55,6 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — infrastructure primitive / wraps external provider)
+* **Depends On:** (none -- infrastructure primitive / wraps external provider)
 * **Emits To:** events
 * **Recommends:** (none)

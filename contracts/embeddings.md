@@ -1,11 +1,11 @@
 # Module: embeddings
 
 **Version:** 0.1.0
-**Part:** III — Data and State
+**Part:** III -- Data and State
 
 ## Purpose
 
-Defines the interface for generating, storing, indexing, and querying vector embeddings. An embedding is a numerical vector representation of a piece of content (text, image, or structured data) produced by a machine learning model. Embeddings enable semantic similarity search, recommendation, clustering, and retrieval-augmented generation (RAG). This module owns the embedding lifecycle — generation, upsert into the vector index, similarity query, and deletion — independent of the embedding model or vector store used. It is a first-class infrastructure module for any system implementing AI-native features.
+Defines the interface for generating, storing, indexing, and querying vector embeddings. An embedding is a numerical vector representation of a piece of content (text, image, or structured data) produced by a machine learning model. Embeddings enable semantic similarity search, recommendation, clustering, and retrieval-augmented generation (RAG). This module owns the embedding lifecycle -- generation, upsert into the vector index, similarity query, and deletion -- independent of the embedding model or vector store used. It is a first-class infrastructure module for any system implementing AI-native features.
 
 ---
 
@@ -202,7 +202,7 @@ type ListIndexesInput = {
 
 - `index.created`
 - `index.deleted`
-- `vector.upserted` — includes `indexId`, `vectorId` (no vector values)
+- `vector.upserted` -- includes `indexId`, `vectorId` (no vector values)
 - `vector.deleted`
 
 ---

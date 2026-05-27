@@ -1,5 +1,6 @@
 {
   "name": "engineering-blueprinter",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "bin": {
@@ -8,7 +9,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
-    "test": "npm run build && node --test dist/core/*.test.js"
+    "test": "npm run build && node --test dist/core/*.test.js",
+    "postinstall": "npm run build",
+    "link": "npm run build && npm link"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",

@@ -67,7 +67,7 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 ### Temporal Constraints
 ```
 Flag evaluation cache:
-    max_age:        30 seconds (default) — flag evaluation must not serve data older than this
+    max_age:        30 seconds (default) -- flag evaluation must not serve data older than this
     on_expiry:      refetch from source
 
   Flag (with time-based rollout rule):

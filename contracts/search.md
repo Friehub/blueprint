@@ -27,7 +27,7 @@ IndexStats { document_count, index_size, last_updated }
 ```
 
 **Invariants**
-- `indexDocument` must be idempotent — re-indexing the same document must update, not duplicate
+- `indexDocument` must be idempotent -- re-indexing the same document must update, not duplicate
 
 **Providers:** Typesense, Algolia, Meilisearch, Elasticsearch, PostgreSQL full-text
 
@@ -78,7 +78,7 @@ Index freshness:
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — wraps external provider)
+* **Depends On:** (none -- wraps external provider)
 * **Emits To:** (none)
 * **Recommends:** (none)
 * **Pagination Sort Key:** Uses cursor-based pagination sorting by `score DESC` (relevance first) on `search`.

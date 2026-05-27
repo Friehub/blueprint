@@ -1,11 +1,11 @@
 # Module: jobs
 
 **Version:** 0.1.0
-**Part:** III — Data and State
+**Part:** III -- Data and State
 
 ## Purpose
 
-Defines the interface for registering, scheduling, and monitoring named background jobs. A job is a discrete, named unit of work with a defined schedule, retry policy, and execution record. This module is distinct from `queues`, which handles event-driven message consumption. Jobs are time-driven — they fire on a schedule or on explicit trigger, independent of any incoming message.
+Defines the interface for registering, scheduling, and monitoring named background jobs. A job is a discrete, named unit of work with a defined schedule, retry policy, and execution record. This module is distinct from `queues`, which handles event-driven message consumption. Jobs are time-driven -- they fire on a schedule or on explicit trigger, independent of any incoming message.
 
 ---
 
@@ -184,9 +184,9 @@ type ListExecutionsInput = {
 - `job.enabled`
 - `job.disabled`
 - `job.execution.started`
-- `job.execution.succeeded` — includes `durationMs`
-- `job.execution.failed` — includes `attempt`, `errorMessage`
-- `job.execution.exhausted` — all retries consumed
+- `job.execution.succeeded` -- includes `durationMs`
+- `job.execution.failed` -- includes `attempt`, `errorMessage`
+- `job.execution.exhausted` -- all retries consumed
 
 ---
 

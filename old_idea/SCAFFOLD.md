@@ -17,7 +17,7 @@
 
 If the spec says "every payment mutation requires an idempotency key,"
 the scaffold expresses this as a function signature where `idempotency_key`
-is a required, non-optional parameter — not a comment, not a docstring.
+is a required, non-optional parameter -- not a comment, not a docstring.
 A developer who tries to call the function without the key gets a
 compile error, not a code review comment.
 
@@ -47,7 +47,7 @@ The TODO markers are not generic `// TODO: implement`. They are structured:
 // Failure modes addressed: FM-001, FM-002.
 // Algorithm: PIPELINE.md § Pass 4, Algorithm: "Initiate Payment Transfer".
 // Steps 4–11 of the algorithm must be implemented in this function body.
-todo!("Implement per PIPELINE.md § Pass 4 — Initiate Payment Transfer")
+todo!("Implement per PIPELINE.md § Pass 4 -- Initiate Payment Transfer")
 ```
 
 This links every unimplemented function directly back to the exact section
@@ -110,7 +110,7 @@ src/
 
 ### Type Scaffold Rules for Rust
 
-**Rule 1 — Monetary amounts are NEVER primitive floats.**
+**Rule 1 -- Monetary amounts are NEVER primitive floats.**
 ```rust
 // CORRECT
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -122,13 +122,13 @@ impl Amount {
     // SPEC[MONETARY_PRECISION]: No From<f64> impl. Intentional.
 }
 
-// WRONG — never generated
+// WRONG -- never generated
 type Amount = f64;
 ```
 
-**Rule 2 — State machines are enums, not strings.**
+**Rule 2 -- State machines are enums, not strings.**
 ```rust
-// CORRECT — compiler prevents invalid transitions
+// CORRECT -- compiler prevents invalid transitions
 #[derive(Debug, Clone, PartialEq)]
 pub enum PaymentStatus {
     Initiated,
@@ -143,11 +143,11 @@ pub enum PaymentStatus {
 // PaymentService::transition(). Invalid transitions return Err.
 // No direct field mutation of PaymentStatus allowed outside service layer.
 
-// WRONG — never generated
+// WRONG -- never generated
 type PaymentStatus = String;
 ```
 
-**Rule 3 — Idempotency key is non-optional on all mutation signatures.**
+**Rule 3 -- Idempotency key is non-optional on all mutation signatures.**
 ```rust
 // CORRECT
 pub async fn initiate_transfer(
@@ -160,21 +160,21 @@ pub async fn initiate_transfer(
 ) -> Result<PaymentIntent, PaymentError> {
     // SPEC[FR-001, FM-001, FM-002, FM-003]:
     // REQUIRED PATTERN: IDEMPOTENCY_KEY, ATOMIC_LEDGER_ENTRY, DOUBLE_ENTRY_LEDGER
-    // See PIPELINE.md § Pass 4 — Algorithm: Initiate Payment Transfer
+    // See PIPELINE.md § Pass 4 -- Algorithm: Initiate Payment Transfer
     // Steps 1-14 must be implemented here.
     todo!("Implement per spec")
 }
 
-// WRONG — never generated
+// WRONG -- never generated
 pub async fn initiate_transfer(
     &self,
     sender_id: AccountId,
     receiver_id: AccountId,
-    amount: f64, // also wrong — not Amount type
+    amount: f64, // also wrong -- not Amount type
 ) -> Result<(), Error>
 ```
 
-**Rule 4 — Error types are exhaustive, named enums.**
+**Rule 4 -- Error types are exhaustive, named enums.**
 ```rust
 // Generated from the failure paths in each Algorithm in DesignOutput.
 #[derive(Debug, thiserror::Error)]
@@ -194,7 +194,7 @@ pub enum PaymentError {
     #[error("Payment processor error: {0}")]
     ProcessorError(#[from] ProcessorClientError),
 
-    #[error("Concurrent modification conflict — retry with backoff")]
+    #[error("Concurrent modification conflict -- retry with backoff")]
     // SPEC[FM-002, ATOMIC_LEDGER_ENTRY]: Returned on optimistic lock failure.
     // Caller MUST retry with exponential backoff. Max 3 retries.
     ConcurrentModification,
@@ -204,7 +204,7 @@ pub enum PaymentError {
 }
 ```
 
-**Rule 5 — Repository traits are separated from service traits.**
+**Rule 5 -- Repository traits are separated from service traits.**
 ```rust
 // Service: business logic interface (no DB details)
 #[async_trait::async_trait]
@@ -287,7 +287,7 @@ src/
 
 ### Type Scaffold Rules for TypeScript
 
-**Rule 1 — Branded types for domain identifiers.**
+**Rule 1 -- Branded types for domain identifiers.**
 ```typescript
 // Prevents mixing up AccountId and PaymentId at compile time.
 // SPEC[IMPLICIT_CONSTRAINT_3]: Domain identifiers are never raw strings.
@@ -299,11 +299,11 @@ export type PaymentId = Brand<string, "PaymentId">;
 export type IdempotencyKey = Brand<string, "IdempotencyKey">;
 export type TransactionReference = Brand<string, "TransactionReference">;
 
-// WRONG — never generated
+// WRONG -- never generated
 type AccountId = string;
 ```
 
-**Rule 2 — Money class, never number.**
+**Rule 2 -- Money class, never number.**
 ```typescript
 // SPEC[MONETARY_PRECISION, FM-006]: All monetary values in minor units.
 export class Money {
@@ -331,11 +331,11 @@ export class Money {
   }
 }
 
-// WRONG — never generated
+// WRONG -- never generated
 type Amount = number;
 ```
 
-**Rule 3 — Payment status as discriminated union.**
+**Rule 3 -- Payment status as discriminated union.**
 ```typescript
 // SPEC[AUTH_CAPTURE_STATE_MACHINE]: Every state carries only its
 // relevant data. Invalid state data is impossible to represent.
@@ -348,17 +348,17 @@ export type PaymentStatus =
   | { status: "failed"; reason: FailureReason; failedAt: Date }
   | { status: "expired"; expiredAt: Date };
 
-// WRONG — never generated
+// WRONG -- never generated
 type PaymentStatus = "initiated" | "authorized" | "captured" | "failed";
 ```
 
-**Rule 4 — Service interface with required idempotency key.**
+**Rule 4 -- Service interface with required idempotency key.**
 ```typescript
 export interface PaymentService {
   /**
    * SPEC[FR-001, FM-001, FM-002, FM-003]
    * REQUIRED PATTERNS: IDEMPOTENCY_KEY, ATOMIC_LEDGER_ENTRY, DOUBLE_ENTRY_LEDGER
-   * See PIPELINE.md § Pass 4 — Algorithm: Initiate Payment Transfer
+   * See PIPELINE.md § Pass 4 -- Algorithm: Initiate Payment Transfer
    */
   initiateTransfer(params: {
     idempotencyKey: IdempotencyKey; // Non-optional. FM-001.
@@ -368,7 +368,7 @@ export interface PaymentService {
   }): Promise<Result<PaymentIntent, PaymentError>>;
 }
 
-// Stub implementation — logic is TODO with spec references
+// Stub implementation -- logic is TODO with spec references
 export class PaymentServiceImpl implements PaymentService {
   constructor(
     private readonly walletRepo: WalletRepository,
@@ -388,12 +388,12 @@ export class PaymentServiceImpl implements PaymentService {
     // SPEC[FM-002, ATOMIC_LEDGER_ENTRY]: Use atomic debit+credit in one tx.
     // SPEC[FM-004, OUTBOX_PATTERN]: Insert outbox entry in same transaction.
     // Full algorithm: PIPELINE.md § Pass 4, Steps 1-14.
-    throw new Error("Not implemented — see PIPELINE.md § Pass 4");
+    throw new Error("Not implemented -- see PIPELINE.md § Pass 4");
   }
 }
 ```
 
-**Rule 5 — Config is validated at startup, not at runtime.**
+**Rule 5 -- Config is validated at startup, not at runtime.**
 ```typescript
 import { z } from "zod";
 
@@ -441,7 +441,7 @@ src/
 
 ### Type Scaffold Rules for Solidity
 
-**Rule 1 — Use custom errors, never string reverts.**
+**Rule 1 -- Use custom errors, never string reverts.**
 ```solidity
 // CORRECT
 error InsufficientFunds(address account, uint256 balance, uint256 required);
@@ -449,11 +449,11 @@ error DuplicateRequest(bytes32 idempotencyKey);
 error ComplianceRejected(address account, string reason);
 error UnauthorizedStateTransition(PaymentStatus from, PaymentStatus to);
 
-// WRONG — never generated
+// WRONG -- never generated
 revert("Insufficient funds");
 ```
 
-**Rule 2 — Amounts use fixed-point with explicit denomination.**
+**Rule 2 -- Amounts use fixed-point with explicit denomination.**
 ```solidity
 // SPEC[MONETARY_PRECISION]: All amounts in smallest denomination.
 // For USD: 1 USD = 100 cents = stored as 100.
@@ -466,7 +466,7 @@ struct Money {
 }
 ```
 
-**Rule 3 — Payment status as explicit enum with transition guards.**
+**Rule 3 -- Payment status as explicit enum with transition guards.**
 ```solidity
 // SPEC[AUTH_CAPTURE_STATE_MACHINE]
 enum PaymentStatus {
@@ -479,7 +479,7 @@ enum PaymentStatus {
     Expired       // 6
 }
 
-// Transition guard — called before every state change
+// Transition guard -- called before every state change
 function _assertValidTransition(
     PaymentStatus from,
     PaymentStatus to
@@ -489,11 +489,11 @@ function _assertValidTransition(
     //        Authorized→Expired, Captured→Settled, Initiated→Failed
     // All other transitions revert with UnauthorizedStateTransition.
     // TODO: implement transition matrix
-    revert("Not implemented — see PIPELINE.md § Pass 4");
+    revert("Not implemented -- see PIPELINE.md § Pass 4");
 }
 ```
 
-**Rule 4 — Reentrancy protection on all state-changing functions.**
+**Rule 4 -- Reentrancy protection on all state-changing functions.**
 ```solidity
 // SPEC[FM-003]: Every external call that follows a state change
 // must be protected against reentrancy.
@@ -512,7 +512,7 @@ contract PaymentGateway is ReentrancyGuard {
         // 1. All checks (idempotency, balance, compliance) FIRST.
         // 2. All effects (state changes) SECOND.
         // 3. All interactions (external calls) LAST.
-        // See PIPELINE.md § Pass 4 — Algorithm: Initiate Payment Transfer
+        // See PIPELINE.md § Pass 4 -- Algorithm: Initiate Payment Transfer
         revert("Not implemented");
     }
 }
@@ -548,7 +548,7 @@ When scaffold generation is complete, the following must be true:
    Unimplemented functions have TODO markers with spec references.
 
 2. **Every identified failure mode maps to at least one type constraint.**
-   The type system must make the failure mode harder (not impossible —
+   The type system must make the failure mode harder (not impossible --
    that's the implementation's job) to introduce accidentally.
 
 3. **Every algorithm step that requires a specific pattern has a comment**

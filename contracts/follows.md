@@ -23,12 +23,12 @@ FollowCounts { followers, following }
 ```
 
 **Invariants**
-- `follow` must be idempotent — following twice must not create a duplicate relation
+- `follow` must be idempotent -- following twice must not create a duplicate relation
 - Self-follows must be rejected
 
 ---
 
-## Part VI — Platform Operations
+## Part VI -- Platform Operations
 
 ---
 

@@ -31,6 +31,9 @@ export type ModuleContract = {
   invariants: string[];
   providers: string[];
   integrations: string[];
+  hardDeps: string[];
+  softDeps: string[];
+  coreInherits: string[];
   rawSections: RawSection[];
   profile: ModuleProfile;
   source: SourceRef;
@@ -42,6 +45,7 @@ export type CoreContract = {
   summary: string | null;
   sections: RawSection[];
   rawSections: RawSection[];
+  implicit: boolean;
   profile: CoreProfile;
   source: SourceRef;
 };
@@ -93,4 +97,21 @@ export type ParseIssue = {
 export type ParseResult<T> = {
   value: T | null;
   issues: ParseIssue[];
+};
+
+export function implicitCores(catalog: Catalog): CoreContract[] {
+  return catalog.core.filter((c) => c.implicit);
+}
+
+export type ResolvedModule = {
+  name: string;
+  source: "explicit" | "hard-dep" | "soft-dep";
+  hardDeps: string[];
+  softDeps: string[];
+};
+
+export type ResolvedSet = {
+  modules: ResolvedModule[];
+  core: CoreContract[];
+  warnings: string[];
 };

@@ -27,7 +27,7 @@ JobOptions { delay?, priority?, max_attempts?, backoff? }
 ```
 
 **Invariants**
-- A failed job must not be lost — it must transition to `failed` state with the error recorded
+- A failed job must not be lost -- it must transition to `failed` state with the error recorded
 - `cancelJob` on an active job must be a best-effort operation, not a guarantee
 
 **Providers:** BullMQ, Inngest, Quirrel, AWS SQS, Sidekiq
@@ -120,7 +120,7 @@ gensense_queues_depth                       gauge { queue_name, status }
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — infrastructure primitive)
+* **Depends On:** (none -- infrastructure primitive)
 * **Emits To:** (none)
 * **Recommends:** audit_log
 * **Pagination Sort Key:** Uses cursor-based pagination sorting by `run_at ASC` (next to execute first) on `getJobStatus`.

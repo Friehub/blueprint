@@ -31,7 +31,7 @@ ReturnRequest { id, order_id, lines, reason, status }
 ```
 
 **Invariants**
-- Status transitions must follow the defined state machine — invalid transitions must throw
+- Status transitions must follow the defined state machine -- invalid transitions must throw
 - A cancelled order must release all stock reservations
 
 ---

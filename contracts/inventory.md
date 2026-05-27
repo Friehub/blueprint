@@ -28,7 +28,7 @@ StockAdjustment { id, variant_id, delta, reason, created_at }
 
 **Invariants**
 - `available = on_hand - reserved` at all times
-- `confirmStock` must be idempotent — confirming twice must not double-decrement
+- `confirmStock` must be idempotent -- confirming twice must not double-decrement
 - Reservations must expire automatically if not confirmed
 
 ---

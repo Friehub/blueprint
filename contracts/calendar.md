@@ -1,7 +1,7 @@
 # Module: calendar
 
 **Version:** 0.1.0
-**Part:** VIII — Industry Verticals
+**Part:** VIII -- Industry Verticals
 
 ## Purpose
 
@@ -245,13 +245,13 @@ type UpdateOccurrenceInput = UpdateEventInput & {
 ## Events Emitted
 
 - `calendar.event.created`
-- `calendar.event.published` — triggers invitation dispatch
+- `calendar.event.published` -- triggers invitation dispatch
 - `calendar.event.updated`
-- `calendar.event.rescheduled` — triggers RSVP reset and re-invitation
-- `calendar.event.cancelled` — triggers cancellation notices
+- `calendar.event.rescheduled` -- triggers RSVP reset and re-invitation
+- `calendar.event.cancelled` -- triggers cancellation notices
 - `calendar.attendee.added`
 - `calendar.attendee.removed`
-- `calendar.rsvp.responded` — includes `attendeeId`, `response`
+- `calendar.rsvp.responded` -- includes `attendeeId`, `response`
 - `calendar.occurrence.cancelled`
 
 ---

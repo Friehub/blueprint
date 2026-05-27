@@ -104,7 +104,7 @@ gensense_ledger_account_balance_snapshot    gauge { account_id }
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — owns its own financial ledger data layer)
+* **Depends On:** (none -- owns its own financial ledger data layer)
 * **Emits To:** events
 * **Recommends:** audit_log, caching (for high-speed balance reads)
 * **Pagination Sort Key:** Uses cursor-based pagination sorting by `posted_at DESC` on `getLedgerTransactions`.

@@ -4,7 +4,7 @@
 > A specification is a long-lived artifact. Users return to it when
 > requirements change, when implementation starts, and when they need
 > to understand why a design decision was made. The storage layer must
-> support versioning, retrieval, and delta analysis — not just persistence.
+> support versioning, retrieval, and delta analysis -- not just persistence.
 
 ---
 
@@ -107,7 +107,7 @@ When a user requests a spec update:
 1. The original `spec_run` is NOT modified.
 2. A new `spec_run` is created with `parent_spec_id` pointing to the
    original.
-3. The user provides the changed or new requirements only — not the full
+3. The user provides the changed or new requirements only -- not the full
    prompt again.
 4. The pipeline runs a **delta analysis** first: which passes are
    invalidated by the change?
@@ -209,7 +209,7 @@ SELECT * FROM spec_runs
 WHERE user_id = $1
 ORDER BY created_at DESC
 LIMIT 20;
--- Index: (user_id, created_at DESC) — already defined above
+-- Index: (user_id, created_at DESC) -- already defined above
 
 -- Check if a spec is still running (dashboard polling)
 SELECT status FROM spec_runs WHERE id = $1;
@@ -232,7 +232,7 @@ WHERE status = 'pending' AND timeout_at < now();
 ## Consistency Requirements
 
 The storage layer for spec runs does NOT require strong distributed
-consistency — a spec run is owned by one pipeline process at a time.
+consistency -- a spec run is owned by one pipeline process at a time.
 However, the following operations are atomic:
 
 1. **Pass output + pass status update**: When a pass completes, its
@@ -245,7 +245,7 @@ However, the following operations are atomic:
 
 3. **Spec completion**: When the pipeline completes, the `rendered_specs`
    row is inserted AND `spec_runs.status` is set to `completed` AND
-   `spec_runs.completed_at` is set — all in one transaction.
+   `spec_runs.completed_at` is set -- all in one transaction.
 
 **Invariant**: A `spec_run` with `status = completed` ALWAYS has a
 corresponding `rendered_specs` row. There is no partial completion state.

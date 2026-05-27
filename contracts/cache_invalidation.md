@@ -1,7 +1,7 @@
 # Module: cache_invalidation
 
 **Version:** 0.1.0
-**Part:** III — Data and State
+**Part:** III -- Data and State
 
 ## Purpose
 
@@ -185,9 +185,9 @@ type ListJobsInput = {
 - `cache_invalidation.rule.disabled`
 - `cache_invalidation.rule.enabled`
 - `cache_invalidation.rule.deleted`
-- `cache_invalidation.job.triggered` — includes `ruleId`, `resolvedKeyPatterns`
-- `cache_invalidation.job.completed` — includes `purgedKeys` count
-- `cache_invalidation.job.failed` — includes `failedKeys`
+- `cache_invalidation.job.triggered` -- includes `ruleId`, `resolvedKeyPatterns`
+- `cache_invalidation.job.completed` -- includes `purgedKeys` count
+- `cache_invalidation.job.failed` -- includes `failedKeys`
 
 ---
 

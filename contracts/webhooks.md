@@ -33,7 +33,7 @@ DeliveryStatus = pending | success | failed
 
 ---
 
-## Part III — Data and State
+## Part III -- Data and State
 
 ---
 
@@ -101,6 +101,6 @@ Webhook delivery:
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — wraps external provider)
+* **Depends On:** (none -- wraps external provider)
 * **Emits To:** events
 * **Recommends:** queues, audit_log

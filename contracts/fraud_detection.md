@@ -77,6 +77,6 @@ Risk history retention:
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — wraps external provider or rules engine)
+* **Depends On:** (none -- wraps external provider or rules engine)
 * **Emits To:** events
 * **Recommends:** audit_log, ip_intelligence, rate_limiting

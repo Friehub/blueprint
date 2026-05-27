@@ -1,11 +1,11 @@
 # Module: geo
 
 **Version:** 0.1.0
-**Part:** III — Data and State
+**Part:** III -- Data and State
 
 ## Purpose
 
-Defines the interface for geolocation resolution, region classification, and geographic constraint enforcement. A geo module resolves a network address or a user-supplied coordinate into a structured geographic context — country, region, city, timezone, and currency — and evaluates that context against access rules. This module does not own user location data persistently; it provides stateless resolution and classification services. Persistent location preferences belong to `users`.
+Defines the interface for geolocation resolution, region classification, and geographic constraint enforcement. A geo module resolves a network address or a user-supplied coordinate into a structured geographic context -- country, region, city, timezone, and currency -- and evaluates that context against access rules. This module does not own user location data persistently; it provides stateless resolution and classification services. Persistent location preferences belong to `users`.
 
 ---
 
@@ -18,7 +18,7 @@ Resolves an IP address to a structured geographic context. Returns country, subd
 Resolves a latitude/longitude pair to a structured geographic context.
 
 ### `reverseGeocode(input: CoordinateInput) → ReverseGeocodeResult`
-Converts a coordinate pair to a human-readable address. More precise than `resolveCoordinate` — returns street-level data where available.
+Converts a coordinate pair to a human-readable address. More precise than `resolveCoordinate` -- returns street-level data where available.
 
 ### `forwardGeocode(query: string) → ForwardGeocodeResult[]`
 Converts a free-text address or place name to one or more coordinate candidates, ordered by relevance.
@@ -156,7 +156,7 @@ type TimezoneConvertInput = {
 
 ## Invariants
 
-1. `resolveIp` must return a result for any valid IPv4 or IPv6 address, including private/reserved ranges — in that case, `confidence` is `LOW` and geographic fields may be null.
+1. `resolveIp` must return a result for any valid IPv4 or IPv6 address, including private/reserved ranges -- in that case, `confidence` is `LOW` and geographic fields may be null.
 2. `evaluateGeoRule` must not embed hard-coded lists of countries; rule definitions must be configurable at the adapter level so sanctioned country lists can be updated without a code deployment.
 3. `isVpn` and `isTor` fields are best-effort classifications and must never be the sole basis for an access denial; they inform risk scoring, not hard blocks.
 4. `forwardGeocode` must return results ordered by descending `confidence`; no result with `confidence < 0.3` may be returned.

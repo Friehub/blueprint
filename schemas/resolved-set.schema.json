@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://engineering-blueprinter.dev/schemas/resolved-set.json",
+  "title": "Engineering Blueprinter Resolved Set",
+  "description": "Output of `blueprinter resolve` — selected modules with transitive deps and core contracts.",
+  "type": "object",
+  "required": ["modules", "core", "warnings"],
+  "properties": {
+    "modules": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ResolvedModule" }
+    },
+    "core": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/CoreContract" }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "ResolvedModule": {
+      "type": "object",
+      "required": ["name", "source", "hardDeps", "softDeps"],
+      "properties": {
+        "name": { "type": "string" },
+        "source": {
+          "type": "string",
+          "enum": ["explicit", "hard-dep", "soft-dep"],
+          "description": "How this module was included: explicitly requested, hard dependency, or soft dependency."
+        },
+        "hardDeps": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "softDeps": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "CoreContract": {
+      "type": "object",
+      "required": ["name", "title", "sections", "rawSections", "implicit", "profile", "source"],
+      "properties": {
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "summary": { "type": ["string", "null"] },
+        "sections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RawSection" }
+        },
+        "rawSections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RawSection" }
+        },
+        "implicit": { "type": "boolean" },
+        "profile": { "type": "string", "const": "core-v1" },
+        "source": { "$ref": "#/$defs/SourceRef" }
+      }
+    },
+    "RawSection": {
+      "type": "object",
+      "required": ["file", "name", "aliases", "kind", "content", "startLine", "endLine"],
+      "properties": {
+        "file": { "type": "string" },
+        "name": { "type": "string" },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "kind": { "type": "string", "enum": ["known", "unknown"] },
+        "content": { "type": "string" },
+        "startLine": { "type": "integer" },
+        "endLine": { "type": "integer" }
+      }
+    },
+    "SourceRef": {
+      "type": "object",
+      "required": ["file", "startLine", "endLine"],
+      "properties": {
+        "file": { "type": "string" },
+        "startLine": { "type": "integer" },
+        "endLine": { "type": "integer" }
+      }
+    }
+  }
+}

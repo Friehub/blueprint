@@ -10,7 +10,7 @@
 
 ## How to Read This Document
 
-Each **Node** is an engineering primitive — a pattern, strategy, or concept.
+Each **Node** is an engineering primitive -- a pattern, strategy, or concept.
 Each **Edge** is a relationship between primitives:
 
 - `REQUIRES`: Using this node forces you to also implement the target node.
@@ -21,12 +21,12 @@ Each **Edge** is a relationship between primitives:
 
 ---
 
-## Part 1 — Failure Mode Register (Pre-Loaded Adversarial Scenarios)
+## Part 1 -- Failure Mode Register (Pre-Loaded Adversarial Scenarios)
 
 These are the known failure modes the Adversarial Pass checks against for
 every fintech system. They are ordered by likelihood × severity.
 
-### FM-001 — Double Charge (CRITICAL)
+### FM-001 -- Double Charge (CRITICAL)
 **Description**: A payment is submitted. The response times out. The client
 retries. The payment processor executes the charge twice.
 **Conditions that trigger it**:
@@ -37,7 +37,7 @@ retries. The payment processor executes the charge twice.
 **Formal invariant**:
 `ASSERT: COUNT(charges WHERE request_id = X) <= 1 FOR ALL X`
 
-### FM-002 — Stale Balance Read (CRITICAL)
+### FM-002 -- Stale Balance Read (CRITICAL)
 **Description**: Two concurrent requests read the same balance. Both pass
 the "sufficient funds" check. Both proceed to deduct. The final balance is
 negative.
@@ -49,7 +49,7 @@ negative.
 **Formal invariant**:
 `ASSERT: balance >= 0 AT ALL TIMES FOR ALL accounts`
 
-### FM-003 — Partial Commit (CRITICAL)
+### FM-003 -- Partial Commit (CRITICAL)
 **Description**: A transfer deducts from Account A. Before crediting Account
 B, the service crashes. Account A is debited. Account B never receives funds.
 Money is destroyed.
@@ -62,7 +62,7 @@ Money is destroyed.
 `ASSERT: SUM(all_ledger_entries) = 0 AT ALL TIMES`
 (Every debit entry has a matching credit entry. Total system money is conserved.)
 
-### FM-004 — Ghost Transaction (HIGH)
+### FM-004 -- Ghost Transaction (HIGH)
 **Description**: A transaction record exists in the database, but no actual
 money movement occurred (or vice versa). The books don't balance.
 **Conditions that trigger it**:
@@ -74,7 +74,7 @@ money movement occurred (or vice versa). The books don't balance.
 **Formal invariant**:
 `ASSERT: EVERY transaction_record HAS a corresponding processor_confirmation`
 
-### FM-005 — Retry Storm (HIGH)
+### FM-005 -- Retry Storm (HIGH)
 **Description**: A downstream service is slow. All clients start retrying
 simultaneously. The increased load makes the service slower. Retries increase.
 System enters a death spiral.
@@ -85,7 +85,7 @@ System enters a death spiral.
 **Required mitigation**: Exponential Backoff with Jitter + Circuit Breaker
 (see Nodes: EXPONENTIAL_BACKOFF, CIRCUIT_BREAKER).
 
-### FM-006 — Currency Precision Loss (HIGH)
+### FM-006 -- Currency Precision Loss (HIGH)
 **Description**: Floating-point arithmetic on monetary values causes rounding
 errors. Over millions of transactions, the accumulated error is significant.
 **Conditions that trigger it**:
@@ -95,7 +95,7 @@ errors. Over millions of transactions, the accumulated error is significant.
 **Formal invariant**:
 `ASSERT: ALL monetary_values ARE stored as INTEGER (minor units) OR DECIMAL(19,4)`
 
-### FM-007 — Clock Skew in Settlement (MEDIUM)
+### FM-007 -- Clock Skew in Settlement (MEDIUM)
 **Description**: Two services use different system clocks. Timestamps on
 transactions disagree. Settlement calculations for a "business day" are
 inconsistent across services.
@@ -105,7 +105,7 @@ inconsistent across services.
 **Required mitigation**: Centralized timestamp authority or logical clocks
 for sequencing (see Node: LOGICAL_CLOCK).
 
-### FM-008 — Silent Authorization Expiry (MEDIUM)
+### FM-008 -- Silent Authorization Expiry (MEDIUM)
 **Description**: A payment is authorized but not captured. The authorization
 expires (typically 7 days). The merchant attempts capture. It fails silently.
 The order is processed but payment never collected.
@@ -116,7 +116,7 @@ The order is processed but payment never collected.
 **Required mitigation**: Authorization Lifecycle State Machine
 (see Node: AUTH_CAPTURE_STATE_MACHINE).
 
-### FM-009 — Webhook Replay Attack (MEDIUM)
+### FM-009 -- Webhook Replay Attack (MEDIUM)
 **Description**: A payment processor sends a webhook confirming payment.
 An attacker intercepts and replays the webhook. The system credits the account
 a second time.
@@ -127,7 +127,7 @@ a second time.
 **Required mitigation**: Webhook Signature Verification + Idempotent
 Webhook Handler (see Nodes: WEBHOOK_IDEMPOTENCY, HMAC_VERIFICATION).
 
-### FM-010 — Regulatory Window Violation (MEDIUM)
+### FM-010 -- Regulatory Window Violation (MEDIUM)
 **Description**: A transaction is processed that violates a regulatory rule
 (e.g., AML threshold, transaction velocity limit). No real-time check was
 performed.
@@ -140,7 +140,7 @@ performed.
 
 ---
 
-## Part 2 — Engineering Primitives (The Nodes)
+## Part 2 -- Engineering Primitives (The Nodes)
 
 ### Node: IDEMPOTENCY_KEY
 **Category**: Reliability Pattern
@@ -287,7 +287,7 @@ atomicity (e.g., payment + inventory reservation + order creation).
 **INTRODUCES**: Compensating transactions are NOT rollbacks. The system
 temporarily enters an inconsistent state while compensation runs. This window
 must be accounted for in the UI (e.g., "Payment processing..." state).
-**CONFLICTS_WITH**: 2PC (Two-Phase Commit) — do not mix Saga and 2PC for
+**CONFLICTS_WITH**: 2PC (Two-Phase Commit) -- do not mix Saga and 2PC for
 the same flow. Pick one.
 
 ---
@@ -335,7 +335,7 @@ allowing one test request.
 - `failure_threshold`: Number of consecutive failures to open the breaker.
 - `timeout`: Duration the breaker stays open.
 - `success_threshold`: Successes in half-open state to close the breaker.
-**SOLVES**: FM-005 (Retry Storm) — prevents cascading failures
+**SOLVES**: FM-005 (Retry Storm) -- prevents cascading failures
 **REQUIRES**: EXPONENTIAL_BACKOFF (for the retry path when breaker is closed)
 **INTRODUCES**: Fallback behavior must be defined. What does the system do
 when the circuit is open? Options: Return cached response, queue the request,
@@ -353,7 +353,7 @@ plus a random jitter to prevent synchronized retries across clients.
 - `cap`: 30 seconds
 - `jitter_max`: 25% of calculated delay
 - `max_attempts`: 3 for user-facing flows, 10 for background jobs
-**SOLVES**: FM-005 (Retry Storm) — jitter prevents synchronized retry waves
+**SOLVES**: FM-005 (Retry Storm) -- jitter prevents synchronized retry waves
 **REQUIRES**: IDEMPOTENCY_KEY on the retried request
 
 ---
@@ -386,7 +386,7 @@ recorded with timestamp, actor, and reason.
 **Category**: Pre-Authorization Control
 **Definition**: A synchronous check executed before any payment is authorized.
 It evaluates the transaction against configured rules and blocks if violated.
-**Checks in gate (ordered by cost — cheapest first)**:
+**Checks in gate (ordered by cost -- cheapest first)**:
 1. Amount limits (per transaction, daily, monthly).
 2. Velocity checks (N transactions in T minutes from same account/IP).
 3. Duplicate detection (same amount + merchant within 60 seconds).
@@ -433,7 +433,7 @@ ASSERT: constant_time_compare(expected_sig, received_sig)
 ```
 **Critical**: Use `constant_time_compare`, not `==`. String equality
 short-circuits and is vulnerable to timing attacks.
-**SOLVES**: FM-009 (Webhook Replay Attack) — prevents spoofed webhooks
+**SOLVES**: FM-009 (Webhook Replay Attack) -- prevents spoofed webhooks
 **REQUIRES**: Webhook secret stored in environment variable, never in code.
 
 ---
@@ -451,7 +451,7 @@ application-level counters) to guarantee monotonicity.
 
 ---
 
-## Part 3 — Conflict Matrix
+## Part 3 -- Conflict Matrix
 
 Quick reference for incompatible design choices.
 
@@ -465,7 +465,7 @@ Quick reference for incompatible design choices.
 
 ---
 
-## Part 4 — Implicit Constraints (Always Applied)
+## Part 4 -- Implicit Constraints (Always Applied)
 
 These constraints are applied to EVERY fintech system design regardless of
 the prompt. They are never asked as clarification questions.
@@ -479,7 +479,7 @@ the prompt. They are never asked as clarification questions.
 
 3. **Secrets never in code.** API keys, webhook secrets, and database
    credentials are always environment variables or a secrets manager. This
-   is not asked — it is enforced in the scaffold.
+   is not asked -- it is enforced in the scaffold.
 
 4. **Amounts in minor units.** All internal representations use integers.
    Conversion to display format is the frontend's responsibility.
