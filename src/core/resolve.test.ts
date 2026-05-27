@@ -13,7 +13,7 @@ function renderList(catalog: Catalog): string {
   for (const mod of catalog.modules.sort((a, b) => a.name.localeCompare(b.name))) {
     const deps = mod.hardDeps.length > 0 ? mod.hardDeps.join(", ") : "(none)";
     const soft = mod.softDeps.length > 0 ? mod.softDeps.join(", ") : "(none)";
-    const summary = mod.summary ? ` — ${mod.summary}` : "";
+    const summary = mod.summary ? ` - ${mod.summary}` : "";
     lines.push(`  ${mod.name}${summary}`);
     lines.push(`    deps: ${deps}`);
     lines.push(`    recommends: ${soft}`);
@@ -74,13 +74,13 @@ describe("resolver", () => {
     assert.ok(!names.includes("fraud_detection"), "fraud_detection is a soft dep of payments (hard-dep), should not be pulled");
   });
 
-  it("warns on unknown module names", async () => {
+  it("errors on unknown module names", async () => {
     const result = await loadCatalogFromRoot(ROOT, "loose");
     assert.notEqual(result.value, null);
 
     const resolved = resolve(result.value!, ["nonexistent"]);
 
-    assert.ok(resolved.warnings.some((w) => w.includes("nonexistent")));
+    assert.ok(resolved.errors.some((e) => e.includes("nonexistent")));
     assert.equal(resolved.modules.length, 0);
   });
 

@@ -113,5 +113,6 @@ export type ResolvedModule = {
 export type ResolvedSet = {
   modules: ResolvedModule[];
   core: CoreContract[];
+  errors: string[];
   warnings: string[];
 };

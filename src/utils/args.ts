@@ -1,4 +1,4 @@
-export type Command = "build" | "resolve" | "list" | "inspect" | "graph";
+export type Command = "build" | "resolve" | "list" | "inspect" | "graph" | "search";
 export type OutputFormat = "ascii" | "mermaid";
 
 export interface ParsedArgs {
@@ -10,6 +10,7 @@ export interface ParsedArgs {
   output: string | undefined;
   modules: string[];
   target: string | undefined;
+  query: string | undefined;
   format: OutputFormat;
   compact: boolean;
   quiet: boolean;
@@ -17,7 +18,7 @@ export interface ParsedArgs {
 }
 
 const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet"]);
-const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph"]);
+const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search"]);
 
 export function parseArguments(args: string[]): ParsedArgs {
   const parsed: ParsedArgs = {
@@ -29,6 +30,7 @@ export function parseArguments(args: string[]): ParsedArgs {
     output: undefined,
     modules: [],
     target: undefined,
+    query: undefined,
     format: "ascii",
     compact: false,
     quiet: false,
@@ -44,6 +46,11 @@ export function parseArguments(args: string[]): ParsedArgs {
 
   if ((parsed.command === "inspect" || parsed.command === "graph") && i < args.length && !args[i]!.startsWith("-")) {
     parsed.target = args[i];
+    i++;
+  }
+
+  if (parsed.command === "search" && i < args.length && !args[i]!.startsWith("-")) {
+    parsed.query = args[i];
     i++;
   }
 

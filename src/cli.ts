@@ -3,11 +3,13 @@
 import { loadCatalogFromRoot } from "./core/load-catalog.js";
 import { resolve, detectCycles } from "./core/resolve.js";
 import { buildGraph, renderAscii, renderMermaid } from "./core/graph.js";
+import { searchModules } from "./core/search.js";
 import { parseArguments } from "./utils/args.js";
 import { writeFile, stat } from "node:fs/promises";
 import { dirname, resolve as pathResolve } from "node:path";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import * as readline from "node:readline";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -22,11 +24,15 @@ function getVersion(): string {
 }
 
 async function readStdin(): Promise<string> {
-  return new Promise((resolve, reject) => {
+  if (process.stdin.destroyed || process.stdin.readableEnded) {
+    return "";
+  }
+  return new Promise((resolve) => {
     const chunks: Buffer[] = [];
     process.stdin.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
     process.stdin.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
-    process.stdin.on("error", reject);
+    process.stdin.on("error", () => resolve(""));
+    process.stdin.resume();
   });
 }
 
@@ -35,6 +41,42 @@ function parseStdinModules(input: string): string[] {
     .split(/[\n,]/)
     .map((s) => s.trim())
     .filter(Boolean);
+}
+
+async function interactivePicker(query: string, results: Array<{ module: { name: string; summary: string | null } }>): Promise<string[]> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const question = (prompt: string): Promise<string> =>
+    new Promise((resolve) => rl.question(prompt, resolve));
+
+  console.log(`\nFound ${results.length} modules matching "${query}":\n`);
+
+  for (let i = 0; i < results.length; i++) {
+    const r = results[i]!;
+    const summary = r.module.summary ? ` - ${r.module.summary}` : "";
+    console.log(`  ${i + 1}. ${r.module.name}${summary}`);
+  }
+
+  console.log("\nEnter numbers separated by commas (e.g., 1,3,5), or 'all' to select all:");
+
+  const answer = await question("> ");
+  rl.close();
+
+  const trimmed = answer.trim().toLowerCase();
+
+  if (trimmed === "all") {
+    return results.map((r) => r.module.name);
+  }
+
+  const indices = trimmed
+    .split(",")
+    .map((s) => parseInt(s.trim(), 10) - 1)
+    .filter((i) => i >= 0 && i < results.length);
+
+  return indices.map((i) => results[i]!.module.name);
 }
 
 async function main() {
@@ -74,6 +116,8 @@ async function main() {
       }
       if (strict) {
         process.exit(1);
+      } else {
+        process.exitCode = 1;
       }
     }
     if (warnings.length > 0 && !quiet) {
@@ -119,6 +163,55 @@ async function main() {
     outputData = args.format === "mermaid"
       ? renderMermaid(graph, args.target)
       : renderAscii(graph, args.target);
+  } else if (args.command === "search") {
+    let query = args.query;
+
+    if (!query && !process.stdin.isTTY) {
+      const input = await readStdin();
+      query = input.trim().split("\n")[0]?.trim();
+    }
+
+    if (!query) {
+      console.error("Error: search query is required.");
+      console.error("Example: blueprinter search billing");
+      process.exit(1);
+    }
+
+    const results = searchModules(result.value, query);
+    if (results.length === 0) {
+      console.error(`No modules found matching "${query}"`);
+      process.exit(1);
+    }
+
+    if (process.stdin.isTTY) {
+      const selected = await interactivePicker(query, results);
+      if (selected.length === 0) {
+        console.error("No modules selected.");
+        process.exit(1);
+      }
+
+      const cycles = detectCycles(result.value);
+      if (cycles.length > 0) {
+        console.error("Cycle detected in hard dependencies:");
+        for (const cycle of cycles) {
+          console.error(`  ${cycle.join(" → ")}`);
+        }
+        process.exit(1);
+      }
+
+      const resolved = resolve(result.value, selected);
+      if (resolved.errors.length > 0) {
+        console.error("Resolve errors:");
+        for (const error of resolved.errors) {
+          console.error(`  - ${error}`);
+        }
+        process.exit(1);
+      }
+      outputData = JSON.stringify(resolved, null, compact ? undefined : 2);
+    } else {
+      const names = results.map((r) => r.module.name);
+      outputData = JSON.stringify(names, null, compact ? undefined : 2);
+    }
   } else if (args.command === "resolve") {
     let modules = args.modules;
 
@@ -144,6 +237,13 @@ async function main() {
     }
 
     const resolved = resolve(result.value, modules);
+    if (resolved.errors.length > 0) {
+      console.error("Resolve errors:");
+      for (const error of resolved.errors) {
+        console.error(`  - ${error}`);
+      }
+      process.exit(1);
+    }
     if (resolved.warnings.length > 0 && !quiet) {
       for (const warning of resolved.warnings) {
         console.warn(`  - ${warning}`);
@@ -151,6 +251,10 @@ async function main() {
     }
     outputData = JSON.stringify(resolved, null, compact ? undefined : 2);
   } else {
+    if (process.exitCode) {
+      console.error("Catalog has errors. Use --strict to fail on errors, or fix the issues above.");
+      process.exit(1);
+    }
     outputData = JSON.stringify(result.value, null, compact ? undefined : 2);
   }
 
@@ -161,7 +265,12 @@ async function main() {
       console.error(`Error: output directory does not exist: ${dirname(output)}`);
       process.exit(1);
     }
-    await writeFile(output, outputData, "utf8");
+    try {
+      await writeFile(output, outputData, "utf8");
+    } catch (error) {
+      console.error(`Error: could not write to ${output}: ${error instanceof Error ? error.message : error}`);
+      process.exit(1);
+    }
   } else {
     console.log(outputData);
   }
@@ -175,7 +284,7 @@ function renderList(catalog: { modules: Array<{ name: string; hardDeps: string[]
     const deps = mod.hardDeps.length > 0 ? mod.hardDeps.join(", ") : "(none)";
     const soft = mod.softDeps.length > 0 ? mod.softDeps.join(", ") : "(none)";
     const coreInherits = mod.coreInherits.length > 0 ? mod.coreInherits.join(", ") : "(none)";
-    const summary = mod.summary ? ` — ${mod.summary}` : "";
+    const summary = mod.summary ? ` - ${mod.summary}` : "";
     lines.push(`  ${mod.name}${summary}`);
     lines.push(`    deps: ${deps}`);
     lines.push(`    recommends: ${soft}`);
@@ -240,12 +349,32 @@ Shows the dependency graph for a module.
     return;
   }
 
+  if (command === "search") {
+    console.log(`
+Usage: blueprinter search <query> [options]
+
+Options:
+  --root <path>      Project root directory (default: current directory)
+  --output <file>    Write the resolved set to this file instead of stdout
+  --compact          Output compact JSON (no indentation)
+
+Searches for modules matching the query and interactively picks which to resolve.
+In non-interactive mode (piped input), outputs matching module names as JSON.
+Examples:
+  blueprinter search billing
+  blueprinter search "user management"
+  echo "payment" | blueprinter search
+`);
+    return;
+  }
+
   console.log(`
 Usage: blueprinter [command] [options]
 
 Commands:
   build (default)    Load all contracts and output catalog.json
   list               List all modules with dependencies
+  search <query>     Search for modules and interactively pick to resolve
   inspect <module>   Show full contract for a module
   graph <module>     Show dependency graph for a module
   resolve            Resolve specific modules with dependencies
@@ -263,6 +392,7 @@ Options:
 
 Examples:
   blueprinter list
+  blueprinter search billing
   blueprinter inspect billing
   blueprinter graph billing
   blueprinter graph billing --format mermaid

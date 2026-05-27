@@ -56,22 +56,22 @@ export function resolve(catalog: Catalog, requestedModules: string[]): ResolvedS
   }
 
   const resolved = new Map<string, ResolveEntry>();
+  const errors: string[] = [];
   const warnings: string[] = [];
 
   for (const name of requestedModules) {
     if (!moduleByName.has(name)) {
-      warnings.push(`Module not found in catalog: ${name}`);
+      errors.push(`Module not found in catalog: ${name}`);
       continue;
     }
     resolved.set(name, { name, source: "explicit" });
   }
 
-  const queue: Array<{ name: string; via: "explicit" | "hard-dep" }> = requestedModules.map((name) => ({
-    name,
-    via: "explicit",
-  }));
+  const queue: Array<{ name: string; via: "explicit" | "hard-dep" }> = requestedModules
+    .filter((name) => moduleByName.has(name))
+    .map((name) => ({ name, via: "explicit" as const }));
 
-  const inQueue = new Set(requestedModules);
+  const inQueue = new Set(queue.map((q) => q.name));
 
   while (queue.length > 0) {
     const current = queue.shift()!;
@@ -82,7 +82,7 @@ export function resolve(catalog: Catalog, requestedModules: string[]): ResolvedS
     for (const dep of mod.hardDeps) {
       if (resolved.has(dep)) continue;
       if (!moduleByName.has(dep)) {
-        warnings.push(`Hard dependency not found in catalog: ${dep} (required by ${current.name})`);
+        errors.push(`Hard dependency not found in catalog: ${dep} (required by ${current.name})`);
         continue;
       }
       resolved.set(dep, { name: dep, source: "hard-dep" });
@@ -136,5 +136,5 @@ export function resolve(catalog: Catalog, requestedModules: string[]): ResolvedS
 
   const core = [...coreByName.values()];
 
-  return { modules: resolvedModules, core, warnings };
+  return { modules: resolvedModules, core, errors, warnings };
 }
