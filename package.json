@@ -1,0 +1,17 @@
+{
+  "name": "engineering-blueprinter",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "blueprinter": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test dist/core/*.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "typescript": "^5.8.3"
+  }
+}
