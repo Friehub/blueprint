@@ -173,6 +173,11 @@ Module contracts inherit `Runtime Standards` unless a module explicitly override
 - [error_tracking](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/error_tracking.md)
 - [security_monitoring](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/security_monitoring.md)
 
+### Part XXI — Incident and Trace Ops
+- [incident_management](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/incident_management.md)
+- [feature_auditing](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/feature_auditing.md)
+- [trace_query](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/trace_query.md)
+
 
 ---
 
