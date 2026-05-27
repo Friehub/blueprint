@@ -41,8 +41,22 @@ DataPoint { timestamp, value }
 * **Model:** `eventual`
 * **Details:** Event tracking is best-effort; metrics may lag by minutes
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for buffered ingestion.
+* **Details:** Duplicate events must be deduplicated by event identity or accepted as safe duplicates by downstream aggregation.
+
+### Worker Scaling
+* **Policy:** Ingestion, buffering, and aggregation workloads must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether analytics ingestion is single-region or active/active.
+* **Details:** Duplicate cross-region ingest must be deduplicated when possible.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If ingestion capacity is saturated, events must be buffered, sampled, or dropped according to explicit policy; the policy must be documented by the adapter.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -52,7 +66,15 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Buffer retention:
+    max_age:           configurable per deployment
+    on_expiry:         flush or drop according to explicit sampling policy
+```
+
+### Storage Model
+* **Model:** Append-only analytics pipeline / warehouse-backed event store.
+* **Details:** Raw events may be buffered, queued, or written to a warehouse; retention and replay semantics must be documented by the provider.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `analytics.<function>`.

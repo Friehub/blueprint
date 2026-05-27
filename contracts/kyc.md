@@ -36,8 +36,22 @@ DocumentType = passport | national_id | drivers_license | utility_bill | selfie
 * **Model:** `strong (default)`
 * **Details:** Standard transactional consistency
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for verification lifecycle events.
+* **Details:** Duplicate submission or approval retries must not create duplicate active verification requests.
+
+### Worker Scaling
+* **Policy:** Document ingestion, review, and status query workloads must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether verification is single-region or active/passive.
+* **Details:** Cross-region review state must converge before approval is accepted.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If review or provider capacity is saturated, verification actions must defer or reject predictably rather than leaving ambiguous status.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -62,6 +76,10 @@ VerificationRequest (pending):
     on_expiry:       transition to expired
                      require re-verification for regulated operations
 ```
+
+### Storage Model
+* **Model:** Durable verification record store.
+* **Details:** Submitted documents must be retained per regulation and access policy; document storage is delegated to `storage`.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `kyc.<function>`.

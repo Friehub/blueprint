@@ -41,12 +41,26 @@ StockAdjustment { id, variant_id, delta, reason, created_at }
 * **Model:** `strong`
 * **Details:** `available = on_hand - reserved` must hold at all times
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for stock reservation and expiry events.
+* **Details:** Duplicate stock actions must be idempotent.
+
+### Worker Scaling
+* **Policy:** Reservation, confirmation, and stock alert workloads must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether inventory is single-region or active/passive.
+* **Details:** Concurrent cross-region writes must not violate stock invariants.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions accept an optional `idempotency_key: string` parameter. Keys must be retained for at least 24 hours.
 * **Required Functions:**
   - `reserveStock(variant_id, quantity, order_id, idempotency_key?)`
   - `confirmStock(reservation_token, idempotency_key?)`
   - `adjustStock(variant_id, delta, reason, idempotency_key?)`
+
+### Backpressure
+* If reservation throughput is saturated, stock reservations must be queued or rejected predictably rather than over-committing inventory.
 
 ### Error Taxonomy
 ### Module-Specific Errors
@@ -76,7 +90,15 @@ reserveStock      → inventory.stock.reserved   { token, variant_id, quantity, 
 ```
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Reservation expiry:
+    max_duration:      configurable per deployment
+    on_expiry:         release stock automatically
+```
+
+### Storage Model
+* **Model:** Strongly consistent inventory store.
+* **Details:** Reservation state must be durable; low-stock alert reads may be served from a replica if the invariant remains intact.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `inventory.<function>`.

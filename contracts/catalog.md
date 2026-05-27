@@ -4,6 +4,7 @@
 
 ### `catalog`
 Product and variant management.
+This module also owns product pricing rules and bundles.
 
 **Functions**
 ```
@@ -18,6 +19,16 @@ getVariantsByProduct(product_id) → Variant[]
 createVariant(product_id, data) → Variant
 updateVariant(variant_id, data) → Variant
 getPricing(variant_id, context?) → Price
+createPricingRule(product_id, rule) → PricingRule
+getPricingRule(rule_id) → PricingRule
+listPricingRules(product_id, options?) → PaginatedResult<PricingRule>
+updatePricingRule(rule_id, data) → PricingRule
+archivePricingRule(rule_id) → PricingRule
+createBundle(data) → Bundle
+getBundle(bundle_id) → Bundle
+listBundles(input, options?) → PaginatedResult<Bundle>
+updateBundle(bundle_id, data) → Bundle
+archiveBundle(bundle_id) → Bundle
 ```
 
 **Types**
@@ -26,7 +37,16 @@ Product { id, name, description, images, status, variants, metadata }
 Variant { id, product_id, sku, options, price, compare_at_price?, weight? }
 Price { amount, currency, compare_at?, tax_inclusive }
 ProductStatus = active | draft | archived
+PricingRule { id, product_id, scope, type, value, priority, active, effective_at?, archived_at? }
+Bundle { id, name, product_ids, variant_ids?, price_override?, status, metadata?, created_at, updated_at }
+PricingRuleType = fixed | percentage | formula | override | tiered
+BundleStatus = draft | active | archived
 ```
+
+**Invariants**
+- Pricing rules must be evaluated deterministically by priority and effective date.
+- Bundles must reference existing products or variants.
+- Archiving a bundle must not mutate the underlying product records.
 
 **Providers:** custom database, Medusa, Shopify API, Saleor
 

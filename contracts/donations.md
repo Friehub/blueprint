@@ -34,8 +34,22 @@ CampaignStats { raised, donor_count, goal, percentage_funded }
 * **Model:** `strong (default)`
 * **Details:** Standard transactional consistency
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for donation lifecycle events.
+* **Details:** Duplicate donation retries must not duplicate donor records or campaign totals.
+
+### Worker Scaling
+* **Policy:** Donation processing, certificate issuance, and stats aggregation must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether donations are single-region or active/passive.
+* **Details:** Cross-region totals must converge deterministically.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If payment or certificate capacity is saturated, donation actions must defer or reject predictably rather than losing campaign totals.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -45,7 +59,15 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Campaign retention:
+    retention:         configurable per policy
+    on_expiry:         archive campaign data according to policy
+```
+
+### Storage Model
+* **Model:** Durable campaign and donation store.
+* **Details:** Donation records and campaign aggregates must remain auditable for the configured retention period.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `donations.<function>`.

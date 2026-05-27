@@ -195,7 +195,13 @@ type ListJobsInput = {
 
 - **Idempotency:** Invalidation jobs are idempotent; purging an already-absent key is a no-op at the `caching` layer.
 - **Consistency:** This module subscribes to the platform event bus. Rule matching and job dispatch must use an at-least-once delivery model; duplicate events may trigger duplicate jobs, but idempotent purges make this safe.
+- **Runtime delivery:** Invalidation jobs are delivered `at_least_once`.
+- **Worker scaling:** Purge workers must be independently scalable from event consumption workers.
+- **Multi-region:** The module must declare whether invalidation execution is single-region or active/passive; duplicate event processing across regions must be deduplicated.
 - **Observability:** Each invalidation job emits a trace span annotated with `ruleId`, `purgedKeyCount`, `failedKeyCount`, and `durationMs`. A metric `cache_invalidation_lag_ms` must be maintained to monitor purge latency from event receipt.
+- **Backpressure:** If purge capacity is saturated, matching events must be deferred or queued predictably rather than dropping invalidations silently.
+- **Dead-letter handling:** Failed invalidation jobs that exhaust retries must be retained in an operator-queryable failed state with the original rule and key patterns.
+- **Storage model:** Rule definitions and invalidation job history must be durably stored; high-volume job history may be trimmed by retention policy, but the active rule set must remain strongly consistent.
 - **Dependencies:** `caching` (low-level purge operations), `queues` (event consumption and job dispatch), `config` (cache store configuration references), `audit_log` (manual trigger history).
 - **Errors:** `RULE_NOT_FOUND`, `RULE_DISABLED`, `JOB_NOT_FOUND`, `INVALID_KEY_PATTERN`, `CACHE_STORE_UNAVAILABLE`.
 - **Providers (adapter examples):** Custom implementation on top of Redis SCAN + DEL, Varnish Cache VCL ban rules, Cloudflare Cache Rules API, Fastly Instant Purge, custom tag-based invalidation (Surrogate-Key).

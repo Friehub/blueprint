@@ -43,8 +43,24 @@ DeliveryStatus = pending | success | failed
 * **Model:** `strong (default)`
 * **Details:** Standard transactional consistency
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once`
+* **Details:** Delivery retries may create duplicates; receivers must be idempotent or deduplicate by delivery identity.
+
+### Worker Scaling
+* **Policy:** Delivery concurrency must be configurable per endpoint and/or per owner.
+* **Details:** High-volume endpoints must support bounded parallelism so one failing target cannot saturate the entire delivery pool.
+
+### Multi-Region Behavior
+* **Mode:** The module must declare whether endpoint delivery is active/passive or active/active across regions.
+* **Details:** Cross-region retries must preserve the original signature and delivery context.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If an endpoint or owner exceeds delivery capacity, the module must defer, rate-limit, or reject deliveries predictably.
+* `dispatchEvent` must never create unbounded in-memory delivery backlog.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -54,7 +70,30 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Webhook delivery:
+    connect_timeout:   2 seconds default
+    total_timeout:     30 seconds maximum
+    max_attempts:      configurable per endpoint, default 3
+    backoff:           exponential with jitter
+
+  Payload size:
+    max_size:          configurable per endpoint, default 256 KiB
+    on_exceed:         reject before dispatch
+
+  Delivery retention:
+    max_duration:      configurable per endpoint, minimum 7 days for failed deliveries
+    on_expiry:         eligible for purge after operator review window
+```
+
+### Dead-Letter Handling
+* Failed deliveries that exhaust retries must move to a dead-letter state or store.
+* Dead-letter records must retain endpoint_id, event_type, payload hash, failure reason, and attempt count.
+* Poison endpoints must be disabled or quarantined until an operator re-enables them.
+
+### Storage Model
+* **Model:** Durable delivery log with a dead-letter store.
+* **Details:** Delivery records may be backed by SQL, document storage, or an event log, but retry state and failure history must remain queryable during the retention window.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `webhooks.<function>`.

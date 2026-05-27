@@ -44,11 +44,27 @@ DeliveryStatus = queued | sent | delivered | failed | bounced
 * **Model:** `eventual`
 * **Details:** Delivery status updates are eventually consistent
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once`
+* **Details:** Duplicate delivery attempts are expected; recipients and adapters must tolerate redelivery.
+
+### Worker Scaling
+* **Policy:** Delivery concurrency must be configurable per channel and per recipient scope.
+* **Details:** Email, SMS, push, and in-app delivery should be independently throttleable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether notification delivery is single-region or active/passive.
+* **Details:** If delivery spans regions, duplicate sends must be deduplicated by delivery identity.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions accept an optional `idempotency_key: string` parameter. Keys must be retained for at least 24 hours.
 * **Required Functions:**
   - `sendEmail(to, template_id, variables, options?, idempotency_key?)`
   - `sendSMS(to, body, options?, idempotency_key?)`
+
+### Backpressure
+* If a channel or recipient exceeds delivery capacity, the module must defer, rate-limit, or reject predictably.
+* `sendEmail` and `sendSMS` must not create unbounded delivery backlog.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -58,7 +74,28 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Delivery attempts:
+    max_attempts:      configurable per channel, default 3
+    backoff:           exponential with jitter
+
+  Payload size:
+    max_size:          configurable per channel, default 256 KiB for message payloads
+    on_exceed:         reject before dispatch
+
+  Delivery retention:
+    max_duration:      configurable per channel, minimum 7 days for failed deliveries
+    on_expiry:         eligible for purge after operator review window
+```
+
+### Dead-Letter Handling
+* Failed deliveries that exhaust retries must move to a dead-letter state or store.
+* Dead-letter records must retain channel, recipient, provider reference, failure reason, and attempt count.
+* Poison recipients or templates may be quarantined until an operator clears them.
+
+### Storage Model
+* **Model:** Durable delivery log with a failed-delivery store.
+* **Details:** Delivery state and preference snapshots must remain queryable during the retention window.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `notifications.<function>`.

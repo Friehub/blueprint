@@ -41,8 +41,22 @@ SignedUrl { url, expires_at, method: GET | PUT }
 * **Model:** `strong (default)`
 * **Details:** Standard transactional consistency
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for metadata and object lifecycle events.
+* **Details:** Duplicate uploads or retries must not create duplicate durable objects when the same key is used.
+
+### Worker Scaling
+* **Policy:** Upload/download and metadata workloads must be independently scalable where the backend uses workers.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether storage is single-region, multi-region replicated, or active/passive.
+* **Details:** Cross-region replication lag must be documented by the adapter.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If storage throughput is saturated, uploads and copy/move operations must fail or defer predictably rather than accepting unbounded work.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -52,7 +66,15 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Object retention:
+    retention:         configurable per bucket or object class
+    on_expiry:         delete or transition according to policy
+```
+
+### Storage Model
+* **Model:** Object storage with optional metadata index.
+* **Details:** Provider must document durability, replication, and retention semantics.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `storage.<function>`.

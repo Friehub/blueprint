@@ -46,10 +46,24 @@ PostingDirection = debit | credit
 * **Model:** `strong`
 * **Details:** Financial ledger balance audits must reflect all committed postings immediately.
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for ledger lifecycle events.
+* **Details:** Duplicate posting retries must not create duplicate postings; reference or idempotency keys must resolve to the original transaction.
+
+### Worker Scaling
+* **Policy:** Posting, balance reads, and export workloads must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether the ledger is single-region or active/passive.
+* **Details:** Cross-region writes must not violate balance or atomicity.
+
 ### Idempotency Requirements
 * **Standard:** Idempotency keys must be accepted on transaction postings and retained for 7 days.
 * **Required Functions:**
   - `postTransaction(postings, reference, idempotency_key?)`
+
+### Backpressure
+* If posting throughput is saturated, the module must defer or reject predictably rather than accepting partial transactions.
 
 ### Error Taxonomy
 ### Module-Specific Errors
@@ -69,7 +83,15 @@ postTransaction  → ledger.transaction.posted   { transaction_id, ledger_id, re
 ```
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Ledger retention:
+    retention:         configurable per finance/compliance policy
+    on_expiry:         archive only if allowed by policy
+```
+
+### Storage Model
+* **Model:** Immutable double-entry ledger store.
+* **Details:** Postings are append-only; corrections must be represented by compensating transactions.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `ledger.<function>`.

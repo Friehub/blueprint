@@ -37,8 +37,22 @@ Subscription { id, topic, handler }
 * **Model:** `strong (default)`
 * **Details:** Standard transactional consistency
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` by default; providers may document stronger semantics if they truly support them.
+* **Details:** Consumers must be idempotent and topic replay must preserve ordering within a topic partition when available.
+
+### Worker Scaling
+* **Policy:** Subscription handling, replay, and publish workloads must be independently scalable where the provider allows it.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether the bus is single-region or multi-region mirrored.
+* **Details:** Cross-region duplicates must be deduplicated by event identity.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If subscriber lag or publish throughput is saturated, the bus must apply backpressure or bounded buffering rather than unbounded growth.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -48,7 +62,15 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Topic retention:
+    retention:         configurable per topic or deployment
+    replay_window:     must be documented by provider
+```
+
+### Storage Model
+* **Model:** Partitioned event log / pubsub transport.
+* **Details:** The provider must document ordering guarantees, partitioning behavior, and replay retention.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `events.<function>`.

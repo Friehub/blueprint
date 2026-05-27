@@ -229,7 +229,12 @@ type ListCategoriesInput = {
 
 - **Idempotency:** `recordView` and `submitFeedback` are best-effort; duplicate submissions within a session window are de-duplicated at the analytics layer.
 - **Consistency:** Article publication and search index update must be atomic via an outbox pattern; a published article that is not searchable is a contract violation.
+- **Runtime delivery:** Publication and indexing events are delivered `at_least_once`.
+- **Worker scaling:** Publication sync, indexing, and analytics export must be independently scalable.
+- **Multi-region:** The deployment must declare whether KB publication is single-region or active/passive; duplicate indexing across regions must be deduplicated.
 - **Observability:** View events carry `articleId`, `locale`, `referrer`, and `sessionId` as span attributes for funnel analysis.
+- **Backpressure:** If indexing or analytics capacity is saturated, publication follow-through must defer or reject predictably rather than losing search sync.
+- **Storage model:** Article revisions and publish state must be durably stored; search index freshness is delegated to the search module.
 - **Dependencies:** `search` (article indexing and retrieval), `approvals` (review workflow), `users` (author identity), `tags` (article tagging system), `localization` (locale validation), `analytics` (view metrics aggregation).
 - **Errors:** `ARTICLE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `ARTICLE_NOT_EDITABLE`, `SLUG_CONFLICT`, `ARTICLE_NOT_PUBLISHABLE`, `DRAFT_ALREADY_EXISTS`.
 - **Providers (adapter examples):** Custom implementation, Notion API (authoring layer), Intercom Articles, Zendesk Guide, Confluence (internal KB).

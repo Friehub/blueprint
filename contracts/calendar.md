@@ -260,7 +260,12 @@ type UpdateOccurrenceInput = UpdateEventInput & {
 
 - **Idempotency:** `respondToInvitation` with the same response as the current RSVP state is a no-op.
 - **Consistency:** Invitation dispatch on `publishEvent` uses an outbox pattern; invitations are sent after the event record is durably written.
+- **Runtime delivery:** Invitations and RSVP notifications are delivered `at_least_once`.
+- **Worker scaling:** Invitation dispatch and RSVP query workloads must be independently scalable.
+- **Multi-region:** The deployment must declare whether calendar sync is single-region or active/passive; duplicate invitation dispatch across regions must be deduplicated.
 - **Observability:** RSVP response rate per event is a key metric; spans on `publishEvent` should carry `attendeeCount` as an attribute.
+- **Backpressure:** If dispatch is saturated, invitation sends must defer or reject predictably rather than dropping notices silently.
+- **Storage model:** Event state and attendee RSVP history must remain durable; recurrence materialisation may be generated on demand.
 - **Dependencies:** `notifications` or `emails` (invitation and cancellation dispatch), `users` (attendee identity resolution), `appointments` (availability data feed for `getAvailability`), `localization` (timezone-aware formatting of event times in notifications).
 - **Errors:** `EVENT_NOT_FOUND`, `SERIES_NOT_FOUND`, `ATTENDEE_NOT_FOUND`, `INVALID_EVENT_DURATION`, `INVALID_RRULE`, `EVENT_NOT_CANCELLABLE`, `ORGANISER_REQUIRED`, `EVENT_NOT_EDITABLE`.
 - **Providers (adapter examples):** Google Calendar API, Microsoft Graph Calendar, CalDAV (RFC 4791), Apple EventKit, custom PostgreSQL implementation.

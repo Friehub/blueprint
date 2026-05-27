@@ -41,8 +41,22 @@ KeyStatus = active | archived | compromised
 * **Model:** `strong (default)`
 * **Details:** Standard transactional consistency
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for key lifecycle events.
+* **Details:** Duplicate rotation retries must not invalidate existing ciphertext.
+
+### Worker Scaling
+* **Policy:** Key rotation and password verification workloads must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether key management is single-region or active/passive.
+* **Details:** Key state must converge across regions before new encryptions are accepted.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If KMS or key rotation capacity is saturated, operations must defer or reject predictably rather than producing ambiguous cryptographic state.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -52,7 +66,15 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Key retention:
+    retention:         configurable per key policy
+    on_expiry:         archive or revoke according to policy
+```
+
+### Storage Model
+* **Model:** Durable key registry / KMS-backed metadata store.
+* **Details:** Ciphertext remains durable; key metadata and rotation history must be queryable for the retention window.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `encryption.<function>`.

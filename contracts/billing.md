@@ -39,14 +39,39 @@ SubscriptionStatus = active | trialing | past_due | cancelled | paused
 * **Model:** `strong`
 * **Details:** Subscription status must reflect cancellation immediately
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for subscription lifecycle events.
+* **Details:** Duplicate plan changes or cancellation retries must not create duplicate billing state transitions.
+
+### Worker Scaling
+* **Policy:** Subscription mutations and invoice queries must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether billing is single-region or active/passive.
+* **Details:** Cross-region subscription updates must converge deterministically.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions accept an optional `idempotency_key: string` parameter. Keys must be retained for at least 24 hours.
 * **Required Functions:**
   - `createSubscription(user_id, plan_id, payment_method, idempotency_key?)`
   - `cancelSubscription(user_id, at_period_end?, idempotency_key?)`
 
+### Backpressure
+* If payment or billing provider capacity is saturated, subscription changes must defer or reject predictably rather than leaving mixed state.
+
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+
+### Temporal Constraints
+```
+Invoice retention:
+    retention:         configurable per finance policy
+    on_expiry:         archive or purge according to compliance rules
+```
+
+### Storage Model
+* **Model:** Durable subscription and invoicing store.
+* **Details:** Billing state must be auditable and retained per finance/compliance policy.
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.

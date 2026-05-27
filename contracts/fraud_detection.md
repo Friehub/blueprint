@@ -36,8 +36,22 @@ RiskContext { ip_address, device_fingerprint?, geo?, user_agent? }
 * **Model:** `strong (default)`
 * **Details:** Standard transactional consistency
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for risk scoring side effects and block/unblock events.
+* **Details:** Duplicate risk evaluations must not produce duplicate blocks.
+
+### Worker Scaling
+* **Policy:** Scoring, reporting, and block-list evaluation must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether fraud state is single-region or active/passive.
+* **Details:** Block state must converge across regions before allowing a risky action.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If provider or rules-engine throughput is saturated, scoring must degrade predictably rather than silently skipping checks.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -47,7 +61,15 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Risk history retention:
+    retention:         configurable per compliance policy
+    on_expiry:         archive only if allowed by policy
+```
+
+### Storage Model
+* **Model:** Durable risk history store.
+* **Details:** Block lists and risk scores must remain queryable for audit and review windows.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `fraud_detection.<function>`.

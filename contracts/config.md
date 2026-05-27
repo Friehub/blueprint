@@ -185,7 +185,12 @@ type ValidationResult = {
 
 - **Idempotency:** `setConfig` with an identical `(key, value)` to the current applied value is a no-op; it returns the existing entry without creating a change record.
 - **Consistency:** Changes must be written atomically with their audit records. The cache must be invalidated within 5 seconds of an `APPLIED` change via a pub/sub notification; stale reads beyond this window are a contract violation.
+- **Runtime delivery:** Config change notifications are delivered `at_least_once`.
+- **Worker scaling:** Config reads and change application / approval workflows must be independently scalable.
+- **Multi-region:** The deployment must declare whether configuration is single-region or multi-region replicated; change propagation lag must be documented.
 - **Observability:** Access to `DEPRECATED` keys must emit a warning-level span annotation with the key name; this enables deprecation tracking without breaking callers.
+- **Backpressure:** If config propagation is saturated, updates must queue or reject predictably rather than leaving the cache in an indeterminate state.
+- **Storage model:** The source of truth for configuration must be durable; the cache is an acceleration layer only.
 - **Dependencies:** `caching` (hot-path read layer), `queues` or `events` (cache invalidation broadcast), `audit_log` (change history), `approvals` (for keys requiring approval flows), `encryption` (SECRET value storage).
 - **Errors:** `CONFIG_NOT_FOUND`, `CONSTRAINT_VIOLATION`, `TYPE_IMMUTABLE`, `CHANGE_NOT_FOUND`, `CHANGE_NOT_PENDING`, `ROLLBACK_NOT_AVAILABLE`, `APPROVAL_REQUIRED`.
 - **Providers (adapter examples):** AWS AppConfig, LaunchDarkly (config layer), HashiCorp Consul, etcd, custom PostgreSQL-backed implementation.

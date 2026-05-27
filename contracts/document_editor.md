@@ -38,10 +38,24 @@ DocumentStatus = active | archived
 * **Model:** `strong` (for `acquireEditLock` operations) and `read_your_writes` (for `saveRevision` and document retrieval).
 * **Details:** Locks must be immediately consistent to avoid race conditions during concurrent editing.
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for revision persistence and event emission.
+* **Details:** Duplicate revision submission must not create duplicate visible versions.
+
+### Worker Scaling
+* **Policy:** Revision write paths and lock-check paths must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether editing is single-region or active/passive.
+* **Details:** Lock ownership must not diverge across regions.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 * **Required Functions:**
   - `createDocument(title, workspace_id, idempotency_key?)`
+
+### Backpressure
+* If lock contention or revision write pressure is high, the module must reject or defer predictably rather than corrupting state.
 
 ### Error Taxonomy
 ### Module-Specific Errors
@@ -69,6 +83,10 @@ EditLock:
     max_duration:   5 minutes (configurable)
     on_expiry:      evict lock silently, making lock available for acquisition
 ```
+
+### Storage Model
+* **Model:** Durable revision store with lock registry.
+* **Details:** Revisions must be persisted durably; lock state may be stored in a fast ephemeral store but must be backed by expiry enforcement.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `document_editor.<function>`.

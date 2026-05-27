@@ -157,8 +157,14 @@ type ListPdfJobsInput = {
 
 - **Idempotency:** PDF generation is not idempotent by default; each call to `generatePdf` creates a new job. Callers requiring idempotency must track job IDs themselves.
 - **Consistency:** Render jobs are dispatched via `queues`; the job record must be durable before dispatch to prevent lost jobs on process restart.
+- **Runtime delivery:** Render jobs are delivered `at_least_once`; the render worker must tolerate duplicate dispatches.
+- **Worker scaling:** Render concurrency must be configurable per source type or render pool.
+- **Multi-region:** The deployment must declare whether rendering is single-region or active/passive; duplicate job pickup across regions must be deduplicated.
 - **Observability:** Each job is a trace root; spans cover queue wait, render duration, and storage upload. `pageCount` and `fileSizeBytes` are span attributes.
 - **Security:** URL and HTML sources must never be rendered in a context with access to internal network addresses (localhost, RFC 1918 ranges); the render sandbox must enforce network egress restrictions.
+- **Backpressure:** If the render queue is saturated, `generatePdf` must fail predictably or defer work rather than creating unbounded backlog.
+- **Dead-letter handling:** Jobs that exhaust retry policy or fail deterministically must be retained in an operator-queryable failed state until the retention window expires.
+- **Storage model:** Render artifacts live in object storage; job state and failure history must remain queryable in durable storage until expiry.
 - **Dependencies:** `queues` (async dispatch), `storage` (artifact persistence), `templates` (TEMPLATE source rendering), `jobs` (TTL expiry enforcement).
 - **Errors:** `JOB_NOT_FOUND`, `JOB_NOT_COMPLETE`, `JOB_EXPIRED`, `JOB_NOT_RETRYABLE`, `RENDER_TIMEOUT`, `CONTENT_TOO_LARGE`, `INVALID_URL`, `STORAGE_UNAVAILABLE`.
 - **Providers (adapter examples):** Puppeteer (Chromium headless), Playwright, wkhtmltopdf, WeasyPrint, PDFKit (Node.js), DocRaptor, Gotenberg.

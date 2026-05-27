@@ -30,11 +30,36 @@ AccessEvent { user_id, resource_id, granted, reason, timestamp }
 * **Model:** `strong (default)`
 * **Details:** Standard transactional consistency
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for entitlement lifecycle events.
+* **Details:** Duplicate grant/revoke retries must not duplicate entitlement state.
+
+### Worker Scaling
+* **Policy:** Entitlement writes and access checks must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether entitlement state is single-region or active/passive.
+* **Details:** Cross-region entitlement conflicts must converge deterministically.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
+### Backpressure
+* If entitlement sync is saturated, grant/revoke operations must be deferred or rejected predictably rather than serving stale access indefinitely.
+
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+
+### Temporal Constraints
+```
+Entitlement retention:
+    retention:         configurable per policy
+    on_expiry:         revoke or downgrade access according to policy
+```
+
+### Storage Model
+* **Model:** Durable entitlement store.
+* **Details:** Access history must remain queryable for the configured retention window.
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.

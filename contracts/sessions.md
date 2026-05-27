@@ -36,8 +36,22 @@ Session { id, user_id, device, ip_address?, created_at, last_active_at, expires_
 * **Model:** `strong`
 * **Details:** Revoked sessions must be rejected immediately
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for session lifecycle events.
+* **Details:** Duplicate session creation retries must not create multiple active sessions unless the contract explicitly allows them.
+
+### Worker Scaling
+* **Policy:** Session validation and cleanup jobs must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether sessions are single-region or active/passive.
+* **Details:** Revocation state must converge across regions before a session is accepted.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If session churn is saturated, create/refresh/revoke operations must defer or reject predictably rather than leaving sessions in an indeterminate state.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -54,6 +68,10 @@ Session (active):
                         emit auth.session.expired
     absolute_timeout:   24 hours regardless of activity
 ```
+
+### Storage Model
+* **Model:** Durable session store or revocation cache backed by persistent identity state.
+* **Details:** Revocation must remain queryable for the full refresh-token validity window.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `sessions.<function>`.

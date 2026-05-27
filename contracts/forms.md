@@ -254,7 +254,13 @@ type ListSubmissionsInput = {
 
 - **Idempotency:** `submitForm` is idempotent on `idempotencyKey`; duplicate calls return the existing submission without creating a new record.
 - **Consistency:** Submission creation and webhook dispatch must use an outbox pattern; the submission must be persisted before the webhook is triggered.
+- **Runtime delivery:** Webhook-triggered downstream processing is `at_least_once`; handlers must tolerate duplicate submission notifications.
+- **Worker scaling:** Submission processing and webhook delivery must be independently scalable.
+- **Multi-region:** If form processing is active/active, duplicate submission handling must be deduplicated by `idempotencyKey`.
 - **Observability:** Each submission is a trace with spans for validation, persistence, and webhook dispatch.
+- **Backpressure:** If webhook or downstream processing capacity is saturated, submissions must be queued or rejected predictably rather than being dropped silently.
+- **Dead-letter handling:** Failed downstream processing attempts must remain queryable until the review or retry window expires.
+- **Storage model:** Form schema and submission records must be durably stored; file attachments remain in `storage`.
 - **Dependencies:** `storage` (FILE_UPLOAD field values), `webhooks` (downstream notification on new submission), `notifications` (confirmation messages to submitters), `auth` (authenticated submission identity).
 - **Errors:** `FORM_NOT_FOUND`, `FORM_NOT_ACCEPTING_SUBMISSIONS`, `FORM_VALIDATION_FAILED`, `DUPLICATE_SUBMISSION`, `SUBMISSION_NOT_FOUND`, `FORM_NOT_EDITABLE`.
 - **Providers (adapter examples):** Custom implementation, Typeform API, Tally, Formspree, Jotform, Airtable Forms.

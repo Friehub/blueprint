@@ -203,7 +203,13 @@ type ListSecretsInput = {
 
 - **Idempotency:** `createSecret` is idempotent on `(name, namespace)`; duplicate calls return existing metadata.
 - **Consistency:** Secret values must be encrypted before any write operation completes; plaintext must never touch durable storage.
+- **Runtime delivery:** Secret lifecycle events are delivered `at_least_once`.
+- **Worker scaling:** Rotation scheduling and access checks must be independently scalable.
+- **Multi-region:** The deployment must declare whether secret state is single-region or active/passive; revocation must converge across regions.
 - **Observability:** All reads of secret values are audit log entries. Metric counters for `secret_access_total` and `secret_rotation_total` must be maintained per secret namespace.
+- **Backpressure:** If rotation or access validation capacity is saturated, the module must defer or reject predictably rather than serving stale secret state.
+- **Dead-letter handling:** Failed rotations must remain queryable until the operator review or retry window expires.
+- **Storage model:** Secret values are encrypted at rest in a durable secret store; deprecated versions must remain retained for the documented migration window.
 - **Dependencies:** `encryption` (value encryption at rest), `audit_log` (mandatory access logging), `jobs` (auto-rotation scheduling), `permissions` (grant evaluation).
 - **Errors:** `SECRET_NOT_FOUND`, `ACCESS_DENIED`, `SECRET_REVOKED`, `SECRET_EXPIRED`, `ROTATION_IN_PROGRESS`, `INVALID_ROTATION_TOKEN`, `NAMESPACE_CONFLICT`.
 - **Providers (adapter examples):** HashiCorp Vault, AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, Doppler, Infisical.

@@ -200,7 +200,13 @@ type GetImportErrorsInput = {
 
 - **Idempotency:** Each import job is a unique entity; idempotency at the row level is enforced by the `onDuplicate` policy passed to the target domain operation.
 - **Consistency:** Parse, validate, and commit phases run as separate async jobs dispatched via `queues`; each phase transition must be durably written before the next phase begins.
+- **Runtime delivery:** Phase jobs are delivered `at_least_once`; parse and commit workers must tolerate duplicate execution and use durable phase markers.
+- **Worker scaling:** Parse, validation, and commit workers must be independently scalable because their resource profiles differ.
+- **Multi-region:** The deployment must declare whether import processing is single-region or active/passive; duplicate phase pickup across regions must be deduplicated.
 - **Observability:** Each import job is a trace root. Phase transitions are spans annotated with row counts and error rates. The `commitImport` span must link to child spans for each batch write to the target domain.
+- **Backpressure:** If async phase capacity is saturated, new phase work must be deferred or rejected predictably rather than enqueued without bound.
+- **Dead-letter handling:** Parse or commit work that exhausts retry policy must be retained in an operator-queryable failed state with the original file reference and phase metadata.
+- **Storage model:** Uploaded files live in object storage; import state and row error history must remain durable until the terminal retention window expires.
 - **Dependencies:** `storage` (file upload and retention), `queues` (async phase execution), `jobs` (phase timeout enforcement), `reporting` (error report generation), `auth` (upload URL signing).
 - **Errors:** `IMPORT_NOT_FOUND`, `IMPORT_NOT_READY`, `IMPORT_NOT_ABORTABLE`, `UPLOAD_URL_EXPIRED`, `FILE_TOO_LARGE`, `UNSUPPORTED_FORMAT`, `SCHEMA_MISMATCH`, `NO_ERRORS_TO_REPORT`.
 - **Providers (adapter examples):** Custom implementation backed by S3/GCS presigned URLs, AWS Glue (ETL), Flatfile.com, Airbyte (for data pipeline imports), Papa Parse (client-side parse layer reference).

@@ -44,12 +44,26 @@ ReturnRequest { id, order_id, lines, reason, status }
 * **Model:** `strong`
 * **Details:** Status transitions must be immediately visible
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for order lifecycle events.
+* **Details:** Duplicate order events must not create duplicate state transitions.
+
+### Worker Scaling
+* **Policy:** Order transition processing and read queries must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether order processing is single-region or active/passive.
+* **Details:** Concurrent cross-region status transitions must be deduplicated.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions accept an optional `idempotency_key: string` parameter. Keys must be retained for at least 24 hours.
 * **Required Functions:**
   - `createOrder(cart_id, user_id, shipping_address, payment_method, idempotency_key?)`
   - `transitionOrderStatus(order_id, status, metadata?, idempotency_key?)`
   - `cancelOrder(order_id, reason, idempotency_key?)`
+
+### Backpressure
+* If order processing capacity is saturated, create and transition calls must defer or reject predictably rather than losing state.
 
 ### Error Taxonomy
 ### Module-Specific Errors
@@ -76,7 +90,15 @@ createOrder             → order.created              { order_id, user_id, tota
 ```
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Order retention:
+    retention:         configurable per deployment
+    on_expiry:         archive order history if allowed by policy
+```
+
+### Storage Model
+* **Model:** Durable transactional order store.
+* **Details:** Order state and package state must be strongly consistent; high-volume historical reads may use replicas.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `orders.<function>`.

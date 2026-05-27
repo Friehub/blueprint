@@ -37,8 +37,20 @@ LimitWindow = second | minute | hour | day
 * **Model:** `strong (default)`
 * **Details:** Standard transactional consistency
 
+### Runtime Delivery Model
+* **Scope:** Rate limits must be explicit per endpoint, per key, or per tenant as appropriate.
+* **Details:** The module must document burst and sustained limits, not only a single threshold.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* When a limit is exceeded, the module must return a predictable `retry_after` or equivalent rejection signal.
+* The implementation must not allow over-consumption under concurrent load.
+
+### Storage Model
+* **Model:** Strongly consistent quota store.
+* **Details:** The backing store may be Redis, a relational database, or another atomic counter store, but limit updates must be atomic.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).

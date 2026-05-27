@@ -37,8 +37,22 @@ ApiKeyValidation { valid, user_id?, scopes?, reason? }
 * **Model:** `strong`
 * **Details:** Revoked keys must be rejected immediately
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for API key lifecycle events.
+* **Details:** Duplicate create/rotate retries must not leak additional raw keys.
+
+### Worker Scaling
+* **Policy:** Key validation and rotation workflows must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether API key validation is single-region or active/passive.
+* **Details:** Revocation state must converge across regions before a key is accepted.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If validation or rotation capacity is saturated, the module must defer or reject predictably rather than issuing ambiguous credentials.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -54,6 +68,10 @@ ApiKey (with expires_at set):
                     validateApiKey returns { valid: false, reason: "expired" }
     warning:        7 days before expiry — emit api_key.expiring_soon to owner
 ```
+
+### Storage Model
+* **Model:** Durable key registry with revocation index.
+* **Details:** Raw secrets must be shown only once at creation; the stored record must retain only the non-secret metadata needed for validation.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `api_keys.<function>`.

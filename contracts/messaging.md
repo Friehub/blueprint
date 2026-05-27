@@ -43,8 +43,22 @@ MessageContent { type: text | image | file | system, body, attachments? }
 * **Model:** `strong (default)`
 * **Details:** Standard transactional consistency
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for message delivery and read-state propagation.
+* **Details:** Duplicate sends must not create duplicate persisted messages.
+
+### Worker Scaling
+* **Policy:** Send, read-receipt, and thread-list workloads must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether messaging is single-region or active/passive.
+* **Details:** Duplicate cross-region dispatch must be deduplicated by message identity.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If the send pipeline is saturated, the module must defer or reject predictably rather than dropping messages.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -54,7 +68,22 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Message retention:
+    retention:         configurable per workspace or deployment
+    on_expiry:         eligible for purge after retention window
+
+  Delivery attempts:
+    max_attempts:      configurable per integration, default 3
+    backoff:           exponential with jitter
+```
+
+### Dead-Letter Handling
+* Failed outbound or relay attempts that exhaust retries must remain queryable in a failed store.
+
+### Storage Model
+* **Model:** Durable conversation store.
+* **Details:** Threads and messages must remain durable and queryable; deleted messages remain as tombstones.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `messaging.<function>`.

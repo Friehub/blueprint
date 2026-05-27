@@ -29,7 +29,10 @@ Each module lists:
 ## Global System Standards & Orchestrations
 
 - [Global Core Standards](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/core/global_standards.md) — Universal error types, pagination requirements, idempotency rules, event envelope formats, logging/tracing rules, deployment tiers, and contract evolution rules.
+- [Runtime Standards](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/core/runtime_standards.md) — Queue semantics, retry budgets, dead-letter handling, webhook timeouts, payload limits, backpressure, storage models, and retention rules.
 - [Cross-Module Sagas](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/core/sagas.md) — Multi-module transaction orchestration and rollback compensations (e.g. `place_order`, `process_refund`, `cancel_subscription`).
+
+Module contracts inherit `Runtime Standards` unless a module explicitly overrides a rule in its own `System-Level Integrations` section.
 
 ---
 
@@ -117,6 +120,58 @@ Each module lists:
 ### Part IX — Workflows
 - [onboarding](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/onboarding.md)
 - [approvals](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/approvals.md)
+
+### Part X — Work Management
+- [projects](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/projects.md)
+
+### Part XI — Finance Operations
+- [reconciliation](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/reconciliation.md)
+- [invoicing](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/invoicing.md)
+
+### Part XII — Education
+- [courses](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/courses.md)
+- [enrollments](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/enrollments.md)
+
+### Part XIII — SaaS Platform
+- [plan_catalog](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/plan_catalog.md)
+- [seat_management](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/seat_management.md)
+- [provisioning](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/provisioning.md)
+- [usage_billing](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/usage_billing.md)
+
+### Part XIV — Commerce and Banking
+- [taxation](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/taxation.md)
+- [returns](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/returns.md)
+- [fulfillment](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/fulfillment.md)
+- [settlement](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/settlement.md)
+- [payouts](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/payouts.md)
+- [chargebacks](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/chargebacks.md)
+- [bank_accounts](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/bank_accounts.md)
+
+### Part XV — Platform Extensions
+- [seat_pricing](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/seat_pricing.md)
+- [audit_exports](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/audit_exports.md)
+- [web_analytics](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/web_analytics.md)
+
+### Part XVI — Education Operations
+- [assignments](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/assignments.md)
+- [grading](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/grading.md)
+- [attendance](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/attendance.md)
+
+### Part XVII — Work Operations
+- [tasks](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/tasks.md)
+
+### Part XVIII — Treasury and Reconciliation
+- [bank_reconciliation](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/bank_reconciliation.md)
+- [treasury_accounts](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/treasury_accounts.md)
+
+### Part XIX — Trust and Security
+- [attachments](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/attachments.md)
+- [moderation](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/moderation.md)
+- [security_settings](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/security_settings.md)
+
+### Part XX — Observability and Security Ops
+- [error_tracking](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/error_tracking.md)
+- [security_monitoring](file:///home/oxisrael/Friehub/Taas/engineering-blueprinter/contracts/security_monitoring.md)
 
 
 ---

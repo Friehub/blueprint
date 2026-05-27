@@ -43,6 +43,17 @@ PaymentStatus = pending | processing | completed | failed | refunded | disputed
 * **Model:** `strong`
 * **Details:** Balance changes must be immediately consistent
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for payment lifecycle events.
+* **Details:** Duplicate provider callbacks or retries must not duplicate charges or refunds.
+
+### Worker Scaling
+* **Policy:** Payment initiation, provider verification, and refund workflows must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether payment processing is single-region or active/passive.
+* **Details:** Duplicate cross-region submission must be deduplicated by payment identity.
+
 ### Idempotency Requirements
 * **Standard:** Idempotency keys must be accepted on financial operations and retained for 7 days. Reference fields serve as idempotency keys for wallet credits/debits.
 * **Required Functions:**
@@ -50,6 +61,9 @@ PaymentStatus = pending | processing | completed | failed | refunded | disputed
   - `creditWallet(user_id, amount, currency, reference, idempotency_key?)`
   - `debitWallet(user_id, amount, currency, reference, idempotency_key?)`
   - `initiateRefund(payment_id, amount?, reason, idempotency_key?)`
+
+### Backpressure
+* If provider capacity is saturated, the module must defer or reject predictably rather than attempting unbounded retries.
 
 ### Error Taxonomy
 ### Module-Specific Errors
@@ -90,7 +104,15 @@ initiatePayment   → payment.initiated          { payment_id, order_id, amount,
 ```
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Payment event retention:
+    retention:         configurable per regulatory policy
+    on_expiry:         archive or purge according to compliance requirements
+```
+
+### Storage Model
+* **Model:** Strongly consistent financial ledger / payment state store.
+* **Details:** Balance and payment records must remain auditable and queryable for the required retention period.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `payments.<function>`.

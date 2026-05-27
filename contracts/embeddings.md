@@ -211,7 +211,12 @@ type ListIndexesInput = {
 
 - **Idempotency:** `upsertVector` and `upsertVectorBatch` are idempotent on `vectorId` per index.
 - **Consistency:** Vector upserts are eventually consistent; queries immediately following an upsert may not reflect the new vector. The acceptable propagation lag is ≤ 5 seconds.
+- **Runtime delivery:** Vector ingest and reindex events are delivered `at_least_once`.
+- **Worker scaling:** Indexing and query workloads must be independently scalable.
+- **Multi-region:** The deployment must declare whether the vector index is single-region or active/active; duplicate writes across regions must be deduplicated by vector ID.
 - **Observability:** `querySimilar` and `queryByText` must emit spans annotated with `indexId`, `topK`, `resultCount`, and `queryLatencyMs`.
+- **Backpressure:** If indexing or query load is saturated, requests must be buffered or rejected predictably rather than silently dropped.
+- **Storage model:** Vector indexes must be durably stored; the provider must document replication and rebuild behavior.
 - **Dependencies:** `storage` (if source content exceeds inline payload limits), `search` (hybrid queries use the keyword layer from `search`), `config` (model endpoint and API key references via the secrets module).
 - **Errors:** `INDEX_NOT_FOUND`, `VECTOR_NOT_FOUND`, `DIMENSION_MISMATCH`, `INVALID_TOP_K`, `MODEL_UNAVAILABLE`, `CONTENT_TOO_LARGE`, `INDEX_NOT_READY`.
 - **Providers (adapter examples):** Pinecone, Weaviate, Qdrant, pgvector (PostgreSQL extension), Chroma, Milvus, OpenAI Embeddings API (generation), Cohere Embed.

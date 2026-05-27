@@ -153,8 +153,14 @@ This module consumes events from other modules; it does not emit new domain even
 
 - **Idempotency:** `ingestEvent` is idempotent on `idempotencyKey`.
 - **Consistency:** Feed writes are eventually consistent. The acceptable lag between a source event and feed entry availability is ≤ 2 seconds under normal load.
+- **Runtime delivery:** Feed ingestion consumes source events `at_least_once`; duplicate source events must not create duplicate feed entries.
+- **Worker scaling:** Feed ingestion and feed query paths must be independently scalable.
+- **Multi-region:** If feed ingestion is active/active, duplicate event processing across regions must be deduplicated by `idempotencyKey`.
 - **Observability:** `ingestEvent` spans must carry `eventName`, `actorId`, `entityType`, and `audienceStrategy` as attributes.
 - **Real-time delivery:** When new entries are ingested, the module must publish to the `presence` module's push channel for subscribed audiences to enable live feed updates.
+- **Backpressure:** If ingestion capacity is saturated, event processing must defer or queue predictably rather than silently dropping events.
+- **Dead-letter handling:** Failed ingestion records must remain queryable until the retry or review window expires.
+- **Storage model:** Feed entries must be stored in a read-optimized durable projection, typically a sorted-set or append-only table with cursor pagination support.
 - **Dependencies:** `follows` (FOLLOWERS audience resolution), `workspaces` (WORKSPACE audience resolution), `users` (actor display name resolution), `presence` (real-time push of new entries), `permissions` (PUBLIC_PROFILE visibility checks).
 - **Errors:** `ACTIVITY_TYPE_NOT_FOUND` (only for `ingestEvent` when strict mode is enabled), `ENTRY_NOT_FOUND`, `FEED_AUDIENCE_INVALID`.
 - **Providers (adapter examples):** Custom Redis-sorted-set implementation, Stream (GetStream.io), Knock, custom PostgreSQL fan-out with cursor pagination.

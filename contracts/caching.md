@@ -40,8 +40,18 @@ CacheStats { hits, misses, keys, memory_used }
 * **Model:** `eventual`
 * **Details:** By definition — cache invalidation is asynchronous
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for invalidation-triggering events.
+* **Details:** Duplicate invalidation events must be safe because cache purges are idempotent.
+
+### Worker Scaling
+* **Policy:** Bulk invalidation and read/write cache traffic must be independently scalable where the implementation uses workers.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If invalidation load is saturated, the module must defer or batch purges predictably rather than dropping them silently.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -57,6 +67,10 @@ CacheEntry:
     on_expiry:      evict silently — next get() returns null
     maximum_ttl:    24 hours — entries with longer TTL must use explicit invalidation instead
 ```
+
+### Storage Model
+* **Model:** Ephemeral key-value store.
+* **Details:** The implementation may use Redis, Memcached, or an in-memory cache; data is not durable by contract.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `caching.<function>`.

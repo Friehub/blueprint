@@ -36,8 +36,23 @@ Unsubscribe = () => void
 * **Model:** `eventual`
 * **Details:** Presence state converges within the TTL window
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once`
+* **Details:** Presence updates may be delivered more than once; the last observed state wins.
+
+### Worker Scaling
+* **Policy:** Presence write traffic and subscribe/poll traffic must be independently scalable.
+* **Details:** High-frequency presence churn must not block read queries.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether presence is single-region or active/active.
+* **Details:** Duplicate presence updates across regions must converge deterministically.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If update throughput is saturated, presence writes must be coalesced or deferred predictably.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -47,7 +62,15 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Presence TTL:
+    offline_timeout:   configurable per deployment
+    on_expiry:         mark user offline automatically
+```
+
+### Storage Model
+* **Model:** Ephemeral state store with TTL-backed records.
+* **Details:** Presence state may be stored in Redis or an equivalent ephemeral store, but expiry must be enforced by the backing store or a reliable sweeper.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `presence.<function>`.

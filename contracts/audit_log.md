@@ -41,10 +41,24 @@ ExportFormat = json | csv
 * **Model:** `eventual`
 * **Details:** Query results may lag by up to 5 seconds; `recordEvent` is durable
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for ingestion into downstream sinks.
+* **Details:** Duplicate records must not violate append-only semantics.
+
+### Worker Scaling
+* **Policy:** Record ingestion and query/export workloads must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether audit ingestion is single-region or active/passive.
+* **Details:** Duplicate cross-region ingestion must be deduplicated by event identity when possible.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions accept an optional `idempotency_key: string` parameter. Keys must be retained for at least 24 hours.
 * **Required Functions:**
   - `recordEvent(event, idempotency_key?)`
+
+### Backpressure
+* If ingestion or export is saturated, the module must defer or reject predictably rather than dropping events silently.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -54,7 +68,15 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Audit retention:
+    retention:         configurable per compliance policy
+    on_expiry:         only purge when policy explicitly allows it
+```
+
+### Storage Model
+* **Model:** Append-only durable audit store.
+* **Details:** Records must be immutable after creation and queryable for the configured retention window.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `audit_log.<function>`.

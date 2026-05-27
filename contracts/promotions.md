@@ -4,6 +4,7 @@
 
 ### `promotions`
 Discount and promotion engine.
+This module also owns gift cards as stored-value promotional instruments.
 
 **Functions**
 ```
@@ -15,6 +16,11 @@ applyPromotionToCart(cart_id, promotion_id) → Cart
 getEligiblePromotions(cart_id, user_id?) → Promotion[]
 createPromotion(data) → Promotion
 archivePromotion(promotion_id) → void
+issueGiftCard(data) → GiftCard
+getGiftCard(code) → GiftCard
+listGiftCards(input, options?) → PaginatedResult<GiftCard>
+redeemGiftCard(code, order_id, amount) → GiftCardRedemption
+voidGiftCard(code, reason) → GiftCard
 ```
 
 **Types**
@@ -24,11 +30,16 @@ Coupon { code, promotion_id, used_count, usage_limit? }
 FlashSale { variant_id, sale_price, start_at, end_at, stock_limit? }
 CouponValidation { valid, discount_amount?, reason? }
 PromotionType = percentage | fixed_amount | free_shipping | buy_x_get_y
+GiftCard { code, balance, currency, status, issued_at, expires_at?, redeemed_at? }
+GiftCardRedemption { id, code, order_id, amount, currency, created_at }
+GiftCardStatus = active | partially_redeemed | redeemed | void | expired
 ```
 
 **Invariants**
 - `validateCoupon` must not mark the coupon as used — that is `markCouponUsed`'s job
 - `markCouponUsed` must be idempotent for the same `(code, order_id)` pair
+- Gift card redemptions must not exceed available balance.
+- Gift card redemption must be idempotent for the same `(code, order_id, amount)` tuple.
 
 ---
 

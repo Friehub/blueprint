@@ -43,8 +43,22 @@ AuthProvider = email | google | github | apple | microsoft | phone
 * **Model:** `strong`
 * **Details:** Token validation must reflect revocation immediately
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for auth lifecycle events.
+* **Details:** Duplicate sign-in or refresh retries must not create duplicate active sessions or token state.
+
+### Worker Scaling
+* **Policy:** Sign-in, token refresh, and password-reset workflows must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether auth is single-region or active/passive.
+* **Details:** Revocation state must converge across regions before tokens are accepted.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If auth provider or token refresh capacity is saturated, the module must fail or defer predictably rather than creating inconsistent token state.
 
 ### Error Taxonomy
 ### Module-Specific Errors
@@ -95,6 +109,10 @@ PasswordResetToken:
     lockout_duration: 15 minutes
     on_expiry:        reset attempt counter
 ```
+
+### Storage Model
+* **Model:** Durable auth state store with revocation index.
+* **Details:** Sessions, tokens, and verification state must be queryable long enough to enforce revocation and abuse controls.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `auth.<function>`.

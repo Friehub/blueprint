@@ -39,8 +39,22 @@ AddressValidation { valid, normalized_address?, suggestions? }
 * **Model:** `strong (default)`
 * **Details:** Standard transactional consistency
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for shipment state updates and tracking events.
+* **Details:** Duplicate tracking callbacks must not duplicate shipments.
+
+### Worker Scaling
+* **Policy:** Rate lookup, label creation, and tracking ingestion must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether shipping is single-region or active/passive.
+* **Details:** Duplicate cross-region shipment creation must be deduplicated.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If carrier adapters are saturated or rate-limited, the module must defer or reject predictably rather than silently dropping shipment operations.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -50,7 +64,15 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Tracking freshness:
+    max_lag:           configurable per carrier integration
+    on_exceed:         surface stale tracking status
+```
+
+### Storage Model
+* **Model:** Durable shipment record store with tracking history.
+* **Details:** Labels may be object-storage backed; shipment state must remain queryable until retention expiry.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `shipping.<function>`.

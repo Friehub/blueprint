@@ -171,7 +171,13 @@ type ListReportRunsInput = {
 
 - **Idempotency:** `queueReport` is idempotent on `(reportId, requestedBy, parameterOverrides)` within a 60-second window; duplicate calls return the existing run.
 - **Consistency:** Report execution reads from a read replica or data warehouse; it does not read from the primary transactional store.
+- **Runtime delivery:** Report runs are delivered `at_least_once`; the worker and delivery adapters must tolerate duplicate execution and duplicate delivery attempts.
+- **Worker scaling:** Report execution workers must be independently scalable from delivery workers and from schedule evaluation.
+- **Multi-region:** The deployment must declare whether report execution is single-region or active/passive; duplicate schedule firing across regions must be deduplicated.
 - **Observability:** Each run emits a trace with spans for queue wait time, data fetch duration, and render duration.
+- **Backpressure:** If execution or delivery capacity is saturated, the module must defer or reject work predictably rather than enqueueing unbounded runs.
+- **Dead-letter handling:** Failed runs that exhaust retry policy must remain queryable in a failed store with run metadata and error history.
+- **Storage model:** Report artifacts live in object storage or an equivalent artifact store; run state and schedule history must remain durable for the configured retention window.
 - **Dependencies:** `storage` (artifact persistence), `queues` (async execution dispatch), `notifications` or `emails` (delivery channels), `auth` (caller identity).
 - **Errors:** `REPORT_NOT_FOUND`, `REPORT_RUN_NOT_FOUND`, `REPORT_NOT_COMPLETE`, `INVALID_CRON_EXPRESSION`, `SCHEDULE_NOT_FOUND`, `DATA_SOURCE_UNAVAILABLE`.
 - **Providers (adapter examples):** Apache Superset, Metabase (embed), AWS Athena, BigQuery, custom SQL runners.

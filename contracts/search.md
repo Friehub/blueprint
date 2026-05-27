@@ -41,8 +41,18 @@ IndexStats { document_count, index_size, last_updated }
 * **Model:** `eventual`
 * **Details:** Index updates are eventually reflected in search results
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for indexing pipelines.
+* **Details:** Duplicate indexing requests must update existing documents rather than create duplicates.
+
+### Worker Scaling
+* **Policy:** Indexing, reindexing, and query serving must be independently scalable when the provider supports it.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If indexing lag or reindex pressure is high, the module must buffer or defer predictably rather than silently dropping documents.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -52,7 +62,15 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * None explicitly defined. Custom events must use the canonical domain envelope.
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Index freshness:
+    max_lag:          configurable by deployment
+    on_exceed:        surface stale-read condition in observability
+```
+
+### Storage Model
+* **Model:** Search index / inverted index / vector-backed retrieval store.
+* **Details:** The backing store may be managed or self-hosted, but queryability and refresh semantics must be documented by the adapter.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `search.<function>`.

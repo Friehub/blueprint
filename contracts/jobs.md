@@ -194,7 +194,17 @@ type ListExecutionsInput = {
 
 - **Idempotency:** `triggerJob` with the same `(jobId, payload)` within a configurable deduplication window returns the existing pending execution rather than creating a new one.
 - **Consistency:** Job definitions are stored durably before `registerJob` returns; no in-memory-only registrations.
+- **Runtime delivery:** Executions are `at_least_once` unless the deployment explicitly documents a stronger guarantee.
+- **Worker scaling:** Worker concurrency must be configurable per job class or schedule group.
+- **Multi-region:** The deployment must declare whether scheduled execution is single-region or active/passive; duplicate firing across regions must be deduplicated.
 - **Observability:** Each execution is a trace root; spans cover queue wait, execution, and retry backoff intervals.
 - **Dependencies:** `queues` (underlying dispatch mechanism for pending executions), `audit_log` (execution history), `notifications` (on exhausted retries).
 - **Errors:** `JOB_NOT_FOUND`, `EXECUTION_NOT_FOUND`, `INVALID_CRON_EXPRESSION`, `CONFLICTING_SCHEDULE`, `EXECUTION_NOT_CANCELLABLE`.
 - **Providers (adapter examples):** BullMQ, Temporal, Inngest, pg-boss, AWS EventBridge Scheduler, Quirrel.
+
+## Runtime Constraints
+
+- **Retry budget:** `RetryPolicy.maxAttempts` is the authoritative cap; once exhausted, the execution must move to `EXHAUSTED` and be recorded for review.
+- **Dead-letter handling:** Exhausted executions must be retained in an operator-queryable failed store or dead-letter view.
+- **Payload size:** `triggerJob` payloads should stay under 256 KiB unless the deployment documents an out-of-band payload strategy.
+- **Backpressure:** If the downstream execution queue is saturated, scheduling should defer or reject predictably rather than enqueueing unbounded work.

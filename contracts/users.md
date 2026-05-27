@@ -44,8 +44,22 @@ UserStatus = active | banned | suspended | pending_verification
 * **Model:** `strong`
 * **Details:** Permission changes must be visible before the response returns
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for user lifecycle events.
+* **Details:** Duplicate updates must not create duplicate user records.
+
+### Worker Scaling
+* **Policy:** Search, profile update, and user moderation workloads must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether user writes are single-region or active/passive.
+* **Details:** Cross-region write conflicts must be resolved deterministically.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If user write or moderation capacity is saturated, the module must defer or reject predictably rather than corrupting profile state.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -63,7 +77,15 @@ createUser        → user.created               { user_id, email }
 ```
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+User soft-delete retention:
+    retention:         configurable per compliance policy
+    on_expiry:         anonymize or purge according to policy
+```
+
+### Storage Model
+* **Model:** Durable user profile store.
+* **Details:** User identity, role, and moderation state must be strongly consistent; deleted records must remain anonymizable for compliance.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `users.<function>`.

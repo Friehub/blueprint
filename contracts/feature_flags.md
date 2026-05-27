@@ -40,8 +40,22 @@ RolloutRule { attribute, operator, value, percentage }
 * **Model:** `eventual`
 * **Details:** Flag changes propagate within the flag evaluation TTL
 
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for flag-change propagation events.
+* **Details:** Duplicate propagation must not change the evaluated outcome unexpectedly.
+
+### Worker Scaling
+* **Policy:** Flag evaluation and remote sync/refresh workloads must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether flag evaluation is single-region or multi-region replicated.
+* **Details:** Concurrent updates across regions must converge deterministically.
+
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Backpressure
+* If flag sync is saturated, refreshes must be deferred or coalesced predictably.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -59,6 +73,10 @@ Flag evaluation cache:
   Flag (with time-based rollout rule):
     start_at/end_at: enforced by the evaluation engine, not by caller
 ```
+
+### Storage Model
+* **Model:** Durable flag definition store with ephemeral evaluation cache.
+* **Details:** The source of truth must be durable; the cache may be eventually consistent within the documented TTL.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `feature_flags.<function>`.
