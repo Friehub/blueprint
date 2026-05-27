@@ -1,0 +1,68 @@
+# Module Contract: `audit_log`
+
+---
+
+### `audit_log`
+Immutable record of system events for compliance and debugging.
+
+**Functions**
+```
+recordEvent(event) → AuditEvent
+queryEvents(filters, options?) → PaginatedResult<AuditEvent>
+getEventsByActor(actor_id, options?) → PaginatedResult<AuditEvent>
+getEventsByResource(resource_type, resource_id) → AuditEvent[]
+exportAuditLog(filters, format) → ExportJob
+getEvent(event_id) → AuditEvent
+```
+
+**Types**
+```
+AuditEvent { id, actor, action, resource, changes?, ip_address?, metadata, created_at }
+AuditActor { type: user | system | api_key, id, name? }
+AuditResource { type, id, name? }
+ExportFormat = json | csv
+```
+
+**Invariants**
+- Audit events must never be deleted or modified after creation
+- `recordEvent` must be non-blocking — it must not add latency to the calling operation
+
+**Providers:** custom append-only table, Axiom, Datadog, custom event stream
+
+---
+
+## Part IV — Commerce
+
+---
+
+## System-Level Integrations & Constraints
+
+### Consistency Model
+* **Model:** `eventual`
+* **Details:** Query results may lag by up to 5 seconds; `recordEvent` is durable
+
+### Idempotency Requirements
+* **Standard:** All state-mutating functions accept an optional `idempotency_key: string` parameter. Keys must be retained for at least 24 hours.
+* **Required Functions:**
+  - `recordEvent(event, idempotency_key?)`
+
+### Error Taxonomy
+* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+
+### Event Emission
+All events are emitted using at-least-once delivery with UUID v4 envelope.
+* None explicitly defined. Custom events must use the canonical domain envelope.
+
+### Temporal Constraints
+* None explicitly defined.
+
+### Observability
+* **Tracing Spans:** Every function call creates a span. Span names follow the pattern `audit_log.<function>`.
+* **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
+* **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Module Dependencies
+* **Depends On:** (none — must be dependency-free to avoid circular dependencies)
+* **Emits To:** (none)
+* **Recommends:** (none)
+* **Pagination Sort Key:** Uses cursor-based pagination sorting by `created_at DESC` on `queryEvents`.
