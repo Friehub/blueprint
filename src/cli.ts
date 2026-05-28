@@ -409,6 +409,8 @@ async function main() {
 
     console.log(`Generated prototype with ${files.length} files to ${outputDir}`);
     outputData = "";
+  } else if (args.command === "schema") {
+    outputData = JSON.stringify(generateJsonSchema(result.value), null, compact ? undefined : 2);
   } else {
     if (process.exitCode) {
       console.error("Catalog has errors. Use --strict to fail on errors, or fix the issues above.");
@@ -433,6 +435,61 @@ async function main() {
   } else {
     console.log(outputData);
   }
+}
+
+function generateJsonSchema(catalog: { modules: Array<{ name: string; functions: Array<{ name: string; params: Array<{ name: string; type: string | null; optional: boolean }>; returns: string }>; types: Array<{ name: string; raw: string }>; hardDeps: string[]; softDeps: string[]; coreInherits: string[] }>; core: Array<{ name: string; implicit: boolean }> }) {
+  const schema: Record<string, unknown> = {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    title: "Engineering Blueprinter Catalog",
+    type: "object",
+    properties: {
+      modules: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            functions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  params: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string" },
+                        type: { type: ["string", "null"] },
+                        optional: { type: "boolean" },
+                      },
+                    },
+                  },
+                  returns: { type: "string" },
+                },
+              },
+            },
+            hardDeps: { type: "array", items: { type: "string" } },
+            softDeps: { type: "array", items: { type: "string" } },
+            coreInherits: { type: "array", items: { type: "string" } },
+          },
+        },
+      },
+      core: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            implicit: { type: "boolean" },
+          },
+        },
+      },
+    },
+  };
+
+  return schema;
 }
 
 function minimalCatalog(catalog: { modules: Array<{ name: string; functions: Array<{ name: string; params: Array<{ name: string; type: string | null; optional: boolean }>; returns: string }>; types: Array<{ name: string; raw: string }>; hardDeps: string[]; softDeps: string[]; coreInherits: string[] }>; core: Array<{ name: string; implicit: boolean }> }) {
@@ -624,6 +681,25 @@ Examples:
     return;
   }
 
+  if (command === "schema") {
+    console.log(`
+Usage: blueprinter schema [options]
+
+Options:
+  --output <file>    Write schema to file instead of stdout
+  --compact          Output compact JSON (no indentation)
+  --root <path>      Project root directory (default: current directory)
+
+Exports the catalog as a JSON Schema for programmatic validation.
+
+Examples:
+  blueprinter schema
+  blueprinter schema --output catalog.schema.json
+  blueprinter schema --compact
+`);
+    return;
+  }
+
   if (command === "prototype") {
     console.log(`
 Usage: blueprinter prototype [options]
@@ -657,6 +733,7 @@ Commands:
   adapters           Manage adapter selections
   generate           Generate code from contracts
   prototype          Generate project scaffold
+  schema             Export catalog as JSON Schema
 
 Options:
   --root <path>      Project root directory (default: current directory)
