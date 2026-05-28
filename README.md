@@ -33,6 +33,18 @@ blueprinter graph billing
 
 # Resolve modules with dependencies
 blueprinter resolve --modules billing,payments,users
+
+# Search for modules interactively
+blueprinter search billing
+
+# List available adapters
+blueprinter adapters list
+
+# Select an adapter
+blueprinter adapters add stripe payments
+
+# Verify adapters match contracts
+blueprinter adapters verify
 ```
 
 ---
@@ -45,9 +57,22 @@ blueprinter resolve --modules billing,payments,users
 |---------|-------------|
 | `build` | Load all contracts and output `catalog.json` (default) |
 | `list` | List all modules with dependencies |
+| `search <query>` | Search for modules and interactively pick to resolve |
 | `inspect <module>` | Show full contract for a module |
 | `graph <module>` | Show dependency graph for a module |
 | `resolve` | Resolve specific modules with dependencies |
+| `adapters` | Manage adapter selections |
+
+### Adapter Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `adapters list [module]` | List available adapters |
+| `adapters add <provider> <module>` | Select an adapter for a module |
+| `adapters remove <module>` | Remove adapter selection |
+| `adapters show` | Show current adapter selections |
+| `adapters verify [module]` | Verify adapters against contracts |
+| `adapters search <query>` | Search for adapters |
 
 ### Options
 
@@ -89,6 +114,118 @@ echo "billing,payments" | blueprinter resolve
 
 # Compact JSON output
 blueprinter resolve --modules billing --compact
+
+# Search for modules interactively
+blueprinter search billing
+
+# List available adapters
+blueprinter adapters list
+
+# List adapters for a specific module
+blueprinter adapters list payments
+
+# Select an adapter
+blueprinter adapters add stripe payments
+
+# Remove adapter selection
+blueprinter adapters remove payments
+
+# Show current selections
+blueprinter adapters show
+
+# Verify adapters match contracts
+blueprinter adapters verify
+
+# Search for adapters
+blueprinter adapters search stripe
+```
+
+---
+
+## Adapter Registry
+
+The adapter registry bridges contracts and concrete provider implementations. Each adapter declares which contract functions it implements, its configuration requirements, and its dependencies.
+
+### Available Adapters
+
+| Module | Adapters |
+|--------|----------|
+| payments | stripe, paystack, adyen |
+| billing | stripe, paddle |
+| subscriptions | stripe, chargebee |
+| invoicing | stripe, freshbooks |
+| donations | stripe, paypal |
+| payouts | stripe, paypal |
+| chargebacks | stripe, chargebacks911 |
+| emails | resend, sendgrid, mailgun |
+| sms | twilio, vonage |
+| notifications | onesignal, firebase, novu |
+| webhooks | svix |
+| caching | redis, memcached |
+| storage | s3, gcs, azure-blob |
+| search | algolia, meilisearch, typesense |
+| queues | bullmq, sqs, rabbitmq |
+| jobs | bullmq, temporal |
+| feature_flags | launchdarkly, flagsmith, unleash |
+| rate_limiting | upstash, cloudflare |
+| auth | clerk, auth0, supertokens |
+| kyc | jumio, onfido |
+| analytics | segment, mixpanel, amplitude |
+| web_analytics | google-analytics, posthog, plausible |
+| fraud_detection | sift, riskified |
+| error_tracking | sentry, bugsnag |
+| incident_management | pagerduty, opsgenie |
+| trace_query | jaeger, datadog, honeycomb |
+| ip_intelligence | maxmind, ipinfo |
+| media | cloudinary, imgix |
+| customer_support | zendesk, intercom |
+| crm_leads | hubspot, salesforce |
+| projects | linear, asana, jira |
+| tasks | linear, asana, jira |
+| shipping | shipengine, easyship |
+| taxation | taxjar, avalara |
+| fulfillment | shipengine, easyship |
+
+### How Adapters Work
+
+1. **Discovery** -- `blueprinter adapters list` shows available adapters per module
+2. **Selection** -- `blueprinter adapters add stripe payments` picks an adapter
+3. **Resolution** -- `blueprinter resolve` includes adapter info in output
+4. **Verification** -- `blueprinter adapters verify` checks adapters match contracts
+
+### Adapter Format
+
+Each adapter is a YAML file in `adapters/<module>/<provider>.yaml`:
+
+```yaml
+name: stripe
+module: payments
+version: 1.2.0
+description: Stripe payment processing adapter
+
+implements:
+  - initiatePayment
+  - refundPayment
+  - getPaymentStatus
+
+does_not_implement:
+  - getWalletBalance
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Stripe secret API key
+      secret: true
+  optional:
+    - name: api_version
+      type: string
+      default: "2023-10-16"
+
+dependencies:
+  - module: notifications
+    purpose: Send payment confirmation emails
+    required: false
 ```
 
 ---
@@ -295,16 +432,22 @@ engineering-blueprinter/
 ├── contracts/              # Markdown contract files
 │   ├── core/               # Core standards (runtime, global, sagas)
 │   └── *.md                # Module contracts
+├── adapters/               # Adapter definitions (YAML)
+│   ├── payments/           # Payment provider adapters
+│   ├── caching/            # Caching provider adapters
+│   ├── emails/             # Email provider adapters
+│   └── ...                 # 35 modules, 82 adapters
 ├── schemas/                # JSON schemas for output formats
 │   ├── catalog.schema.json
 │   └── resolved-set.schema.json
 ├── src/                    # TypeScript source
-│   ├── core/               # Parser, resolver, graph, discovery
+│   ├── core/               # Parser, resolver, graph, search, adapters
 │   ├── cli.ts              # CLI entrypoint
 │   └── utils/              # Argument parsing
 ├── completions/            # Shell completions
 │   ├── blueprinter.bash
 │   └── blueprinter.zsh
+├── blueprinter.json        # User adapter selections
 └── dist/                   # Compiled output
 ```
 
