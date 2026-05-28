@@ -1,8 +1,10 @@
-export type Command = "build" | "resolve" | "list" | "inspect" | "graph" | "search";
+export type Command = "build" | "resolve" | "list" | "inspect" | "graph" | "search" | "adapters";
+export type AdapterSubcommand = "list" | "add" | "remove" | "show" | "verify" | "search";
 export type OutputFormat = "ascii" | "mermaid";
 
 export interface ParsedArgs {
   command: Command;
+  adapterSubcommand: AdapterSubcommand | undefined;
   root: string | undefined;
   strict: boolean | undefined;
   help: boolean | undefined;
@@ -11,18 +13,22 @@ export interface ParsedArgs {
   modules: string[];
   target: string | undefined;
   query: string | undefined;
+  provider: string | undefined;
+  module: string | undefined;
   format: OutputFormat;
   compact: boolean;
   quiet: boolean;
   unknown: string[];
 }
 
-const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet"]);
-const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search"]);
+const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module"]);
+const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters"]);
+const ADAPTER_SUBCOMMANDS = new Set(["list", "add", "remove", "show", "verify", "search"]);
 
 export function parseArguments(args: string[]): ParsedArgs {
   const parsed: ParsedArgs = {
     command: "build",
+    adapterSubcommand: undefined,
     root: undefined,
     strict: undefined,
     help: undefined,
@@ -31,6 +37,8 @@ export function parseArguments(args: string[]): ParsedArgs {
     modules: [],
     target: undefined,
     query: undefined,
+    provider: undefined,
+    module: undefined,
     format: "ascii",
     compact: false,
     quiet: false,
@@ -41,6 +49,30 @@ export function parseArguments(args: string[]): ParsedArgs {
 
   if (i < args.length && !args[i]!.startsWith("-") && COMMANDS.has(args[i]!)) {
     parsed.command = args[i]! as ParsedArgs["command"];
+    i++;
+  }
+
+  if (parsed.command === "adapters" && i < args.length && !args[i]!.startsWith("-") && ADAPTER_SUBCOMMANDS.has(args[i]!)) {
+    parsed.adapterSubcommand = args[i]! as AdapterSubcommand;
+    i++;
+  }
+
+  if (parsed.command === "adapters" && parsed.adapterSubcommand === "add" && i < args.length && !args[i]!.startsWith("-")) {
+    parsed.provider = args[i];
+    i++;
+    if (i < args.length && !args[i]!.startsWith("-")) {
+      parsed.module = args[i];
+      i++;
+    }
+  }
+
+  if (parsed.command === "adapters" && parsed.adapterSubcommand === "remove" && i < args.length && !args[i]!.startsWith("-")) {
+    parsed.module = args[i];
+    i++;
+  }
+
+  if (parsed.command === "adapters" && (parsed.adapterSubcommand === "list" || parsed.adapterSubcommand === "verify" || parsed.adapterSubcommand === "search") && i < args.length && !args[i]!.startsWith("-")) {
+    parsed.query = args[i];
     i++;
   }
 
@@ -68,6 +100,8 @@ export function parseArguments(args: string[]): ParsedArgs {
       parsed.output = args[++i];
     } else if (arg === "--modules" && i + 1 < args.length) {
       parsed.modules = (args[++i] ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+    } else if (arg === "--module" && i + 1 < args.length) {
+      parsed.module = args[++i];
     } else if (arg === "--format" && i + 1 < args.length) {
       const fmt = args[++i];
       if (fmt === "ascii" || fmt === "mermaid") {

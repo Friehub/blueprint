@@ -4,9 +4,10 @@ import { loadCatalogFromRoot } from "./core/load-catalog.js";
 import { resolve, detectCycles } from "./core/resolve.js";
 import { buildGraph, renderAscii, renderMermaid } from "./core/graph.js";
 import { searchModules } from "./core/search.js";
+import { loadAdapters, loadSelection, addAdapter, removeAdapter, resolveAdapters, listAdaptersByModule } from "./core/adapters/index.js";
 import { parseArguments } from "./utils/args.js";
 import { writeFile, stat } from "node:fs/promises";
-import { dirname, resolve as pathResolve } from "node:path";
+import { dirname, join, resolve as pathResolve } from "node:path";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import * as readline from "node:readline";
@@ -250,6 +251,78 @@ async function main() {
       }
     }
     outputData = JSON.stringify(resolved, null, compact ? undefined : 2);
+  } else if (args.command === "adapters") {
+    const adaptersDir = join(root, "adapters");
+    const { adapters, errors: loadErrors } = await loadAdapters(adaptersDir);
+
+    if (loadErrors.length > 0 && !quiet) {
+      for (const error of loadErrors) {
+        console.warn(`  - ${error}`);
+      }
+    }
+
+    if (args.adapterSubcommand === "list") {
+      const byModule = listAdaptersByModule(adapters);
+      outputData = renderAdapterList(byModule, args.query);
+    } else if (args.adapterSubcommand === "add") {
+      if (!args.provider || !args.module) {
+        console.error("Error: provider and module are required.");
+        console.error("Example: blueprinter adapters add stripe payments");
+        process.exit(1);
+      }
+      const { selection, error } = await addAdapter(root, args.module, args.provider);
+      if (error) {
+        console.error(`Error: ${error}`);
+        process.exit(1);
+      }
+      console.log(`Added ${args.provider} as adapter for ${args.module}`);
+      outputData = JSON.stringify(selection, null, compact ? undefined : 2);
+    } else if (args.adapterSubcommand === "remove") {
+      if (!args.module) {
+        console.error("Error: module is required.");
+        console.error("Example: blueprinter adapters remove payments");
+        process.exit(1);
+      }
+      const { selection, error } = await removeAdapter(root, args.module);
+      if (error) {
+        console.error(`Error: ${error}`);
+        process.exit(1);
+      }
+      console.log(`Removed adapter for ${args.module}`);
+      outputData = JSON.stringify(selection, null, compact ? undefined : 2);
+    } else if (args.adapterSubcommand === "show") {
+      const { selection } = await loadSelection(root);
+      outputData = JSON.stringify(selection, null, compact ? undefined : 2);
+    } else if (args.adapterSubcommand === "verify") {
+      const { selection } = await loadSelection(root);
+      const resolution = resolveAdapters(selection, adapters, result.value);
+      if (resolution.issues.length > 0) {
+        for (const issue of resolution.issues) {
+          if (issue.severity === "error") {
+            console.error(`  ERROR: ${issue.adapter ? `${issue.adapter} → ` : ""}${issue.module}: ${issue.message}`);
+          } else if (!quiet) {
+            console.warn(`  WARN: ${issue.adapter ? `${issue.adapter} → ` : ""}${issue.module}: ${issue.message}`);
+          }
+        }
+        const hasErrors = resolution.issues.some((i) => i.severity === "error");
+        if (hasErrors) {
+          process.exit(1);
+        }
+      } else {
+        console.log("All adapters verified successfully.");
+      }
+      outputData = JSON.stringify(resolution, null, compact ? undefined : 2);
+    } else if (args.adapterSubcommand === "search") {
+      const query = args.query ?? "";
+      const results = adapters.filter(
+        (a) => a.name.includes(query) || a.module.includes(query) || a.description?.includes(query),
+      );
+      outputData = JSON.stringify(results, null, compact ? undefined : 2);
+    } else {
+      console.error("Error: adapter subcommand is required.");
+      console.error("Available subcommands: list, add, remove, show, verify, search");
+      process.exit(1);
+    }
   } else {
     if (process.exitCode) {
       console.error("Catalog has errors. Use --strict to fail on errors, or fix the issues above.");
@@ -295,6 +368,27 @@ function renderList(catalog: { modules: Array<{ name: string; hardDeps: string[]
   lines.push("Core contracts:");
   for (const c of catalog.core.sort((a, b) => a.name.localeCompare(b.name))) {
     lines.push(`  ${c.name}${c.implicit ? " (implicit)" : ""}`);
+  }
+
+  return lines.join("\n");
+}
+
+function renderAdapterList(byModule: Record<string, string[]>, filter?: string): string {
+  const lines: string[] = [];
+  const modules = Object.keys(byModule).sort();
+
+  lines.push("Available adapters:");
+  lines.push("");
+
+  for (const module of modules) {
+    if (filter && !module.includes(filter)) {
+      continue;
+    }
+    const adapters = byModule[module]!;
+    lines.push(`  ${module}`);
+    for (const adapter of adapters) {
+      lines.push(`    - ${adapter}`);
+    }
   }
 
   return lines.join("\n");
@@ -368,6 +462,35 @@ Examples:
     return;
   }
 
+  if (command === "adapters") {
+    console.log(`
+Usage: blueprinter adapters <subcommand> [options]
+
+Subcommands:
+  list [module]         List available adapters
+  add <provider> <module>  Select an adapter for a module
+  remove <module>       Remove adapter selection
+  show                  Show current adapter selections
+  verify [module]       Verify adapters against contracts
+  search <query>        Search for adapters
+
+Options:
+  --root <path>         Project root directory (default: current directory)
+  --compact             Output compact JSON (no indentation)
+  --quiet               Suppress warnings
+
+Examples:
+  blueprinter adapters list
+  blueprinter adapters list payments
+  blueprinter adapters add stripe payments
+  blueprinter adapters remove payments
+  blueprinter adapters show
+  blueprinter adapters verify
+  blueprinter adapters search stripe
+`);
+    return;
+  }
+
   console.log(`
 Usage: blueprinter [command] [options]
 
@@ -378,6 +501,7 @@ Commands:
   inspect <module>   Show full contract for a module
   graph <module>     Show dependency graph for a module
   resolve            Resolve specific modules with dependencies
+  adapters           Manage adapter selections
 
 Options:
   --root <path>      Project root directory (default: current directory)

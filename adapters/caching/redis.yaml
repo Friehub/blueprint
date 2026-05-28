@@ -1,0 +1,31 @@
+name: redis
+module: caching
+version: 1.0.0
+description: Redis caching adapter
+
+implements:
+  - get
+  - set
+  - delete
+  - exists
+  - expire
+  - ttl
+
+config:
+  required:
+    - name: url
+      type: string
+      description: Redis connection URL
+  optional:
+    - name: prefix
+      type: string
+      default: "app:"
+      description: Key prefix for all cache entries
+    - name: ttl
+      type: number
+      default: 3600
+      description: Default TTL in seconds
+
+metadata:
+  provider_url: https://redis.io
+  docs_url: https://redis.io/docs

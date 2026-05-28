@@ -9,12 +9,15 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
-    "test": "npm run build && node --test dist/core/*.test.js",
+    "test": "npm run build && node --test dist/core/*.test.js dist/core/adapters/*.test.js",
     "postinstall": "npm run build",
     "link": "npm run build && npm link"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "yaml": "^2.9.0"
   }
 }

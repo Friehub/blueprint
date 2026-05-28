@@ -1,0 +1,54 @@
+name: stripe
+module: payments
+version: 1.2.0
+description: Stripe payment processing adapter
+
+implements:
+  - initiatePayment
+  - verifyPayment
+  - getPaymentByOrder
+  - initiateRefund
+  - getRefundByOrder
+  - getRefund
+
+does_not_implement:
+  - getWallet
+  - creditWallet
+  - debitWallet
+  - getWalletTransactions
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Stripe secret API key
+      secret: true
+    - name: webhook_secret
+      type: string
+      description: Stripe webhook signing secret
+      secret: true
+  optional:
+    - name: api_version
+      type: string
+      default: "2023-10-16"
+      description: Stripe API version
+
+dependencies:
+  - module: notifications
+    purpose: Send payment confirmation emails
+    required: false
+  - module: audit_log
+    purpose: Log payment events
+    required: false
+
+metadata:
+  provider_url: https://stripe.com
+  docs_url: https://stripe.com/docs
+  supported_regions:
+    - us
+    - eu
+    - uk
+  supported_currencies:
+    - usd
+    - eur
+    - gbp

@@ -1,0 +1,30 @@
+name: bullmq
+module: queues
+version: 1.0.0
+description: BullMQ queue adapter
+
+implements:
+  - enqueue
+  - dequeue
+  - peek
+  - size
+  - remove
+
+config:
+  required:
+    - name: url
+      type: string
+      description: Redis connection URL for BullMQ
+  optional:
+    - name: prefix
+      type: string
+      default: "bull"
+      description: Queue prefix
+    - name: default_attempts
+      type: number
+      default: 3
+      description: Default number of attempts per job
+
+metadata:
+  provider_url: https://docs.bullmq.io
+  docs_url: https://docs.bullmq.io
