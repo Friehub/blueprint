@@ -1,10 +1,13 @@
-export type Command = "build" | "resolve" | "list" | "inspect" | "graph" | "search" | "adapters";
+export type Command = "build" | "resolve" | "list" | "inspect" | "graph" | "search" | "adapters" | "generate";
 export type AdapterSubcommand = "list" | "add" | "remove" | "show" | "verify" | "search";
+export type GenerateSubcommand = "interfaces" | "adapters" | "tests" | "all";
+export type Language = "typescript" | "rust" | "python" | "go";
 export type OutputFormat = "ascii" | "mermaid";
 
 export interface ParsedArgs {
   command: Command;
   adapterSubcommand: AdapterSubcommand | undefined;
+  generateSubcommand: GenerateSubcommand | undefined;
   root: string | undefined;
   strict: boolean | undefined;
   help: boolean | undefined;
@@ -15,20 +18,24 @@ export interface ParsedArgs {
   query: string | undefined;
   provider: string | undefined;
   module: string | undefined;
+  language: Language | undefined;
   format: OutputFormat;
   compact: boolean;
   quiet: boolean;
   unknown: string[];
 }
 
-const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module"]);
-const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters"]);
+const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang"]);
+const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters", "generate"]);
 const ADAPTER_SUBCOMMANDS = new Set(["list", "add", "remove", "show", "verify", "search"]);
+const GENERATE_SUBCOMMANDS = new Set(["interfaces", "adapters", "tests", "all"]);
+const LANGUAGES = new Set(["typescript", "rust", "python", "go"]);
 
 export function parseArguments(args: string[]): ParsedArgs {
   const parsed: ParsedArgs = {
     command: "build",
     adapterSubcommand: undefined,
+    generateSubcommand: undefined,
     root: undefined,
     strict: undefined,
     help: undefined,
@@ -39,6 +46,7 @@ export function parseArguments(args: string[]): ParsedArgs {
     query: undefined,
     provider: undefined,
     module: undefined,
+    language: undefined,
     format: "ascii",
     compact: false,
     quiet: false,
@@ -54,6 +62,11 @@ export function parseArguments(args: string[]): ParsedArgs {
 
   if (parsed.command === "adapters" && i < args.length && !args[i]!.startsWith("-") && ADAPTER_SUBCOMMANDS.has(args[i]!)) {
     parsed.adapterSubcommand = args[i]! as AdapterSubcommand;
+    i++;
+  }
+
+  if (parsed.command === "generate" && i < args.length && !args[i]!.startsWith("-") && GENERATE_SUBCOMMANDS.has(args[i]!)) {
+    parsed.generateSubcommand = args[i]! as GenerateSubcommand;
     i++;
   }
 
@@ -74,6 +87,15 @@ export function parseArguments(args: string[]): ParsedArgs {
   if (parsed.command === "adapters" && (parsed.adapterSubcommand === "list" || parsed.adapterSubcommand === "verify" || parsed.adapterSubcommand === "search") && i < args.length && !args[i]!.startsWith("-")) {
     parsed.query = args[i];
     i++;
+  }
+
+  if (parsed.command === "generate" && i < args.length && !args[i]!.startsWith("-")) {
+    parsed.provider = args[i];
+    i++;
+    if (i < args.length && !args[i]!.startsWith("-")) {
+      parsed.module = args[i];
+      i++;
+    }
   }
 
   if ((parsed.command === "inspect" || parsed.command === "graph") && i < args.length && !args[i]!.startsWith("-")) {
@@ -102,6 +124,13 @@ export function parseArguments(args: string[]): ParsedArgs {
       parsed.modules = (args[++i] ?? "").split(",").map((s) => s.trim()).filter(Boolean);
     } else if (arg === "--module" && i + 1 < args.length) {
       parsed.module = args[++i];
+    } else if (arg === "--lang" && i + 1 < args.length) {
+      const lang = args[++i] ?? "";
+      if (LANGUAGES.has(lang)) {
+        parsed.language = lang as Language;
+      } else {
+        parsed.unknown.push(arg);
+      }
     } else if (arg === "--format" && i + 1 < args.length) {
       const fmt = args[++i];
       if (fmt === "ascii" || fmt === "mermaid") {

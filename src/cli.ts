@@ -5,6 +5,8 @@ import { resolve, detectCycles } from "./core/resolve.js";
 import { buildGraph, renderAscii, renderMermaid } from "./core/graph.js";
 import { searchModules } from "./core/search.js";
 import { loadAdapters, loadSelection, addAdapter, removeAdapter, resolveAdapters, listAdaptersByModule } from "./core/adapters/index.js";
+import { registerGenerator, generateAndWrite, getAvailableLanguages } from "./generators/engine.js";
+import { TypeScriptGenerator } from "./generators/typescript/index.js";
 import { parseArguments } from "./utils/args.js";
 import { writeFile, stat } from "node:fs/promises";
 import { dirname, join, resolve as pathResolve } from "node:path";
@@ -81,6 +83,8 @@ async function interactivePicker(query: string, results: Array<{ module: { name:
 }
 
 async function main() {
+  registerGenerator(new TypeScriptGenerator());
+
   const args = parseArguments(process.argv.slice(2));
 
   if (args.unknown.length > 0) {
@@ -323,6 +327,35 @@ async function main() {
       console.error("Available subcommands: list, add, remove, show, verify, search");
       process.exit(1);
     }
+  } else if (args.command === "generate") {
+    const language = args.language ?? "typescript";
+    const type = args.generateSubcommand ?? "all";
+    const outputDir = args.output ?? join(root, "generated");
+
+    const adaptersDir = join(root, "adapters");
+    const { adapters } = await loadAdapters(adaptersDir);
+
+    const { written, errors } = await generateAndWrite(
+      result.value,
+      adapters,
+      {
+        language,
+        type,
+        module: args.module,
+        provider: args.provider,
+        outputDir,
+      },
+    );
+
+    if (errors.length > 0) {
+      console.error("Generation errors:");
+      for (const error of errors) {
+        console.error(`  - ${error}`);
+      }
+    }
+
+    console.log(`Generated ${written} files to ${outputDir}`);
+    outputData = "";
   } else {
     if (process.exitCode) {
       console.error("Catalog has errors. Use --strict to fail on errors, or fix the issues above.");
@@ -491,6 +524,33 @@ Examples:
     return;
   }
 
+  if (command === "generate") {
+    console.log(`
+Usage: blueprinter generate [subcommand] [options]
+
+Subcommands:
+  interfaces            Generate language interfaces from contracts
+  adapters              Generate adapter skeletons
+  tests                 Generate conformance tests
+  all                   Generate all (default)
+
+Options:
+  --lang <language>     Target language: typescript (default), rust, python, go
+  --module <module>     Generate for specific module only
+  --output <dir>        Output directory (default: ./generated)
+  --root <path>         Project root directory (default: current directory)
+
+Examples:
+  blueprinter generate
+  blueprinter generate --lang typescript
+  blueprinter generate interfaces --lang typescript
+  blueprinter generate adapter stripe payments --lang typescript
+  blueprinter generate tests --lang typescript
+  blueprinter generate --module billing --lang typescript
+`);
+    return;
+  }
+
   console.log(`
 Usage: blueprinter [command] [options]
 
@@ -502,6 +562,7 @@ Commands:
   graph <module>     Show dependency graph for a module
   resolve            Resolve specific modules with dependencies
   adapters           Manage adapter selections
+  generate           Generate code from contracts
 
 Options:
   --root <path>      Project root directory (default: current directory)
