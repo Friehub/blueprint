@@ -4,13 +4,13 @@ version: 1.0.0
 description: PostHog web analytics adapter
 
 implements:
-  - trackEvent
-  - identifyUser
   - trackPageView
-  - getMetrics
-  - getFunnel
-  - getCohort
-  - getRetention
+  - trackSessionStart
+  - trackSessionEnd
+  - trackConversion
+  - getPageMetrics
+  - getAttributionReport
+  - getSessionReplay
 
 does_not_implement: []
 
@@ -23,15 +23,6 @@ config:
     - name: host
       type: string
       description: PostHog host URL
-      secret: false
-  optional:
-    - name: project_key
-      type: string
-      description: PostHog project key
-    - name: flush_interval
-      type: integer
-      default: 1000
-      description: Flush interval in milliseconds
 
 dependencies:
   - module: audit_log

@@ -15,7 +15,12 @@ implements:
   - getPlans
   - getPlan
 
-does_not_implement: []
+does_not_implement:
+  - getEntitlements
+  - hasAccess
+  - grantEntitlement
+  - revokeEntitlement
+  - getAccessHistory
 
 config:
   required:

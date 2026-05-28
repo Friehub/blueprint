@@ -4,13 +4,13 @@ version: 1.0.0
 description: Plausible web analytics adapter
 
 implements:
-  - trackEvent
-  - identifyUser
   - trackPageView
-  - getMetrics
-  - getFunnel
-  - getCohort
-  - getRetention
+  - trackSessionStart
+  - trackSessionEnd
+  - trackConversion
+  - getPageMetrics
+  - getAttributionReport
+  - getSessionReplay
 
 does_not_implement: []
 
@@ -20,15 +20,9 @@ config:
       type: string
       description: Plausible API key
       secret: true
-    - name: domain
+    - name: site_id
       type: string
-      description: Plausible domain
-      secret: false
-  optional:
-    - name: base_url
-      type: string
-      default: https://plausible.io/api
-      description: Plausible API base URL
+      description: Plausible site ID
 
 dependencies:
   - module: audit_log

@@ -4,13 +4,13 @@ version: 1.0.0
 description: Google Analytics web analytics adapter
 
 implements:
-  - trackEvent
-  - identifyUser
   - trackPageView
-  - getMetrics
-  - getFunnel
-  - getCohort
-  - getRetention
+  - trackSessionStart
+  - trackSessionEnd
+  - trackConversion
+  - getPageMetrics
+  - getAttributionReport
+  - getSessionReplay
 
 does_not_implement: []
 
@@ -19,7 +19,6 @@ config:
     - name: measurement_id
       type: string
       description: Google Analytics measurement ID
-      secret: false
     - name: api_secret
       type: string
       description: Google Analytics API secret
