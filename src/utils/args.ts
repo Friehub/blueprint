@@ -1,4 +1,4 @@
-export type Command = "build" | "resolve" | "list" | "inspect" | "graph" | "search" | "adapters" | "generate";
+export type Command = "build" | "resolve" | "list" | "inspect" | "graph" | "search" | "adapters" | "generate" | "prototype";
 export type AdapterSubcommand = "list" | "add" | "remove" | "show" | "verify" | "search";
 export type GenerateSubcommand = "interfaces" | "adapters" | "tests" | "all";
 export type Language = "typescript" | "rust" | "python" | "go";
@@ -25,8 +25,8 @@ export interface ParsedArgs {
   unknown: string[];
 }
 
-const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang"]);
-const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters", "generate"]);
+const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name"]);
+const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters", "generate", "prototype"]);
 const ADAPTER_SUBCOMMANDS = new Set(["list", "add", "remove", "show", "verify", "search"]);
 const GENERATE_SUBCOMMANDS = new Set(["interfaces", "adapters", "tests", "all"]);
 const LANGUAGES = new Set(["typescript", "rust", "python", "go"]);
@@ -142,6 +142,8 @@ export function parseArguments(args: string[]): ParsedArgs {
       parsed.compact = true;
     } else if (arg === "--quiet") {
       parsed.quiet = true;
+    } else if (arg === "--name" && i + 1 < args.length) {
+      parsed.target = args[++i];
     } else if (arg.startsWith("-") && !KNOWN_FLAGS.has(arg)) {
       parsed.unknown.push(arg);
     }

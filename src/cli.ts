@@ -7,8 +7,9 @@ import { searchModules } from "./core/search.js";
 import { loadAdapters, loadSelection, addAdapter, removeAdapter, resolveAdapters, listAdaptersByModule } from "./core/adapters/index.js";
 import { registerGenerator, generateAndWrite, getAvailableLanguages } from "./generators/engine.js";
 import { TypeScriptGenerator } from "./generators/typescript/index.js";
+import { generatePrototype } from "./generators/prototype/index.js";
 import { parseArguments } from "./utils/args.js";
-import { writeFile, stat } from "node:fs/promises";
+import { writeFile, stat, mkdir } from "node:fs/promises";
 import { dirname, join, resolve as pathResolve } from "node:path";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -356,6 +357,58 @@ async function main() {
 
     console.log(`Generated ${written} files to ${outputDir}`);
     outputData = "";
+  } else if (args.command === "prototype") {
+    const { selection } = await loadSelection(root);
+    const adaptersDir = join(root, "adapters");
+    const { adapters } = await loadAdapters(adaptersDir);
+
+    const selectedAdapters: Record<string, string> = {};
+    for (const [module, adapterRef] of Object.entries(selection.adapters)) {
+      if (typeof adapterRef === "string") {
+        selectedAdapters[module] = adapterRef;
+      } else {
+        selectedAdapters[module] = adapterRef.primary;
+      }
+    }
+
+    if (Object.keys(selectedAdapters).length === 0) {
+      console.error("Error: No adapters selected. Use 'blueprinter adapters add' first.");
+      process.exit(1);
+    }
+
+    const moduleName = args.target ?? "my-project";
+    const outputDir = args.output ?? join(root, moduleName);
+
+    const { files, errors } = generatePrototype(
+      result.value,
+      adapters,
+      {
+        name: moduleName,
+        modules: Object.keys(selectedAdapters),
+        adapters: selectedAdapters,
+        outputDir,
+      },
+    );
+
+    if (errors.length > 0) {
+      console.error("Prototype generation errors:");
+      for (const error of errors) {
+        console.error(`  - ${error}`);
+      }
+    }
+
+    for (const file of files) {
+      try {
+        const fullPath = join(outputDir, file.path);
+        await mkdir(dirname(fullPath), { recursive: true });
+        await writeFile(fullPath, file.content, "utf8");
+      } catch (error) {
+        console.error(`Failed to write ${file.path}: ${error instanceof Error ? error.message : error}`);
+      }
+    }
+
+    console.log(`Generated prototype with ${files.length} files to ${outputDir}`);
+    outputData = "";
   } else {
     if (process.exitCode) {
       console.error("Catalog has errors. Use --strict to fail on errors, or fix the issues above.");
@@ -551,6 +604,26 @@ Examples:
     return;
   }
 
+  if (command === "prototype") {
+    console.log(`
+Usage: blueprinter prototype [options]
+
+Options:
+  --name <name>         Project name (default: my-project)
+  --output <dir>        Output directory (default: ./<name>)
+  --root <path>         Project root directory (default: current directory)
+
+Generates a project scaffold based on selected adapters.
+Requires adapters to be selected first with 'blueprinter adapters add'.
+
+Examples:
+  blueprinter prototype
+  blueprinter prototype --name my-saas
+  blueprinter prototype --output ./my-project
+`);
+    return;
+  }
+
   console.log(`
 Usage: blueprinter [command] [options]
 
@@ -563,6 +636,7 @@ Commands:
   resolve            Resolve specific modules with dependencies
   adapters           Manage adapter selections
   generate           Generate code from contracts
+  prototype          Generate project scaffold
 
 Options:
   --root <path>      Project root directory (default: current directory)
