@@ -169,7 +169,7 @@ function generateEnvExample(adapters: AdapterDefinition[]): GeneratedFile {
 function generateConfig(options: PrototypeOptions, adapters: AdapterDefinition[], catalog: Catalog): GeneratedFile {
   const lines: string[] = [
     "// Adapter configuration",
-    "// Fill in your API keys and configuration",
+    "// Fill in your API keys in .env file",
     "",
   ];
 
@@ -187,19 +187,15 @@ function generateConfig(options: PrototypeOptions, adapters: AdapterDefinition[]
     const configFields = adapter.config.required
       .map((f) => {
         if (f.secret) {
-          return `  // ${f.description || f.name}`;
+          return `  ${f.name}: process.env.${f.name.toUpperCase()}!,`;
         }
-        return `  // ${f.description || f.name}`;
+        return `  ${f.name}: process.env.${f.name.toUpperCase()} || '',`;
       })
       .join("\n");
 
-    adapterConfigs.push(`// ${module}`);
-    adapterConfigs.push(`// ${configFields}`);
-    adapterConfigs.push(`// export const ${module}Adapter = new ${className}({`);
-    for (const field of adapter.config.required) {
-      adapterConfigs.push(`//   ${field.name}: process.env.${field.name.toUpperCase()},`);
-    }
-    adapterConfigs.push(`// });`);
+    adapterConfigs.push(`export const ${module}Adapter = new ${className}({`);
+    adapterConfigs.push(configFields);
+    adapterConfigs.push(`});`);
     adapterConfigs.push("");
   }
 

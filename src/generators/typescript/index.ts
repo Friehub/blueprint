@@ -16,9 +16,26 @@ export class TypeScriptGenerator implements LanguageGenerator {
   generateInterfaces(context: GeneratorContext): GeneratorResult {
     const files: GeneratedFile[] = [];
     const errors: string[] = [];
-    const modules = context.module
+    
+    let modules = context.module
       ? context.catalog.modules.filter((m) => m.name === context.module)
       : context.catalog.modules;
+
+    if (context.module) {
+      const targetMod = context.catalog.modules.find((m) => m.name === context.module);
+      if (targetMod) {
+        const depNames = new Set<string>();
+        for (const dep of targetMod.hardDeps) {
+          if (!depNames.has(dep)) {
+            depNames.add(dep);
+            const depMod = context.catalog.modules.find((m) => m.name === dep);
+            if (depMod && !modules.some((m) => m.name === dep)) {
+              modules = [...modules, depMod];
+            }
+          }
+        }
+      }
+    }
 
     for (const mod of modules) {
       try {
@@ -247,7 +264,7 @@ export class TypeScriptGenerator implements LanguageGenerator {
 
     for (const fn of mod.functions) {
       if (adapter.implements.includes(fn.name)) {
-        lines.push(this.generateAdapterMethod(fn, "  "));
+        lines.push(this.generateAdapterMethod(fn, adapter.name, "  "));
       } else if (!adapter.does_not_implement?.includes(fn.name)) {
         lines.push(this.generateUnimplementedMethod(fn, "  "));
       }
@@ -272,10 +289,16 @@ export class TypeScriptGenerator implements LanguageGenerator {
     return `${indent}${camelCase(fn.name)}(${params}): Promise<${returnType}> {`;
   }
 
-  private generateAdapterMethod(fn: ContractFunction, indent: string): string {
+  private generateAdapterMethod(fn: ContractFunction, adapterName: string, indent: string): string {
     const lines: string[] = [];
     lines.push(`${indent}${camelCase(fn.name)}(${this.generateParamsList(fn)}): Promise<${mapType(fn.returns, "typescript")}> {`);
-    lines.push(`${indent}  // TODO: Implement with ${fn.name}`);
+    
+    const sdkHint = getSdkHint(adapterName, fn.name);
+    if (sdkHint) {
+      lines.push(`${indent}  // ${sdkHint}`);
+    } else {
+      lines.push(`${indent}  // TODO: Implement with ${fn.name}`);
+    }
     lines.push(`${indent}  throw new Error('Not implemented');`);
     lines.push(`${indent}}`);
     return lines.join("\n");
@@ -352,4 +375,43 @@ export class TypeScriptGenerator implements LanguageGenerator {
 
     return lines.join("\n");
   }
+}
+
+function getSdkHint(adapterName: string, functionName: string): string | null {
+  const hints: Record<string, Record<string, string>> = {
+    stripe: {
+      initiatePayment: "stripe.paymentIntents.create({ amount, currency, payment_method })",
+      refundPayment: "stripe.refunds.create({ payment_intent, amount })",
+      getPaymentStatus: "stripe.paymentIntents.retrieve(paymentId)",
+      createSubscription: "stripe.subscriptions.create({ customer, items: [{ price }] })",
+      getSubscription: "stripe.subscriptions.retrieve(subscriptionId)",
+      cancelSubscription: "stripe.subscriptions.cancel(subscriptionId)",
+    },
+    redis: {
+      get: "redis.get(key)",
+      set: "redis.set(key, value, { EX: ttl })",
+      delete: "redis.del(key)",
+      exists: "redis.exists(key)",
+      expire: "redis.expire(key, seconds)",
+      ttl: "redis.ttl(key)",
+    },
+    bullmq: {
+      enqueue: "queue.add(name, data, { attempts: 3 })",
+      dequeue: "worker.process(job => handler(job.data))",
+      peek: "queue.getJobs(['waiting'], 0, 1)",
+      size: "queue.getWaitingCount()",
+      remove: "queue.remove(jobId)",
+    },
+    sendgrid: {
+      sendEmail: "sgMail.send({ to, from, subject, text })",
+    },
+    resend: {
+      sendEmail: "resend.emails.send({ from, to, subject, html })",
+    },
+    twilio: {
+      sendSMS: "twilio.messages.create({ to, from, body })",
+    },
+  };
+
+  return hints[adapterName]?.[functionName] ?? null;
 }

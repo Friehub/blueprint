@@ -22,10 +22,11 @@ export interface ParsedArgs {
   format: OutputFormat;
   compact: boolean;
   quiet: boolean;
+  minimal: boolean;
   unknown: string[];
 }
 
-const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name"]);
+const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name", "--minimal"]);
 const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters", "generate", "prototype"]);
 const ADAPTER_SUBCOMMANDS = new Set(["list", "add", "remove", "show", "verify", "search"]);
 const GENERATE_SUBCOMMANDS = new Set(["interfaces", "adapters", "tests", "all"]);
@@ -50,6 +51,7 @@ export function parseArguments(args: string[]): ParsedArgs {
     format: "ascii",
     compact: false,
     quiet: false,
+    minimal: false,
     unknown: [],
   };
 
@@ -142,6 +144,8 @@ export function parseArguments(args: string[]): ParsedArgs {
       parsed.compact = true;
     } else if (arg === "--quiet") {
       parsed.quiet = true;
+    } else if (arg === "--minimal") {
+      parsed.minimal = true;
     } else if (arg === "--name" && i + 1 < args.length) {
       parsed.target = args[++i];
     } else if (arg.startsWith("-") && !KNOWN_FLAGS.has(arg)) {

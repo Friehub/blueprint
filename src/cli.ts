@@ -414,7 +414,7 @@ async function main() {
       console.error("Catalog has errors. Use --strict to fail on errors, or fix the issues above.");
       process.exit(1);
     }
-    outputData = JSON.stringify(result.value, null, compact ? undefined : 2);
+    outputData = args.minimal ? JSON.stringify(minimalCatalog(result.value), null, compact ? undefined : 2) : JSON.stringify(result.value, null, compact ? undefined : 2);
   }
 
   if (output) {
@@ -433,6 +433,26 @@ async function main() {
   } else {
     console.log(outputData);
   }
+}
+
+function minimalCatalog(catalog: { modules: Array<{ name: string; functions: Array<{ name: string; params: Array<{ name: string; type: string | null; optional: boolean }>; returns: string }>; types: Array<{ name: string; raw: string }>; hardDeps: string[]; softDeps: string[]; coreInherits: string[] }>; core: Array<{ name: string; implicit: boolean }> }) {
+  return {
+    modules: catalog.modules.map((mod) => ({
+      name: mod.name,
+      functions: mod.functions.map((fn) => ({
+        name: fn.name,
+        params: fn.params.map((p) => `${p.name}${p.optional ? "?" : ""}: ${p.type ?? "unknown"}`),
+        returns: fn.returns,
+      })),
+      hardDeps: mod.hardDeps,
+      softDeps: mod.softDeps,
+      coreInherits: mod.coreInherits,
+    })),
+    core: catalog.core.map((c) => ({
+      name: c.name,
+      implicit: c.implicit,
+    })),
+  };
 }
 
 function renderList(catalog: { modules: Array<{ name: string; hardDeps: string[]; softDeps: string[]; coreInherits: string[]; summary: string | null }>; core: Array<{ name: string; implicit: boolean }> }): string {

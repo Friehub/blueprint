@@ -26,10 +26,12 @@ export function validateAdapter(
   for (const fn of adapter.implements) {
     const contractFn = module.functions.find((f) => f.name === fn);
     if (!contractFn) {
+      const similar = findSimilarFunction(fn, module);
+      const suggestion = similar ? ` Did you mean "${similar}"?` : "";
       issues.push({
         adapter: adapter.name,
         module: adapter.module,
-        message: `Adapter implements "${fn}" but contract does not define it`,
+        message: `Adapter implements "${fn}" but contract does not define it.${suggestion}`,
         severity: "warning",
       });
     }
@@ -40,10 +42,13 @@ export function validateAdapter(
       if (adapter.does_not_implement?.includes(fn.name)) {
         continue;
       }
+      const similar = findSimilarFunction(fn.name, adapter);
+      const suggestion = similar ? ` Did you mean "${similar}"?` : "";
+      const params = fn.params.map((p) => `${p.name}${p.optional ? "?" : ""}: ${p.type ?? "unknown"}`).join(", ");
       issues.push({
         adapter: adapter.name,
         module: adapter.module,
-        message: `Contract defines "${fn.name}" but adapter does not implement it`,
+        message: `Contract defines "${fn.name}(${params})" but adapter does not implement it.${suggestion}`,
         severity: "error",
       });
     }
@@ -67,6 +72,49 @@ export function validateAdapter(
   };
 }
 
+function findSimilarFunction(target: string, source: { functions?: Array<{ name: string }> } | { implements?: string[] }): string | null {
+  let names: string[] = [];
+  if ("functions" in source && source.functions) {
+    names = source.functions.map((f) => f.name);
+  } else if ("implements" in source && source.implements) {
+    names = source.implements;
+  }
+  const targetLower = target.toLowerCase();
+
+  for (const name of names) {
+    if (name.toLowerCase() === targetLower) continue;
+    if (name.toLowerCase().includes(targetLower) || targetLower.includes(name.toLowerCase())) {
+      return name;
+    }
+    if (levenshteinDistance(name.toLowerCase(), targetLower) <= 3) {
+      return name;
+    }
+  }
+
+  return null;
+}
+
+function levenshteinDistance(a: string, b: string): number {
+  const m = a.length;
+  const n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+
+  for (let i = 0; i <= m; i++) dp[i]![0] = i;
+  for (let j = 0; j <= n; j++) dp[0]![j] = j;
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (a[i - 1] === b[j - 1]) {
+        dp[i]![j] = dp[i - 1]![j - 1]!;
+      } else {
+        dp[i]![j] = 1 + Math.min(dp[i - 1]![j]!, dp[i]![j - 1]!, dp[i - 1]![j - 1]!);
+      }
+    }
+  }
+
+  return dp[m]![n]!;
+}
+
 export function validateAdapterSelection(
   selected: Record<string, string>,
   adapters: AdapterDefinition[],
@@ -77,10 +125,12 @@ export function validateAdapterSelection(
   for (const [module, provider] of Object.entries(selected)) {
     const adapter = adapters.find((a) => a.module === module && a.name === provider);
     if (!adapter) {
+      const available = adapters.filter((a) => a.module === module).map((a) => a.name);
+      const suggestion = available.length > 0 ? ` Available adapters: ${available.join(", ")}` : "";
       issues.push({
         adapter: provider,
         module,
-        message: `Adapter "${provider}" not found for module "${module}"`,
+        message: `Adapter "${provider}" not found for module "${module}".${suggestion}`,
         severity: "error",
       });
       continue;
