@@ -1,0 +1,57 @@
+name: paddle
+module: billing
+version: 1.0.0
+description: Paddle billing subscription and plan management adapter
+
+implements:
+  - createSubscription
+  - getSubscription
+  - upgradeSubscription
+  - downgradeSubscription
+  - cancelSubscription
+  - reactivateSubscription
+  - getInvoices
+  - getInvoice
+  - getPlans
+  - getPlan
+
+does_not_implement: []
+
+config:
+  required:
+    - name: vendor_id
+      type: string
+      description: Paddle vendor ID
+      secret: false
+    - name: api_key
+      type: string
+      description: Paddle API key
+      secret: true
+    - name: client_side_token
+      type: string
+      description: Paddle client-side token
+      secret: true
+    - name: webhook_secret
+      type: string
+      description: Paddle webhook secret
+      secret: true
+  optional:
+    - name: environment
+      type: string
+      default: "production"
+      description: Paddle environment (sandbox or production)
+
+dependencies:
+  - module: payments
+    purpose: Process subscription payments
+    required: true
+  - module: notifications
+    purpose: Send subscription lifecycle emails
+    required: false
+  - module: audit_log
+    purpose: Log subscription events
+    required: false
+
+metadata:
+  provider_url: https://paddle.com
+  docs_url: https://developer.paddle.com

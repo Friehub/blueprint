@@ -1,0 +1,58 @@
+name: sentry
+module: error_tracking
+version: 1.0.0
+description: Sentry error tracking adapter
+
+implements:
+  - recordError
+  - getErrorEvent
+  - listErrorEvents
+  - getIssue
+  - listIssues
+  - updateIssue
+  - assignIssue
+  - muteIssue
+  - unmuteIssue
+  - createAlertRule
+  - getAlertRule
+  - listAlertRules
+
+does_not_implement: []
+
+config:
+  required:
+    - name: dsn
+      type: string
+      description: Sentry DSN
+      secret: true
+    - name: org
+      type: string
+      description: Sentry organization slug
+      secret: false
+    - name: project
+      type: string
+      description: Sentry project slug
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      description: Sentry environment
+    - name: release
+      type: string
+      description: Sentry release version
+    - name: traces_sample_rate
+      type: number
+      default: 0.1
+      description: Traces sample rate
+
+dependencies:
+  - module: notifications
+    purpose: Send alert notifications
+    required: false
+  - module: audit_log
+    purpose: Log error tracking events
+    required: false
+
+metadata:
+  provider_url: https://sentry.io
+  docs_url: https://docs.sentry.io

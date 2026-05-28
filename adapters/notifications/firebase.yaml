@@ -1,0 +1,45 @@
+name: firebase
+module: notifications
+version: 1.0.0
+description: Firebase Cloud Messaging adapter
+
+implements:
+  - sendPush
+  - getNotifications
+  - markRead
+  - markAllRead
+  - getUnreadCount
+  - updatePreferences
+  - getPreferences
+
+does_not_implement:
+  - sendEmail
+  - sendSMS
+  - sendInApp
+
+config:
+  required:
+    - name: service_account_key
+      type: string
+      description: Firebase service account key JSON
+      secret: true
+    - name: project_id
+      type: string
+      description: Firebase project ID
+      secret: false
+  optional:
+    - name: database_url
+      type: string
+      description: Firebase Realtime Database URL
+
+dependencies:
+  - module: users
+    purpose: Get user preferences
+    required: true
+  - module: audit_log
+    purpose: Log notification events
+    required: false
+
+metadata:
+  provider_url: https://firebase.google.com
+  docs_url: https://firebase.google.com/docs/cloud-messaging

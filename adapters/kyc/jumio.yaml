@@ -1,0 +1,54 @@
+name: jumio
+module: kyc
+version: 1.0.0
+description: Jumio KYC verification adapter
+
+implements:
+  - submitVerification
+  - getVerification
+  - getUserVerification
+  - getVerificationStatus
+  - updateVerification
+  - rejectVerification
+  - approveVerification
+  - listPendingVerifications
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_token
+      type: string
+      description: Jumio API token
+      secret: true
+    - name: api_secret
+      type: string
+      description: Jumio API secret
+      secret: true
+    - name: subdomain
+      type: string
+      description: Jumio subdomain
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      default: "production"
+      description: Jumio environment (demo or production)
+
+dependencies:
+  - module: users
+    purpose: Get user data for verification
+    required: true
+  - module: storage
+    purpose: Store verification documents
+    required: true
+  - module: notifications
+    purpose: Send verification status updates
+    required: false
+  - module: audit_log
+    purpose: Log verification events
+    required: false
+
+metadata:
+  provider_url: https://www.jumio.com
+  docs_url: https://netverifyusercontentdocs.jumio.com

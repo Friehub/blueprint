@@ -1,0 +1,49 @@
+name: linear
+module: projects
+version: 1.0.0
+description: Linear project management adapter
+
+implements:
+  - createProject
+  - getProject
+  - listProjects
+  - updateProject
+  - archiveProject
+  - unarchiveProject
+  - addProjectMember
+  - removeProjectMember
+  - changeProjectOwner
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Linear API key
+      secret: true
+  optional:
+    - name: team_id
+      type: string
+      description: Default team ID
+    - name: organization_id
+      type: string
+      description: Linear organization ID
+
+dependencies:
+  - module: workspaces
+    purpose: Get workspace data
+    required: true
+  - module: users
+    purpose: Get user data for membership
+    required: true
+  - module: notifications
+    purpose: Send project notifications
+    required: false
+  - module: audit_log
+    purpose: Log project events
+    required: false
+
+metadata:
+  provider_url: https://linear.app
+  docs_url: https://developers.linear.app

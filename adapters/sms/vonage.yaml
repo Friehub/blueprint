@@ -1,0 +1,41 @@
+name: vonage
+module: sms
+version: 1.0.0
+description: Vonage SMS delivery adapter
+
+implements:
+  - send
+  - sendBulk
+  - getDeliveryStatus
+  - getBalance
+  - lookupNumber
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Vonage API key
+      secret: false
+    - name: api_secret
+      type: string
+      description: Vonage API secret
+      secret: true
+    - name: from_number
+      type: string
+      description: Vonage phone number
+      secret: false
+  optional:
+    - name: brand
+      type: string
+      description: Vonage brand name
+
+dependencies:
+  - module: audit_log
+    purpose: Log SMS delivery events
+    required: false
+
+metadata:
+  provider_url: https://www.vonage.com
+  docs_url: https://developer.nexmo.com

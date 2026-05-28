@@ -1,0 +1,45 @@
+name: easyship
+module: shipping
+version: 1.0.0
+description: Easyship shipping adapter
+
+implements:
+  - getRates
+  - createShipment
+  - getShipment
+  - trackShipment
+  - cancelShipment
+  - createLabel
+  - getLabel
+  - validateAddress
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Easyship API key
+      secret: true
+  optional:
+    - name: store_id
+      type: string
+      description: Easyship store ID
+    - name: currency
+      type: string
+      description: Default currency
+
+dependencies:
+  - module: orders
+    purpose: Get order data for shipments
+    required: true
+  - module: notifications
+    purpose: Send tracking updates
+    required: false
+  - module: audit_log
+    purpose: Log shipping events
+    required: false
+
+metadata:
+  provider_url: https://www.easyship.com
+  docs_url: https://docs.easyship.com

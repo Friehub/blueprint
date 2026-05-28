@@ -1,18 +1,19 @@
 name: bullmq
-module: queues
+module: jobs
 version: 1.0.0
-description: BullMQ queue adapter
+description: BullMQ jobs adapter
 
 implements:
-  - enqueue
-  - enqueueBulk
+  - registerJob
   - scheduleJob
-  - cancelJob
+  - triggerJob
+  - disableJob
+  - enableJob
   - getJob
-  - getJobStatus
-  - retryJob
-  - getQueueStats
-  - purgeQueue
+  - listJobs
+  - getExecution
+  - listExecutions
+  - cancelExecution
 
 does_not_implement: []
 
@@ -40,7 +41,13 @@ config:
       default: 0
       description: Redis database number
 
-dependencies: []
+dependencies:
+  - module: queues
+    purpose: Underlying job dispatch mechanism
+    required: true
+  - module: audit_log
+    purpose: Log job execution events
+    required: false
 
 metadata:
   provider_url: https://docs.bullmq.io

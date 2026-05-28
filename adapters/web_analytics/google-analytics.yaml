@@ -1,0 +1,43 @@
+name: google-analytics
+module: web_analytics
+version: 1.0.0
+description: Google Analytics web analytics adapter
+
+implements:
+  - trackEvent
+  - identifyUser
+  - trackPageView
+  - getMetrics
+  - getFunnel
+  - getCohort
+  - getRetention
+
+does_not_implement: []
+
+config:
+  required:
+    - name: measurement_id
+      type: string
+      description: Google Analytics measurement ID
+      secret: false
+    - name: api_secret
+      type: string
+      description: Google Analytics API secret
+      secret: true
+  optional:
+    - name: property_id
+      type: string
+      description: Google Analytics 4 property ID
+    - name: credentials
+      type: string
+      description: Google service account credentials JSON
+      secret: true
+
+dependencies:
+  - module: audit_log
+    purpose: Log analytics events
+    required: false
+
+metadata:
+  provider_url: https://analytics.google.com
+  docs_url: https://developers.google.com/analytics

@@ -1,21 +1,19 @@
 name: stripe
-module: payments
+module: donations
 version: 1.0.0
-description: Stripe payment processing adapter
+description: Stripe donations adapter
 
 implements:
-  - initiatePayment
-  - verifyPayment
-  - getPaymentByOrder
-  - initiateRefund
-  - getRefundByOrder
-  - getRefund
+  - createCampaign
+  - getCampaign
+  - listCampaigns
+  - donate
+  - getDonation
+  - getDonationsByCampaign
+  - getCampaignStats
+  - issueCertificate
 
-does_not_implement:
-  - getWallet
-  - creditWallet
-  - debitWallet
-  - getWalletTransactions
+does_not_implement: []
 
 config:
   required:
@@ -32,16 +30,16 @@ config:
       type: string
       default: "2023-10-16"
       description: Stripe API version
-    - name: account_id
-      type: string
-      description: Stripe account ID for Connect
 
 dependencies:
+  - module: payments
+    purpose: Process donation payments
+    required: true
   - module: notifications
-    purpose: Send payment confirmation emails
+    purpose: Send donation receipts
     required: false
   - module: audit_log
-    purpose: Log payment events
+    purpose: Log donation events
     required: false
 
 metadata:

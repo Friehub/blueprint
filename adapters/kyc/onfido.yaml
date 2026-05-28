@@ -1,0 +1,53 @@
+name: onfido
+module: kyc
+version: 1.0.0
+description: Onfido KYC verification adapter
+
+implements:
+  - submitVerification
+  - getVerification
+  - getUserVerification
+  - getVerificationStatus
+  - updateVerification
+  - rejectVerification
+  - approveVerification
+  - listPendingVerifications
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_token
+      type: string
+      description: Onfido API token
+      secret: true
+    - name: region
+      type: string
+      description: Onfido region (eu or us)
+      secret: false
+  optional:
+    - name: webhook_secret
+      type: string
+      description: Onfido webhook secret
+      secret: true
+    - name: report_type
+      type: string
+      description: Default report type
+
+dependencies:
+  - module: users
+    purpose: Get user data for verification
+    required: true
+  - module: storage
+    purpose: Store verification documents
+    required: true
+  - module: notifications
+    purpose: Send verification status updates
+    required: false
+  - module: audit_log
+    purpose: Log verification events
+    required: false
+
+metadata:
+  provider_url: https://onfido.com
+  docs_url: https://developers.onfido.com

@@ -1,0 +1,50 @@
+name: linear
+module: tasks
+version: 1.0.0
+description: Linear task management adapter
+
+implements:
+  - createTask
+  - getTask
+  - listTasks
+  - updateTask
+  - assignTask
+  - changeTaskStatus
+  - addTaskDependency
+  - removeTaskDependency
+  - completeTask
+  - archiveTask
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Linear API key
+      secret: true
+  optional:
+    - name: team_id
+      type: string
+      description: Default team ID
+    - name: project_id
+      type: string
+      description: Default project ID
+
+dependencies:
+  - module: projects
+    purpose: Get project data
+    required: true
+  - module: users
+    purpose: Get user data for assignment
+    required: true
+  - module: notifications
+    purpose: Send task notifications
+    required: false
+  - module: audit_log
+    purpose: Log task events
+    required: false
+
+metadata:
+  provider_url: https://linear.app
+  docs_url: https://developers.linear.app

@@ -1,21 +1,21 @@
 name: stripe
-module: payments
+module: billing
 version: 1.0.0
-description: Stripe payment processing adapter
+description: Stripe billing subscription and plan management adapter
 
 implements:
-  - initiatePayment
-  - verifyPayment
-  - getPaymentByOrder
-  - initiateRefund
-  - getRefundByOrder
-  - getRefund
+  - createSubscription
+  - getSubscription
+  - upgradeSubscription
+  - downgradeSubscription
+  - cancelSubscription
+  - reactivateSubscription
+  - getInvoices
+  - getInvoice
+  - getPlans
+  - getPlan
 
-does_not_implement:
-  - getWallet
-  - creditWallet
-  - debitWallet
-  - getWalletTransactions
+does_not_implement: []
 
 config:
   required:
@@ -32,18 +32,18 @@ config:
       type: string
       default: "2023-10-16"
       description: Stripe API version
-    - name: account_id
-      type: string
-      description: Stripe account ID for Connect
 
 dependencies:
+  - module: payments
+    purpose: Process subscription payments
+    required: true
   - module: notifications
-    purpose: Send payment confirmation emails
+    purpose: Send subscription lifecycle emails
     required: false
   - module: audit_log
-    purpose: Log payment events
+    purpose: Log subscription events
     required: false
 
 metadata:
   provider_url: https://stripe.com
-  docs_url: https://stripe.com/docs
+  docs_url: https://stripe.com/docs/billing

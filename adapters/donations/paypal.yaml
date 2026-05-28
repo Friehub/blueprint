@@ -1,0 +1,47 @@
+name: paypal
+module: donations
+version: 1.0.0
+description: PayPal donations adapter
+
+implements:
+  - createCampaign
+  - getCampaign
+  - listCampaigns
+  - donate
+  - getDonation
+  - getDonationsByCampaign
+  - getCampaignStats
+  - issueCertificate
+
+does_not_implement: []
+
+config:
+  required:
+    - name: client_id
+      type: string
+      description: PayPal client ID
+      secret: false
+    - name: client_secret
+      type: string
+      description: PayPal client secret
+      secret: true
+  optional:
+    - name: environment
+      type: string
+      default: "production"
+      description: PayPal environment (sandbox or production)
+
+dependencies:
+  - module: payments
+    purpose: Process donation payments
+    required: true
+  - module: notifications
+    purpose: Send donation receipts
+    required: false
+  - module: audit_log
+    purpose: Log donation events
+    required: false
+
+metadata:
+  provider_url: https://www.paypal.com
+  docs_url: https://developer.paypal.com/docs

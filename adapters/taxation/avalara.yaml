@@ -1,0 +1,52 @@
+name: avalara
+module: taxation
+version: 1.0.0
+description: Avalara taxation adapter
+
+implements:
+  - calculateTax
+  - getTaxRate
+  - listTaxRates
+  - setTaxProfile
+  - getTaxProfile
+  - validateTaxId
+  - previewTax
+
+does_not_implement: []
+
+config:
+  required:
+    - name: account_id
+      type: string
+      description: Avalara account ID
+      secret: false
+    - name: license_key
+      type: string
+      description: Avalara license key
+      secret: true
+  optional:
+    - name: service_url
+      type: string
+      default: https://sandbox-rest.avatax.com
+      description: Avalara service URL
+    - name: company_code
+      type: string
+      description: Avalara company code
+
+dependencies:
+  - module: billing
+    purpose: Access billing data for tax calculations
+    required: false
+  - module: invoicing
+    purpose: Access invoice data for tax calculations
+    required: false
+  - module: orders
+    purpose: Access order data for tax calculations
+    required: false
+  - module: audit_log
+    purpose: Log tax events
+    required: false
+
+metadata:
+  provider_url: https://www.avalara.com
+  docs_url: https://developer.avalara.com

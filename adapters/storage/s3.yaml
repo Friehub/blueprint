@@ -1,0 +1,49 @@
+name: s3
+module: storage
+version: 1.0.0
+description: AWS S3 storage adapter
+
+implements:
+  - uploadFile
+  - downloadFile
+  - deleteFile
+  - getSignedUrl
+  - getSignedUploadUrl
+  - listFiles
+  - moveFile
+  - copyFile
+  - getMetadata
+
+does_not_implement: []
+
+config:
+  required:
+    - name: access_key_id
+      type: string
+      description: AWS access key ID
+      secret: false
+    - name: secret_access_key
+      type: string
+      description: AWS secret access key
+      secret: true
+    - name: region
+      type: string
+      description: AWS region
+      secret: false
+  optional:
+    - name: endpoint
+      type: string
+      description: Custom S3 endpoint URL
+    - name: bucket
+      type: string
+      description: Default bucket name
+    - name: force_path_style
+      type: boolean
+      default: false
+      description: Force path-style URLs
+
+dependencies: []
+
+metadata:
+  provider_url: https://aws.amazon.com/s3
+  docs_url: https://docs.aws.amazon.com/AmazonS3/latest/APIReference

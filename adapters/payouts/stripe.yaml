@@ -1,0 +1,49 @@
+name: stripe
+module: payouts
+version: 1.0.0
+description: Stripe Connect payouts adapter
+
+implements:
+  - createPayout
+  - getPayout
+  - listPayouts
+  - cancelPayout
+  - retryPayout
+  - schedulePayout
+  - getPayoutSchedule
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Stripe secret API key
+      secret: true
+    - name: webhook_secret
+      type: string
+      description: Stripe webhook signing secret
+      secret: true
+  optional:
+    - name: api_version
+      type: string
+      default: "2023-10-16"
+      description: Stripe API version
+
+dependencies:
+  - module: payments
+    purpose: Access payment data for payouts
+    required: true
+  - module: ledger
+    purpose: Track payout ledger entries
+    required: true
+  - module: notifications
+    purpose: Send payout notifications
+    required: false
+  - module: audit_log
+    purpose: Log payout events
+    required: false
+
+metadata:
+  provider_url: https://stripe.com/connect
+  docs_url: https://stripe.com/docs/connect

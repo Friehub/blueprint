@@ -1,0 +1,45 @@
+name: chargebacks911
+module: chargebacks
+version: 1.0.0
+description: Chargebacks911 chargeback management adapter
+
+implements:
+  - createChargeback
+  - getChargeback
+  - listChargebacks
+  - submitEvidence
+  - updateChargebackStatus
+  - closeChargeback
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Chargebacks911 API key
+      secret: true
+    - name: merchant_id
+      type: string
+      description: Chargebacks911 merchant ID
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      default: "production"
+      description: Chargebacks911 environment (sandbox or production)
+
+dependencies:
+  - module: payments
+    purpose: Access payment data for chargebacks
+    required: true
+  - module: notifications
+    purpose: Send chargeback notifications
+    required: false
+  - module: audit_log
+    purpose: Log chargeback events
+    required: false
+
+metadata:
+  provider_url: https://chargebacks911.com
+  docs_url: https://chargebacks911.com/docs

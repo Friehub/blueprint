@@ -1,0 +1,42 @@
+name: typesense
+module: search
+version: 1.0.0
+description: Typesense search adapter
+
+implements:
+  - indexDocument
+  - indexBulk
+  - removeDocument
+  - search
+  - suggest
+  - reindex
+  - getIndexStats
+  - createIndex
+  - deleteIndex
+
+does_not_implement: []
+
+config:
+  required:
+    - name: host
+      type: string
+      description: Typesense host URL
+      secret: false
+    - name: api_key
+      type: string
+      description: Typesense API key
+      secret: true
+    - name: collection
+      type: string
+      description: Default collection name
+      secret: false
+  optional:
+    - name: nearest_node_host
+      type: string
+      description: Nearest node host for geo-distributed search
+
+dependencies: []
+
+metadata:
+  provider_url: https://typesense.org
+  docs_url: https://typesense.org/docs

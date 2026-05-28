@@ -1,0 +1,49 @@
+name: datadog
+module: trace_query
+version: 1.0.0
+description: Datadog APM trace query adapter
+
+implements:
+  - queryTraces
+  - getTrace
+  - getSpan
+  - listServices
+  - searchTraces
+  - getTraceStats
+  - getErrorTraces
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Datadog API key
+      secret: true
+    - name: app_key
+      type: string
+      description: Datadog application key
+      secret: true
+  optional:
+    - name: site
+      type: string
+      default: "datadoghq.com"
+      description: Datadog site
+    - name: service
+      type: string
+      description: Default service name filter
+    - name: env
+      type: string
+      description: Default environment filter
+
+dependencies:
+  - module: error_tracking
+    purpose: Access error data for traces
+    required: false
+  - module: audit_log
+    purpose: Log trace query events
+    required: false
+
+metadata:
+  provider_url: https://www.datadoghq.com
+  docs_url: https://docs.datadoghq.com

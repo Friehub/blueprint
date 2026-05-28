@@ -1,0 +1,49 @@
+name: opsgenie
+module: incident_management
+version: 1.0.0
+description: Opsgenie incident management adapter
+
+implements:
+  - createIncident
+  - getIncident
+  - listIncidents
+  - acknowledgeIncident
+  - assignIncident
+  - updateIncidentSeverity
+  - addIncidentNote
+  - resolveIncident
+  - createRunbookLink
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Opsgenie API key
+      secret: true
+    - name: team_id
+      type: string
+      description: Opsgenie team ID
+      secret: false
+    - name: service_id
+      type: string
+      description: Opsgenie service ID
+      secret: false
+  optional:
+    - name: region
+      type: string
+      default: "us"
+      description: Opsgenie region (us or eu)
+
+dependencies:
+  - module: notifications
+    purpose: Send incident notifications
+    required: false
+  - module: audit_log
+    purpose: Log incident events
+    required: false
+
+metadata:
+  provider_url: https://www.atlassian.com/software/opsgenie
+  docs_url: https://docs.opsgenie.com

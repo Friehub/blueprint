@@ -1,0 +1,40 @@
+name: plausible
+module: web_analytics
+version: 1.0.0
+description: Plausible web analytics adapter
+
+implements:
+  - trackEvent
+  - identifyUser
+  - trackPageView
+  - getMetrics
+  - getFunnel
+  - getCohort
+  - getRetention
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Plausible API key
+      secret: true
+    - name: domain
+      type: string
+      description: Plausible domain
+      secret: false
+  optional:
+    - name: base_url
+      type: string
+      default: https://plausible.io/api
+      description: Plausible API base URL
+
+dependencies:
+  - module: audit_log
+    purpose: Log analytics events
+    required: false
+
+metadata:
+  provider_url: https://plausible.io
+  docs_url: https://plausible.io/docs

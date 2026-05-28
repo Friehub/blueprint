@@ -1,0 +1,43 @@
+name: resend
+module: emails
+version: 1.0.0
+description: Resend email delivery adapter
+
+implements:
+  - sendTransactional
+  - sendBulk
+  - createTemplate
+  - updateTemplate
+  - getTemplate
+  - listTemplates
+  - getDeliveryStatus
+  - getDeliveryEvents
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Resend API key
+      secret: true
+    - name: from_email
+      type: string
+      description: Default sender email address
+      secret: false
+  optional:
+    - name: from_name
+      type: string
+      description: Default sender name
+    - name: reply_to
+      type: string
+      description: Default reply-to email address
+
+dependencies:
+  - module: audit_log
+    purpose: Log email delivery events
+    required: false
+
+metadata:
+  provider_url: https://resend.com
+  docs_url: https://resend.com/docs

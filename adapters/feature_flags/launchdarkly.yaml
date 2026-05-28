@@ -1,0 +1,41 @@
+name: launchdarkly
+module: feature_flags
+version: 1.0.0
+description: LaunchDarkly feature flags adapter
+
+implements:
+  - isEnabled
+  - getVariant
+  - setFlag
+  - archiveFlag
+  - listFlags
+  - getFlag
+  - rolloutToPercent
+  - evaluateAll
+
+does_not_implement: []
+
+config:
+  required:
+    - name: sdk_key
+      type: string
+      description: LaunchDarkly SDK key
+      secret: true
+    - name: project_key
+      type: string
+      description: LaunchDarkly project key
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      description: LaunchDarkly environment
+    - name: base_uri
+      type: string
+      default: https://app.launchdarkly.com
+      description: LaunchDarkly API base URI
+
+dependencies: []
+
+metadata:
+  provider_url: https://launchdarkly.com
+  docs_url: https://docs.launchdarkly.com

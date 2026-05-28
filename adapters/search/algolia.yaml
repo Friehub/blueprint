@@ -1,0 +1,39 @@
+name: algolia
+module: search
+version: 1.0.0
+description: Algolia search adapter
+
+implements:
+  - indexDocument
+  - indexBulk
+  - removeDocument
+  - search
+  - suggest
+  - reindex
+  - getIndexStats
+  - createIndex
+  - deleteIndex
+
+does_not_implement: []
+
+config:
+  required:
+    - name: app_id
+      type: string
+      description: Algolia application ID
+      secret: false
+    - name: api_key
+      type: string
+      description: Algolia admin API key
+      secret: true
+  optional:
+    - name: search_api_key
+      type: string
+      description: Algolia search-only API key
+      secret: true
+
+dependencies: []
+
+metadata:
+  provider_url: https://www.algolia.com
+  docs_url: https://www.algolia.com/doc/api-reference

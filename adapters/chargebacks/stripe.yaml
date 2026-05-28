@@ -1,21 +1,17 @@
 name: stripe
-module: payments
+module: chargebacks
 version: 1.0.0
-description: Stripe payment processing adapter
+description: Stripe chargebacks adapter
 
 implements:
-  - initiatePayment
-  - verifyPayment
-  - getPaymentByOrder
-  - initiateRefund
-  - getRefundByOrder
-  - getRefund
+  - createChargeback
+  - getChargeback
+  - listChargebacks
+  - submitEvidence
+  - updateChargebackStatus
+  - closeChargeback
 
-does_not_implement:
-  - getWallet
-  - creditWallet
-  - debitWallet
-  - getWalletTransactions
+does_not_implement: []
 
 config:
   required:
@@ -32,18 +28,18 @@ config:
       type: string
       default: "2023-10-16"
       description: Stripe API version
-    - name: account_id
-      type: string
-      description: Stripe account ID for Connect
 
 dependencies:
+  - module: payments
+    purpose: Access payment data for chargebacks
+    required: true
   - module: notifications
-    purpose: Send payment confirmation emails
+    purpose: Send chargeback notifications
     required: false
   - module: audit_log
-    purpose: Log payment events
+    purpose: Log chargeback events
     required: false
 
 metadata:
   provider_url: https://stripe.com
-  docs_url: https://stripe.com/docs
+  docs_url: https://stripe.com/docs/disputes

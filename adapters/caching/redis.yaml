@@ -6,25 +6,42 @@ description: Redis caching adapter
 implements:
   - get
   - set
-  - delete
-  - exists
-  - expire
-  - ttl
+  - del
+  - getOrSet
+  - invalidateByTag
+  - invalidateByPrefix
+  - mget
+  - mset
+  - increment
+  - decrement
+
+does_not_implement: []
 
 config:
   required:
     - name: url
       type: string
       description: Redis connection URL
+      secret: false
   optional:
-    - name: prefix
+    - name: host
       type: string
-      default: "app:"
-      description: Key prefix for all cache entries
-    - name: ttl
-      type: number
-      default: 3600
-      description: Default TTL in seconds
+      default: "localhost"
+      description: Redis host
+    - name: port
+      type: integer
+      default: 6379
+      description: Redis port
+    - name: password
+      type: string
+      description: Redis password
+      secret: true
+    - name: db
+      type: integer
+      default: 0
+      description: Redis database number
+
+dependencies: []
 
 metadata:
   provider_url: https://redis.io

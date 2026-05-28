@@ -1,0 +1,43 @@
+name: hubspot
+module: crm_leads
+version: 1.0.0
+description: HubSpot CRM leads adapter
+
+implements:
+  - createLead
+  - updateLeadStatus
+  - createDeal
+  - updateDealStage
+  - assignOwner
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: HubSpot API key
+      secret: true
+  optional:
+    - name: portal_id
+      type: string
+      description: HubSpot portal ID
+    - name: access_token
+      type: string
+      description: HubSpot access token
+      secret: true
+
+dependencies:
+  - module: users
+    purpose: Get user data for lead assignments
+    required: true
+  - module: notifications
+    purpose: Send lead notifications
+    required: false
+  - module: audit_log
+    purpose: Log CRM events
+    required: false
+
+metadata:
+  provider_url: https://www.hubspot.com
+  docs_url: https://developers.hubspot.com

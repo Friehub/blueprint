@@ -1,0 +1,54 @@
+name: freshbooks
+module: invoicing
+version: 1.0.0
+description: FreshBooks invoicing adapter
+
+implements:
+  - createInvoice
+  - issueInvoice
+  - sendInvoice
+  - getInvoice
+  - listInvoices
+  - recordInvoicePayment
+  - voidInvoice
+  - createCreditNote
+
+does_not_implement: []
+
+config:
+  required:
+    - name: client_id
+      type: string
+      description: FreshBooks client ID
+      secret: false
+    - name: client_secret
+      type: string
+      description: FreshBooks client secret
+      secret: true
+    - name: access_token
+      type: string
+      description: FreshBooks access token
+      secret: true
+    - name: refresh_token
+      type: string
+      description: FreshBooks refresh token
+      secret: true
+  optional:
+    - name: business_id
+      type: string
+      description: FreshBooks business ID
+
+dependencies:
+  - module: payments
+    purpose: Process invoice payments
+    required: true
+  - module: notifications
+    purpose: Send invoice emails
+    required: false
+  - module: audit_log
+    purpose: Log invoice events
+    required: false
+
+metadata:
+  provider_url: https://www.freshbooks.com
+  docs_url: https://www.freshbooks.com/api

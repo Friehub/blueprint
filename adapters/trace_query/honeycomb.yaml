@@ -1,0 +1,42 @@
+name: honeycomb
+module: trace_query
+version: 1.0.0
+description: Honeycomb trace query adapter
+
+implements:
+  - queryTraces
+  - getTrace
+  - getSpan
+  - listServices
+  - searchTraces
+  - getTraceStats
+  - getErrorTraces
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Honeycomb API key
+      secret: true
+    - name: dataset
+      type: string
+      description: Honeycomb dataset name
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      description: Honeycomb environment
+
+dependencies:
+  - module: error_tracking
+    purpose: Access error data for traces
+    required: false
+  - module: audit_log
+    purpose: Log trace query events
+    required: false
+
+metadata:
+  provider_url: https://www.honeycomb.io
+  docs_url: https://docs.honeycomb.io

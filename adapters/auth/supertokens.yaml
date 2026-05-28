@@ -1,0 +1,55 @@
+name: supertokens
+module: auth
+version: 1.0.0
+description: SuperTokens authentication adapter
+
+implements:
+  - signUp
+  - signIn
+  - signInWithProvider
+  - signOut
+  - refreshToken
+  - verifyToken
+  - requestPasswordReset
+  - confirmPasswordReset
+  - verifyEmail
+  - resendVerification
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_domain
+      type: string
+      description: SuperTokens API domain
+      secret: false
+    - name: api_key
+      type: string
+      description: SuperTokens API key
+      secret: true
+    - name: connection_uri
+      type: string
+      description: SuperTokens connection URI
+      secret: false
+  optional:
+    - name: app_name
+      type: string
+      description: Application name
+    - name: website_domain
+      type: string
+      description: Website domain
+
+dependencies:
+  - module: sessions
+    purpose: Manage user sessions
+    required: true
+  - module: users
+    purpose: User data storage
+    required: true
+  - module: audit_log
+    purpose: Log authentication events
+    required: false
+
+metadata:
+  provider_url: https://supertokens.com
+  docs_url: https://supertokens.com/docs

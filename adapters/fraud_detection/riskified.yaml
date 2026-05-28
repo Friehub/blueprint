@@ -1,0 +1,41 @@
+name: riskified
+module: fraud_detection
+version: 1.0.0
+description: Riskified fraud detection adapter
+
+implements:
+  - scoreTransaction
+  - scoreSignUp
+  - scoreLogin
+  - reportFraud
+  - blockEntity
+  - unblockEntity
+  - isBlocked
+  - getRiskHistory
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Riskified API key
+      secret: true
+    - name: domain
+      type: string
+      description: Riskified domain
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      default: "production"
+      description: Riskified environment (sandbox or production)
+
+dependencies:
+  - module: audit_log
+    purpose: Log fraud detection events
+    required: false
+
+metadata:
+  provider_url: https://www.riskified.com
+  docs_url: https://docs.riskified.com

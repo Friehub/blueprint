@@ -1,0 +1,39 @@
+name: meilisearch
+module: search
+version: 1.0.0
+description: Meilisearch search adapter
+
+implements:
+  - indexDocument
+  - indexBulk
+  - removeDocument
+  - search
+  - suggest
+  - reindex
+  - getIndexStats
+  - createIndex
+  - deleteIndex
+
+does_not_implement: []
+
+config:
+  required:
+    - name: host
+      type: string
+      description: Meilisearch host URL
+      secret: false
+    - name: api_key
+      type: string
+      description: Meilisearch master key
+      secret: true
+  optional:
+    - name: tenant_token
+      type: string
+      description: Meilisearch tenant token
+      secret: true
+
+dependencies: []
+
+metadata:
+  provider_url: https://www.meilisearch.com
+  docs_url: https://docs.meilisearch.com

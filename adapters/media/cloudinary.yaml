@@ -1,0 +1,48 @@
+name: cloudinary
+module: media
+version: 1.0.0
+description: Cloudinary media processing adapter
+
+implements:
+  - uploadMedia
+  - processMedia
+  - getMediaAsset
+  - getVariants
+  - deleteMediaAsset
+  - generateThumbnail
+  - transcodeVideo
+  - getProcessingJob
+
+does_not_implement: []
+
+config:
+  required:
+    - name: cloud_name
+      type: string
+      description: Cloudinary cloud name
+      secret: false
+    - name: api_key
+      type: string
+      description: Cloudinary API key
+      secret: false
+    - name: api_secret
+      type: string
+      description: Cloudinary API secret
+      secret: true
+  optional:
+    - name: secure_url
+      type: boolean
+      default: true
+      description: Use secure URLs
+
+dependencies:
+  - module: storage
+    purpose: Store media assets
+    required: false
+  - module: audit_log
+    purpose: Log media events
+    required: false
+
+metadata:
+  provider_url: https://cloudinary.com
+  docs_url: https://cloudinary.com/documentation

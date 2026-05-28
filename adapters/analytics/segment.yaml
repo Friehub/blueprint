@@ -1,0 +1,40 @@
+name: segment
+module: analytics
+version: 1.0.0
+description: Segment analytics adapter
+
+implements:
+  - trackEvent
+  - identifyUser
+  - trackPageView
+  - getMetrics
+  - getFunnel
+  - getCohort
+  - getRetention
+
+does_not_implement: []
+
+config:
+  required:
+    - name: write_key
+      type: string
+      description: Segment write key
+      secret: true
+  optional:
+    - name: cdn_host
+      type: string
+      default: https://cdn.segment.com
+      description: Segment CDN host
+    - name: flush_interval
+      type: integer
+      default: 1000
+      description: Flush interval in milliseconds
+
+dependencies:
+  - module: audit_log
+    purpose: Log analytics events
+    required: false
+
+metadata:
+  provider_url: https://segment.com
+  docs_url: https://segment.com/docs

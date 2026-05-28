@@ -1,0 +1,47 @@
+name: mixpanel
+module: analytics
+version: 1.0.0
+description: Mixpanel analytics adapter
+
+implements:
+  - trackEvent
+  - identifyUser
+  - trackPageView
+  - getMetrics
+  - getFunnel
+  - getCohort
+  - getRetention
+
+does_not_implement: []
+
+config:
+  required:
+    - name: project_token
+      type: string
+      description: Mixpanel project token
+      secret: false
+    - name: secret
+      type: string
+      description: Mixpanel API secret
+      secret: true
+  optional:
+    - name: api_secret
+      type: string
+      description: Mixpanel API secret for data export
+      secret: true
+    - name: service_account_username
+      type: string
+      description: Mixpanel service account username
+    - name: service_account_secret
+      type: string
+      description: Mixpanel service account secret
+      secret: true
+
+dependencies:
+  - module: audit_log
+    purpose: Log analytics events
+    required: false
+
+metadata:
+  provider_url: https://mixpanel.com
+  docs_url: https://docs.mixpanel.com

@@ -1,0 +1,60 @@
+name: salesforce
+module: crm_leads
+version: 1.0.0
+description: Salesforce CRM leads adapter
+
+implements:
+  - createLead
+  - updateLeadStatus
+  - createDeal
+  - updateDealStage
+  - assignOwner
+
+does_not_implement: []
+
+config:
+  required:
+    - name: client_id
+      type: string
+      description: Salesforce client ID
+      secret: false
+    - name: client_secret
+      type: string
+      description: Salesforce client secret
+      secret: true
+    - name: username
+      type: string
+      description: Salesforce username
+      secret: false
+    - name: password
+      type: string
+      description: Salesforce password
+      secret: true
+    - name: security_token
+      type: string
+      description: Salesforce security token
+      secret: true
+  optional:
+    - name: login_url
+      type: string
+      default: https://login.salesforce.com
+      description: Salesforce login URL
+    - name: api_version
+      type: string
+      default: "v58.0"
+      description: Salesforce API version
+
+dependencies:
+  - module: users
+    purpose: Get user data for lead assignments
+    required: true
+  - module: notifications
+    purpose: Send lead notifications
+    required: false
+  - module: audit_log
+    purpose: Log CRM events
+    required: false
+
+metadata:
+  provider_url: https://www.salesforce.com
+  docs_url: https://developer.salesforce.com

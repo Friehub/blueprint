@@ -1,0 +1,47 @@
+name: imgix
+module: media
+version: 1.0.0
+description: imgix media processing adapter
+
+implements:
+  - uploadMedia
+  - processMedia
+  - getMediaAsset
+  - getVariants
+  - deleteMediaAsset
+  - generateThumbnail
+  - transcodeVideo
+  - getProcessingJob
+
+does_not_implement: []
+
+config:
+  required:
+    - name: domain
+      type: string
+      description: imgix domain
+      secret: false
+    - name: api_key
+      type: string
+      description: imgix API key
+      secret: true
+  optional:
+    - name: secure_url
+      type: boolean
+      default: true
+      description: Use secure URLs
+    - name: source_id
+      type: string
+      description: imgix source ID
+
+dependencies:
+  - module: storage
+    purpose: Store media assets
+    required: false
+  - module: audit_log
+    purpose: Log media events
+    required: false
+
+metadata:
+  provider_url: https://imgix.com
+  docs_url: https://docs.imgix.com

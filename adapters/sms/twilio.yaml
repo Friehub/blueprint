@@ -1,0 +1,41 @@
+name: twilio
+module: sms
+version: 1.0.0
+description: Twilio SMS delivery adapter
+
+implements:
+  - send
+  - sendBulk
+  - getDeliveryStatus
+  - getBalance
+  - lookupNumber
+
+does_not_implement: []
+
+config:
+  required:
+    - name: account_sid
+      type: string
+      description: Twilio account SID
+      secret: false
+    - name: auth_token
+      type: string
+      description: Twilio auth token
+      secret: true
+    - name: from_number
+      type: string
+      description: Twilio phone number
+      secret: false
+  optional:
+    - name: messaging_service_sid
+      type: string
+      description: Twilio messaging service SID
+
+dependencies:
+  - module: audit_log
+    purpose: Log SMS delivery events
+    required: false
+
+metadata:
+  provider_url: https://www.twilio.com
+  docs_url: https://www.twilio.com/docs

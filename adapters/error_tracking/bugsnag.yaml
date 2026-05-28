@@ -1,0 +1,52 @@
+name: bugsnag
+module: error_tracking
+version: 1.0.0
+description: Bugsnag error tracking adapter
+
+implements:
+  - recordError
+  - getErrorEvent
+  - listErrorEvents
+  - getIssue
+  - listIssues
+  - updateIssue
+  - assignIssue
+  - muteIssue
+  - unmuteIssue
+  - createAlertRule
+  - getAlertRule
+  - listAlertRules
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Bugsnag API key
+      secret: true
+  optional:
+    - name: notify_url
+      type: string
+      description: Bugsnag notify URL
+    - name: sessions_url
+      type: string
+      description: Bugsnag sessions URL
+    - name: release_stage
+      type: string
+      description: Bugsnag release stage
+    - name: app_version
+      type: string
+      description: Application version
+
+dependencies:
+  - module: notifications
+    purpose: Send alert notifications
+    required: false
+  - module: audit_log
+    purpose: Log error tracking events
+    required: false
+
+metadata:
+  provider_url: https://www.bugsnag.com
+  docs_url: https://docs.bugsnag.com

@@ -1,0 +1,43 @@
+name: memcached
+module: caching
+version: 1.0.0
+description: Memcached caching adapter
+
+implements:
+  - get
+  - set
+  - del
+  - getOrSet
+  - invalidateByPrefix
+  - mget
+  - mset
+  - increment
+  - decrement
+
+does_not_implement:
+  - invalidateByTag
+
+config:
+  required:
+    - name: servers
+      type: string
+      description: Memcached server addresses (comma-separated)
+      secret: false
+  optional:
+    - name: username
+      type: string
+      description: Memcached username
+    - name: password
+      type: string
+      description: Memcached password
+      secret: true
+    - name: pool_size
+      type: integer
+      default: 10
+      description: Connection pool size
+
+dependencies: []
+
+metadata:
+  provider_url: https://memcached.org
+  docs_url: https://github.com/memcached/memcached/wiki

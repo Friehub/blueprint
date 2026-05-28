@@ -1,0 +1,45 @@
+name: sqs
+module: queues
+version: 1.0.0
+description: AWS SQS queue adapter
+
+implements:
+  - enqueue
+  - enqueueBulk
+  - scheduleJob
+  - cancelJob
+  - getJob
+  - getJobStatus
+  - retryJob
+  - getQueueStats
+  - purgeQueue
+
+does_not_implement: []
+
+config:
+  required:
+    - name: access_key_id
+      type: string
+      description: AWS access key ID
+      secret: false
+    - name: secret_access_key
+      type: string
+      description: AWS secret access key
+      secret: true
+    - name: region
+      type: string
+      description: AWS region
+      secret: false
+  optional:
+    - name: queue_url
+      type: string
+      description: Default SQS queue URL
+    - name: endpoint
+      type: string
+      description: Custom SQS endpoint URL
+
+dependencies: []
+
+metadata:
+  provider_url: https://aws.amazon.com/sqs
+  docs_url: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference

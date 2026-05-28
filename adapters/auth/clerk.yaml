@@ -1,0 +1,53 @@
+name: clerk
+module: auth
+version: 1.0.0
+description: Clerk authentication adapter
+
+implements:
+  - signUp
+  - signIn
+  - signInWithProvider
+  - signOut
+  - refreshToken
+  - verifyToken
+  - requestPasswordReset
+  - confirmPasswordReset
+  - verifyEmail
+  - resendVerification
+
+does_not_implement: []
+
+config:
+  required:
+    - name: publishable_key
+      type: string
+      description: Clerk publishable key
+      secret: false
+    - name: secret_key
+      type: string
+      description: Clerk secret key
+      secret: true
+    - name: frontend_api
+      type: string
+      description: Clerk frontend API URL
+      secret: false
+  optional:
+    - name: jwt_key
+      type: string
+      description: Clerk JWT key for token verification
+      secret: true
+
+dependencies:
+  - module: sessions
+    purpose: Manage user sessions
+    required: true
+  - module: users
+    purpose: User data storage
+    required: true
+  - module: audit_log
+    purpose: Log authentication events
+    required: false
+
+metadata:
+  provider_url: https://clerk.com
+  docs_url: https://clerk.com/docs

@@ -1,0 +1,41 @@
+name: flagsmith
+module: feature_flags
+version: 1.0.0
+description: Flagsmith feature flags adapter
+
+implements:
+  - isEnabled
+  - getVariant
+  - setFlag
+  - archiveFlag
+  - listFlags
+  - getFlag
+  - rolloutToPercent
+  - evaluateAll
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Flagsmith API key
+      secret: true
+    - name: environment_key
+      type: string
+      description: Flagsmith environment key
+      secret: false
+  optional:
+    - name: base_url
+      type: string
+      default: https://api.flagsmith.com/api/v1
+      description: Flagsmith API base URL
+    - name: project
+      type: string
+      description: Flagsmith project name
+
+dependencies: []
+
+metadata:
+  provider_url: https://flagsmith.com
+  docs_url: https://docs.flagsmith.com

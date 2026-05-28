@@ -1,0 +1,35 @@
+name: upstash
+module: rate_limiting
+version: 1.0.0
+description: Upstash rate limiting adapter
+
+implements:
+  - checkLimit
+  - consumeToken
+  - resetLimit
+  - getLimitStatus
+  - setCustomLimit
+
+does_not_implement: []
+
+config:
+  required:
+    - name: url
+      type: string
+      description: Upstash Redis URL
+      secret: false
+    - name: token
+      type: string
+      description: Upstash Redis token
+      secret: true
+  optional:
+    - name: enable_telemetry
+      type: boolean
+      default: true
+      description: Enable Upstash telemetry
+
+dependencies: []
+
+metadata:
+  provider_url: https://upstash.com
+  docs_url: https://docs.upstash.com

@@ -1,0 +1,40 @@
+name: sift
+module: fraud_detection
+version: 1.0.0
+description: Sift fraud detection adapter
+
+implements:
+  - scoreTransaction
+  - scoreSignUp
+  - scoreLogin
+  - reportFraud
+  - blockEntity
+  - unblockEntity
+  - isBlocked
+  - getRiskHistory
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Sift API key
+      secret: true
+  optional:
+    - name: environment
+      type: string
+      default: "production"
+      description: Sift environment (sandbox or production)
+    - name: account_id
+      type: string
+      description: Sift account ID
+
+dependencies:
+  - module: audit_log
+    purpose: Log fraud detection events
+    required: false
+
+metadata:
+  provider_url: https://sift.com
+  docs_url: https://sift.com/developers

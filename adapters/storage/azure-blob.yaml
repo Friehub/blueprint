@@ -1,0 +1,42 @@
+name: azure-blob
+module: storage
+version: 1.0.0
+description: Azure Blob Storage adapter
+
+implements:
+  - uploadFile
+  - downloadFile
+  - deleteFile
+  - getSignedUrl
+  - getSignedUploadUrl
+  - listFiles
+  - moveFile
+  - copyFile
+  - getMetadata
+
+does_not_implement: []
+
+config:
+  required:
+    - name: account_name
+      type: string
+      description: Azure storage account name
+      secret: false
+    - name: account_key
+      type: string
+      description: Azure storage account key
+      secret: true
+  optional:
+    - name: container
+      type: string
+      description: Default container name
+    - name: sas_token
+      type: string
+      description: Azure SAS token
+      secret: true
+
+dependencies: []
+
+metadata:
+  provider_url: https://azure.microsoft.com/en-us/services/storage/blobs
+  docs_url: https://docs.microsoft.com/en-us/azure/storage/blobs

@@ -1,0 +1,46 @@
+name: novu
+module: notifications
+version: 1.0.0
+description: Novu notification infrastructure adapter
+
+implements:
+  - sendPush
+  - sendEmail
+  - sendSMS
+  - getNotifications
+  - markRead
+  - markAllRead
+  - getUnreadCount
+  - updatePreferences
+  - getPreferences
+
+does_not_implement:
+  - sendInApp
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Novu API key
+      secret: true
+    - name: environment_id
+      type: string
+      description: Novu environment ID
+      secret: false
+  optional:
+    - name: backend_url
+      type: string
+      default: https://api.novu.co
+      description: Novu backend URL
+
+dependencies:
+  - module: users
+    purpose: Get user preferences
+    required: true
+  - module: audit_log
+    purpose: Log notification events
+    required: false
+
+metadata:
+  provider_url: https://novu.co
+  docs_url: https://docs.novu.co

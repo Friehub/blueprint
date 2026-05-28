@@ -1,0 +1,58 @@
+name: jira
+module: projects
+version: 1.0.0
+description: Jira project management adapter
+
+implements:
+  - createProject
+  - getProject
+  - listProjects
+  - updateProject
+  - archiveProject
+  - unarchiveProject
+  - addProjectMember
+  - removeProjectMember
+  - changeProjectOwner
+
+does_not_implement: []
+
+config:
+  required:
+    - name: base_url
+      type: string
+      description: Jira instance URL
+      secret: false
+    - name: email
+      type: string
+      description: Jira admin email
+      secret: false
+    - name: api_token
+      type: string
+      description: Jira API token
+      secret: true
+  optional:
+    - name: project_key
+      type: string
+      description: Default project key
+    - name: cloud
+      type: boolean
+      default: true
+      description: Whether using Jira Cloud
+
+dependencies:
+  - module: workspaces
+    purpose: Get workspace data
+    required: true
+  - module: users
+    purpose: Get user data for membership
+    required: true
+  - module: notifications
+    purpose: Send project notifications
+    required: false
+  - module: audit_log
+    purpose: Log project events
+    required: false
+
+metadata:
+  provider_url: https://www.atlassian.com/software/jira
+  docs_url: https://developer.atlassian.com/cloud/jira/platform

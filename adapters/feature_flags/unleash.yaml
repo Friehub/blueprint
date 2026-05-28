@@ -1,0 +1,41 @@
+name: unleash
+module: feature_flags
+version: 1.0.0
+description: Unleash feature flags adapter
+
+implements:
+  - isEnabled
+  - getVariant
+  - setFlag
+  - archiveFlag
+  - listFlags
+  - getFlag
+  - rolloutToPercent
+  - evaluateAll
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_token
+      type: string
+      description: Unleash API token
+      secret: true
+    - name: app_name
+      type: string
+      description: Unleash application name
+      secret: false
+  optional:
+    - name: url
+      type: string
+      default: https://app.getunleash.io/api
+      description: Unleash API URL
+    - name: project
+      type: string
+      description: Unleash project name
+
+dependencies: []
+
+metadata:
+  provider_url: https://www.getunleash.io
+  docs_url: https://docs.getunleash.io

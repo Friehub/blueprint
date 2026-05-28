@@ -1,0 +1,41 @@
+name: gcs
+module: storage
+version: 1.0.0
+description: Google Cloud Storage adapter
+
+implements:
+  - uploadFile
+  - downloadFile
+  - deleteFile
+  - getSignedUrl
+  - getSignedUploadUrl
+  - listFiles
+  - moveFile
+  - copyFile
+  - getMetadata
+
+does_not_implement: []
+
+config:
+  required:
+    - name: project_id
+      type: string
+      description: Google Cloud project ID
+      secret: false
+    - name: service_account_key
+      type: string
+      description: Google Cloud service account key JSON
+      secret: true
+  optional:
+    - name: bucket
+      type: string
+      description: Default bucket name
+    - name: endpoint
+      type: string
+      description: Custom GCS endpoint URL
+
+dependencies: []
+
+metadata:
+  provider_url: https://cloud.google.com/storage
+  docs_url: https://cloud.google.com/storage/docs/apis
