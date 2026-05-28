@@ -109,6 +109,62 @@ export function parseTypeLine(line: string, source: SourceRef): ContractType | n
   return null;
 }
 
+export function collectMultiLineTypes(body: SectionBody, source: SourceRef): ContractType[] {
+  const items: ContractType[] = [];
+  const lines = body.lines;
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i]!.trim();
+    if (!line || line.startsWith("```") || /^[-*+]\s+/.test(line)) {
+      i++;
+      continue;
+    }
+
+    const typeMatch = line.match(/^type\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{/);
+    if (typeMatch) {
+      const name = typeMatch[1] ?? "";
+      const startLine = i;
+      let raw = line;
+      let braceDepth = 1;
+      i++;
+
+      while (i < lines.length && braceDepth > 0) {
+        const nextLine = lines[i]!.trim();
+        raw += "\n" + nextLine;
+        for (const ch of nextLine) {
+          if (ch === "{") braceDepth++;
+          if (ch === "}") braceDepth--;
+        }
+        if (braceDepth === 0) break;
+        i++;
+      }
+
+      items.push({
+        name,
+        raw,
+        source: {
+          file: source.file,
+          startLine: source.startLine + startLine,
+          endLine: source.startLine + i,
+        },
+      });
+      i++;
+      continue;
+    }
+
+    const parsed = parseTypeLine(line, {
+      file: source.file,
+      startLine: source.startLine + i,
+      endLine: source.startLine + i,
+    });
+    if (parsed) items.push(parsed);
+    i++;
+  }
+
+  return items;
+}
+
 export function parseParameters(paramsRaw: string): ContractParameter[] {
   return splitTopLevel(paramsRaw, ",")
     .map((chunk) => chunk.trim())
@@ -173,7 +229,7 @@ export function parseSectionBody(
   }
 
   if (section === "types") {
-    const items = parseBodyLines(body, source, parseTypeLine);
+    const items = collectMultiLineTypes(body, source);
     return { kind: "types", items, raw: body.raw, source };
   }
 

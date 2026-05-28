@@ -7,7 +7,7 @@ import type {
   GeneratedFile,
   LanguageGenerator,
 } from "../types.js";
-import { pascalCase, camelCase, mapType, createTemplateData } from "../types.js";
+import { pascalCase, camelCase, mapType, inferType, createTemplateData } from "../types.js";
 
 export class TypeScriptGenerator implements LanguageGenerator {
   language: Language = "typescript";
@@ -138,10 +138,76 @@ export class TypeScriptGenerator implements LanguageGenerator {
     }
 
     if (raw.includes("{")) {
-      return `export interface ${name} ${raw}`;
+      const fields = this.parseTypeFields(raw);
+      const fieldsStr = fields
+        .map((f) => {
+          const type = f.type ? `: ${mapType(f.type, "typescript")}` : `: ${inferType(f.name, "typescript")}`;
+          const optional = f.optional ? "?" : "";
+          return `  ${camelCase(f.name)}${optional}${type};`;
+        })
+        .join("\n");
+      return `export interface ${name} {\n${fieldsStr}\n}`;
+    }
+
+    const fieldsMatch = raw.match(/^\w+\s*\{\s*(.+)\s*\}$/);
+    if (fieldsMatch) {
+      const fields = fieldsMatch[1]?.split(",").map((f) => f.trim()) ?? [];
+      const fieldsStr = fields
+        .map((f) => {
+          const optional = f.endsWith("?");
+          const fieldName = f.replace(/\?$/, "");
+          return `  ${camelCase(fieldName)}${optional ? "?" : ""}: ${inferType(fieldName, "typescript")};`;
+        })
+        .join("\n");
+      return `export interface ${name} {\n${fieldsStr}\n}`;
     }
 
     return `export type ${name} = ${raw};`;
+  }
+
+  private parseTypeFields(raw: string): Array<{ name: string; type: string | null; optional: boolean }> {
+    const fields: Array<{ name: string; type: string | null; optional: boolean }> = [];
+    const match = raw.match(/\{([^}]+)\}/s);
+    if (!match) return fields;
+
+    const content = match[1] ?? "";
+    const fieldLines = content.split(/[,\n]/).filter((l) => l.trim());
+
+    for (const line of fieldLines) {
+      const trimmed = line.trim().replace(/,\s*$/, "").replace(/\/\/.*$/, "").trim();
+      if (!trimmed) continue;
+
+      const typeMatch = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.+)$/);
+      if (typeMatch) {
+        fields.push({
+          name: typeMatch[1] ?? "",
+          type: typeMatch[2]?.trim() ?? null,
+          optional: false,
+        });
+        continue;
+      }
+
+      const optionalMatch = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\?\s*:\s*(.+)$/);
+      if (optionalMatch) {
+        fields.push({
+          name: optionalMatch[1] ?? "",
+          type: optionalMatch[2]?.trim() ?? null,
+          optional: true,
+        });
+        continue;
+      }
+
+      const simpleMatch = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)$/);
+      if (simpleMatch) {
+        fields.push({
+          name: simpleMatch[1] ?? "",
+          type: null,
+          optional: trimmed.endsWith("?"),
+        });
+      }
+    }
+
+    return fields;
   }
 
   private generateFunctionSignature(fn: ContractFunction): string {

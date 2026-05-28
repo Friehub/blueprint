@@ -1,3 +1,4 @@
+import Handlebars from "handlebars";
 import type { TemplateData } from "./types.js";
 
 export type Template = {
@@ -10,92 +11,165 @@ export type RenderContext = {
   [key: string]: unknown;
 };
 
+Handlebars.registerHelper("pascalCase", (str: string) => {
+  return str
+    .split(/[_\-.\s]+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join("");
+});
+
+Handlebars.registerHelper("camelCase", (str: string) => {
+  const pascal = str
+    .split(/[_\-.\s]+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join("");
+  return pascal.charAt(0).toLowerCase() + pascal.slice(1);
+});
+
+Handlebars.registerHelper("snakeCase", (str: string) => {
+  return str
+    .replace(/([A-Z])/g, "_$1")
+    .toLowerCase()
+    .replace(/^_/, "")
+    .replace(/[_\-.\s]+/g, "_");
+});
+
+Handlebars.registerHelper("kebabCase", (str: string) => {
+  return str
+    .replace(/([A-Z])/g, "-$1")
+    .toLowerCase()
+    .replace(/^-/, "")
+    .replace(/[_\-.\s]+/g, "-");
+});
+
+Handlebars.registerHelper("lowerCase", (str: string) => str.toLowerCase());
+
+Handlebars.registerHelper("upperCase", (str: string) => str.toUpperCase());
+
+Handlebars.registerHelper("mapType", (type: string, language: string) => {
+  const TYPE_MAPPINGS: Record<string, Record<string, string>> = {
+    string: { typescript: "string", rust: "String", python: "str", go: "string" },
+    number: { typescript: "number", rust: "f64", python: "float", go: "float64" },
+    boolean: { typescript: "boolean", rust: "bool", python: "bool", go: "bool" },
+    null: { typescript: "null", rust: "Option::None", python: "None", go: "nil" },
+  };
+
+  const mapping = TYPE_MAPPINGS[type]?.[language];
+  if (mapping) return mapping;
+
+  if (type.endsWith("[]")) {
+    const inner = type.slice(0, -2);
+    const mappedInner = mapTypeHelper(inner, language);
+    switch (language) {
+      case "typescript":
+        return `${mappedInner}[]`;
+      case "rust":
+        return `Vec<${mappedInner}>`;
+      case "python":
+        return `list[${mappedInner}]`;
+      case "go":
+        return `[]${mappedInner}`;
+    }
+  }
+
+  if (type.endsWith("?")) {
+    const inner = type.slice(0, -1);
+    const mappedInner = mapTypeHelper(inner, language);
+    switch (language) {
+      case "typescript":
+        return `${mappedInner} | undefined`;
+      case "rust":
+        return `Option<${mappedInner}>`;
+      case "python":
+        return `Optional[${mappedInner}]`;
+      case "go":
+        return `*${mappedInner}`;
+    }
+  }
+
+  return type;
+});
+
+function mapTypeHelper(type: string, language: string): string {
+  const TYPE_MAPPINGS: Record<string, Record<string, string>> = {
+    string: { typescript: "string", rust: "String", python: "str", go: "string" },
+    number: { typescript: "number", rust: "f64", python: "float", go: "float64" },
+    boolean: { typescript: "boolean", rust: "bool", python: "bool", go: "bool" },
+    null: { typescript: "null", rust: "Option::None", python: "None", go: "nil" },
+  };
+
+  const mapping = TYPE_MAPPINGS[type]?.[language];
+  if (mapping) return mapping;
+
+  if (type.endsWith("[]")) {
+    const inner = type.slice(0, -2);
+    const mappedInner = mapTypeHelper(inner, language);
+    switch (language) {
+      case "typescript":
+        return `${mappedInner}[]`;
+      case "rust":
+        return `Vec<${mappedInner}>`;
+      case "python":
+        return `list[${mappedInner}]`;
+      case "go":
+        return `[]${mappedInner}`;
+    }
+  }
+
+  if (type.endsWith("?")) {
+    const inner = type.slice(0, -1);
+    const mappedInner = mapTypeHelper(inner, language);
+    switch (language) {
+      case "typescript":
+        return `${mappedInner} | undefined`;
+      case "rust":
+        return `Option<${mappedInner}>`;
+      case "python":
+        return `Optional[${mappedInner}]`;
+      case "go":
+        return `*${mappedInner}`;
+    }
+  }
+
+  return type;
+}
+
+Handlebars.registerHelper("inferType", (fieldName: string, language: string) => {
+  const TYPE_INFERENCE_RULES: Array<{ pattern: RegExp; typescript: string; rust: string; python: string; go: string }> = [
+    { pattern: /^id$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+    { pattern: /_id$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+    { pattern: /_at$/i, typescript: "Timestamp", rust: "DateTime<Utc>", python: "str", go: "time.Time" },
+    { pattern: /_count$/i, typescript: "number", rust: "i64", python: "int", go: "int" },
+    { pattern: /_amount$/i, typescript: "number", rust: "f64", python: "float", go: "float64" },
+    { pattern: /_price$/i, typescript: "number", rust: "f64", python: "float", go: "float64" },
+    { pattern: /_total$/i, typescript: "number", rust: "f64", python: "float", go: "float64" },
+    { pattern: /is_/i, typescript: "boolean", rust: "bool", python: "bool", go: "bool" },
+    { pattern: /has_/i, typescript: "boolean", rust: "bool", python: "bool", go: "bool" },
+    { pattern: /_status$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+    { pattern: /_type$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+    { pattern: /_name$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+    { pattern: /_url$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+    { pattern: /_email$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+    { pattern: /_key$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+    { pattern: /_token$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+    { pattern: /_data$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
+    { pattern: /_metadata$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
+    { pattern: /_options$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
+  ];
+
+  const rule = TYPE_INFERENCE_RULES.find((r) => r.pattern.test(fieldName));
+  if (rule) {
+    return rule[language as keyof typeof rule] ?? "unknown";
+  }
+  return "unknown";
+});
+
 export function renderTemplate(template: string, context: RenderContext): string {
-  let result = template;
-
-  result = result.replace(/\{\{#each (\w+)\}\}([\s\S]*?)\{\{\/each\}\}/g, (_, key, block) => {
-    const items = context[key];
-    if (!Array.isArray(items)) return "";
-    return items.map((item: unknown) => renderBlock(block, item, context)).join("");
-  });
-
-  result = result.replace(/\{\{#if (\w+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (_, key, block) => {
-    return context[key] ? block : "";
-  });
-
-  result = result.replace(/\{\{(\w+(?:\.\w+)*)\}\}/g, (_, path) => {
-    const value = resolvePath(context, path);
-    return value !== undefined && value !== null ? String(value) : "";
-  });
-
-  result = result.replace(/\{\{pascalCase (\w+)\}\}/g, (_, key) => {
-    const value = context[key];
-    if (typeof value !== "string") return "";
-    return context.data.pascalCase(value);
-  });
-
-  result = result.replace(/\{\{camelCase (\w+)\}\}/g, (_, key) => {
-    const value = context[key];
-    if (typeof value !== "string") return "";
-    return context.data.camelCase(value);
-  });
-
-  result = result.replace(/\{\{snakeCase (\w+)\}\}/g, (_, key) => {
-    const value = context[key];
-    if (typeof value !== "string") return "";
-    return context.data.snakeCase(value);
-  });
-
-  return result;
+  const compiled = Handlebars.compile(template);
+  return compiled(context);
 }
 
-function renderBlock(block: string, item: unknown, context: RenderContext): string {
-  if (typeof item !== "object" || item === null) {
-    return block.replace(/\{\{this\}\}/g, String(item));
-  }
-
-  let result = block;
-  const obj = item as Record<string, unknown>;
-
-  for (const [key, value] of Object.entries(obj)) {
-    const regex = new RegExp(`\\{\\{${key}\\}\\}`, "g");
-    result = result.replace(regex, value !== undefined && value !== null ? String(value) : "");
-  }
-
-  result = result.replace(/\{\{pascalCase (\w+)\}\}/g, (_, key) => {
-    const value = obj[key];
-    if (typeof value !== "string") return "";
-    return context.data.pascalCase(value);
-  });
-
-  result = result.replace(/\{\{camelCase (\w+)\}\}/g, (_, key) => {
-    const value = obj[key];
-    if (typeof value !== "string") return "";
-    return context.data.camelCase(value);
-  });
-
-  result = result.replace(/\{\{snakeCase (\w+)\}\}/g, (_, key) => {
-    const value = obj[key];
-    if (typeof value !== "string") return "";
-    return context.data.snakeCase(value);
-  });
-
-  return result;
-}
-
-function resolvePath(obj: unknown, path: string): unknown {
-  const parts = path.split(".");
-  let current: unknown = obj;
-
-  for (const part of parts) {
-    if (current === null || current === undefined) {
-      return undefined;
-    }
-    if (typeof current !== "object") {
-      return undefined;
-    }
-    current = (current as Record<string, unknown>)[part];
-  }
-
-  return current;
+export function renderTemplateFile(templatePath: string, context: RenderContext): string {
+  const template = Handlebars.compile(templatePath);
+  return template(context);
 }

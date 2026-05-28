@@ -56,6 +56,36 @@ export const TYPE_MAPPINGS: TypeMapping[] = [
   { contractType: "null", typescript: "null", rust: "Option::None", python: "None", go: "nil" },
 ];
 
+export const TYPE_INFERENCE_RULES: Array<{ pattern: RegExp; typescript: string; rust: string; python: string; go: string }> = [
+  { pattern: /^id$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /_id$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /_at$/i, typescript: "Timestamp", rust: "DateTime<Utc>", python: "str", go: "time.Time" },
+  { pattern: /_count$/i, typescript: "number", rust: "i64", python: "int", go: "int" },
+  { pattern: /_amount$/i, typescript: "number", rust: "f64", python: "float", go: "float64" },
+  { pattern: /_price$/i, typescript: "number", rust: "f64", python: "float", go: "float64" },
+  { pattern: /_total$/i, typescript: "number", rust: "f64", python: "float", go: "float64" },
+  { pattern: /is_/i, typescript: "boolean", rust: "bool", python: "bool", go: "bool" },
+  { pattern: /has_/i, typescript: "boolean", rust: "bool", python: "bool", go: "bool" },
+  { pattern: /_status$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /_type$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /_name$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /_url$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /_email$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /_key$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /_token$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /_data$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
+  { pattern: /_metadata$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
+  { pattern: /_options$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
+];
+
+export function inferType(fieldName: string, language: Language): string {
+  const rule = TYPE_INFERENCE_RULES.find((r) => r.pattern.test(fieldName));
+  if (rule) {
+    return rule[language];
+  }
+  return "unknown";
+}
+
 export function mapType(type: string, language: Language): string {
   const mapping = TYPE_MAPPINGS.find((m) => m.contractType === type);
   if (mapping) {
