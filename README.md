@@ -230,6 +230,90 @@ dependencies:
 
 ---
 
+## Code Generation
+
+The code generator produces language-specific code from contracts and adapters. Currently supports TypeScript, with Rust, Python, and Go planned.
+
+### Generate All
+
+```bash
+blueprinter generate --lang typescript
+```
+
+Generates for all 108 modules:
+- `generated/interfaces/` -- TypeScript interfaces (273 files)
+- `generated/adapters/` -- Adapter skeletons (82 files)
+- `generated/__tests__/` -- Conformance tests (82 files)
+
+### Generate Specific Module
+
+```bash
+blueprinter generate --lang typescript --module billing
+```
+
+### Generate Only Interfaces
+
+```bash
+blueprinter generate interfaces --lang typescript
+```
+
+### Generate Only Adapter Skeleton
+
+```bash
+blueprinter generate adapters --lang typescript --module billing
+```
+
+### Generate Only Tests
+
+```bash
+blueprinter generate tests --lang typescript
+```
+
+### Generated Output Example
+
+**Interface** (`generated/interfaces/billing.ts`):
+```typescript
+export interface BillingContract {
+  createSubscription(userId: string, planId: string, paymentMethod: string): Promise<Subscription>;
+  getSubscription(userId: string): Promise<Subscription | undefined>;
+  cancelSubscription(userId: string, atPeriodEnd?: boolean): Promise<Subscription>;
+}
+```
+
+**Adapter** (`generated/adapters/billing/stripe.ts`):
+```typescript
+export class StripeAdapter implements BillingContract {
+  constructor(private config: { apiKey: string; webhookSecret: string }) {}
+
+  async createSubscription(userId: string, planId: string, paymentMethod: string): Promise<Subscription> {
+    // TODO: Implement with Stripe SDK
+    throw new Error('Not implemented');
+  }
+}
+```
+
+**Test** (`generated/__tests__/billing/stripe.test.ts`):
+```typescript
+describe('StripeAdapter implements BillingContract', () => {
+  const adapter: BillingContract = new StripeAdapter({ apiKey: 'test', webhookSecret: 'test' });
+
+  it('has createSubscription method', () => {
+    expect(typeof adapter.createSubscription).toBe('function');
+  });
+});
+```
+
+### Language Support
+
+| Language | Interfaces | Adapters | Tests | Status |
+|----------|-----------|----------|-------|--------|
+| TypeScript | Yes | Yes | Yes | Available |
+| Rust | Planned | Planned | Planned | Coming soon |
+| Python | Planned | Planned | Planned | Coming soon |
+| Go | Planned | Planned | Planned | Coming soon |
+
+---
+
 ## How to Read Each Module
 
 Each module lists:
