@@ -133,6 +133,10 @@ export class TypeScriptGenerator implements LanguageGenerator {
     const name = pascalCase(type.name);
     const raw = type.raw;
 
+    if (raw.startsWith("type ")) {
+      return `export ${raw}`;
+    }
+
     if (raw.includes("{")) {
       return `export interface ${name} ${raw}`;
     }
