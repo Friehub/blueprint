@@ -2,7 +2,7 @@ import type { ModuleContract, ContractFunction, ContractType } from "../../core/
 import type { AdapterDefinition } from "../../core/adapters/types.js";
 import type { Language, GeneratorContext, GeneratorResult, GeneratedFile, LanguageGenerator } from "../types.js";
 import { pascalCase, camelCase, mapType } from "../types.js";
-import { generateTypeDefinition, generateFunctionSignature, generateParamsList, generateIndex, getSdkHint } from "./helpers.js";
+import { generateTypeDefinition, generateFunctionSignature, generateParamsList, generateIndex, getSdkHint, generateSharedTypes } from "./helpers.js";
 
 export class TypeScriptGenerator implements LanguageGenerator {
   language: Language = "typescript";
@@ -12,6 +12,8 @@ export class TypeScriptGenerator implements LanguageGenerator {
     const files: GeneratedFile[] = [];
     const errors: string[] = [];
     let modules = this.resolveModules(context);
+
+    files.push({ path: "interfaces/shared.ts", content: generateSharedTypes() });
 
     for (const mod of modules) {
       try {
@@ -122,8 +124,11 @@ export class TypeScriptGenerator implements LanguageGenerator {
     for (const fn of mod.functions) {
       if (adapter.implements.includes(fn.name)) {
         lines.push(this.generateAdapterMethod(fn, adapter.name));
-      } else if (!adapter.does_not_implement?.includes(fn.name)) {
-        lines.push(this.generateUnimplementedMethod(fn));
+      } else {
+        const notSupportedMessage = adapter.does_not_implement?.includes(fn.name)
+          ? `Not supported by ${adapter.name}: ${fn.name}`
+          : `Not yet implemented: ${fn.name}`;
+        lines.push(this.generateUnimplementedMethod(fn, notSupportedMessage));
       }
     }
     lines.push("}");
@@ -132,16 +137,20 @@ export class TypeScriptGenerator implements LanguageGenerator {
 
   private generateAdapterMethod(fn: ContractFunction, adapterName: string): string {
     const lines: string[] = [];
-    lines.push(`  ${camelCase(fn.name)}(${generateParamsList(fn)}): Promise<${mapType(fn.returns, "typescript")}> {`);
+    lines.push(`  async ${camelCase(fn.name)}(${generateParamsList(fn)}): Promise<${mapType(fn.returns, "typescript")}> {`);
     const hint = getSdkHint(adapterName, fn.name);
-    lines.push(hint ? `  // ${hint}` : `  // TODO: Implement with ${fn.name}`);
-    lines.push(`  throw new Error('Not implemented');`);
+    if (hint) {
+      lines.push(`  // ${hint}`);
+      lines.push(`  return ${fn.returns === "void" ? "" : `{} as any`};`);
+    } else {
+      lines.push(`  throw new Error('Not implemented: ${fn.name}');`);
+    }
     lines.push(`}`);
     return lines.join("\n");
   }
 
-  private generateUnimplementedMethod(fn: ContractFunction): string {
-    return `  ${camelCase(fn.name)}(${generateParamsList(fn)}): Promise<${mapType(fn.returns, "typescript")}> {\n  throw new Error('Not implemented by this adapter');\n}`;
+  private generateUnimplementedMethod(fn: ContractFunction, message: string): string {
+    return `  async ${camelCase(fn.name)}(${generateParamsList(fn)}): Promise<${mapType(fn.returns, "typescript")}> {\n    throw new Error('${message}');\n  }`;
   }
 
   private generateConformanceTest(adapter: AdapterDefinition, mod: ModuleContract): string {

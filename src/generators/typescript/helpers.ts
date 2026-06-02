@@ -75,14 +75,32 @@ export function generateParamsList(fn: ContractFunction): string {
   }).join(", ");
 }
 
+const SHARED_TYPES = `// Shared types used across all contracts
+export type Timestamp = string;
+export type UserId = string;
+export type EntityId = string;
+
+export interface PaginatedResult<T> {
+  data: T[];
+  cursor: string | null;
+  hasMore: boolean;
+  total?: number;
+}
+`;
+
+export function generateSharedTypes(): string {
+  return SHARED_TYPES;
+}
+
 export function generateIndex(moduleNames: string[]): string {
   const lines: string[] = [
     "// Auto-generated module index",
-    "// Do not edit manually",
+    "",
+    "export * from './shared.js';",
     "",
   ];
   for (const name of moduleNames.sort()) {
-    lines.push(`export * from './${name}';`);
+    lines.push(`export * from './${name}.js';`);
   }
   return lines.join("\n");
 }
