@@ -1,6 +1,7 @@
 import { resolve, detectCycles } from "../core/resolve.js";
 import { buildGraph, renderAscii, renderMermaid } from "../core/graph.js";
 import { searchModules } from "../core/search.js";
+import { verifyImplementation } from "../core/verify.js";
 import { loadAdapters, loadSelection, addAdapter, removeAdapter, resolveAdapters, listAdaptersByModule } from "../core/adapters/index.js";
 import { generateAndWrite } from "../generators/engine.js";
 import { generatePrototype } from "../generators/prototype/index.js";
@@ -297,4 +298,32 @@ export async function handleBuild(result: { value: Catalog | null }, config: Par
     ? JSON.stringify(minimalCatalog(result.value!), null, config.compact ? undefined : 2)
     : JSON.stringify(result.value, null, config.compact ? undefined : 2);
   await writeOutput(outputData, config.output);
+}
+
+export async function handleVerify(result: { value: Catalog | null }, config: ParsedArgs, root: string) {
+  if (!config.target) {
+    console.error("Error: implementation file is required. Example: blueprinter verify ./src/adapters/stripe.ts --module payments");
+    process.exit(1);
+  }
+  if (!config.module) {
+    console.error("Error: --module is required. Example: blueprinter verify ./src/adapters/stripe.ts --module payments");
+    process.exit(1);
+  }
+
+  const verification = await verifyImplementation(config.target, config.module, result.value!);
+
+  if (verification.issues.length > 0) {
+    console.error(`Verification issues for ${config.module}:`);
+    for (const issue of verification.issues) {
+      if (issue.kind === "missing") {
+        console.error(`  MISSING: ${issue.message}`);
+      }
+    }
+  }
+
+  if (verification.valid) {
+    console.log(`\n${config.module}: All ${result.value!.modules.find((m) => m.name === config.module)!.functions.length} functions implemented. ✓`);
+  }
+
+  await writeOutput(JSON.stringify(verification, null, config.compact ? undefined : 2), config.output);
 }

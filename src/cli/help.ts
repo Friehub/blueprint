@@ -122,6 +122,24 @@ Examples:
     return;
   }
 
+  if (command === "verify") {
+    console.log(`
+Usage: blueprinter verify <file> --module <module> [options]
+
+Options:
+  --module <module>  Module name to verify against (required)
+  --root <path>      Project root directory (default: current directory)
+  --compact          Output compact JSON (no indentation)
+
+Checks that an implementation file covers all contract functions.
+
+Examples:
+  blueprinter verify ./src/adapters/payments/stripe.ts --module payments
+  blueprinter verify ./src/adapters/payments/stripe.ts --module payments --compact
+`);
+    return;
+  }
+
   if (command === "schema") {
     console.log(`
 Usage: blueprinter schema [options]
@@ -175,6 +193,7 @@ Commands:
   generate           Generate code from contracts
   prototype          Generate project scaffold
   schema             Export catalog as JSON Schema
+  verify <file>      Verify an implementation against its contract
 
 Options:
   --root <path>      Project root directory (default: current directory)
