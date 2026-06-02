@@ -62,7 +62,7 @@ function parseTypeFields(raw: string): Array<{ name: string; type: string | null
 
 export function generateFunctionSignature(fn: ContractFunction): string {
   const params = fn.params.map((p) => {
-    const type = p.type ? `: ${mapType(p.type, "typescript")}` : ": unknown";
+    const type = p.type ? `: ${mapType(p.type, "typescript")}` : `: ${inferType(p.name, "typescript")}`;
     return `${camelCase(p.name)}${p.optional ? "?" : ""}${type}`;
   }).join(", ");
   return `  ${camelCase(fn.name)}(${params}): Promise<${mapType(fn.returns, "typescript")}>;`;
@@ -70,7 +70,7 @@ export function generateFunctionSignature(fn: ContractFunction): string {
 
 export function generateParamsList(fn: ContractFunction): string {
   return fn.params.map((p) => {
-    const type = p.type ? `: ${mapType(p.type, "typescript")}` : ": unknown";
+    const type = p.type ? `: ${mapType(p.type, "typescript")}` : `: ${inferType(p.name, "typescript")}`;
     return `${camelCase(p.name)}${p.optional ? "?" : ""}${type}`;
   }).join(", ");
 }

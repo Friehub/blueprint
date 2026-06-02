@@ -5,36 +5,36 @@
 export interface Payment {
   id: string;
   orderId: string;
-  amount: unknown;
-  currency: unknown;
-  status: unknown;
-  method: unknown;
-  providerReference: unknown;
+  amount: number;
+  currency: string;
+  status: string;
+  method: string;
+  providerReference: string;
   createdAt: Timestamp;
 }
 
 export interface Wallet {
   userId: string;
-  balance: unknown;
-  currency: unknown;
-  lockedBalance: unknown;
+  balance: number;
+  currency: string;
+  lockedBalance: number;
 }
 
 export interface Wallettransaction {
   id: string;
   type: credit|debit;
-  amount: unknown;
-  balanceAfter: unknown;
-  reference: unknown;
+  amount: number;
+  balanceAfter: number;
+  reference: string;
   createdAt: Timestamp;
 }
 
 export interface Refund {
   id: string;
   paymentId: string;
-  amount: unknown;
-  status: unknown;
-  reason: unknown;
+  amount: number;
+  status: string;
+  reason: string;
   createdAt: Timestamp;
 }
 
@@ -43,14 +43,14 @@ export type Paymentmethod = PaymentMethod = card | bank_transfer | wallet | ussd
 export type Paymentstatus = PaymentStatus = pending | processing | completed | failed | refunded | disputed;
 
 export interface PaymentsContract {
-  initiatePayment(orderId: unknown, amount: unknown, currency: unknown, method: unknown): Promise<Payment>;
-  verifyPayment(paymentId: unknown): Promise<Payment>;
-  getPaymentByOrder(orderId: unknown): Promise<Payment | undefined>;
-  getWallet(userId: unknown): Promise<Wallet>;
-  creditWallet(userId: unknown, amount: unknown, currency: unknown, reference: unknown): Promise<WalletTransaction>;
-  debitWallet(userId: unknown, amount: unknown, currency: unknown, reference: unknown): Promise<WalletTransaction>;
-  getWalletTransactions(userId: unknown, options?: unknown): Promise<PaginatedResult<WalletTransaction>>;
-  initiateRefund(paymentId: unknown, amount?: unknown, reason: unknown): Promise<Refund>;
-  getRefundByOrder(orderId: unknown): Promise<Refund | undefined>;
-  getRefund(refundId: unknown): Promise<Refund>;
+  initiatePayment(orderId: string, amount: number, currency: string, method: string): Promise<Payment>;
+  verifyPayment(paymentId: string): Promise<Payment>;
+  getPaymentByOrder(orderId: string): Promise<Payment | undefined>;
+  getWallet(userId: string): Promise<Wallet>;
+  creditWallet(userId: string, amount: number, currency: string, reference: string): Promise<WalletTransaction>;
+  debitWallet(userId: string, amount: number, currency: string, reference: string): Promise<WalletTransaction>;
+  getWalletTransactions(userId: string, options?: Record<string, unknown>): Promise<PaginatedResult<WalletTransaction>>;
+  initiateRefund(paymentId: string, amount?: number, reason: string): Promise<Refund>;
+  getRefundByOrder(orderId: string): Promise<Refund | undefined>;
+  getRefund(refundId: string): Promise<Refund>;
 }

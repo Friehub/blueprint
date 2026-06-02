@@ -76,6 +76,23 @@ export const TYPE_INFERENCE_RULES: Array<{ pattern: RegExp; typescript: string; 
   { pattern: /_data$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
   { pattern: /_metadata$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
   { pattern: /_options$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
+  { pattern: /^input$/i, typescript: "unknown", rust: "Value", python: "Any", go: "interface{}" },
+  { pattern: /^data$/i, typescript: "unknown", rust: "Value", python: "Any", go: "interface{}" },
+  { pattern: /^context$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
+  { pattern: /^reason$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /^currency$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /^period$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /^filters$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
+  { pattern: /^code$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /^message$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /^content$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /^status$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /^method$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /^reference$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /^amount$/i, typescript: "number", rust: "f64", python: "float", go: "float64" },
+  { pattern: /balance/i, typescript: "number", rust: "f64", python: "float", go: "float64" },
+  { pattern: /[Rr]eference$/i, typescript: "string", rust: "String", python: "str", go: "string" },
+  { pattern: /^options$/i, typescript: "Record<string, unknown>", rust: "HashMap<String, Value>", python: "dict[str, Any]", go: "map[string]interface{}" },
 ];
 
 export function inferType(fieldName: string, language: Language): string {

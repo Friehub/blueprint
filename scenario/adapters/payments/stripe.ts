@@ -10,35 +10,35 @@ export class StripeAdapter implements PaymentsContract {
   webhook_secret: string;
   }) {}
 
-  async initiatePayment(orderId: unknown, amount: unknown, currency: unknown, method: unknown): Promise<Payment> {
+  async initiatePayment(orderId: string, amount: number, currency: string, method: string): Promise<Payment> {
   // stripe.paymentIntents.create({ amount, currency, payment_method })
   return {} as any;
 }
-  async verifyPayment(paymentId: unknown): Promise<Payment> {
+  async verifyPayment(paymentId: string): Promise<Payment> {
   throw new Error('Not implemented: verifyPayment');
 }
-  async getPaymentByOrder(orderId: unknown): Promise<Payment | undefined> {
+  async getPaymentByOrder(orderId: string): Promise<Payment | undefined> {
   throw new Error('Not implemented: getPaymentByOrder');
 }
-  async getWallet(userId: unknown): Promise<Wallet> {
+  async getWallet(userId: string): Promise<Wallet> {
     throw new Error('Not supported by stripe: getWallet');
   }
-  async creditWallet(userId: unknown, amount: unknown, currency: unknown, reference: unknown): Promise<WalletTransaction> {
+  async creditWallet(userId: string, amount: number, currency: string, reference: string): Promise<WalletTransaction> {
     throw new Error('Not supported by stripe: creditWallet');
   }
-  async debitWallet(userId: unknown, amount: unknown, currency: unknown, reference: unknown): Promise<WalletTransaction> {
+  async debitWallet(userId: string, amount: number, currency: string, reference: string): Promise<WalletTransaction> {
     throw new Error('Not supported by stripe: debitWallet');
   }
-  async getWalletTransactions(userId: unknown, options?: unknown): Promise<PaginatedResult<WalletTransaction>> {
+  async getWalletTransactions(userId: string, options?: Record<string, unknown>): Promise<PaginatedResult<WalletTransaction>> {
     throw new Error('Not supported by stripe: getWalletTransactions');
   }
-  async initiateRefund(paymentId: unknown, amount?: unknown, reason: unknown): Promise<Refund> {
+  async initiateRefund(paymentId: string, amount?: number, reason: string): Promise<Refund> {
   throw new Error('Not implemented: initiateRefund');
 }
-  async getRefundByOrder(orderId: unknown): Promise<Refund | undefined> {
+  async getRefundByOrder(orderId: string): Promise<Refund | undefined> {
   throw new Error('Not implemented: getRefundByOrder');
 }
-  async getRefund(refundId: unknown): Promise<Refund> {
+  async getRefund(refundId: string): Promise<Refund> {
   throw new Error('Not implemented: getRefund');
 }
 }
