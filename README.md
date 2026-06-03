@@ -259,7 +259,7 @@ A module belongs here if:
 3. Its interface is stable across providers
 4. It cannot be trivially derived from a single-table CRUD
 
-What is excluded: infrastructure configuration, database schema design, ORM setup, HTTP routing, middleware, anything framework-specific.
+The catalogue defines *what* your system does. The prototype generator produces the project structure (*how* you start). Adapter implementations and business logic are yours to write.
 
 ---
 
