@@ -17,7 +17,7 @@ export type ParsedSectionBody =
   | { kind: "text"; items: string[]; raw: string; source: SourceRef };
 
 const FENCED_BLOCK_RE = /^```(?:[a-zA-Z0-9_-]+)?\s*$/;
-const FUNCTION_SIGNATURE_RE = /^([A-Za-z_][A-Za-z0-9_]*)\((.*)\)\s*→\s*(.+)$/;
+const FUNCTION_SIGNATURE_RE = /^([A-Za-z_][A-Za-z0-9_]*)(?:<[^>]+>)?\s*\((.*)\)\s*→\s*(.+)$/;
 const TYPE_ALIAS_RE = /^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$/;
 const TYPE_RECORD_RE = /^([A-Za-z_][A-Za-z0-9_]*)\s*\{\s*(.+)\s*\}$/;
 

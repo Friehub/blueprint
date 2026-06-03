@@ -1,26 +1,16 @@
 name: chargebee
 module: subscriptions
 version: 1.0.0
-description: Chargebee subscriptions adapter
+description: Chargebee subscriptions adapter for access management
 
 implements:
-  - createSubscription
-  - getSubscription
-  - upgradeSubscription
-  - downgradeSubscription
-  - cancelSubscription
-  - reactivateSubscription
-  - getInvoices
-  - getInvoice
-  - getPlans
-  - getPlan
-
-does_not_implement:
   - getEntitlements
   - hasAccess
   - grantEntitlement
   - revokeEntitlement
   - getAccessHistory
+
+does_not_implement: []
 
 config:
   required:
@@ -33,12 +23,9 @@ config:
       description: Chargebee site name
 
 dependencies:
-  - module: payments
-    purpose: Process subscription payments
+  - module: billing
+    purpose: Check subscription status
     required: true
-  - module: notifications
-    purpose: Send subscription lifecycle emails
-    required: false
 
 metadata:
   provider_url: https://www.chargebee.com

@@ -1,36 +1,22 @@
 name: stripe
 module: subscriptions
 version: 1.0.0
-description: Stripe subscriptions adapter
+description: Stripe subscriptions adapter for access management
 
 implements:
-  - createSubscription
-  - getSubscription
-  - upgradeSubscription
-  - downgradeSubscription
-  - cancelSubscription
-  - reactivateSubscription
-  - getInvoices
-  - getInvoice
-  - getPlans
-  - getPlan
-
-does_not_implement:
   - getEntitlements
   - hasAccess
   - grantEntitlement
   - revokeEntitlement
   - getAccessHistory
 
+does_not_implement: []
+
 config:
   required:
     - name: api_key
       type: string
       description: Stripe secret API key
-      secret: true
-    - name: webhook_secret
-      type: string
-      description: Stripe webhook signing secret
       secret: true
   optional:
     - name: api_version
@@ -39,14 +25,11 @@ config:
       description: Stripe API version
 
 dependencies:
-  - module: payments
-    purpose: Process subscription payments
+  - module: billing
+    purpose: Check subscription status
     required: true
-  - module: notifications
-    purpose: Send subscription lifecycle emails
-    required: false
   - module: audit_log
-    purpose: Log subscription events
+    purpose: Log access events
     required: false
 
 metadata:

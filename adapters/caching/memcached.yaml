@@ -8,7 +8,6 @@ implements:
   - set
   - del
   - getOrSet
-  - invalidateByPrefix
   - mget
   - mset
   - increment
@@ -16,28 +15,14 @@ implements:
 
 does_not_implement:
   - invalidateByTag
+  - invalidateByPrefix
 
 config:
   required:
     - name: servers
       type: string
-      description: Memcached server addresses (comma-separated)
-      secret: false
-  optional:
-    - name: username
-      type: string
-      description: Memcached username
-    - name: password
-      type: string
-      description: Memcached password
-      secret: true
-    - name: pool_size
-      type: integer
-      default: 10
-      description: Connection pool size
-
-dependencies: []
+      description: Memcached servers (e.g., "localhost:11211")
 
 metadata:
   provider_url: https://memcached.org
-  docs_url: https://github.com/memcached/memcached/wiki
+  docs_url: https://memcached.org/docs
