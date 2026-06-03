@@ -1,0 +1,15 @@
+src/
+contracts/
+schemas/
+completions/
+scripts/
+scenario/
+generated/
+my-saas/
+old_idea/
+node_modules/
+*.test.ts
+*.md
+!README.md
+.DS_Store
+.env

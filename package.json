@@ -1,7 +1,9 @@
 {
   "name": "engineering-blueprinter",
   "version": "0.1.0",
-  "private": true,
+  "description": "A provider-agnostic interface specification for AI-assisted backend development. 108 domain contracts, 83 adapters, code generation.",
+  "keywords": ["contract", "domain", "backend", "ai", "code-generation", "adapter", "registry"],
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
