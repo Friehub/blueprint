@@ -177,7 +177,7 @@ export function parseParameters(paramsRaw: string): ContractParameter[] {
 
       const parameter: ContractParameter = {
         name,
-        type: typePart ? typePart.trim() : null,
+        type: typePart ? typePart.trim() : inferParamType(name),
         optional,
       };
 
@@ -264,4 +264,49 @@ function parseBodyLines<T>(
   }
 
   return items;
+}
+
+function inferParamType(paramName: string): string {
+  const rules: Array<{ pattern: RegExp; type: string }> = [
+    { pattern: /^id$/i, type: "string" },
+    { pattern: /_id$/i, type: "string" },
+    { pattern: /_at$/i, type: "Timestamp" },
+    { pattern: /_count$/i, type: "number" },
+    { pattern: /_amount$/i, type: "number" },
+    { pattern: /_price$/i, type: "number" },
+    { pattern: /_total$/i, type: "number" },
+    { pattern: /is_/i, type: "boolean" },
+    { pattern: /has_/i, type: "boolean" },
+    { pattern: /_status$/i, type: "string" },
+    { pattern: /_type$/i, type: "string" },
+    { pattern: /_name$/i, type: "string" },
+    { pattern: /_url$/i, type: "string" },
+    { pattern: /_email$/i, type: "string" },
+    { pattern: /_key$/i, type: "string" },
+    { pattern: /_token$/i, type: "string" },
+    { pattern: /_data$/i, type: "Record<string, unknown>" },
+    { pattern: /_metadata$/i, type: "Record<string, unknown>" },
+    { pattern: /_options$/i, type: "Record<string, unknown>" },
+    { pattern: /^input$/i, type: "unknown" },
+    { pattern: /^context$/i, type: "Record<string, unknown>" },
+    { pattern: /^reason$/i, type: "string" },
+    { pattern: /^currency$/i, type: "string" },
+    { pattern: /^period$/i, type: "string" },
+    { pattern: /^filters$/i, type: "Record<string, unknown>" },
+    { pattern: /^code$/i, type: "string" },
+    { pattern: /^message$/i, type: "string" },
+    { pattern: /^content$/i, type: "string" },
+    { pattern: /^status$/i, type: "string" },
+    { pattern: /^method$/i, type: "string" },
+    { pattern: /_method$/i, type: "string" },
+    { pattern: /^reference$/i, type: "string" },
+    { pattern: /^amount$/i, type: "number" },
+    { pattern: /balance/i, type: "number" },
+    { pattern: /[Rr]eference$/i, type: "string" },
+  ];
+
+  for (const rule of rules) {
+    if (rule.pattern.test(paramName)) return rule.type;
+  }
+  return "unknown";
 }
