@@ -9,7 +9,7 @@ import { checkErrors } from "./cli/commands.js";
 import {
   handleList, handleInspect, handleGraph, handleSearch,
   handleResolve, handleAdapters, handleGenerate,
-  handlePrototype, handleSchema, handleBuild, handleVerify,
+  handlePrototype, handleSchema, handleBuild, handleVerify, handleImplement,
 } from "./cli/commands.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -56,6 +56,7 @@ async function main() {
     prototype: handlePrototype,
     schema: handleSchema,
     verify: handleVerify,
+    implement: handleImplement,
     build: handleBuild,
   };
 

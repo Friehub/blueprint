@@ -1,4 +1,4 @@
-export type Command = "build" | "resolve" | "list" | "inspect" | "graph" | "search" | "adapters" | "generate" | "prototype" | "schema" | "verify";
+export type Command = "build" | "resolve" | "list" | "inspect" | "graph" | "search" | "adapters" | "generate" | "prototype" | "schema" | "verify" | "implement";
 export type AdapterSubcommand = "list" | "add" | "remove" | "show" | "verify" | "search";
 export type GenerateSubcommand = "interfaces" | "adapters" | "tests" | "all";
 export type Language = "typescript" | "rust" | "python" | "go";
@@ -23,11 +23,12 @@ export interface ParsedArgs {
   compact: boolean;
   quiet: boolean;
   minimal: boolean;
+  prompts: boolean;
   unknown: string[];
 }
 
-const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name", "--minimal"]);
-const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters", "generate", "prototype", "schema", "verify"]);
+const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name", "--minimal", "--prompts", "--adapter"]);
+const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters", "generate", "prototype", "schema", "verify", "implement"]);
 const ADAPTER_SUBCOMMANDS = new Set(["list", "add", "remove", "show", "verify", "search"]);
 const GENERATE_SUBCOMMANDS = new Set(["interfaces", "adapters", "tests", "all"]);
 const LANGUAGES = new Set(["typescript", "rust", "python", "go"]);
@@ -52,6 +53,7 @@ export function parseArguments(args: string[]): ParsedArgs {
     compact: false,
     quiet: false,
     minimal: false,
+    prompts: false,
     unknown: [],
   };
 
@@ -151,6 +153,10 @@ export function parseArguments(args: string[]): ParsedArgs {
       parsed.quiet = true;
     } else if (arg === "--minimal") {
       parsed.minimal = true;
+    } else if (arg === "--prompts") {
+      parsed.prompts = true;
+    } else if (arg === "--adapter" && i + 1 < args.length) {
+      parsed.provider = args[++i];
     } else if (arg === "--name" && i + 1 < args.length) {
       parsed.target = args[++i];
     } else if (arg.startsWith("-") && !KNOWN_FLAGS.has(arg)) {

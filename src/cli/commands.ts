@@ -2,6 +2,7 @@ import { resolve, detectCycles } from "../core/resolve.js";
 import { buildGraph, renderAscii, renderMermaid } from "../core/graph.js";
 import { searchModules } from "../core/search.js";
 import { verifyImplementation } from "../core/verify.js";
+import { generateImplementPrompts } from "../core/implement.js";
 import { loadAdapters, loadSelection, addAdapter, removeAdapter, resolveAdapters, listAdaptersByModule } from "../core/adapters/index.js";
 import { generateAndWrite } from "../generators/engine.js";
 import { generatePrototype } from "../generators/prototype/index.js";
@@ -298,6 +299,43 @@ export async function handleBuild(result: { value: Catalog | null }, config: Par
     ? JSON.stringify(minimalCatalog(result.value!), null, config.compact ? undefined : 2)
     : JSON.stringify(result.value, null, config.compact ? undefined : 2);
   await writeOutput(outputData, config.output);
+}
+
+export async function handleImplement(result: { value: Catalog | null }, config: ParsedArgs, root: string) {
+  if (!config.module) {
+    console.error("Error: --module is required. Example: blueprinter implement payments --adapter stripe --prompts");
+    process.exit(1);
+  }
+  if (!config.provider) {
+    console.error("Error: --adapter is required. Example: blueprinter implement payments --adapter stripe --prompts");
+    process.exit(1);
+  }
+
+  const adaptersDir = join(root, "adapters");
+  const { adapters } = await loadAdapters(adaptersDir);
+
+  const prompts = generateImplementPrompts(result.value!, adapters, config.module, config.provider);
+
+  if (prompts.length === 0) {
+    console.error(`No functions to implement for ${config.provider}/${config.module}`);
+    process.exit(1);
+  }
+
+  if (config.prompts) {
+    console.log(`# Implementation prompts for ${config.provider} → ${config.module}`);
+    console.log(`# ${prompts.length} functions need implementation\n`);
+    for (const p of prompts) {
+      console.log(`--- ${p.function} ---`);
+      console.log(p.prompt);
+      console.log("");
+    }
+  } else {
+    console.log(`${prompts.length} functions ready to implement for ${config.provider}/${config.module}`);
+    console.log("Use --prompts to generate AI prompts.");
+    for (const p of prompts) {
+      console.log(`  - ${p.function}`);
+    }
+  }
 }
 
 export async function handleVerify(result: { value: Catalog | null }, config: ParsedArgs, root: string) {
