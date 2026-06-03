@@ -13,6 +13,22 @@ This catalogue defines those interfaces -- function signatures, types, and error
 
 ---
 
+## Why Blueprinter?
+
+| Task | Raw Markdown | Blueprinter |
+|---|---|---|
+| Get module contract | Read 108 `.md` files, parse `→` by eye | `loadCatalog()`, 1 call |
+| Parameter types | Guess from context | `order_id: string`, `amount: number` inferred |
+| Dependencies | Scan prose for "Depends On" | `hardDeps: ["payments", "users"]` resolved |
+| Transitive deps | Trace manually across files | `resolve(["billing"])` walks entire graph |
+| Available providers | Search for "Providers" section | `adapters list payments` shows 3 options |
+| Write types | Manually from scratch | Generated interfaces with full SDK code |
+| Verify completeness | Hope you didn't miss a function | `verify` says "10/10" or "missing: X" |
+| Feed to AI | Paste markdown, hope it parses correctly | `mcp` server, 7 tools, typed JSON over stdio |
+| Project scaffold | Create package.json, tsconfig, dirs | `prototype` generates complete structure |
+
+---
+
 ## Quick Start
 
 ```bash
