@@ -1,5 +1,7 @@
 # Module Contract: `reviews`
 
+**Version:** 0.1.0
+
 ---
 
 ### `reviews`

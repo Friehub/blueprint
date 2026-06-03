@@ -1,5 +1,7 @@
 # Module Contract: `audit_exports`
 
+**Version:** 0.1.0
+
 ---
 
 ### `audit_exports`

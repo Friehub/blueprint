@@ -1,5 +1,7 @@
 # Module Contract: `reactions`
 
+**Version:** 0.1.0
+
 ---
 
 ### `reactions`

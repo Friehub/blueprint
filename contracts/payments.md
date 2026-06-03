@@ -1,5 +1,7 @@
 # Module Contract: `payments`
 
+**Version:** 0.1.0
+
 ---
 
 ### `payments`

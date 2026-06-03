@@ -1,5 +1,7 @@
 # Module Contract: `api_keys`
 
+**Version:** 0.1.0
+
 ---
 
 ### `api_keys`

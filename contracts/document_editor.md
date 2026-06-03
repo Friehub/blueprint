@@ -1,5 +1,7 @@
 # Module Contract: `document_editor`
 
+**Version:** 0.1.0
+
 ---
 
 ### `document_editor`

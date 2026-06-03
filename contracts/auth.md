@@ -1,5 +1,7 @@
 # Module Contract: `auth`
 
+**Version:** 0.1.0
+
 ---
 
 ### `auth`

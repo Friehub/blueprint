@@ -1,5 +1,7 @@
 # Module Contract: `crm_leads`
 
+**Version:** 0.1.0
+
 ---
 
 ### `crm_leads`

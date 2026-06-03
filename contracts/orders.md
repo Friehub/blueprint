@@ -1,5 +1,7 @@
 # Module Contract: `orders`
 
+**Version:** 0.1.0
+
 ---
 
 ### `orders`

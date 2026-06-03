@@ -1,5 +1,7 @@
 # Module Contract: `treasury_accounts`
 
+**Version:** 0.1.0
+
 ---
 
 ### `treasury_accounts`

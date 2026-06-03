@@ -1,5 +1,7 @@
 # Module Contract: `web_analytics`
 
+**Version:** 0.1.0
+
 ---
 
 ### `web_analytics`

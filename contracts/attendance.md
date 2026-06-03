@@ -1,5 +1,7 @@
 # Module Contract: `attendance`
 
+**Version:** 0.1.0
+
 ---
 
 ### `attendance`

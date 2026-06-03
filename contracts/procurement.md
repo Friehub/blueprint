@@ -1,5 +1,7 @@
 # Module Contract: `procurement`
 
+**Version:** 0.1.0
+
 ---
 
 ### `procurement`

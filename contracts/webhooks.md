@@ -1,5 +1,7 @@
 # Module Contract: `webhooks`
 
+**Version:** 0.1.0
+
 ---
 
 ### `webhooks`

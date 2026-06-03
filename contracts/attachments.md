@@ -1,5 +1,7 @@
 # Module Contract: `attachments`
 
+**Version:** 0.1.0
+
 ---
 
 ### `attachments`

@@ -1,5 +1,7 @@
 # Module Contract: `sms`
 
+**Version:** 0.1.0
+
 ---
 
 ### `sms`

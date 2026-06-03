@@ -1,5 +1,7 @@
 # Module Contract: `donations`
 
+**Version:** 0.1.0
+
 ---
 
 ### `donations` (Non-profit, Crowdfunding)

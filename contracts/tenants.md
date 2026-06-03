@@ -1,5 +1,7 @@
 # Module Contract: `tenants`
 
+**Version:** 0.1.0
+
 ---
 
 ### `tenants`

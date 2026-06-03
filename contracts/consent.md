@@ -1,5 +1,7 @@
 # Module Contract: `consent`
 
+**Version:** 0.1.0
+
 ---
 
 ### `consent`

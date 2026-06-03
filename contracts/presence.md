@@ -1,5 +1,7 @@
 # Module Contract: `presence`
 
+**Version:** 0.1.0
+
 ---
 
 ### `presence`

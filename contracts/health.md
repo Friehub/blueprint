@@ -1,5 +1,7 @@
 # Module Contract: `health`
 
+**Version:** 0.1.0
+
 ---
 
 ### `health`

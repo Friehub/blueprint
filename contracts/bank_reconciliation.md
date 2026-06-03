@@ -1,5 +1,7 @@
 # Module Contract: `bank_reconciliation`
 
+**Version:** 0.1.0
+
 ---
 
 ### `bank_reconciliation`

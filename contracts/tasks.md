@@ -1,5 +1,7 @@
 # Module Contract: `tasks`
 
+**Version:** 0.1.0
+
 ---
 
 ### `tasks`

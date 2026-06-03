@@ -1,5 +1,7 @@
 # Module Contract: `projects`
 
+**Version:** 0.1.0
+
 ---
 
 ### `projects`

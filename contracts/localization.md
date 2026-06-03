@@ -1,5 +1,7 @@
 # Module Contract: `localization`
 
+**Version:** 0.1.0
+
 ---
 
 ### `localization`

@@ -1,5 +1,7 @@
 # Module Contract: `taxation`
 
+**Version:** 0.1.0
+
 ---
 
 ### `taxation`

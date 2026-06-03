@@ -1,5 +1,7 @@
 # Module Contract: `notifications`
 
+**Version:** 0.1.0
+
 ---
 
 ### `notifications`

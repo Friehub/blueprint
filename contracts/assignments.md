@@ -1,5 +1,7 @@
 # Module Contract: `assignments`
 
+**Version:** 0.1.0
+
 ---
 
 ### `assignments`

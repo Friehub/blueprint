@@ -1,5 +1,7 @@
 # Module Contract: `transfers`
 
+**Version:** 0.1.0
+
 ---
 
 ### `transfers`

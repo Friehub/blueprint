@@ -1,5 +1,7 @@
 # Module Contract: `fulfillment`
 
+**Version:** 0.1.0
+
 ---
 
 ### `fulfillment`

@@ -1,5 +1,7 @@
 # Module Contract: `follows`
 
+**Version:** 0.1.0
+
 ---
 
 ### `follows`

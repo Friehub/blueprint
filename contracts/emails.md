@@ -1,5 +1,7 @@
 # Module Contract: `emails`
 
+**Version:** 0.1.0
+
 ---
 
 ### `emails`

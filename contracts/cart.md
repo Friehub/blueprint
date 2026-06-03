@@ -1,5 +1,7 @@
 # Module Contract: `cart`
 
+**Version:** 0.1.0
+
 ---
 
 ### `cart`

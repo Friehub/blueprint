@@ -1,5 +1,7 @@
 # Module Contract: `ip_intelligence`
 
+**Version:** 0.1.0
+
 ---
 
 ### `ip_intelligence`

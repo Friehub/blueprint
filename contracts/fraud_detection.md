@@ -1,5 +1,7 @@
 # Module Contract: `fraud_detection`
 
+**Version:** 0.1.0
+
 ---
 
 ### `fraud_detection`

@@ -1,5 +1,7 @@
 # Module Contract: `seat_management`
 
+**Version:** 0.1.0
+
 ---
 
 ### `seat_management`

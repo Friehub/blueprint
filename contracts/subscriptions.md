@@ -1,5 +1,7 @@
 # Module Contract: `subscriptions`
 
+**Version:** 0.1.0
+
 ---
 
 ### `subscriptions` (Media, SaaS, Content)

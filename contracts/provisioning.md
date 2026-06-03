@@ -1,5 +1,7 @@
 # Module Contract: `provisioning`
 
+**Version:** 0.1.0
+
 ---
 
 ### `provisioning`

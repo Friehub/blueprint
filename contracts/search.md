@@ -1,5 +1,7 @@
 # Module Contract: `search`
 
+**Version:** 0.1.0
+
 ---
 
 ### `search`

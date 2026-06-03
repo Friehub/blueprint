@@ -1,5 +1,7 @@
 # Module Contract: `media`
 
+**Version:** 0.1.0
+
 ---
 
 ### `media`

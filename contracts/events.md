@@ -1,5 +1,7 @@
 # Module Contract: `events`
 
+**Version:** 0.1.0
+
 ---
 
 ### `events` (pubsub)

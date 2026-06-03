@@ -1,5 +1,7 @@
 # Module Contract: `sessions`
 
+**Version:** 0.1.0
+
 ---
 
 ### `sessions`

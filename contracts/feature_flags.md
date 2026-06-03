@@ -1,5 +1,7 @@
 # Module Contract: `feature_flags`
 
+**Version:** 0.1.0
+
 ---
 
 ### `feature_flags`

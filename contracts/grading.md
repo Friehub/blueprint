@@ -1,5 +1,7 @@
 # Module Contract: `grading`
 
+**Version:** 0.1.0
+
 ---
 
 ### `grading`

@@ -1,5 +1,7 @@
 # Module Contract: `seat_pricing`
 
+**Version:** 0.1.0
+
 ---
 
 ### `seat_pricing`

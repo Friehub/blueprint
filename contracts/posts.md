@@ -1,5 +1,7 @@
 # Module Contract: `posts`
 
+**Version:** 0.1.0
+
 ---
 
 ### `posts`

@@ -1,5 +1,7 @@
 # Module Contract: `inventory`
 
+**Version:** 0.1.0
+
 ---
 
 ### `inventory`

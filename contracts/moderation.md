@@ -1,5 +1,7 @@
 # Module Contract: `moderation`
 
+**Version:** 0.1.0
+
 ---
 
 ### `moderation`

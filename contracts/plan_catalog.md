@@ -1,5 +1,7 @@
 # Module Contract: `plan_catalog`
 
+**Version:** 0.1.0
+
 ---
 
 ### `plan_catalog`

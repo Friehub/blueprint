@@ -1,5 +1,7 @@
 # Module Contract: `promotions`
 
+**Version:** 0.1.0
+
 ---
 
 ### `promotions`

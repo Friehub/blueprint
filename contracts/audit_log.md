@@ -1,5 +1,7 @@
 # Module Contract: `audit_log`
 
+**Version:** 0.1.0
+
 ---
 
 ### `audit_log`

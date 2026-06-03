@@ -1,5 +1,7 @@
 # Module Contract: `security_monitoring`
 
+**Version:** 0.1.0
+
 ---
 
 ### `security_monitoring`

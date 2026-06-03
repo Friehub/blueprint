@@ -1,5 +1,7 @@
 # Module Contract: `loyalty`
 
+**Version:** 0.1.0
+
 ---
 
 ### `loyalty` (Retail, Hospitality)

@@ -1,5 +1,7 @@
 # Module Contract: `usage_billing`
 
+**Version:** 0.1.0
+
 ---
 
 ### `usage_billing`

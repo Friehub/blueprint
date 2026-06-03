@@ -1,5 +1,7 @@
 # Module Contract: `caching`
 
+**Version:** 0.1.0
+
 ---
 
 ### `caching`

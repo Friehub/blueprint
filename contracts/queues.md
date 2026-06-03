@@ -1,5 +1,7 @@
 # Module Contract: `queues`
 
+**Version:** 0.1.0
+
 ---
 
 ### `queues`

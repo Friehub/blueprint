@@ -1,5 +1,7 @@
 # Module Contract: `chargebacks`
 
+**Version:** 0.1.0
+
 ---
 
 ### `chargebacks`

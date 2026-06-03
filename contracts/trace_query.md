@@ -1,5 +1,7 @@
 # Module Contract: `trace_query`
 
+**Version:** 0.1.0
+
 ---
 
 ### `trace_query`

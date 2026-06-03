@@ -1,5 +1,7 @@
 # Module Contract: `appointments`
 
+**Version:** 0.1.0
+
 ---
 
 ### `appointments` (Healthcare, Services)

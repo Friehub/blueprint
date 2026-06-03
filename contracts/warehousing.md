@@ -1,5 +1,7 @@
 # Module Contract: `warehousing`
 
+**Version:** 0.1.0
+
 ---
 
 ### `warehousing`

@@ -1,5 +1,7 @@
 # Module Contract: `incident_management`
 
+**Version:** 0.1.0
+
 ---
 
 ### `incident_management`

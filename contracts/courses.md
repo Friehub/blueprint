@@ -1,5 +1,7 @@
 # Module Contract: `courses`
 
+**Version:** 0.1.0
+
 ---
 
 ### `courses`

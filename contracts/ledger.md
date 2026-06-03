@@ -1,5 +1,7 @@
 # Module Contract: `ledger`
 
+**Version:** 0.1.0
+
 ---
 
 ### `ledger`

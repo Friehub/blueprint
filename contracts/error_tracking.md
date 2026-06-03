@@ -1,5 +1,7 @@
 # Module Contract: `error_tracking`
 
+**Version:** 0.1.0
+
 ---
 
 ### `error_tracking`

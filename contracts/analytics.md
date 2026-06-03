@@ -1,5 +1,7 @@
 # Module Contract: `analytics`
 
+**Version:** 0.1.0
+
 ---
 
 ### `analytics`

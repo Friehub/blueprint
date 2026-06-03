@@ -1,5 +1,7 @@
 # Module Contract: `storage`
 
+**Version:** 0.1.0
+
 ---
 
 ### `storage`

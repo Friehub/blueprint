@@ -1,5 +1,7 @@
 # Module Contract: `kyc`
 
+**Version:** 0.1.0
+
 ---
 
 ### `kyc` (Fintech, Regulated Industries)

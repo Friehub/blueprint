@@ -1,5 +1,7 @@
 # Module Contract: `workspaces`
 
+**Version:** 0.1.0
+
 ---
 
 ### `workspaces`

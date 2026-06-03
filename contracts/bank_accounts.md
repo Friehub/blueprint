@@ -1,5 +1,7 @@
 # Module Contract: `bank_accounts`
 
+**Version:** 0.1.0
+
 ---
 
 ### `bank_accounts`

@@ -1,5 +1,7 @@
 # Module Contract: `customer_support`
 
+**Version:** 0.1.0
+
 ---
 
 ### `customer_support`
