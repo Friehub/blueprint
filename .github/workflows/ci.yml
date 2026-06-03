@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: System audit
+        run: |
+          node -e "
+            const {loadCatalogFromRoot} = require('./dist/core/load-catalog.js');
+            const {loadAdapters} = require('./dist/core/adapters/load.js');
+            const {validateAdapter} = require('./dist/core/adapters/validate.js');
+
+            async function audit() {
+              let failed = false;
+              const catalog = await loadCatalogFromRoot(process.cwd(), 'loose');
+
+              console.log('Modules:', catalog.value?.modules.length);
+              console.log('Core:', catalog.value?.core.length);
+              console.log('Parse errors:', catalog.issues.filter(i => i.severity === 'error').length);
+
+              const {adapters, errors: loadErrors} = await loadAdapters('./adapters');
+              console.log('Adapters:', adapters.length);
+              console.log('Load errors:', loadErrors.length);
+
+              let validationErrors = 0;
+              for (const adapter of adapters) {
+                const result = validateAdapter(adapter, catalog.value);
+                validationErrors += result.issues.filter(i => i.severity === 'error').length;
+              }
+              console.log('Validation errors:', validationErrors);
+
+              if (catalog.issues.filter(i => i.severity === 'error').length > 0) { console.error('FAIL: parse errors'); failed = true; }
+              if (loadErrors.length > 0) { console.error('FAIL: load errors'); failed = true; }
+              if (validationErrors > 0) { console.error('FAIL: validation errors'); failed = true; }
+              if (catalog.value?.modules.length !== 108) { console.error('FAIL: expect 108 modules, got ' + catalog.value?.modules.length); failed = true; }
+              if (catalog.value?.core.length !== 3) { console.error('FAIL: expect 3 core, got ' + catalog.value?.core.length); failed = true; }
+              if (adapters.length < 82) { console.error('FAIL: expect at least 82 adapters'); failed = true; }
+
+              if (failed) process.exit(1);
+              console.log('AUDIT PASSED');
+            }
+            audit();
+          "
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: [audit, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Integration test
+        run: |
+          npm run build
+
+          # 1. Select adapters
+          node dist/cli.js adapters add stripe payments
+          node dist/cli.js adapters add redis caching
+          node dist/cli.js adapters add bullmq queues
+
+          # 2. Generate code for selected modules
+          node dist/cli.js generate --lang typescript --module payments --output /tmp/integration
+          node dist/cli.js generate --lang typescript --module caching --output /tmp/integration
+          node dist/cli.js generate --lang typescript --module queues --output /tmp/integration
+
+          # 3. Verify generated files exist
+          test -f /tmp/integration/interfaces/shared.ts || { echo 'FAIL: shared types missing'; exit 1; }
+          test -f /tmp/integration/interfaces/payments.ts || { echo 'FAIL: payments interface missing'; exit 1; }
+          test -f /tmp/integration/adapters/payments/stripe.ts || { echo 'FAIL: stripe adapter missing'; exit 1; }
+          test -f /tmp/integration/adapters/caching/redis.ts || { echo 'FAIL: redis adapter missing'; exit 1; }
+          test -f /tmp/integration/adapters/queues/bullmq.ts || { echo 'FAIL: bullmq adapter missing'; exit 1; }
+
+          # 4. Verify generated adapters implement all contract methods
+          node dist/cli.js verify /tmp/integration/adapters/payments/stripe.ts --module payments
+          node dist/cli.js verify /tmp/integration/adapters/caching/redis.ts --module caching
+          node dist/cli.js verify /tmp/integration/adapters/queues/bullmq.ts --module queues
+
+          # 5. Generate prototype
+          node dist/cli.js prototype --name test-project --output /tmp/test-project
+
+          # 6. Verify prototype files exist
+          test -f /tmp/test-project/package.json || { echo 'FAIL: package.json missing'; exit 1; }
+          test -f /tmp/test-project/tsconfig.json || { echo 'FAIL: tsconfig.json missing'; exit 1; }
+          test -f /tmp/test-project/src/config/adapters.ts || { echo 'FAIL: adapters config missing'; exit 1; }
+
+          # 7. Verify package.json has correct dependencies
+          grep -q "stripe" /tmp/test-project/package.json || { echo 'FAIL: stripe dependency missing'; exit 1; }
+          grep -q "redis" /tmp/test-project/package.json || { echo 'FAIL: redis dependency missing'; exit 1; }
+          grep -q "bullmq" /tmp/test-project/package.json || { echo 'FAIL: bullmq dependency missing'; exit 1; }
+
+          echo "INTEGRATION TESTS PASSED"

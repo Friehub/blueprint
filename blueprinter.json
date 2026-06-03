@@ -1,7 +1,6 @@
 {
   "adapters": {
-    "caching": "redis",
-    "queues": "bullmq",
-    "payments": "stripe"
+    "payments": "stripe",
+    "caching": "redis"
   }
 }
