@@ -1,7 +1,8 @@
 // adyen.ts
 // Auto-generated adapter for adyen → payments
-// Do not edit manually
+// Types are inferred from naming conventions. Review before production use.
 
+// TODO: import adyen SDK
 import type { PaymentsContract } from '../interfaces/payments';
 
 export class AdyenAdapter implements PaymentsContract {
@@ -11,14 +12,17 @@ export class AdyenAdapter implements PaymentsContract {
   }) {}
 
   async initiatePayment(orderId: string, amount: number, currency: string, method: string): Promise<Payment> {
-  throw new Error('Not implemented: initiatePayment');
-}
+    // TODO: Implement initiatePayment
+    throw new Error('Not implemented: initiatePayment');
+  }
   async verifyPayment(paymentId: string): Promise<Payment> {
-  throw new Error('Not implemented: verifyPayment');
-}
+    // TODO: Implement verifyPayment
+    throw new Error('Not implemented: verifyPayment');
+  }
   async getPaymentByOrder(orderId: string): Promise<Payment | undefined> {
-  throw new Error('Not implemented: getPaymentByOrder');
-}
+    // TODO: Implement getPaymentByOrder
+    throw new Error('Not implemented: getPaymentByOrder');
+  }
   async getWallet(userId: string): Promise<Wallet> {
     throw new Error('Not supported by adyen: getWallet');
   }
@@ -32,12 +36,15 @@ export class AdyenAdapter implements PaymentsContract {
     throw new Error('Not supported by adyen: getWalletTransactions');
   }
   async initiateRefund(paymentId: string, amount?: number, reason: string): Promise<Refund> {
-  throw new Error('Not implemented: initiateRefund');
-}
+    // TODO: Implement initiateRefund
+    throw new Error('Not implemented: initiateRefund');
+  }
   async getRefundByOrder(orderId: string): Promise<Refund | undefined> {
-  throw new Error('Not implemented: getRefundByOrder');
-}
+    // TODO: Implement getRefundByOrder
+    throw new Error('Not implemented: getRefundByOrder');
+  }
   async getRefund(refundId: string): Promise<Refund> {
-  throw new Error('Not implemented: getRefund');
-}
+    // TODO: Implement getRefund
+    throw new Error('Not implemented: getRefund');
+  }
 }

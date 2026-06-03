@@ -1,6 +1,6 @@
 // payments.ts
 // Auto-generated from contracts/payments.md
-// Do not edit manually
+// Types are inferred from naming conventions. Review before production use.
 
 export interface Payment {
   id: string;

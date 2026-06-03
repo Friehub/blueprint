@@ -4,6 +4,26 @@ import type { Language, GeneratorContext, GeneratorResult, GeneratedFile, Langua
 import { pascalCase, camelCase, mapType } from "../types.js";
 import { generateTypeDefinition, generateFunctionSignature, generateParamsList, generateIndex, getSdkHint, generateSharedTypes } from "./helpers.js";
 
+const SDK_IMPORTS: Record<string, string> = {
+  stripe: `import Stripe from 'stripe';`,
+  redis: `import { createClient } from 'redis';`,
+  bullmq: `import { Queue, Worker, Job } from 'bullmq';`,
+  sendgrid: `import sgMail from '@sendgrid/mail';`,
+  resend: `import { Resend } from 'resend';`,
+  twilio: `import twilio from 'twilio';`,
+  memcached: `import Memcached from 'memcached';`,
+  sqs: `import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';`,
+  sentry: `import * as Sentry from '@sentry/node';`,
+  clerk: `import { createClerkClient } from '@clerk/clerk-sdk-node';`,
+  sift: `import { SiftClient } from 'sift';`,
+  cloudinary: `import { v2 as cloudinary } from 'cloudinary';`,
+  algolia: `import { algoliasearch } from 'algoliasearch';`,
+};
+
+function getSdkImport(adapterName: string): string {
+  return SDK_IMPORTS[adapterName] || `// TODO: import ${adapterName} SDK`;
+}
+
 export class TypeScriptGenerator implements LanguageGenerator {
   language: Language = "typescript";
   name = "TypeScript Generator";
@@ -89,7 +109,7 @@ export class TypeScriptGenerator implements LanguageGenerator {
     const lines: string[] = [
       `// ${mod.name}.ts`,
       `// Auto-generated from contracts/${mod.name}.md`,
-      `// Do not edit manually`,
+      `// Types are inferred from naming conventions. Review before production use.`,
       "",
     ];
     for (const type of mod.types) {
@@ -107,8 +127,9 @@ export class TypeScriptGenerator implements LanguageGenerator {
     const lines: string[] = [
       `// ${adapter.name}.ts`,
       `// Auto-generated adapter for ${adapter.name} → ${mod.name}`,
-      `// Do not edit manually`,
+      `// Types are inferred from naming conventions. Review before production use.`,
       "",
+      getSdkImport(adapter.name),
       `import type { ${pascalCase(mod.name)}Contract } from '../interfaces/${mod.name}';`,
       "",
     ];
@@ -140,12 +161,17 @@ export class TypeScriptGenerator implements LanguageGenerator {
     lines.push(`  async ${camelCase(fn.name)}(${generateParamsList(fn)}): Promise<${mapType(fn.returns, "typescript")}> {`);
     const hint = getSdkHint(adapterName, fn.name);
     if (hint) {
-      lines.push(`  // ${hint}`);
-      lines.push(`  return ${fn.returns === "void" ? "" : `{} as any`};`);
+      const hintLines = hint.split("\n");
+      for (const hintLine of hintLines) {
+        lines.push(`    ${hintLine}`);
+      }
     } else {
-      lines.push(`  throw new Error('Not implemented: ${fn.name}');`);
+      lines.push(`    // TODO: Implement ${fn.name}`);
+      if (fn.returns !== "void") {
+        lines.push(`    throw new Error('Not implemented: ${fn.name}');`);
+      }
     }
-    lines.push(`}`);
+    lines.push(`  }`);
     return lines.join("\n");
   }
 
