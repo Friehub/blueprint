@@ -5,7 +5,7 @@ import type { Catalog, ContractFunction, ContractType, CoreContract, ModuleContr
 import type { DocumentEnvelope } from "./envelope.js";
 import {
   collectFunctions, collectTypes, collectTextSections, collectProviders,
-  extractDependencies, extractCoreInherits, groupSections, extractSummary, issue,
+  extractDependencies, extractCoreInherits, groupSections, extractSummary, extractVersion, issue,
 } from "./collectors.js";
 
 export type ParsedDocument = ModuleContract | CoreContract;
@@ -64,6 +64,7 @@ function parseModuleDocument(
 ): ParseResult<ModuleContract> {
   const issues: ParseIssue[] = [];
   const summary = extractSummary(preamble);
+  const version = extractVersion(preamble);
   const grouped = groupSections(sections);
   const required = SECTION_DEFINITIONS.filter(
     (definition: (typeof SECTION_DEFINITIONS)[number]) => definition.requiredForModule,
@@ -104,6 +105,7 @@ function parseModuleDocument(
     value: {
       name,
       title,
+      version,
       summary,
       functions,
       types,
@@ -130,12 +132,14 @@ function parseCoreDocument(
   _mode: ParseMode,
 ): ParseResult<CoreContract> {
   const summary = extractSummary(preamble);
+  const version = extractVersion(preamble);
   const title = envelope.title;
 
   return {
     value: {
       name: envelope.name,
       title,
+      version,
       summary,
       sections,
       rawSections: sections,

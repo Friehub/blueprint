@@ -106,8 +106,9 @@ export class TypeScriptGenerator implements LanguageGenerator {
   }
 
   private generateModuleInterface(mod: ModuleContract): string {
+    const versionNote = mod.version ? `v${mod.version}` : "version not specified";
     const lines: string[] = [
-      `// ${mod.name}.ts`,
+      `// ${mod.name}.ts — ${versionNote} — contracts/${mod.name}.md`,
       `// Auto-generated from contracts/${mod.name}.md`,
       `// Types are inferred from naming conventions. Review before production use.`,
       "",

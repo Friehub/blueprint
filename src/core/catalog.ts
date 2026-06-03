@@ -25,6 +25,7 @@ export type RawSection = {
 export type ModuleContract = {
   name: string;
   title: string;
+  version: string | null;
   summary: string | null;
   functions: ContractFunction[];
   types: ContractType[];
@@ -42,6 +43,7 @@ export type ModuleContract = {
 export type CoreContract = {
   name: string;
   title: string;
+  version: string | null;
   summary: string | null;
   sections: RawSection[];
   rawSections: RawSection[];

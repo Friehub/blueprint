@@ -1,6 +1,7 @@
 export type CatalogView = {
   modules: Array<{
     name: string;
+    version: string | null;
     functions: Array<{
       name: string;
       params: Array<{ name: string; type: string | null; optional: boolean }>;
@@ -63,6 +64,7 @@ export function minimalCatalog(catalog: CatalogView) {
   return {
     modules: catalog.modules.map((mod) => ({
       name: mod.name,
+      version: mod.version,
       functions: mod.functions.map((fn) => ({
         name: fn.name,
         params: fn.params.map((p) => `${p.name}${p.optional ? "?" : ""}: ${p.type ?? "unknown"}`),

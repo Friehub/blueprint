@@ -6,3 +6,4 @@ export * from "./scanner.js";
 export * from "./discovery.js";
 export * from "./parse-document.js";
 export * from "./load-catalog.js";
+export * from "./collectors.js";

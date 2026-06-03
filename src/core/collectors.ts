@@ -62,7 +62,13 @@ export function groupSections(sections: RawSection[]): Map<string, RawSection[]>
 export function extractSummary(preamble: string | null): string | null {
   if (!preamble) return null;
   const lines = preamble.split(/\r?\n/).map((line) => line.trim());
-  return lines.find((line) => line && !line.startsWith("#") && line !== "---") ?? null;
+  return lines.find((line) => line && !line.startsWith("#") && line !== "---" && !line.includes("**Version:**") && !line.includes("**Part:**")) ?? null;
+}
+
+export function extractVersion(preamble: string | null): string | null {
+  if (!preamble) return null;
+  const match = preamble.match(/\*\*Version:\*\*\s*([\d.]+)/);
+  return match ? match[1] ?? null : null;
 }
 
 export function stripTextLine(line: string): string {
