@@ -1,6 +1,9 @@
 node_modules/
-.env
 dist/
-build/
+.env
 *.log
+blueprinter.json
+scenario/
+generated/
+my-saas/
 .DS_Store

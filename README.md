@@ -44,11 +44,13 @@ const catalog = await loadCatalogFromRoot('./contracts');
 | `inspect <module>` | Full contract for a module |
 | `graph <module>` | ASCII or Mermaid dependency graph |
 | `resolve` | Resolve modules with transitive deps |
-| `adapters` | Manage adapter selections |
-| `generate` | Generate code from contracts |
-| `prototype` | Generate project scaffold |
-| `schema` | Export JSON Schema |
+| `adapters` | Manage adapter selections (83 adapters, 35 modules) |
+| `generate` | Generate TypeScript code from contracts |
+| `prototype` | Generate project scaffold with dependencies |
+| `schema` | Export catalog as JSON Schema |
 | `verify <file>` | Check implementation against contract |
+| `implement` | Generate AI prompts for implementation |
+| `mcp` | Start MCP server for AI tools |
 
 ### Flags
 
@@ -224,12 +226,11 @@ blueprinter verify ./src/adapters/payments/stripe.ts --module payments
 | 108 contracts parsed | 0 errors, 0 warnings |
 | 83 adapters loaded | 0 errors |
 | Adapter validation | 0 errors, 0 warnings |
-| Interface generation | 110 files, 0 errors |
-| Adapter generation | 83 files, 0 errors |
-| Test generation | 83 files, 0 errors |
-| Unit tests | 58 passing |
-| Integration tests | 25 passing |
+| Tests | 91 passing (58 unit + 25 integration + 8 MCP) |
+| Edge cases | 33 tests covering malformed input, empty state, 50-module chains |
 | CI (Node 18/20/22) | Passing |
+| MCP server | 7 tools, stdio transport |
+| npm publish | On GitHub release |
 
 ---
 
