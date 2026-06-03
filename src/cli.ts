@@ -60,6 +60,11 @@ async function main() {
     build: handleBuild,
   };
 
+  if (args.command === "mcp") {
+    await import("./mcp/server.js");
+    return;
+  }
+
   const handler = handlers[args.command] ?? handleBuild;
   await handler(result, args, root);
 }

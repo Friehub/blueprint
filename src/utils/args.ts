@@ -1,4 +1,4 @@
-export type Command = "build" | "resolve" | "list" | "inspect" | "graph" | "search" | "adapters" | "generate" | "prototype" | "schema" | "verify" | "implement";
+export type Command = "build" | "resolve" | "list" | "inspect" | "graph" | "search" | "adapters" | "generate" | "prototype" | "schema" | "verify" | "implement" | "mcp";
 export type AdapterSubcommand = "list" | "add" | "remove" | "show" | "verify" | "search";
 export type GenerateSubcommand = "interfaces" | "adapters" | "tests" | "all";
 export type Language = "typescript" | "rust" | "python" | "go";
@@ -28,7 +28,7 @@ export interface ParsedArgs {
 }
 
 const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name", "--minimal", "--prompts", "--adapter"]);
-const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters", "generate", "prototype", "schema", "verify", "implement"]);
+const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters", "generate", "prototype", "schema", "verify", "implement", "mcp"]);
 const ADAPTER_SUBCOMMANDS = new Set(["list", "add", "remove", "show", "verify", "search"]);
 const GENERATE_SUBCOMMANDS = new Set(["interfaces", "adapters", "tests", "all"]);
 const LANGUAGES = new Set(["typescript", "rust", "python", "go"]);

@@ -149,6 +149,44 @@ Produces:
 
 ---
 
+## MCP Server
+
+AI tools (Claude Desktop, Cursor, Copilot) can query the catalog directly via the Model Context Protocol.
+
+**Configuration** -- add to Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "blueprinter": {
+      "command": "npx",
+      "args": ["engineering-blueprinter", "mcp"]
+    }
+  }
+}
+```
+
+**7 tools exposed:**
+
+| Tool | What it does |
+|---|---|
+| `list_modules` | List all 108 modules with deps |
+| `get_module` | Full contract with functions, types |
+| `search_modules` | Search by name, summary, function |
+| `resolve_deps` | Transitive dependency resolution |
+| `list_adapters` | 83 adapters across 35 modules |
+| `get_adapter` | Adapter details with config |
+| `get_dependency_graph` | Hard/soft deps + reverse deps |
+
+**Start manually:**
+```bash
+blueprinter mcp
+# or with a specific root:
+BLUEPRINTER_ROOT=/path/to/project blueprinter mcp
+```
+
+---
+
 ## Project Structure
 
 ```
