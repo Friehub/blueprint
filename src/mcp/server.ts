@@ -13,10 +13,10 @@ import { loadAdapters } from "../core/adapters/load.js";
 import type { Catalog, ModuleContract } from "../core/catalog.js";
 import type { AdapterDefinition } from "../core/adapters/types.js";
 
-const ROOT_DIR = process.env.BLUEPRINTER_ROOT || process.cwd();
+const ROOT_DIR = process.env.BLUEPRINT_ROOT || process.cwd();
 
 const server = new Server(
-  { name: "engineering-blueprinter", version: "0.1.0" },
+  { name: "engineering-blueprint", version: "0.1.0" },
   { capabilities: { tools: {} } },
 );
 

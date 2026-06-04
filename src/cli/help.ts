@@ -1,7 +1,7 @@
 export function printHelp(command?: string) {
   if (command === "resolve") {
     console.log(`
-Usage: blueprinter resolve [options]
+Usage: blueprint resolve [options]
 
 Options:
   --modules <list>   Comma-separated module names to resolve
@@ -12,16 +12,16 @@ Options:
 
 Reads module names from stdin if --modules is not provided.
 Examples:
-  blueprinter resolve --modules billing,payments,users
-  echo billing,payments | blueprinter resolve
-  cat modules.txt | blueprinter resolve --output resolved.json
+  blueprint resolve --modules billing,payments,users
+  echo billing,payments | blueprint resolve
+  cat modules.txt | blueprint resolve --output resolved.json
 `);
     return;
   }
 
   if (command === "inspect") {
     console.log(`
-Usage: blueprinter inspect <module> [options]
+Usage: blueprint inspect <module> [options]
 
 Options:
   --root <path>      Project root directory (default: current directory)
@@ -35,7 +35,7 @@ Shows the full contract for a single module.
 
   if (command === "graph") {
     console.log(`
-Usage: blueprinter graph <module> [options]
+Usage: blueprint graph <module> [options]
 
 Options:
   --format <fmt>     Output format: ascii (default) or mermaid
@@ -49,7 +49,7 @@ Shows the dependency graph for a module.
 
   if (command === "search") {
     console.log(`
-Usage: blueprinter search <query> [options]
+Usage: blueprint search <query> [options]
 
 Options:
   --root <path>      Project root directory (default: current directory)
@@ -59,16 +59,16 @@ Options:
 Searches for modules matching the query and interactively picks which to resolve.
 In non-interactive mode (piped input), outputs matching module names as JSON.
 Examples:
-  blueprinter search billing
-  blueprinter search "user management"
-  echo "payment" | blueprinter search
+  blueprint search billing
+  blueprint search "user management"
+  echo "payment" | blueprint search
 `);
     return;
   }
 
   if (command === "adapters") {
     console.log(`
-Usage: blueprinter adapters <subcommand> [options]
+Usage: blueprint adapters <subcommand> [options]
 
 Subcommands:
   list [module]         List available adapters
@@ -84,20 +84,20 @@ Options:
   --quiet               Suppress warnings
 
 Examples:
-  blueprinter adapters list
-  blueprinter adapters list payments
-  blueprinter adapters add stripe payments
-  blueprinter adapters remove payments
-  blueprinter adapters show
-  blueprinter adapters verify
-  blueprinter adapters search stripe
+  blueprint adapters list
+  blueprint adapters list payments
+  blueprint adapters add stripe payments
+  blueprint adapters remove payments
+  blueprint adapters show
+  blueprint adapters verify
+  blueprint adapters search stripe
 `);
     return;
   }
 
   if (command === "generate") {
     console.log(`
-Usage: blueprinter generate [subcommand] [options]
+Usage: blueprint generate [subcommand] [options]
 
 Subcommands:
   interfaces            Generate language interfaces from contracts
@@ -112,19 +112,19 @@ Options:
   --root <path>         Project root directory (default: current directory)
 
 Examples:
-  blueprinter generate
-  blueprinter generate --lang typescript
-  blueprinter generate interfaces --lang typescript
-  blueprinter generate adapter stripe payments --lang typescript
-  blueprinter generate tests --lang typescript
-  blueprinter generate --module billing --lang typescript
+  blueprint generate
+  blueprint generate --lang typescript
+  blueprint generate interfaces --lang typescript
+  blueprint generate adapter stripe payments --lang typescript
+  blueprint generate tests --lang typescript
+  blueprint generate --module billing --lang typescript
 `);
     return;
   }
 
   if (command === "verify") {
     console.log(`
-Usage: blueprinter verify <file> --module <module> [options]
+Usage: blueprint verify <file> --module <module> [options]
 
 Options:
   --module <module>  Module name to verify against (required)
@@ -134,15 +134,15 @@ Options:
 Checks that an implementation file covers all contract functions.
 
 Examples:
-  blueprinter verify ./src/adapters/payments/stripe.ts --module payments
-  blueprinter verify ./src/adapters/payments/stripe.ts --module payments --compact
+  blueprint verify ./src/adapters/payments/stripe.ts --module payments
+  blueprint verify ./src/adapters/payments/stripe.ts --module payments --compact
 `);
     return;
   }
 
   if (command === "schema") {
     console.log(`
-Usage: blueprinter schema [options]
+Usage: blueprint schema [options]
 
 Options:
   --output <file>    Write schema to file instead of stdout
@@ -152,16 +152,16 @@ Options:
 Exports the catalog as a JSON Schema for programmatic validation.
 
 Examples:
-  blueprinter schema
-  blueprinter schema --output catalog.schema.json
-  blueprinter schema --compact
+  blueprint schema
+  blueprint schema --output catalog.schema.json
+  blueprint schema --compact
 `);
     return;
   }
 
   if (command === "prototype") {
     console.log(`
-Usage: blueprinter prototype [options]
+Usage: blueprint prototype [options]
 
 Options:
   --name <name>         Project name (default: my-project)
@@ -169,18 +169,18 @@ Options:
   --root <path>         Project root directory (default: current directory)
 
 Generates a project scaffold based on selected adapters.
-Requires adapters to be selected first with 'blueprinter adapters add'.
+Requires adapters to be selected first with 'blueprint adapters add'.
 
 Examples:
-  blueprinter prototype
-  blueprinter prototype --name my-saas
-  blueprinter prototype --output ./my-project
+  blueprint prototype
+  blueprint prototype --name my-saas
+  blueprint prototype --output ./my-project
 `);
     return;
   }
 
   console.log(`
-Usage: blueprinter [command] [options]
+Usage: blueprint [command] [options]
 
 Commands:
   build (default)    Load all contracts and output catalog.json
@@ -208,13 +208,13 @@ Options:
   --version, -v      Show version number
 
 Examples:
-  blueprinter list
-  blueprinter inspect billing
-  blueprinter graph billing
-  blueprinter graph billing --format mermaid
-  blueprinter resolve --modules billing,payments,users
-  blueprinter resolve --modules billing,payments,users --output resolved.json
-  echo billing,payments | blueprinter resolve --compact
-  blueprinter schema --output catalog.schema.json
+  blueprint list
+  blueprint inspect billing
+  blueprint graph billing
+  blueprint graph billing --format mermaid
+  blueprint resolve --modules billing,payments,users
+  blueprint resolve --modules billing,payments,users --output resolved.json
+  echo billing,payments | blueprint resolve --compact
+  blueprint schema --output catalog.schema.json
 `);
 }

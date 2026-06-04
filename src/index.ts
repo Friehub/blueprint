@@ -1,5 +1,5 @@
 // Engineering Blueprinter - Public API
-// Import this library as: import { loadCatalog } from 'engineering-blueprinter'
+// Import this library as: import { loadCatalog } from 'engineering-blueprint'
 
 export { loadCatalogFromRoot } from "./core/load-catalog.js";
 export { loadAdapters, loadAdapter } from "./core/adapters/load.js";

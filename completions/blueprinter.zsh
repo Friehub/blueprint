@@ -1,6 +1,6 @@
-#compdef blueprinter
+#compdef blueprint
 
-_blueprinter() {
+_blueprint() {
   local -a commands
   commands=(
     'build:Load all contracts and output catalog.json'
@@ -63,4 +63,4 @@ _blueprinter() {
   esac
 }
 
-_blueprinter "$@"
+_blueprint "$@"

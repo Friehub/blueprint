@@ -35,7 +35,7 @@ describe("MCP server", () => {
 
   before(() => {
     server = spawn("node", [SERVER_PATH], {
-      env: { ...process.env, BLUEPRINTER_ROOT: ROOT },
+      env: { ...process.env, BLUEPRINT_ROOT: ROOT },
       stdio: ["pipe", "pipe", "pipe"],
     });
   });

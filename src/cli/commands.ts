@@ -91,7 +91,7 @@ export async function handleList(result: { value: Catalog | null }, config: Pars
 
 export async function handleInspect(result: { value: Catalog | null }, config: ParsedArgs, root: string) {
   if (!config.target) {
-    console.error("Error: module name is required. Example: blueprinter inspect billing");
+    console.error("Error: module name is required. Example: blueprint inspect billing");
     process.exit(1);
   }
   const mod = result.value!.modules.find((m) => m.name === config.target);
@@ -105,7 +105,7 @@ export async function handleInspect(result: { value: Catalog | null }, config: P
 
 export async function handleGraph(result: { value: Catalog | null }, config: ParsedArgs, root: string) {
   if (!config.target) {
-    console.error("Error: module name is required. Example: blueprinter graph billing");
+    console.error("Error: module name is required. Example: blueprint graph billing");
     process.exit(1);
   }
   const graph = buildGraph(result.value!, config.target);
@@ -124,7 +124,7 @@ export async function handleSearch(result: { value: Catalog | null }, config: Pa
     query = input.trim().split("\n")[0]?.trim();
   }
   if (!query) {
-    console.error("Error: search query is required. Example: blueprinter search billing");
+    console.error("Error: search query is required. Example: blueprint search billing");
     process.exit(1);
   }
   const results = searchModules(result.value!, query);
@@ -163,7 +163,7 @@ export async function handleResolve(result: { value: Catalog | null }, config: P
     modules = parseStdinModules(await readStdin());
   }
   if (modules.length === 0) {
-    console.error("Error: --modules is required. Example: blueprinter resolve --modules billing,payments,users");
+    console.error("Error: --modules is required. Example: blueprint resolve --modules billing,payments,users");
     process.exit(1);
   }
   const cycles = detectCycles(result.value!);
@@ -194,7 +194,7 @@ export async function handleAdapters(result: { value: Catalog | null }, config: 
     await writeOutput(renderAdapterList(byModule, config.query), config.output);
   } else if (config.adapterSubcommand === "add") {
     if (!config.provider || !config.module) {
-      console.error("Error: provider and module required. Example: blueprinter adapters add stripe payments");
+      console.error("Error: provider and module required. Example: blueprint adapters add stripe payments");
       process.exit(1);
     }
     const { selection, error } = await addAdapter(root, config.module, config.provider);
@@ -203,7 +203,7 @@ export async function handleAdapters(result: { value: Catalog | null }, config: 
     await writeOutput(JSON.stringify(selection, null, config.compact ? undefined : 2), config.output);
   } else if (config.adapterSubcommand === "remove") {
     if (!config.module) {
-      console.error("Error: module is required. Example: blueprinter adapters remove payments");
+      console.error("Error: module is required. Example: blueprint adapters remove payments");
       process.exit(1);
     }
     const { selection, error } = await removeAdapter(root, config.module);
@@ -261,7 +261,7 @@ export async function handlePrototype(result: { value: Catalog | null }, config:
     selectedAdapters[module] = typeof adapterRef === "string" ? adapterRef : adapterRef.primary;
   }
   if (Object.keys(selectedAdapters).length === 0) {
-    console.error("Error: No adapters selected. Use 'blueprinter adapters add' first.");
+    console.error("Error: No adapters selected. Use 'blueprint adapters add' first.");
     process.exit(1);
   }
   const moduleName = config.target ?? "my-project";
@@ -303,11 +303,11 @@ export async function handleBuild(result: { value: Catalog | null }, config: Par
 
 export async function handleImplement(result: { value: Catalog | null }, config: ParsedArgs, root: string) {
   if (!config.module) {
-    console.error("Error: --module is required. Example: blueprinter implement payments --adapter stripe --prompts");
+    console.error("Error: --module is required. Example: blueprint implement payments --adapter stripe --prompts");
     process.exit(1);
   }
   if (!config.provider) {
-    console.error("Error: --adapter is required. Example: blueprinter implement payments --adapter stripe --prompts");
+    console.error("Error: --adapter is required. Example: blueprint implement payments --adapter stripe --prompts");
     process.exit(1);
   }
 
@@ -340,11 +340,11 @@ export async function handleImplement(result: { value: Catalog | null }, config:
 
 export async function handleVerify(result: { value: Catalog | null }, config: ParsedArgs, root: string) {
   if (!config.target) {
-    console.error("Error: implementation file is required. Example: blueprinter verify ./src/adapters/stripe.ts --module payments");
+    console.error("Error: implementation file is required. Example: blueprint verify ./src/adapters/stripe.ts --module payments");
     process.exit(1);
   }
   if (!config.module) {
-    console.error("Error: --module is required. Example: blueprinter verify ./src/adapters/stripe.ts --module payments");
+    console.error("Error: --module is required. Example: blueprint verify ./src/adapters/stripe.ts --module payments");
     process.exit(1);
   }
 

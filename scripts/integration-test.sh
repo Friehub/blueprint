@@ -27,47 +27,47 @@ echo "1. Adapter selection"
 node dist/cli.js adapters add stripe payments 2>/dev/null
 node dist/cli.js adapters add redis caching 2>/dev/null
 node dist/cli.js adapters add bullmq queues 2>/dev/null
-check "select stripe for payments" 'grep -q stripe blueprinter.json'
-check "select redis for caching" 'grep -q redis blueprinter.json'
-check "select bullmq for queues" 'grep -q bullmq blueprinter.json'
+check "select stripe for payments" 'grep -q stripe blueprint.json'
+check "select redis for caching" 'grep -q redis blueprint.json'
+check "select bullmq for queues" 'grep -q bullmq blueprint.json'
 
 # 2. Generate code
 echo ""
 echo "2. Code generation"
-rm -rf /tmp/blueprinter-integration 2>/dev/null
-node dist/cli.js generate --lang typescript --output /tmp/blueprinter-integration 2>/dev/null
-check "generates shared types" 'test -f /tmp/blueprinter-integration/interfaces/shared.ts'
-check "generates payments interface" 'test -f /tmp/blueprinter-integration/interfaces/payments.ts'
-check "generates stripe adapter" 'test -f /tmp/blueprinter-integration/adapters/payments/stripe.ts'
-check "generates stripe test" 'test -f /tmp/blueprinter-integration/__tests__/payments/stripe.test.ts'
+rm -rf /tmp/blueprint-integration 2>/dev/null
+node dist/cli.js generate --lang typescript --output /tmp/blueprint-integration 2>/dev/null
+check "generates shared types" 'test -f /tmp/blueprint-integration/interfaces/shared.ts'
+check "generates payments interface" 'test -f /tmp/blueprint-integration/interfaces/payments.ts'
+check "generates stripe adapter" 'test -f /tmp/blueprint-integration/adapters/payments/stripe.ts'
+check "generates stripe test" 'test -f /tmp/blueprint-integration/__tests__/payments/stripe.test.ts'
 
 # 3. Verify adapters
 echo ""
 echo "3. Adapter verification"
-check "stripe implements all payments functions" 'node dist/cli.js verify /tmp/blueprinter-integration/adapters/payments/stripe.ts --module payments 2>&1 | grep -q "All 10 functions"'
-check "redis implements all caching functions" 'node dist/cli.js verify /tmp/blueprinter-integration/adapters/caching/redis.ts --module caching 2>&1 | grep -q "All"'
-check "bullmq implements all queues functions" 'node dist/cli.js verify /tmp/blueprinter-integration/adapters/queues/bullmq.ts --module queues 2>&1 | grep -q "All"'
+check "stripe implements all payments functions" 'node dist/cli.js verify /tmp/blueprint-integration/adapters/payments/stripe.ts --module payments 2>&1 | grep -q "All 10 functions"'
+check "redis implements all caching functions" 'node dist/cli.js verify /tmp/blueprint-integration/adapters/caching/redis.ts --module caching 2>&1 | grep -q "All"'
+check "bullmq implements all queues functions" 'node dist/cli.js verify /tmp/blueprint-integration/adapters/queues/bullmq.ts --module queues 2>&1 | grep -q "All"'
 
 # 4. Generate prototype
 echo ""
 echo "4. Prototype generation"
-rm -rf /tmp/blueprinter-project 2>/dev/null
-node dist/cli.js prototype --name test-project --output /tmp/blueprinter-project 2>/dev/null
-check "generates package.json" 'test -f /tmp/blueprinter-project/package.json'
-check "generates tsconfig.json" 'test -f /tmp/blueprinter-project/tsconfig.json'
-check "generates .gitignore" 'test -f /tmp/blueprinter-project/.gitignore'
-check "generates .env.example" 'test -f /tmp/blueprinter-project/.env.example'
-check "generates config" 'test -f /tmp/blueprinter-project/src/config/adapters.ts'
-check "generates entry point" 'test -f /tmp/blueprinter-project/src/index.ts'
-check "generates README" 'test -f /tmp/blueprinter-project/README.md'
+rm -rf /tmp/blueprint-project 2>/dev/null
+node dist/cli.js prototype --name test-project --output /tmp/blueprint-project 2>/dev/null
+check "generates package.json" 'test -f /tmp/blueprint-project/package.json'
+check "generates tsconfig.json" 'test -f /tmp/blueprint-project/tsconfig.json'
+check "generates .gitignore" 'test -f /tmp/blueprint-project/.gitignore'
+check "generates .env.example" 'test -f /tmp/blueprint-project/.env.example'
+check "generates config" 'test -f /tmp/blueprint-project/src/config/adapters.ts'
+check "generates entry point" 'test -f /tmp/blueprint-project/src/index.ts'
+check "generates README" 'test -f /tmp/blueprint-project/README.md'
 
 # 5. Verify package.json
 echo ""
 echo "5. Package dependencies"
-check "has stripe dependency" 'grep -q stripe /tmp/blueprinter-project/package.json'
-check "has redis dependency" 'grep -q redis /tmp/blueprinter-project/package.json'
-check "has bullmq dependency" 'grep -q bullmq /tmp/blueprinter-project/package.json'
-check "has typescript dev dep" 'grep -q typescript /tmp/blueprinter-project/package.json'
+check "has stripe dependency" 'grep -q stripe /tmp/blueprint-project/package.json'
+check "has redis dependency" 'grep -q redis /tmp/blueprint-project/package.json'
+check "has bullmq dependency" 'grep -q bullmq /tmp/blueprint-project/package.json'
+check "has typescript dev dep" 'grep -q typescript /tmp/blueprint-project/package.json'
 
 # 6. Resolve dependencies
 echo ""
@@ -90,8 +90,8 @@ echo "9. Schema export"
 check "exports JSON schema" 'node dist/cli.js schema 2>&1 | grep -q "json-schema.org"'
 
 # 10. Clean up
-rm -f blueprinter.json
-rm -rf /tmp/blueprinter-integration /tmp/blueprinter-project
+rm -f blueprint.json
+rm -rf /tmp/blueprint-integration /tmp/blueprint-project
 
 echo ""
 echo "=== Results: $PASS passed, $FAIL failed ==="

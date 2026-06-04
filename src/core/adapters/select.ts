@@ -9,7 +9,7 @@ export type SelectionResult = {
 };
 
 export async function loadSelection(rootDir: string): Promise<SelectionResult> {
-  const configPath = join(rootDir, "blueprinter.json");
+  const configPath = join(rootDir, "blueprint.json");
 
   try {
     const content = await readFile(configPath, "utf8");
@@ -29,7 +29,7 @@ export async function loadSelection(rootDir: string): Promise<SelectionResult> {
 }
 
 export async function saveSelection(rootDir: string, selection: UserSelection): Promise<string | null> {
-  const configPath = join(rootDir, "blueprinter.json");
+  const configPath = join(rootDir, "blueprint.json");
 
   try {
     let config: Record<string, unknown> = {};

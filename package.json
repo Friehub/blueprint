@@ -1,22 +1,17 @@
 {
-  "name": "engineering-blueprinter",
+  "name": "blueprint",
   "version": "0.1.0",
-  "description": "A provider-agnostic interface specification for AI-assisted backend development. 108 domain contracts, 83 adapters, code generation.",
-  "keywords": [
-    "contract",
-    "domain",
-    "backend",
-    "ai",
-    "code-generation",
-    "adapter",
-    "registry"
-  ],
+  "description": "A domain contract catalogue for backend development. 108 interfaces, 83 adapters, AI-ready.",
+  "keywords": ["contract", "domain", "backend", "ai", "code-generation", "adapter", "blueprint"],
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js",
     "./cli": "./dist/cli.js"
+  },
+  "bin": {
+    "blueprint": "./dist/cli.js"
   },
   "bin": {
     "blueprinter": "./dist/cli.js"

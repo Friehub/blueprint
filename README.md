@@ -32,17 +32,17 @@ This catalogue defines those interfaces -- function signatures, types, and error
 ## Quick Start
 
 ```bash
-npm install -g engineering-blueprinter
-blueprinter list
-blueprinter inspect billing
-blueprinter graph billing
-blueprinter resolve --modules billing,payments,users
+npm install -g engineering-blueprint
+blueprint list
+blueprint inspect billing
+blueprint graph billing
+blueprint resolve --modules billing,payments,users
 ```
 
 Or import as a library:
 
 ```typescript
-import { loadCatalogFromRoot } from 'engineering-blueprinter';
+import { loadCatalogFromRoot } from 'engineering-blueprint';
 const catalog = await loadCatalogFromRoot('./contracts');
 ```
 
@@ -100,9 +100,9 @@ const catalog = await loadCatalogFromRoot('./contracts');
 | *and 17 more modules* | |
 
 ```bash
-blueprinter adapters list
-blueprinter adapters add stripe payments
-blueprinter adapters verify
+blueprint adapters list
+blueprint adapters add stripe payments
+blueprint adapters verify
 ```
 
 ---
@@ -112,8 +112,8 @@ blueprinter adapters verify
 Generates TypeScript interfaces, adapter skeletons, and conformance tests from contracts:
 
 ```bash
-blueprinter generate --lang typescript
-blueprinter generate --module billing --lang typescript
+blueprint generate --lang typescript
+blueprint generate --module billing --lang typescript
 ```
 
 Output for payments module:
@@ -153,10 +153,10 @@ Languages supported: TypeScript (full), Rust/Go/Python (planned).
 Generate a project scaffold with selected adapters and correct dependencies:
 
 ```bash
-blueprinter adapters add stripe payments
-blueprinter adapters add redis caching
-blueprinter adapters add bullmq queues
-blueprinter prototype --name my-saas
+blueprint adapters add stripe payments
+blueprint adapters add redis caching
+blueprint adapters add bullmq queues
+blueprint prototype --name my-saas
 ```
 
 Produces:
@@ -176,9 +176,9 @@ AI tools (Claude Desktop, Cursor, Copilot) can query the catalog directly via th
 ```json
 {
   "mcpServers": {
-    "blueprinter": {
+    "blueprint": {
       "command": "npx",
-      "args": ["engineering-blueprinter", "mcp"]
+      "args": ["engineering-blueprint", "mcp"]
     }
   }
 }
@@ -198,9 +198,9 @@ AI tools (Claude Desktop, Cursor, Copilot) can query the catalog directly via th
 
 **Start manually:**
 ```bash
-blueprinter mcp
+blueprint mcp
 # or with a specific root:
-BLUEPRINTER_ROOT=/path/to/project blueprinter mcp
+BLUEPRINTER_ROOT=/path/to/project blueprint mcp
 ```
 
 ---
@@ -208,7 +208,7 @@ BLUEPRINTER_ROOT=/path/to/project blueprinter mcp
 ## Project Structure
 
 ```
-engineering-blueprinter/
+engineering-blueprint/
 ├── contracts/              # 108 markdown contract files
 │   └── core/               # Global standards, runtime, sagas
 ├── adapters/               # 83 YAML adapter definitions
@@ -229,7 +229,7 @@ engineering-blueprinter/
 Check that implementations match contracts:
 
 ```bash
-blueprinter verify ./src/adapters/payments/stripe.ts --module payments
+blueprint verify ./src/adapters/payments/stripe.ts --module payments
 # All 10 functions implemented. PASS
 ```
 

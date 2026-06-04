@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-_blueprinter() {
+_blueprint() {
   local cur prev commands global_opts
   COMPREPLY=()
   cur="${COMP_WORDS[COMP_CWORD]}"
@@ -55,4 +55,4 @@ _blueprinter() {
   fi
 }
 
-complete -F _blueprinter blueprinter
+complete -F _blueprint blueprint

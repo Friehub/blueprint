@@ -38,7 +38,7 @@ async function main() {
   }
 
   if (args.help) { printHelp(args.command); return; }
-  if (args.version) { console.log(`engineering-blueprinter@${getVersion()}`); return; }
+  if (args.version) { console.log(`engineering-blueprint@${getVersion()}`); return; }
 
   const root = args.root ?? process.cwd();
   const result = await loadCatalogFromRoot(root, args.strict ? "strict" : "loose");
