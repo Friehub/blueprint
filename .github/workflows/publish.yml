@@ -3,6 +3,7 @@ name: Publish to npm
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -18,6 +19,8 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
+      - name: Set version from tag
+        run: npm version --no-git-tag-version ${{ github.ref_name }}
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
