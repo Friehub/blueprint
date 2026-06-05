@@ -18,7 +18,8 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
-      - name: Publish
-        run: npm publish --access public
+      - name: Pre-publish checks
+        run: bash scripts/check-publish.sh
+      - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

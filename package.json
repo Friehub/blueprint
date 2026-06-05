@@ -21,6 +21,7 @@
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test dist/core/*.test.js dist/core/adapters/*.test.js",
     "test:mcp": "node --test dist/mcp/*.test.js",
+    "check:publish": "bash scripts/check-publish.sh",
     "test:integration": "npm run build && bash scripts/integration-test.sh",
     "postinstall": "npm run build",
     "link": "npm run build && npm link"
