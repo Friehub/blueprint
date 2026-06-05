@@ -1,6 +1,6 @@
 {
   "name": "@friehub/blueprint",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A domain contract catalogue for backend development. 108 interfaces, 83 adapters, AI-ready.",
   "keywords": ["contract", "domain", "backend", "ai", "code-generation", "adapter", "blueprint"],
   "license": "MIT",

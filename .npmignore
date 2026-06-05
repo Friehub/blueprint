@@ -1,5 +1,4 @@
 src/
-contracts/
 schemas/
 completions/
 scripts/
@@ -11,5 +10,7 @@ node_modules/
 *.test.ts
 *.md
 !README.md
+!CHANGELOG.md
 .DS_Store
 .env
+blueprint.json
