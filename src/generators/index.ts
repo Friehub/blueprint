@@ -40,3 +40,8 @@ export type {
 } from "./render.js";
 
 export { renderTemplate } from "./render.js";
+
+export { PythonGenerator } from "./python/index.js";
+export { GoGenerator } from "./go/index.js";
+export { RustGenerator } from "./rust/index.js";
+export { JavaGenerator } from "./java/index.js";

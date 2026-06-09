@@ -14,9 +14,10 @@ import type {
 export type GenerateOptions = {
   language: Language;
   type: GenerationType;
-  module: string | undefined;
-  provider: string | undefined;
+  module?: string;
+  provider?: string;
   outputDir: string;
+  namespace?: string;
 };
 
 export type EngineResult = {
@@ -57,6 +58,7 @@ export async function generate(
     module: options.module,
     provider: options.provider,
   };
+  if (options.namespace) context.namespace = options.namespace;
 
   let result: GeneratorResult;
 

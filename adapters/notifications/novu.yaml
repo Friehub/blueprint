@@ -2,6 +2,7 @@ name: novu
 module: notifications
 version: 1.0.0
 description: Novu notification infrastructure adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - sendPush

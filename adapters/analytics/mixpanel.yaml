@@ -2,6 +2,7 @@ name: mixpanel
 module: analytics
 version: 1.0.0
 description: Mixpanel analytics adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - trackEvent

@@ -8,10 +8,10 @@ import { loadCatalogFromRoot, parseDocument } from "./index.js";
 const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 
 describe("parser accuracy", () => {
-  it("parses all 108 contracts without errors", async () => {
+  it("parses all contracts without errors", async () => {
     const result = await loadCatalogFromRoot(ROOT, "loose");
-    assert.notEqual(result.value, null);
-    assert.equal(result.value!.modules.length, 108);
+
+    assert.ok(result.value!.modules.length >= 108, `Expected at least 108 modules, got ${result.value!.modules.length}`);
     assert.equal(result.issues.filter((i) => i.severity === "error").length, 0);
   });
 

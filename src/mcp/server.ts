@@ -6,6 +6,8 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { join } from "node:path";
 import { loadCatalogFromRoot } from "../core/load-catalog.js";
 import { resolve as resolveDeps, detectCycles } from "../core/resolve.js";
 import { searchModules } from "../core/search.js";
@@ -43,11 +45,40 @@ function moduleSummary(m: ModuleContract) {
   };
 }
 
+function getSagaFiles(): string[] {
+  const sagasDir = join(ROOT_DIR, "sagas");
+  if (!existsSync(sagasDir)) return [];
+  try {
+    return readdirSync(sagasDir).filter((f) => f.endsWith(".md"));
+  } catch {
+    return [];
+  }
+}
+
+function readSagaContent(name: string): string | null {
+  const sagaPath = join(ROOT_DIR, "sagas", `${name}.md`);
+  if (!existsSync(sagaPath)) return null;
+  try {
+    return readFileSync(sagaPath, "utf8");
+  } catch {
+    return null;
+  }
+}
+
+function extractSectionContent(mod: ModuleContract, sectionName: string): string | null {
+  for (const section of mod.rawSections) {
+    if (section.name.toLowerCase().includes(sectionName.toLowerCase())) {
+      return section.content;
+    }
+  }
+  return null;
+}
+
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
       name: "list_modules",
-      description: "List all available module contracts (108 modules)",
+      description: "List all available module contracts",
       inputSchema: { type: "object", properties: {} },
     },
     {
@@ -81,11 +112,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: "list_adapters",
-      description: "List available adapters (83 adapters across 35 modules)",
+      description: "List available adapters across all modules, optionally filtered by language and module",
       inputSchema: {
         type: "object",
         properties: {
           module: { type: "string", description: "Optional: filter by module name" },
+          language: { type: "string", description: "Optional: filter by language (typescript, python, go, rust, java)" },
         },
       },
     },
@@ -108,6 +140,68 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         type: "object",
         properties: { module: { type: "string", description: "Module name" } },
         required: ["module"],
+      },
+    },
+    {
+      name: "get_database_schema",
+      description: "Get the canonical database schema (DDL) for a module",
+      inputSchema: {
+        type: "object",
+        properties: {
+          module: { type: "string", description: "Module name" },
+          engine: {
+            type: "string",
+            enum: ["postgresql", "mysql", "mongodb", "sqlite"],
+            description: "Database engine",
+            default: "postgresql",
+          },
+        },
+        required: ["module"],
+      },
+    },
+    {
+      name: "get_saga",
+      description: "Get the full saga specification for a multi-module business flow (checkout, subscription, refund, etc.)",
+      inputSchema: {
+        type: "object",
+        properties: {
+          name: { type: "string", description: "Saga name (e.g., checkout, subscription_upgrade, user_offboarding)" },
+        },
+        required: ["name"],
+      },
+    },
+    {
+      name: "get_distributed_patterns",
+      description: "Get recommended distributed system patterns for a module (saga, outbox, idempotency table, optimistic locking, etc.)",
+      inputSchema: {
+        type: "object",
+        properties: {
+          module: { type: "string", description: "Module name" },
+        },
+        required: ["module"],
+      },
+    },
+    {
+      name: "validate_implementation",
+      description: "Check an implementation description against the module contract invariants. Returns violations if any.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          module: { type: "string", description: "Module name" },
+          code_summary: { type: "string", description: "Description of what was implemented" },
+        },
+        required: ["module", "code_summary"],
+      },
+    },
+    {
+      name: "suggest_modules",
+      description: "Given a plain-English description of a feature or system, suggest which Blueprint modules to implement and in what order",
+      inputSchema: {
+        type: "object",
+        properties: {
+          description: { type: "string", description: "What you want to build (e.g., 'a checkout flow with fraud detection')" },
+          language: { type: "string", description: "Optional: filter adapters by language (typescript, python, go, rust, java)" },
+        },
       },
     },
   ],
@@ -164,7 +258,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "list_adapters": {
         const modName = input.module as string | undefined;
-        const filtered = modName ? adapters.filter((a) => a.module === modName) : adapters;
+        const lang = input.language as string | undefined;
+        let filtered = modName ? adapters.filter((a) => a.module === modName) : adapters;
+        if (lang) {
+          const { adapterSupportsLanguage } = await import("../core/adapters/types.js");
+          filtered = filtered.filter((a) => adapterSupportsLanguage(a, lang));
+        }
         const grouped: Record<string, string[]> = {};
         for (const a of filtered) {
           const mod = a.module;
@@ -198,6 +297,164 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               requiredBy: catalog?.modules.filter((m) => m.hardDeps.includes(modName)).map((m) => m.name),
               softDepsOf: catalog?.modules.filter((m) => m.softDeps.includes(modName)).map((m) => m.name),
             }, null, 2),
+          }],
+        };
+      }
+
+      case "get_database_schema": {
+        const modName = input.module as string;
+        const engine = (input.engine as string) || "postgresql";
+        const mod = catalog?.modules.find((m) => m.name === modName);
+        if (!mod) return { content: [{ type: "text", text: `Module "${modName}" not found` }] };
+
+        const schemaSection = extractSectionContent(mod, "database schema");
+        if (!schemaSection) {
+          return {
+            content: [{
+              type: "text",
+              text: `No database schema defined yet for "${modName}". Database schemas will be added to all modules in a future update. The schema for engine "${engine}" would include DDL for tables, indexes, constraints, and design decisions (e.g., amount as BIGINT in smallest unit, optimistic locking version columns, partial indexes for active records).`,
+            }],
+          };
+        }
+        return { content: [{ type: "text", text: schemaSection }] };
+      }
+
+      case "get_saga": {
+        const sagaName = input.name as string;
+        const content = readSagaContent(sagaName);
+        if (!content) {
+          const available = getSagaFiles().map((f) => f.replace(/\.md$/, ""));
+          const msg = available.length > 0
+            ? `Saga "${sagaName}" not found. Available sagas: ${available.join(", ")}`
+            : `No sagas defined yet. Sagas (checkout, subscription_upgrade, refund_flow, etc.) will be added to contracts/sagas/ in a future update.`;
+          return { content: [{ type: "text", text: msg }] };
+        }
+        return { content: [{ type: "text", text: content }] };
+      }
+
+      case "get_distributed_patterns": {
+        const modName = input.module as string;
+        const mod = catalog?.modules.find((m) => m.name === modName);
+        if (!mod) return { content: [{ type: "text", text: `Module "${modName}" not found` }] };
+
+        const patternsSection = extractSectionContent(mod, "distributed");
+        if (!patternsSection) {
+          return {
+            content: [{
+              type: "text",
+              text: `No distributed patterns defined yet for "${modName}". The patterns would be determined by the module's consistency model and delivery guarantees (e.g., saga for strong consistency with cross-module flows, outbox for at-least-once event delivery, idempotency table for provider interaction deduplication, optimistic locking for concurrent wallet operations).`,
+            }],
+          };
+        }
+        return { content: [{ type: "text", text: patternsSection }] };
+      }
+
+      case "validate_implementation": {
+        const modName = input.module as string;
+        const codeSummary = (input.code_summary as string) || "";
+        const mod = catalog?.modules.find((m) => m.name === modName);
+        if (!mod) return { content: [{ type: "text", text: `Module "${modName}" not found` }] };
+
+        const violations: string[] = [];
+        const summaryLower = codeSummary.toLowerCase();
+
+        for (const invariant of mod.invariants) {
+          const invariantLower = invariant.toLowerCase();
+
+          if (invariantLower.includes("must") || invariantLower.includes("must not")) {
+            if (invariantLower.includes("idempotent") && !summaryLower.includes("idempoten")) {
+              violations.push(`Contract requires idempotency: "${invariant}" — your implementation does not mention idempotency handling.`);
+            }
+            if (invariantLower.includes("atomic") && !summaryLower.includes("atomic")) {
+              violations.push(`Contract requires atomicity: "${invariant}" — your implementation does not mention atomic operations.`);
+            }
+            if (invariantLower.includes("not reduce balance below zero") && !summaryLower.includes("balance") && !summaryLower.includes("insufficient")) {
+              violations.push(`Contract requires balance floor: "${invariant}" — your implementation does not mention balance checking.`);
+            }
+          }
+        }
+
+        if (violations.length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: JSON.stringify({
+                module: modName,
+                status: "pass",
+                message: "No contract violations detected based on the provided summary.",
+              }, null, 2),
+            }],
+          };
+        }
+
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              module: modName,
+              status: "violations_found",
+              violations,
+            }, null, 2),
+          }],
+        };
+      }
+
+      case "suggest_modules": {
+        const description = (input.description as string) || "";
+        const lang = input.language as string | undefined;
+        const results = searchModules(catalog!, description);
+
+        const suggested = results.slice(0, 8).map((r) => {
+          const moduleAdapters = adapters.filter((a) => a.module === r.module.name);
+          const availableLanguages: Record<string, string[]> = {};
+          for (const adapter of moduleAdapters) {
+            const langs = adapter.languages || ["typescript", "python", "go", "rust", "java"];
+            for (const l of langs) {
+              if (!availableLanguages[l]) availableLanguages[l] = [];
+              if (!availableLanguages[l].includes(adapter.name)) {
+                availableLanguages[l].push(adapter.name);
+              }
+            }
+          }
+          return {
+            name: r.module.name,
+            relevance: r.score,
+            summary: r.module.summary,
+            functionCount: r.module.functions.length,
+            hardDeps: r.module.hardDeps,
+            adapters: moduleAdapters.map((a) => a.name),
+            adapter_languages: availableLanguages,
+          };
+        });
+
+        const names = suggested.map((s) => s.name);
+        const resolved = names.length > 0 ? resolveDeps(catalog!, names) : null;
+
+        const result: Record<string, unknown> = {
+          description,
+          language_filter: lang || "all",
+          suggested_modules: suggested,
+          transitive_dependencies: resolved ? {
+            all_modules: resolved.modules.map((m) => m.name),
+            module_count: resolved.modules.length,
+          } : null,
+          recommended_order: suggested.map((s) => s.name),
+        };
+
+        if (lang) {
+          result.adapters_available_in_language = suggested.map((s) => ({
+            module: s.name,
+            adapters: adapters
+              .filter((a) => a.module === s.name)
+              .filter((a) => !a.languages || a.languages.includes(lang))
+              .map((a) => a.name),
+          })).filter((m) => m.adapters.length > 0);
+        }
+
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify(result, null, 2),
           }],
         };
       }

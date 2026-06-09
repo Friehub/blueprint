@@ -2,6 +2,7 @@ name: clerk
 module: auth
 version: 1.0.0
 description: Clerk authentication adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - signUp

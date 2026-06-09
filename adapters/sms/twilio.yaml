@@ -2,6 +2,7 @@ name: twilio
 module: sms
 version: 1.0.0
 description: Twilio SMS delivery adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - send

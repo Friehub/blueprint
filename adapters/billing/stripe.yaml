@@ -2,6 +2,7 @@ name: stripe
 module: billing
 version: 1.0.0
 description: Stripe billing subscription and plan management adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - createSubscription

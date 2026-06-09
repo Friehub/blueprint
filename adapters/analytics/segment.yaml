@@ -2,6 +2,7 @@ name: segment
 module: analytics
 version: 1.0.0
 description: Segment analytics adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - trackEvent

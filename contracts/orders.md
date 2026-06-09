@@ -102,6 +102,69 @@ Order retention:
 * **Model:** Durable transactional order store.
 * **Details:** Order state and package state must be strongly consistent; high-volume historical reads may use replicas.
 
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE order_status AS ENUM ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned');
+CREATE TYPE package_status AS ENUM ('pending', 'packed', 'shipped', 'in_transit', 'delivered', 'returned');
+
+CREATE TABLE orders (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL,
+  status          order_status NOT NULL DEFAULT 'pending',
+  total           BIGINT NOT NULL CHECK (total >= 0),
+  currency        CHAR(3) NOT NULL,
+  shipping_address JSONB NOT NULL,
+  idempotency_key TEXT UNIQUE,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_orders_user ON orders(user_id, created_at DESC);
+CREATE INDEX idx_orders_status ON orders(status) WHERE status IN ('pending', 'confirmed', 'processing');
+
+CREATE TABLE order_line_items (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id    UUID NOT NULL REFERENCES orders(id),
+  variant_id  UUID NOT NULL,
+  quantity    INT NOT NULL CHECK (quantity > 0),
+  unit_price  BIGINT NOT NULL CHECK (unit_price >= 0),
+  total       BIGINT NOT NULL CHECK (total >= 0)
+);
+
+CREATE INDEX idx_order_items_order ON order_line_items(order_id);
+
+CREATE TABLE order_packages (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id    UUID NOT NULL REFERENCES orders(id),
+  status      package_status NOT NULL DEFAULT 'pending',
+  tracking_ref TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE order_returns (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id      UUID NOT NULL REFERENCES orders(id),
+  status        TEXT NOT NULL DEFAULT 'requested',
+  refund_amount BIGINT,
+  reason        TEXT NOT NULL,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+### Distributed System Patterns
+
+**Saga pattern (checkout flow):**
+* Step 1: Validate cart items
+* Step 2: Create order (status: pending)
+* Step 3: Reserve inventory via inventory.reserveStock
+* Step 4: Initiate payment via payments.initiatePayment
+* Step 5: Confirm order (status: confirmed) and inventory via inventory.confirmStock
+* Compensation on step 3 failure: cancel order (no payment yet)
+* Compensation on step 4 failure: release inventory, cancel order
+* Compensation on step 5 failure: payment was captured but order confirm failed — retry idempotently
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `orders.<function>`.
 * **Telemetry Metrics:**

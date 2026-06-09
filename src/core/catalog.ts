@@ -83,7 +83,8 @@ export type ParseIssueCode =
   | "MALFORMED_TYPE_BLOCK"
   | "UNSUPPORTED_SECTION"
   | "TITLE_MISMATCH"
-  | "UNKNOWN_PROFILE";
+  | "UNKNOWN_PROFILE"
+  | "CATALOG_NOT_FOUND";
 
 export type ParseIssue = {
   code: ParseIssueCode;

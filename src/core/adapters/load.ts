@@ -115,6 +115,12 @@ function parseAdapterDefinition(data: unknown, filePath: string): AdapterDefinit
     adapter.metadata = obj.metadata as AdapterMetadata;
   }
 
+  if (Array.isArray(obj.languages)) {
+    adapter.languages = (obj.languages as string[]).filter((l) =>
+      ["typescript", "python", "go", "rust", "java"].includes(l),
+    );
+  }
+
   return adapter;
 }
 

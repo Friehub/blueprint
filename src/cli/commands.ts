@@ -189,8 +189,14 @@ export async function handleAdapters(result: { value: Catalog | null }, config: 
   const { adapters, errors: loadErrors } = await loadAdapters(adaptersDir);
   if (loadErrors.length > 0 && !config.quiet) loadErrors.forEach((e) => console.warn(`  - ${e}`));
 
+  let filteredAdapters = adapters;
+  if (config.language) {
+    const { adapterSupportsLanguage } = await import("../core/adapters/types.js");
+    filteredAdapters = adapters.filter((a) => adapterSupportsLanguage(a, config.language!));
+  }
+
   if (config.adapterSubcommand === "list") {
-    const byModule = listAdaptersByModule(adapters);
+    const byModule = listAdaptersByModule(filteredAdapters);
     await writeOutput(renderAdapterList(byModule, config.query), config.output);
   } else if (config.adapterSubcommand === "add") {
     if (!config.provider || !config.module) {
@@ -243,7 +249,9 @@ export async function handleGenerate(result: { value: Catalog | null }, config: 
   const outputDir = config.output ?? join(root, "generated");
   const adaptersDir = join(root, "adapters");
   const { adapters } = await loadAdapters(adaptersDir);
-  const { written, errors } = await generateAndWrite(result.value!, adapters, { language, type, module: config.module, provider: config.provider, outputDir });
+  const genOpts: Record<string, unknown> = { language, type, module: config.module, provider: config.provider, outputDir };
+  if (config.namespace) genOpts.namespace = config.namespace;
+  const { written, errors } = await generateAndWrite(result.value!, adapters, genOpts as any);
   if (errors.length > 0) {
     console.error("Generation errors:");
     errors.forEach((e) => console.error(`  - ${e}`));
@@ -266,8 +274,9 @@ export async function handlePrototype(result: { value: Catalog | null }, config:
   }
   const moduleName = config.target ?? "my-project";
   const outputDir = config.output ?? join(root, moduleName);
+  const lang = config.language ?? "typescript";
   const { files, errors } = generatePrototype(result.value!, adapters, {
-    name: moduleName, modules: Object.keys(selectedAdapters), adapters: selectedAdapters, outputDir,
+    name: moduleName, modules: Object.keys(selectedAdapters), adapters: selectedAdapters, outputDir, language: lang,
   });
   if (errors.length > 0) {
     console.error("Prototype generation errors:");

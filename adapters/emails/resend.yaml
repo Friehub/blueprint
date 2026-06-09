@@ -2,6 +2,7 @@ name: resend
 module: emails
 version: 1.0.0
 description: Resend email delivery adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - sendTransactional

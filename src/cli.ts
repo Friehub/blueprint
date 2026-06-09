@@ -3,6 +3,10 @@
 import { loadCatalogFromRoot } from "./core/load-catalog.js";
 import { registerGenerator } from "./generators/engine.js";
 import { TypeScriptGenerator } from "./generators/typescript/index.js";
+import { PythonGenerator } from "./generators/python/index.js";
+import { GoGenerator } from "./generators/go/index.js";
+import { RustGenerator } from "./generators/rust/index.js";
+import { JavaGenerator } from "./generators/java/index.js";
 import { parseArguments } from "./utils/args.js";
 import { printHelp } from "./cli/help.js";
 import { checkErrors } from "./cli/commands.js";
@@ -29,6 +33,10 @@ function getVersion(): string {
 
 async function main() {
   registerGenerator(new TypeScriptGenerator());
+  registerGenerator(new PythonGenerator());
+  registerGenerator(new GoGenerator());
+  registerGenerator(new RustGenerator());
+  registerGenerator(new JavaGenerator());
 
   const args = parseArguments(process.argv.slice(2));
 

@@ -8,6 +8,7 @@ export type PrototypeOptions = {
   modules: string[];
   adapters: Record<string, string>;
   outputDir: string;
+  language?: string;
 };
 
 export function generatePrototype(
@@ -101,16 +102,25 @@ dist/
 }
 
 function generateReadme(options: PrototypeOptions, adapters: AdapterDefinition[]): GeneratedFile {
+  const lang = options.language || "typescript";
   const moduleList = options.modules.map((m) => `- ${m}`).join("\n");
   const adapterList = Object.entries(options.adapters)
     .map(([module, adapter]) => `- ${module}: ${adapter}`)
     .join("\n");
+
+  const langLabel = lang === "typescript" ? "TypeScript" : lang === "python" ? "Python" : lang === "go" ? "Go" : lang === "rust" ? "Rust" : "Java";
+  const entryPoint = lang === "typescript" ? "src/index.ts" : lang === "python" ? "src/main.py" : lang === "go" ? "cmd/main.go" : lang === "rust" ? "src/main.rs" : "src/main.java";
+  const buildCmd = lang === "typescript" ? "npm run build" : lang === "python" ? "python -m src.main" : lang === "go" ? "go build ./..." : lang === "rust" ? "cargo build" : "mvn compile";
 
   return {
     path: "README.md",
     content: `# ${options.name}
 
 Generated scaffold from Engineering Blueprinter contracts.
+
+Language: ${langLabel}
+Modules: ${options.modules.length}
+Adapters: ${Object.keys(options.adapters).length}
 
 ## Modules
 
@@ -123,26 +133,15 @@ ${adapterList}
 ## Getting Started
 
 \`\`\`bash
-npm install
-npm run build
-npm run dev
-\`\`\`
-
-## Project Structure
-
-\`\`\`
-src/
-├── interfaces/     # TypeScript interfaces from contracts
-├── adapters/       # Adapter implementations (fill in TODOs)
-├── config/         # Adapter configuration
-└── index.ts        # Entry point
+${buildCmd}
 \`\`\`
 
 ## Next Steps
 
-1. Fill in adapter implementations in \`src/adapters/\`
+1. Generate interfaces: \`blueprint generate --lang ${lang} --module <module>\`
 2. Configure environment variables in \`.env\`
-3. Implement business logic in \`src/index.ts\`
+3. Fill in adapter implementations
+4. Implement business logic in \`${entryPoint}\`
 `,
   };
 }

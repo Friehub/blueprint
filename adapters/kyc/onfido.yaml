@@ -2,6 +2,7 @@ name: onfido
 module: kyc
 version: 1.0.0
 description: Onfido KYC verification adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - submitVerification

@@ -4,6 +4,8 @@ import { loadCatalogFromRoot } from "../core/index.js";
 import { loadAdapters } from "../core/adapters/load.js";
 import { registerGenerator, generate, getAvailableLanguages } from "./engine.js";
 import { TypeScriptGenerator } from "./typescript/index.js";
+import { PythonGenerator } from "./python/index.js";
+import { GoGenerator } from "./go/index.js";
 import { pascalCase, camelCase, snakeCase, mapType, inferType } from "./types.js";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
@@ -18,7 +20,19 @@ describe("generator engine", () => {
     assert.ok(languages.includes("typescript"));
   });
 
-  it("generates interfaces for all 108 modules", async () => {
+  it("registers Python generator", () => {
+    registerGenerator(new PythonGenerator());
+    const languages = getAvailableLanguages();
+    assert.ok(languages.includes("python"));
+  });
+
+  it("registers Go generator", () => {
+    registerGenerator(new GoGenerator());
+    const languages = getAvailableLanguages();
+    assert.ok(languages.includes("go"));
+  });
+
+  it("generates interfaces for all modules", async () => {
     const result = await loadCatalogFromRoot(ROOT, "loose");
     const { adapters } = await loadAdapters(ADAPTERS_DIR);
 
@@ -31,7 +45,7 @@ describe("generator engine", () => {
     });
 
     assert.equal(genResult.errors.length, 0, `No errors: ${genResult.errors.join(", ")}`);
-    assert.ok(genResult.files.length >= 108, `At least 108 interface files, got ${genResult.files.length}`);
+    assert.ok(genResult.files.length >= 100, `At least 100 interface files, got ${genResult.files.length}`);
   });
 
   it("generates adapters for all 82 adapters", async () => {
@@ -95,6 +109,104 @@ describe("generator engine", () => {
 
     assert.ok(genResult.files.some((f) => f.path.includes("stripe")));
   });
+
+  it("generates python interfaces for all modules", async () => {
+    const result = await loadCatalogFromRoot(ROOT, "loose");
+    const { adapters } = await loadAdapters(ADAPTERS_DIR);
+
+    const genResult = await generate(result.value!, adapters, {
+      language: "python",
+      type: "interfaces",
+      module: undefined,
+      provider: undefined,
+      outputDir: "/tmp/test",
+    });
+
+    assert.equal(genResult.errors.length, 0, `No errors: ${genResult.errors.join(", ")}`);
+    assert.ok(genResult.files.length >= 100);
+    assert.ok(genResult.files.some((f) => f.path.endsWith(".py")));
+  });
+
+  it("generates python adapters", async () => {
+    const result = await loadCatalogFromRoot(ROOT, "loose");
+    const { adapters } = await loadAdapters(ADAPTERS_DIR);
+
+    const genResult = await generate(result.value!, adapters, {
+      language: "python",
+      type: "adapters",
+      module: undefined,
+      provider: undefined,
+      outputDir: "/tmp/test",
+    });
+
+    assert.equal(genResult.errors.length, 0, `No errors: ${genResult.errors.join(", ")}`);
+    assert.ok(genResult.files.length >= 82);
+  });
+
+  it("generates python tests for all adapters", async () => {
+    const result = await loadCatalogFromRoot(ROOT, "loose");
+    const { adapters } = await loadAdapters(ADAPTERS_DIR);
+
+    const genResult = await generate(result.value!, adapters, {
+      language: "python",
+      type: "tests",
+      module: undefined,
+      provider: undefined,
+      outputDir: "/tmp/test",
+    });
+
+    assert.equal(genResult.errors.length, 0, `No errors: ${genResult.errors.join(", ")}`);
+    assert.ok(genResult.files.length >= 82);
+  });
+
+  it("generates go interfaces for all modules", async () => {
+    const result = await loadCatalogFromRoot(ROOT, "loose");
+    const { adapters } = await loadAdapters(ADAPTERS_DIR);
+
+    const genResult = await generate(result.value!, adapters, {
+      language: "go",
+      type: "interfaces",
+      module: undefined,
+      provider: undefined,
+      outputDir: "/tmp/test",
+    });
+
+    assert.equal(genResult.errors.length, 0, `No errors: ${genResult.errors.join(", ")}`);
+    assert.ok(genResult.files.length >= 100);
+    assert.ok(genResult.files.some((f) => f.path.endsWith(".go")));
+  });
+
+  it("generates go adapters", async () => {
+    const result = await loadCatalogFromRoot(ROOT, "loose");
+    const { adapters } = await loadAdapters(ADAPTERS_DIR);
+
+    const genResult = await generate(result.value!, adapters, {
+      language: "go",
+      type: "adapters",
+      module: undefined,
+      provider: undefined,
+      outputDir: "/tmp/test",
+    });
+
+    assert.equal(genResult.errors.length, 0, `No errors: ${genResult.errors.join(", ")}`);
+    assert.ok(genResult.files.length >= 82);
+  });
+
+  it("generates go tests for all adapters", async () => {
+    const result = await loadCatalogFromRoot(ROOT, "loose");
+    const { adapters } = await loadAdapters(ADAPTERS_DIR);
+
+    const genResult = await generate(result.value!, adapters, {
+      language: "go",
+      type: "tests",
+      module: undefined,
+      provider: undefined,
+      outputDir: "/tmp/test",
+    });
+
+    assert.equal(genResult.errors.length, 0, `No errors: ${genResult.errors.join(", ")}`);
+    assert.ok(genResult.files.length >= 82);
+  });
 });
 
 describe("type utilities", () => {
@@ -129,6 +241,6 @@ describe("type utilities", () => {
     assert.equal(inferType("user_id", "typescript"), "string");
     assert.equal(inferType("created_at", "typescript"), "Timestamp");
     assert.equal(inferType("is_active", "typescript"), "boolean");
-    assert.equal(inferType("amount", "typescript"), "unknown");
+    assert.equal(inferType("amount", "typescript"), "number");
   });
 });

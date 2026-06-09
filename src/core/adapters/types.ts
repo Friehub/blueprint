@@ -34,6 +34,7 @@ export type AdapterDefinition = {
   config: AdapterConfig;
   dependencies?: AdapterDependency[];
   metadata?: AdapterMetadata;
+  languages?: string[];
 };
 
 export type AdapterSelection = {
@@ -57,3 +58,8 @@ export type AdapterResolution = {
   fallbacks: Record<string, string>;
   issues: AdapterIssue[];
 };
+
+export function adapterSupportsLanguage(adapter: AdapterDefinition, language: string): boolean {
+  if (!adapter.languages || adapter.languages.length === 0) return true;
+  return adapter.languages.includes(language);
+}

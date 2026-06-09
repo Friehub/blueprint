@@ -54,7 +54,7 @@ describe("MCP server", () => {
     const json = JSON.parse(response);
     assert.ok(json.result, "should have result");
     assert.ok(json.result.tools, "should have tools array");
-    assert.ok(json.result.tools.length >= 7, "should have at least 7 tools");
+    assert.ok(json.result.tools.length >= 12, "should have at least 12 tools");
   });
 
   it("responds to list_modules", { timeout: 15000 }, async () => {
@@ -66,7 +66,7 @@ describe("MCP server", () => {
     });
     const json = JSON.parse(response);
     const content = JSON.parse(json.result.content[0].text);
-    assert.ok(content.total >= 100, "should have 108 modules");
+    assert.ok(content.total >= 100, "should have at least 100 modules");
     assert.ok(content.modules.length >= 100);
   });
 
@@ -147,5 +147,67 @@ describe("MCP server", () => {
     assert.equal(content.name, "stripe");
     assert.equal(content.module, "payments");
     assert.ok(content.config.required.length > 0);
+  });
+
+  it("responds to get_database_schema", { timeout: 15000 }, async () => {
+    const response = await sendRequest(server, {
+      jsonrpc: "2.0",
+      id: 9,
+      method: "tools/call",
+      params: { name: "get_database_schema", arguments: { module: "payments" } },
+    });
+    const json = JSON.parse(response);
+    const text = json.result.content[0].text;
+    assert.ok(text.length > 0);
+  });
+
+  it("responds to get_saga", { timeout: 15000 }, async () => {
+    const response = await sendRequest(server, {
+      jsonrpc: "2.0",
+      id: 10,
+      method: "tools/call",
+      params: { name: "get_saga", arguments: { name: "checkout" } },
+    });
+    const json = JSON.parse(response);
+    assert.ok(json.result.content[0].text.length > 0);
+  });
+
+  it("responds to get_distributed_patterns", { timeout: 15000 }, async () => {
+    const response = await sendRequest(server, {
+      jsonrpc: "2.0",
+      id: 11,
+      method: "tools/call",
+      params: { name: "get_distributed_patterns", arguments: { module: "payments" } },
+    });
+    const json = JSON.parse(response);
+    assert.ok(json.result.content[0].text.length > 0);
+  });
+
+  it("responds to validate_implementation", { timeout: 15000 }, async () => {
+    const response = await sendRequest(server, {
+      jsonrpc: "2.0",
+      id: 12,
+      method: "tools/call",
+      params: {
+        name: "validate_implementation",
+        arguments: { module: "payments", code_summary: "Process payment using Stripe API with idempotency key and balance check" },
+      },
+    });
+    const json = JSON.parse(response);
+    const content = JSON.parse(json.result.content[0].text);
+    assert.ok(content.status, "should have status field");
+  });
+
+  it("responds to suggest_modules", { timeout: 15000 }, async () => {
+    const response = await sendRequest(server, {
+      jsonrpc: "2.0",
+      id: 13,
+      method: "tools/call",
+      params: { name: "suggest_modules", arguments: { description: "checkout flow with fraud detection" } },
+    });
+    const json = JSON.parse(response);
+    const content = JSON.parse(json.result.content[0].text);
+    assert.ok(content.suggested_modules, "should have suggested_modules");
+    assert.ok(content.recommended_order, "should have recommended_order");
   });
 });

@@ -2,6 +2,7 @@ name: redis
 module: caching
 version: 1.0.0
 description: Redis caching adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - get

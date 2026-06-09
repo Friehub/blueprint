@@ -2,6 +2,7 @@ name: amplitude
 module: analytics
 version: 1.0.0
 description: Amplitude analytics adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - trackEvent

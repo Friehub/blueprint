@@ -87,6 +87,72 @@ createSubscription    → subscription.created     { user_id, plan_id, trial_end
 ### Temporal Constraints
 * None explicitly defined.
 
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE subscription_status AS ENUM ('active', 'trialing', 'past_due', 'cancelled', 'paused');
+CREATE TYPE invoice_status AS ENUM ('draft', 'pending', 'paid', 'overdue', 'cancelled', 'refunded');
+
+CREATE TABLE subscriptions (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id             UUID NOT NULL,
+  plan_id             UUID NOT NULL,
+  status              subscription_status NOT NULL DEFAULT 'active',
+  current_period_start TIMESTAMPTZ NOT NULL,
+  current_period_end   TIMESTAMPTZ NOT NULL,
+  cancel_at           TIMESTAMPTZ,
+  cancelled_at        TIMESTAMPTZ,
+  trial_end           TIMESTAMPTZ,
+  idempotency_key     TEXT UNIQUE,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_subscriptions_user ON subscriptions(user_id);
+CREATE INDEX idx_subscriptions_status ON subscriptions(status) WHERE status IN ('active', 'past_due');
+
+CREATE TABLE invoices (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL,
+  amount      BIGINT NOT NULL CHECK (amount > 0),
+  currency    CHAR(3) NOT NULL,
+  status      invoice_status NOT NULL DEFAULT 'draft',
+  due_at      TIMESTAMPTZ NOT NULL,
+  paid_at     TIMESTAMPTZ,
+  line_items  JSONB NOT NULL DEFAULT '[]',
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_invoices_user ON invoices(user_id, created_at DESC);
+CREATE INDEX idx_invoices_due ON invoices(due_at) WHERE status IN ('pending', 'overdue');
+
+CREATE TABLE plans (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        TEXT NOT NULL,
+  price       BIGINT NOT NULL CHECK (price >= 0),
+  currency    CHAR(3) NOT NULL,
+  interval    TEXT NOT NULL CHECK (interval IN ('month', 'year', 'week', 'day')),
+  features    JSONB NOT NULL DEFAULT '{}',
+  limits      JSONB NOT NULL DEFAULT '{}',
+  active      BOOLEAN NOT NULL DEFAULT true,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+### Distributed System Patterns
+
+**Saga pattern (createSubscription):**
+* Step 1: Validate payment method via payments module
+* Step 2: Create subscription record (status: trialing or active)
+* Step 3: Create first invoice (status: pending) if not trialing
+* Step 4: Charge payment method via payments.initiatePayment
+* Compensation on step 4 failure: mark invoice as failed, cancel subscription
+
+**Outbox pattern (subscription lifecycle events):**
+* Subscription state transitions write to outbox in same transaction
+* Worker delivers events to downstream billing, notifications, entitlements
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `billing.<function>`.
 * **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).

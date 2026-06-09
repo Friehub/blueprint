@@ -2,6 +2,7 @@ name: sift
 module: fraud_detection
 version: 1.0.0
 description: Sift fraud detection adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - scoreTransaction

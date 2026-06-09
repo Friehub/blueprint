@@ -1,5 +1,6 @@
 import type { ModuleContract, ContractFunction, ContractType } from "../../core/catalog.js";
 import type { AdapterDefinition } from "../../core/adapters/types.js";
+import { adapterSupportsLanguage } from "../../core/adapters/types.js";
 import type { Language, GeneratorContext, GeneratorResult, GeneratedFile, LanguageGenerator } from "../types.js";
 import { pascalCase, camelCase, mapType } from "../types.js";
 import { generateTypeDefinition, generateFunctionSignature, generateParamsList, generateIndex, getSdkHint, generateSharedTypes } from "./helpers.js";
@@ -27,8 +28,10 @@ function getSdkImport(adapterName: string): string {
 export class TypeScriptGenerator implements LanguageGenerator {
   language: Language = "typescript";
   name = "TypeScript Generator";
+  protected context: GeneratorContext | null = null;
 
   generateInterfaces(context: GeneratorContext): GeneratorResult {
+    this.context = context;
     const files: GeneratedFile[] = [];
     const errors: string[] = [];
     let modules = this.resolveModules(context);
@@ -47,11 +50,13 @@ export class TypeScriptGenerator implements LanguageGenerator {
   }
 
   generateAdapter(context: GeneratorContext): GeneratorResult {
+    this.context = context;
     const files: GeneratedFile[] = [];
     const errors: string[] = [];
     const adapters = context.adapters.filter((a) => {
       if (context.module && a.module !== context.module) return false;
       if (context.provider && a.name !== context.provider) return false;
+      if (!adapterSupportsLanguage(a, this.language)) return false;
       return true;
     });
 
@@ -73,6 +78,7 @@ export class TypeScriptGenerator implements LanguageGenerator {
     const adapters = context.adapters.filter((a) => {
       if (context.module && a.module !== context.module) return false;
       if (context.provider && a.name !== context.provider) return false;
+      if (!adapterSupportsLanguage(a, this.language)) return false;
       return true;
     });
 
@@ -107,9 +113,10 @@ export class TypeScriptGenerator implements LanguageGenerator {
 
   private generateModuleInterface(mod: ModuleContract): string {
     const versionNote = mod.version ? `v${mod.version}` : "version not specified";
+    const ns = this.context?.namespace ? `${pascalCase(this.context.namespace)}_` : "";
     const lines: string[] = [
       `// ${mod.name}.ts — ${versionNote} — contracts/${mod.name}.md`,
-      `// Auto-generated from contracts/${mod.name}.md`,
+      `// Auto-generated from contracts/${mod.name}.md -- namespace: "${this.context?.namespace ?? "none"}"`,
       `// Types are inferred from naming conventions. Review before production use.`,
       "",
     ];
@@ -117,7 +124,7 @@ export class TypeScriptGenerator implements LanguageGenerator {
       lines.push(generateTypeDefinition(type));
       lines.push("");
     }
-    const interfaceName = `${pascalCase(mod.name)}Contract`;
+    const interfaceName = `${ns}${pascalCase(mod.name)}Contract`;
     lines.push(`export interface ${interfaceName} {`);
     for (const fn of mod.functions) lines.push(generateFunctionSignature(fn));
     lines.push("}");
@@ -125,17 +132,18 @@ export class TypeScriptGenerator implements LanguageGenerator {
   }
 
   private generateAdapterClass(adapter: AdapterDefinition, mod: ModuleContract): string {
+    const ns = this.context?.namespace ? `${pascalCase(this.context.namespace)}_` : "";
     const lines: string[] = [
       `// ${adapter.name}.ts`,
-      `// Auto-generated adapter for ${adapter.name} → ${mod.name}`,
+      `// Auto-generated adapter for ${adapter.name} → ${mod.name} -- namespace: "${this.context?.namespace ?? "none"}"`,
       `// Types are inferred from naming conventions. Review before production use.`,
       "",
       getSdkImport(adapter.name),
-      `import type { ${pascalCase(mod.name)}Contract } from '../interfaces/${mod.name}';`,
+      `import type { ${ns}${pascalCase(mod.name)}Contract } from '../interfaces/${mod.name}';`,
       "",
     ];
 
-    const className = `${pascalCase(adapter.name)}Adapter`;
+    const className = `${ns}${pascalCase(adapter.name)}Adapter`;
     const configFields = adapter.config.required.map((f) => `  ${f.name}: ${mapType(f.type, "typescript")};`).join("\n");
     lines.push(`export class ${className} implements ${pascalCase(mod.name)}Contract {`);
     lines.push(`  constructor(private config: {`);

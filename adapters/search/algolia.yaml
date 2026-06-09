@@ -2,6 +2,7 @@ name: algolia
 module: search
 version: 1.0.0
 description: Algolia search adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - indexDocument

@@ -2,6 +2,7 @@ name: sqs
 module: queues
 version: 1.0.0
 description: AWS SQS queue adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - enqueue

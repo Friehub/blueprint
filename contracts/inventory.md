@@ -102,6 +102,57 @@ Reservation expiry:
 * **Model:** Strongly consistent inventory store.
 * **Details:** Reservation state must be durable; low-stock alert reads may be served from a replica if the invariant remains intact.
 
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE inventory_stock (
+  variant_id  UUID NOT NULL,
+  location_id UUID,
+  on_hand     BIGINT NOT NULL DEFAULT 0 CHECK (on_hand >= 0),
+  version     INT NOT NULL DEFAULT 0,
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (variant_id, location_id)
+);
+
+CREATE TABLE inventory_reservations (
+  token       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  variant_id  UUID NOT NULL,
+  location_id UUID,
+  quantity    INT NOT NULL CHECK (quantity > 0),
+  order_id    UUID NOT NULL,
+  status      TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'confirmed', 'released', 'expired')),
+  expires_at  TIMESTAMPTZ NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_reservations_variant ON inventory_reservations(variant_id, status) WHERE status = 'active';
+CREATE INDEX idx_reservations_expiry ON inventory_reservations(expires_at) WHERE status = 'active';
+
+CREATE TABLE inventory_adjustments (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  variant_id  UUID NOT NULL,
+  delta       BIGINT NOT NULL,
+  on_hand_before BIGINT NOT NULL,
+  on_hand_after  BIGINT NOT NULL,
+  reason      TEXT NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+### Distributed System Patterns
+
+**Optimistic locking (stock level updates):**
+* Read stock level with version N
+* UPDATE inventory_stock SET on_hand = on_hand + $delta, version = N+1 WHERE variant_id = $id AND version = N
+* If 0 rows updated: retry entire operation (max 3)
+* Prevents double-sell under concurrent checkout load
+
+**Scheduled expiry (reservation cleanup):**
+* Background worker queries inventory_reservations WHERE status = 'active' AND expires_at < now()
+* For each expired reservation: release stock, emit inventory.stock.released event
+* Idempotent — double-expiry is a no-op
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `inventory.<function>`.
 * **Telemetry Metrics:**

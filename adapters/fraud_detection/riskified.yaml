@@ -2,6 +2,7 @@ name: riskified
 module: fraud_detection
 version: 1.0.0
 description: Riskified fraud detection adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - scoreTransaction

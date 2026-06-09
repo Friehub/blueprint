@@ -2,6 +2,7 @@ name: adyen
 module: payments
 version: 1.0.0
 description: Adyen payment processing adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - initiatePayment

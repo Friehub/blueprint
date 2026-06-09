@@ -2,6 +2,7 @@ name: opsgenie
 module: incident_management
 version: 1.0.0
 description: Opsgenie incident management adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - createIncident

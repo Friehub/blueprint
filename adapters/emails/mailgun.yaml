@@ -2,6 +2,7 @@ name: mailgun
 module: emails
 version: 1.0.0
 description: Mailgun email delivery adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - sendTransactional

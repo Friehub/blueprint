@@ -2,6 +2,7 @@ name: honeycomb
 module: trace_query
 version: 1.0.0
 description: Honeycomb trace query adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - queryTraces

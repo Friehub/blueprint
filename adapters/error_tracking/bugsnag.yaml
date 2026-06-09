@@ -2,6 +2,7 @@ name: bugsnag
 module: error_tracking
 version: 1.0.0
 description: Bugsnag error tracking adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - recordError

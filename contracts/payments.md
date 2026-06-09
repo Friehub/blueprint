@@ -116,6 +116,79 @@ Payment event retention:
 * **Model:** Strongly consistent financial ledger / payment state store.
 * **Details:** Balance and payment records must remain auditable and queryable for the required retention period.
 
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE payment_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'refunded', 'disputed');
+CREATE TYPE payment_method AS ENUM ('card', 'bank_transfer', 'wallet', 'ussd', 'qr_code');
+
+CREATE TABLE payments (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id        UUID NOT NULL,
+  amount          BIGINT NOT NULL CHECK (amount > 0),
+  currency        CHAR(3) NOT NULL,
+  status          payment_status NOT NULL DEFAULT 'pending',
+  method          payment_method NOT NULL,
+  provider_ref    TEXT,
+  idempotency_key TEXT UNIQUE,
+  error_code      TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_payments_order_id ON payments(order_id);
+CREATE INDEX idx_payments_status ON payments(status) WHERE status IN ('pending', 'processing');
+CREATE INDEX idx_payments_idempotency ON payments(idempotency_key) WHERE idempotency_key IS NOT NULL;
+
+CREATE TABLE wallets (
+  user_id        UUID PRIMARY KEY,
+  balance        BIGINT NOT NULL DEFAULT 0 CHECK (balance >= 0),
+  currency       CHAR(3) NOT NULL,
+  locked_balance BIGINT NOT NULL DEFAULT 0 CHECK (locked_balance >= 0),
+  version        INT NOT NULL DEFAULT 0,
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE wallet_transactions (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  wallet_id     UUID NOT NULL REFERENCES wallets(user_id),
+  type          TEXT NOT NULL CHECK (type IN ('credit', 'debit')),
+  amount        BIGINT NOT NULL CHECK (amount > 0),
+  balance_after BIGINT NOT NULL,
+  reference     TEXT NOT NULL,
+  idempotency_key TEXT UNIQUE,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_wallet_transactions_wallet ON wallet_transactions(wallet_id, created_at DESC);
+```
+
+### Distributed System Patterns
+
+**Saga pattern (initiatePayment):**
+* Step 1: Create payment record (status: pending) — local transaction
+* Step 2: Call provider (async, with idempotency key)
+* Step 3: On provider success: update status → completed, emit PaymentCompleted event
+* Compensation: On step 2 failure: update status → failed, emit PaymentFailed, refund if wallet was debited
+
+**Outbox pattern (PaymentCompleted events):**
+* Write event to outbox table in same transaction as status update
+* Separate worker polls outbox and delivers to event bus
+* Guarantees at-least-once delivery even if app crashes after DB write
+
+**Idempotency table (provider webhook deduplication):**
+* Table: payment_idempotency_keys (key, result_json, created_at)
+* On each webhook: check table first, return cached result if found
+* Insert key + result atomically with the state change
+* Retain for 7 days
+
+**Optimistic locking (wallet operations):**
+* Read wallet with version N
+* Apply change (debit/credit)
+* UPDATE wallets SET balance = $new, version = N+1 WHERE user_id = $id AND version = N
+* If 0 rows updated: retry (max 3) before returning concurrency_conflict
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `payments.<function>`.
 * **Telemetry Metrics:**

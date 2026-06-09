@@ -2,6 +2,7 @@ name: datadog
 module: trace_query
 version: 1.0.0
 description: Datadog APM trace query adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - queryTraces
