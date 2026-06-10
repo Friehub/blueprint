@@ -3,6 +3,7 @@
     <a class="nav-logo" @click="goHome"><span>blue</span>printer</a>
     <a :class="{ active: state.view === 'home' }" @click="goHome">Home</a>
     <a :class="{ active: state.view === 'quickstart' }" @click="goQuickstart">Quick Start</a>
+    <a :class="{ active: state.view === 'mcp' }" @click="goMcp">MCP</a>
     <a :class="{ active: state.view === 'modules' }" @click="goModules">Modules</a>
     <a :class="{ active: state.view === 'adapters' }" @click="goAdapters">Adapters</a>
     <a :class="{ active: state.view === 'sagas' }" @click="goSagas">Sagas</a>
@@ -119,7 +120,11 @@
             <code class="qs-code">blueprint generate --lang typescript</code>
             <code class="qs-code">blueprint generate --lang python --module payments</code>
             <code class="qs-code">blueprint generate --lang go --namespace acme</code>
-            <p class="qs-text">Use <strong>--namespace</strong> to prefix all generated identifiers with a project name, <strong>--aliases</strong> to replace function names via a JSON5 map, or <strong>--obfuscate</strong> to replace all names with deterministic hashes from a secret seed.</p>
+            <h4 style="margin-top:12px;font-size:14px;font-weight:600">Name protection flags</h4>
+            <p class="qs-text"><strong>--namespace &lt;name&gt;</strong> prefixes all generated class, interface, and file names with your project name. Without it, generated code uses generic names like <em>PaymentsContract</em> and <em>StripeAdapter</em>. With <strong>--namespace acme</strong>, the same code uses <em>Acme_PaymentsContract</em> and <em>Acme_StripeAdapter</em>, and all files are placed under an <em>Acme/</em> directory. This prevents generic name scanning and avoids collisions when multiple Blueprint projects coexist.</p>
+            <p class="qs-text"><strong>--aliases &lt;file.json5&gt;</strong> replaces contract names entirely with project-specific names from a JSON5 alias file. Unlike <strong>--namespace</strong> which only prefixes, aliases can rename functions, modules, classes, and config fields to anything you choose. For example, <em>initiatePayment</em> can become <em>chargeCustomer</em>, <em>payments</em> can become <em>billing</em>, and <em>StripeAdapter</em> can become <em>CardProcessor</em> — all from one alias file. The alias file supports comments and is never committed to version control.</p>
+            <p class="qs-text"><strong>--obfuscate &lt;seed&gt;</strong> replaces every name with a deterministic short hash derived from a secret seed. The same seed always produces the same names, so builds are reproducible. Different seeds produce completely different names. The original contract name cannot be recovered without the seed. This is the strongest protection — it makes generated code impossible to fingerprint, at the cost of debuggability since function names become opaque strings like <em>fn_a1b2c3d4</em>. The seed must be stored in your secrets manager and injected at CI time, never committed.</p>
+            <p class="qs-text">All three flags work together. The order of application is: aliases are resolved first, then namespace is prepended. Obfuscation bypasses aliases entirely when set.</p>
           </div>
         </div>
 
@@ -131,6 +136,63 @@
             <code class="qs-code">blueprint verify ./src/payments/stripe.ts --module payments</code>
             <p class="qs-text">Verification checks that every contract function is implemented, return types match, and nothing required is missing. If you use aliases or obfuscation, pass the same flags to verify for accurate reverse-mapping.</p>
           </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- MCP SERVER -->
+    <template v-if="state.view === 'mcp'">
+      <div class="main">
+        <h2 class="section-title">MCP Server</h2>
+        <p class="section-sub">The Blueprint MCP server gives AI agents direct access to the full contract catalog over stdio. Compatible with Claude Desktop, Cursor, Copilot, and any MCP-compatible tool.</p>
+
+        <div class="mcp-section">
+          <h3>Setup</h3>
+          <p>Add this to your Claude Desktop, Cursor, or Copilot configuration:</p>
+          <code class="qs-code">{
+  "mcpServers": {
+    "blueprint": {
+      "command": "npx",
+      "args": ["engineering-blueprint", "mcp"]
+    }
+  }
+}</code>
+          <p>Or start it manually:</p>
+          <code class="qs-code">blueprint mcp</code>
+          <p style="color:var(--fog);font-size:13px;margin-top:4px">The server binds to localhost via stdio by default. If exposed beyond localhost, token-based authentication must be configured.</p>
+        </div>
+
+        <div class="mcp-section">
+          <h3>12 Tools</h3>
+          <p>Once connected, your AI agent has access to these tools:</p>
+          <table class="mcp-table">
+            <thead><tr><th>Tool</th><th>What it gives the agent</th></tr></thead>
+            <tbody>
+              <tr><td class="mcp-tool">list_modules</td><td>All 162 modules with function counts and dependency lists</td></tr>
+              <tr><td class="mcp-tool">get_module</td><td>Full contract for one module: functions, types, invariants, constraints</td></tr>
+              <tr><td class="mcp-tool">search_modules</td><td>Find modules by name, summary, or function name</td></tr>
+              <tr><td class="mcp-tool">resolve_deps</td><td>Transitive dependency resolution — every module required by a set</td></tr>
+              <tr><td class="mcp-tool">list_adapters</td><td>Available providers for a module, optionally filtered by language</td></tr>
+              <tr><td class="mcp-tool">get_adapter</td><td>Adapter details including required config fields and secret keys</td></tr>
+              <tr><td class="mcp-tool">get_dependency_graph</td><td>Hard deps, soft deps, reverse deps for a module</td></tr>
+              <tr><td class="mcp-tool">get_database_schema</td><td>Canonical DDL for a module (PostgreSQL, MySQL, MongoDB, SQLite)</td></tr>
+              <tr><td class="mcp-tool">get_saga</td><td>Full saga specification: steps, compensation, failure modes</td></tr>
+              <tr><td class="mcp-tool">get_distributed_patterns</td><td>Recommended patterns: saga, outbox, idempotency table, optimistic locking</td></tr>
+              <tr><td class="mcp-tool">validate_implementation</td><td>Check a code description against contract invariants; returns violations</td></tr>
+              <tr><td class="mcp-tool">suggest_modules</td><td>Given a plain-English description, suggest modules + implementation order</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mcp-section">
+          <h3>What the agent can do</h3>
+          <p>An AI agent with access to the Blueprint MCP server can:</p>
+          <ul class="feature-list">
+            <li><strong>Design a system</strong> — "I need a checkout flow with fraud detection" calls <em>suggest_modules</em> to get the module list, <em>resolve_deps</em> to understand the dependency graph, <em>get_saga</em> to see the checkout flow, and <em>list_adapters</em> to find available providers.</li>
+            <li><strong>Implement a module</strong> — "Implement payments with Stripe" calls <em>get_module</em> to read the full contract, <em>get_adapter</em> to get Stripe-specific config, and <em>get_database_schema</em> for the DDL.</li>
+            <li><strong>Validate an implementation</strong> — "Check my payments code" calls <em>validate_implementation</em> with a code summary and receives a list of invariant violations to fix.</li>
+            <li><strong>Understand a flow</strong> — "What happens during checkout?" calls <em>get_saga</em> to walk through every step, compensation, and failure mode.</li>
+          </ul>
         </div>
       </div>
     </template>
@@ -358,6 +420,7 @@ export default {
     goAdapters() { window.scrollTo(0,0); this.state.view = "adapters"; this.state.currentModule = null; },
     goSagas() { window.scrollTo(0,0); this.state.view = "sagas"; this.state.currentModule = null; },
     goQuickstart() { window.scrollTo(0,0); this.state.view = "quickstart"; this.state.currentModule = null; },
+    goMcp() { window.scrollTo(0,0); this.state.view = "mcp"; this.state.currentModule = null; },
     openModule(m) { window.scrollTo(0,0); this.state.currentModule = m; this.state.view = "contract"; },
     jumpTo(name) {
       const m = this.catalog.modules.find(mm => mm.name === name);

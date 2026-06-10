@@ -293,6 +293,21 @@ body {
   letter-spacing: .01em;
 }
 
+/* === MCP page === */
+.mcp-section { margin-bottom: 36px; }
+.mcp-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.mcp-section p { font-size: 14px; line-height: 1.7; margin-bottom: 10px; color: var(--ink); }
+.mcp-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+.mcp-table thead th {
+  text-align: left; padding: 10px 16px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--fog); border-bottom: 1.5px solid var(--border);
+}
+.mcp-table tbody td { padding: 10px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.mcp-table tbody tr:last-child td { border-bottom: none; }
+.mcp-table tbody tr:hover td { background: var(--slate); }
+.mcp-tool { font-family: var(--mono); font-size: 13px; color: var(--ember); white-space: nowrap; font-weight: 600; }
+
 /* === Back link === */
 .back { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 16px; color: var(--fog); text-decoration: none; font-size: 13px; font-weight: 500; cursor: pointer; }
 .back:hover { color: var(--mint); }
