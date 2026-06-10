@@ -18,7 +18,7 @@ import {
 import { readFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
-import { dirname, resolve as pathResolve } from "node:path";
+import { dirname, resolve as pathResolve, join } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -33,8 +33,9 @@ function getVersion(): string {
 }
 
 function verifyCatalogHash(): void {
-  const pkgPath = pathResolve(__dirname, "../package.json");
-  const minCatalogPath = pathResolve(__dirname, "../dist/catalog.min.json");
+  const pkgDir = pathResolve(__dirname, "..");
+  const pkgPath = join(pkgDir, "package.json");
+  const minCatalogPath = join(pkgDir, "dist", "catalog.min.json");
   if (!existsSync(minCatalogPath)) return;
 
   try {
@@ -75,7 +76,9 @@ async function main() {
   if (args.help) { printHelp(args.command); return; }
   if (args.version) { console.log(`@friehub/blueprint@${getVersion()}`); return; }
 
-  const root = args.root ?? process.cwd();
+  const userRoot = args.root ?? process.cwd();
+  const pkgRoot = pathResolve(__dirname, "..");
+  const root = existsSync(join(pkgRoot, "dist", "catalog.min.json")) ? pkgRoot : userRoot;
   const result = await loadCatalogFromRoot(root, args.strict ? "strict" : "loose");
   checkErrors(result, args.strict ?? false, args.quiet ?? false);
   if (!result.value) { console.error("Failed to load catalog."); process.exit(1); }

@@ -19,6 +19,8 @@ function stripModule(mod) {
     title: mod.title,
     version: mod.version,
     summary: mod.summary,
+    functions: mod.functions,
+    types: mod.types,
     hardDeps: mod.hardDeps,
     softDeps: mod.softDeps,
     coreInherits: mod.coreInherits,
