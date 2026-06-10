@@ -1,3 +1,4 @@
+/* === Design System === */
 :root {
   --ink: #0A0A0A;
   --white: #FFFFFF;
@@ -21,7 +22,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Nav */
+/* === Nav === */
 .nav {
   position: sticky; top: 0;
   background: var(--steel);
@@ -32,9 +33,9 @@ body {
   gap: 28px;
   z-index: 10;
 }
+.nav * { cursor: pointer; }
 .nav-logo { font-size: 17px; font-weight: 700; letter-spacing: -.02em; color: var(--white); text-decoration: none; }
 .nav-logo span { color: var(--mint); }
-.nav * { cursor: pointer; }
 .nav a:not(.nav-logo) {
   color: rgba(255,255,255,0.55);
   text-decoration: none;
@@ -46,16 +47,100 @@ body {
 .nav a.active { color: var(--mint); }
 .nav-right { margin-left: auto; }
 
-/* Main */
-.main { max-width: 1160px; margin: 0 auto; padding: 40px 32px; }
+/* === Main layout === */
+.main { max-width: 1000px; margin: 0 auto; padding: 40px 32px; }
+.section-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.section-sub { color: var(--fog); font-size: 14px; margin-bottom: 24px; }
+.empty { color: var(--fog); margin-top: 20px; font-size: 14px; }
 
-/* Stats bar */
-.stats { display: flex; gap: 4px; margin-bottom: 32px; flex-wrap: wrap; background: var(--slate); border-radius: var(--radius); padding: 4px; }
+/* === Hero === */
+.hero { text-align: center; padding: 72px 24px 56px; }
+.hero-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--slate);
+  color: var(--fog);
+  margin-bottom: 20px;
+}
+.hero-title { font-size: 44px; font-weight: 800; line-height: 1.15; letter-spacing: -.03em; margin-bottom: 14px; }
+.hero-title .mint { color: var(--mint); }
+.hero-sub { font-size: 16px; color: var(--fog); margin-bottom: 28px; }
+.hero-cta { margin-bottom: 28px; }
+.install-cmd {
+  display: inline-block;
+  padding: 12px 24px;
+  background: var(--steel);
+  color: var(--mint);
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-family: var(--mono);
+}
+.hero-demo {
+  display: inline-block;
+  text-align: left;
+  background: var(--slate);
+  border-radius: var(--radius);
+  padding: 16px 24px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 2;
+}
+.demo-line .prompt { color: var(--mint); margin-right: 8px; }
+
+/* === Home sections === */
+.home-section { max-width: 720px; margin: 0 auto 48px; padding: 0 24px; }
+.home-section h2 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+.home-section p { font-size: 15px; color: var(--ink); margin-bottom: 12px; line-height: 1.7; }
+.home-section .stats { margin-top: 8px; }
+
+/* Pipeline */
+.pipeline {
+  display: flex; flex-direction: column; gap: 6px;
+  background: var(--slate);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.pipe-step { display: flex; gap: 12px; align-items: baseline; }
+.pipe-step strong { font-size: 14px; min-width: 90px; }
+.pipe-step span { font-size: 13px; color: var(--fog); }
+.pipe-arrow { color: var(--mint); font-size: 16px; padding-left: 90px; }
+
+/* === Stats === */
+.stats { display: flex; gap: 4px; flex-wrap: wrap; background: var(--slate); border-radius: var(--radius); padding: 4px; }
 .stat { flex: 1; min-width: 120px; text-align: center; padding: 20px 16px; border-radius: 8px; background: var(--white); }
 .stat-num { font-size: 28px; font-weight: 700; color: var(--ink); }
 .stat-label { font-size: 12px; color: var(--fog); margin-top: 2px; font-weight: 500; }
 
-/* Search */
+/* === Quick Start === */
+.qs-step {
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+.qs-step:last-child { border-bottom: none; }
+.qs-num {
+  width: 32px; height: 32px; min-width: 32px;
+  border-radius: 50%;
+  background: var(--mint);
+  color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+}
+.qs-step h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.qs-code {
+  display: block;
+  padding: 10px 14px;
+  background: var(--slate);
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+/* === Search === */
 .search-wrap { position: relative; margin-bottom: 20px; }
 .search-wrap input {
   width: 100%;
@@ -65,16 +150,12 @@ body {
   font-size: 14px;
   font-family: var(--font);
   outline: none;
-  background: var(--white);
   transition: border-color .15s;
 }
 .search-wrap input:focus { border-color: var(--mint); }
-.search-icon {
-  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-  color: var(--fog); font-size: 14px; pointer-events: none;
-}
+.search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--fog); font-size: 14px; pointer-events: none; }
 
-/* Module grid */
+/* === Module grid === */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
 .card {
   background: var(--white);
@@ -84,21 +165,12 @@ body {
   cursor: pointer;
   transition: border-color .2s, box-shadow .2s;
 }
-.saga-card { cursor: pointer; }
-.dep-node { cursor: pointer; }
-.back { cursor: pointer; }
 .card:hover { border-color: var(--mint); box-shadow: 0 4px 12px rgba(28,200,88,0.08); }
 .card h3 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
 .card p { font-size: 13px; color: var(--fog); line-height: 1.5; }
 .card-meta { font-size: 12px; color: var(--fog); margin-top: 8px; font-weight: 500; }
 
-/* Section titles */
-.section-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-.section-sub { color: var(--fog); font-size: 14px; margin-bottom: 24px; }
-
-/* Contract view */
-.contract h2 { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
-.contract-summary { color: var(--fog); font-size: 14px; margin-bottom: 28px; }
+/* === Contract view === */
 .contract section { margin-bottom: 28px; }
 .contract section h3 {
   font-size: 11px; font-weight: 700;
@@ -116,8 +188,16 @@ body {
 }
 .fn-name { color: var(--ember); font-weight: 600; }
 .fn-ret { color: var(--fog); }
+.type-block {
+  padding: 10px 14px;
+  background: var(--slate);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
 
-/* Dep graph */
+/* === Dep graph === */
 .dep-graph { display: flex; flex-direction: column; gap: 4px; }
 .dep-node {
   padding: 8px 14px;
@@ -132,7 +212,7 @@ body {
 .dep-hard { border-left: 3px solid var(--ember); margin-left: 20px; }
 .dep-soft { border-left: 3px solid var(--fog); margin-left: 40px; }
 
-/* Saga */
+/* === Saga === */
 .saga-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
 .saga-card {
   background: var(--white);
@@ -167,12 +247,10 @@ body {
   flex-shrink: 0;
 }
 .saga-comp { font-size: 12px; color: var(--fog); margin-left: 4px; }
-
-/* Invariants list */
 .invariant-list { padding-left: 20px; }
-.invariant-list li { font-size: 13px; margin-bottom: 6px; color: var(--ink); }
+.invariant-list li { font-size: 13px; margin-bottom: 6px; }
 
-/* Adapter table */
+/* === Adapter table === */
 .adapter-table {
   width: 100%;
   border-collapse: separate;
@@ -197,8 +275,8 @@ body {
 }
 .adapter-table tbody tr:last-child td { border-bottom: none; }
 .adapter-table tbody tr:hover td { background: var(--slate); }
-.adapter-table .mod-name { font-weight: 600; font-size: 13px; }
-.adapter-table .provider-list { color: var(--fog); font-size: 13px; }
+.mod-name { font-weight: 600; font-size: 13px; }
+.provider-list { color: var(--fog); font-size: 13px; }
 .lang-badge {
   display: inline-block;
   padding: 2px 7px;
@@ -211,19 +289,6 @@ body {
   letter-spacing: .01em;
 }
 
-/* Types */
-.type-block {
-  padding: 10px 14px;
-  background: var(--slate);
-  border-radius: 8px;
-  margin-bottom: 6px;
-  font-family: var(--mono);
-  font-size: 12.5px;
-}
-
-/* Back link */
+/* === Back link === */
 .back { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 16px; color: var(--fog); text-decoration: none; font-size: 13px; font-weight: 500; cursor: pointer; }
 .back:hover { color: var(--mint); }
-
-/* Type list view */
-.type-list { font-size: 13px; color: var(--fog); line-height: 1.8; }

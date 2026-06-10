@@ -1,81 +1,178 @@
 <template>
   <div class="nav">
-    <a class="nav-logo" @click="state.view = 'modules'; state.query = ''"><span>blue</span>printer</a>
+    <a class="nav-logo" @click="goHome"><span>blue</span>printer</a>
+    <a :class="{ active: state.view === 'home' }" @click="goHome">Home</a>
     <a :class="{ active: state.view === 'modules' }" @click="goModules">Modules</a>
     <a :class="{ active: state.view === 'adapters' }" @click="goAdapters">Adapters</a>
     <a :class="{ active: state.view === 'sagas' }" @click="goSagas">Sagas</a>
+    <a :class="{ active: state.view === 'quickstart' }" @click="goQuickstart">Quick Start</a>
     <a v-if="state.currentModule" :class="{ active: state.view === 'contract' }" @click="state.view = 'contract'">Contract</a>
     <a class="nav-right" href="https://github.com/Friehub/blueprint" target="_blank">GitHub</a>
   </div>
 
-  <div class="main">
-    <div v-if="!state.loaded" style="text-align:center;padding:80px 0;color:var(--fog);font-size:14px">Loading catalog...</div>
-    <template v-if="state.loaded">
+  <template v-if="!state.loaded">
+    <div class="main" style="text-align:center;padding:120px 0;color:var(--fog)">Loading catalog...</div>
+  </template>
 
-    <!-- MODULE BROWSER -->
-    <template v-if="state.view === 'modules'">
-      <div class="stats">
-        <div class="stat"><div class="stat-num">{{ catalog.modules.length }}</div><div class="stat-label">Modules</div></div>
-        <div class="stat"><div class="stat-num">{{ adapterModules }}</div><div class="stat-label">Modules with adapters</div></div>
-        <div class="stat"><div class="stat-num">{{ totalFunctions }}</div><div class="stat-label">Functions</div></div>
-        <div class="stat"><div class="stat-num">{{ catalog.core.length }}</div><div class="stat-label">Core contracts</div></div>
-      </div>
+  <template v-if="state.loaded">
 
-      <div class="search-wrap">
-        <span class="search-icon">&#128269;</span>
-        <input type="text" v-model="state.query" placeholder="Search modules by name, summary, or function..." />
-      </div>
-
-      <div class="grid">
-        <div v-for="m in filteredModules" :key="m.name" class="card" @click="openModule(m)">
-          <h3>{{ m.name }}</h3>
-          <p>{{ m.summary || '' }}</p>
-          <div class="card-meta">{{ m.functions?.length || 0 }} functions</div>
+    <!-- HOME -->
+    <template v-if="state.view === 'home'">
+      <div class="hero">
+        <div class="hero-badge">v0.2.0 &middot; Open Source</div>
+        <h1 class="hero-title">Backend contracts<br/>for <span class="mint">AI agents</span> and engineers</h1>
+        <p class="hero-sub">155 domain modules &middot; 83 adapters &middot; 5 code generators &middot; 12 MCP tools</p>
+        <div class="hero-cta">
+          <code class="install-cmd">npm install -g @friehub/blueprint</code>
+        </div>
+        <div class="hero-demo">
+          <div class="demo-line"><span class="prompt">$</span> blueprint list</div>
+          <div class="demo-line"><span class="prompt">$</span> blueprint inspect payments</div>
+          <div class="demo-line"><span class="prompt">$</span> blueprint generate --lang go --namespace acme</div>
         </div>
       </div>
-      <p v-if="filteredModules.length === 0" style="color:var(--fog);margin-top:20px">No modules match "{{ state.query }}"</p>
+
+      <div class="home-section">
+        <h2>What is Blueprint?</h2>
+        <p>Every backend system is made of the same puzzles: payments, notifications, auth, caching, queues. The implementations differ. The interface does not. Stripe and Paystack both process payments. Twilio and Vonage both send texts. Redis and Memcached both cache things.</p>
+        <p>Blueprint captures that shape. It defines what <strong>initiatePayment</strong> must guarantee, what errors it can throw, and how it behaves under load — once, in one place, so an AI agent or a new team member never has to guess.</p>
+      </div>
+
+      <div class="home-section">
+        <h2>How it works</h2>
+        <div class="pipeline">
+          <div class="pipe-step"><strong>1. Contracts</strong><span>155 markdown files define every function, type, and invariant</span></div>
+          <div class="pipe-arrow">&rarr;</div>
+          <div class="pipe-step"><strong>2. Parser</strong><span>Validates and compiles into a typed catalog</span></div>
+          <div class="pipe-arrow">&rarr;</div>
+          <div class="pipe-step"><strong>3. Catalog</strong><span>Resolved dependency graph with adapter compatibility</span></div>
+          <div class="pipe-arrow">&rarr;</div>
+          <div class="pipe-step"><strong>4. Generators</strong><span>TypeScript, Python, Go, Rust, Java — interfaces, stubs, tests</span></div>
+        </div>
+      </div>
+
+      <div class="home-section">
+        <h2>Stats</h2>
+        <div class="stats">
+          <div class="stat"><div class="stat-num">{{ catalog.modules.length }}</div><div class="stat-label">Module contracts</div></div>
+          <div class="stat"><div class="stat-num">{{ adapterModules }}</div><div class="stat-label">Modules with adapters</div></div>
+          <div class="stat"><div class="stat-num">{{ totalFunctions }}</div><div class="stat-label">Function signatures</div></div>
+          <div class="stat"><div class="stat-num">83</div><div class="stat-label">Provider adapters</div></div>
+          <div class="stat"><div class="stat-num">204</div><div class="stat-label">Tests passing</div></div>
+        </div>
+      </div>
+    </template>
+
+    <!-- QUICK START -->
+    <template v-if="state.view === 'quickstart'">
+      <div class="main">
+        <h2 class="section-title">Quick Start</h2>
+        <div class="qs-step">
+          <div class="qs-num">1</div>
+          <div>
+            <h3>Install</h3>
+            <code class="qs-code">npm install -g @friehub/blueprint</code>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-num">2</div>
+          <div>
+            <h3>Browse the catalog</h3>
+            <code class="qs-code">blueprint list</code>
+            <code class="qs-code">blueprint inspect payments</code>
+            <code class="qs-code">blueprint graph billing</code>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-num">3</div>
+          <div>
+            <h3>Select adapters</h3>
+            <code class="qs-code">blueprint adapters add stripe payments</code>
+            <code class="qs-code">blueprint adapters add redis caching</code>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-num">4</div>
+          <div>
+            <h3>Generate code</h3>
+            <code class="qs-code">blueprint generate --lang python --module payments</code>
+            <code class="qs-code">blueprint generate --lang go --namespace acme</code>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-num">5</div>
+          <div>
+            <h3>Verify implementations</h3>
+            <code class="qs-code">blueprint verify ./src/payments/stripe.ts --module payments</code>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- MODULES -->
+    <template v-if="state.view === 'modules'">
+      <div class="main">
+        <h2 class="section-title">Modules</h2>
+        <p class="section-sub">Browse all {{ catalog.modules.length }} contracts. Click any module to see its functions, types, invariants, and dependencies.</p>
+
+        <div class="search-wrap">
+          <span class="search-icon">&#128269;</span>
+          <input type="text" v-model="state.query" placeholder="Search modules by name, summary, or function..." />
+        </div>
+
+        <div class="grid">
+          <div v-for="m in filteredModules" :key="m.name" class="card" @click="openModule(m)">
+            <h3>{{ m.name }}</h3>
+            <p>{{ m.summary || '' }}</p>
+            <div class="card-meta">{{ m.functions?.length || 0 }} functions &middot; {{ m.hardDeps?.length || 0 }} deps</div>
+          </div>
+        </div>
+        <p v-if="filteredModules.length === 0" class="empty">No modules match "{{ state.query }}"</p>
+      </div>
     </template>
 
     <!-- ADAPTERS -->
     <template v-if="state.view === 'adapters'">
-      <div class="section-title">Adapters</div>
-      <div class="section-sub">Available provider implementations per module</div>
-      <table class="adapter-table">
-        <thead><tr><th>Module</th><th>Providers</th><th>Languages</th></tr></thead>
-        <tbody>
-          <tr v-for="g in adapterGroups" :key="g.module">
-            <td class="mod-name">{{ g.module }}</td>
-            <td class="provider-list">{{ g.adapters.map(a => a.name).join(", ") }}</td>
-            <td>
-              <template v-if="g.hasLangs">
-                <span v-for="(langs, aName) in g.langMap" :key="aName">
-                  <span class="lang-badge">{{ aName }}: {{ langs.join(", ") }}</span>
-                </span>
-              </template>
-              <span v-else style="color:var(--fog);font-size:12px">all languages</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="main">
+        <h2 class="section-title">Adapters</h2>
+        <p class="section-sub">Available provider implementations per module</p>
+        <table class="adapter-table">
+          <thead><tr><th>Module</th><th>Providers</th><th>Languages</th></tr></thead>
+          <tbody>
+            <tr v-for="g in adapterGroups" :key="g.module">
+              <td class="mod-name">{{ g.module }}</td>
+              <td class="provider-list">{{ g.adapters.map(a => a.name).join(", ") }}</td>
+              <td>
+                <template v-if="g.hasLangs">
+                  <span v-for="(langs, aName) in g.langMap" :key="aName" class="lang-badge">{{ aName }}: {{ langs.join(", ") }}</span>
+                </template>
+                <span v-else style="color:var(--fog);font-size:12px">all languages</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </template>
 
-    <!-- SAGAS LIST -->
+    <!-- SAGAS -->
     <template v-if="state.view === 'sagas'">
-      <div class="section-title">Sagas</div>
-      <div class="section-sub">Cross-module business flows with compensation logic</div>
-      <div class="saga-list">
-        <div v-for="s in sagas" :key="s.name" class="saga-card" @click="state.currentSaga = s; state.view = 'saga'">
-          <h3>{{ s.name }}</h3>
-          <p>{{ s.modules.join(" → ") }}</p>
+      <div class="main">
+        <h2 class="section-title">Sagas</h2>
+        <p class="section-sub">Cross-module business flows with compensation logic and failure modes</p>
+        <div class="saga-list">
+          <div v-for="s in sagas" :key="s.name" class="saga-card" @click="state.currentSaga = s; state.view = 'saga'">
+            <h3>{{ s.name }}</h3>
+            <p>{{ s.modules.join(" → ") }}</p>
+          </div>
         </div>
       </div>
     </template>
 
     <!-- SAGA DETAIL -->
     <template v-if="state.view === 'saga' && state.currentSaga">
-      <a class="back" @click="state.view = 'sagas'">&larr; Back to sagas</a>
-      <div class="contract">
-        <h2>{{ state.currentSaga.name }}</h2>
+      <div class="main">
+        <a class="back" @click="goSagas">&larr; Back to sagas</a>
+        <h2 class="section-title">{{ state.currentSaga.name }}</h2>
         <div class="saga-flow">
           <div v-for="(step, i) in state.currentSaga.steps" :key="i" class="saga-step">
             <div class="saga-step-num">{{ i + 1 }}</div>
@@ -96,12 +193,12 @@
 
     <!-- CONTRACT VIEWER -->
     <template v-if="state.view === 'contract' && state.currentModule">
-      <a class="back" @click="state.view = 'modules'; state.currentModule = null">&larr; Back to modules</a>
-      <div class="contract">
-        <h2>{{ state.currentModule.name }}</h2>
-        <div class="contract-summary">{{ state.currentModule.summary || 'No description' }}</div>
+      <div class="main">
+        <a class="back" @click="goModules">&larr; Back to modules</a>
+        <h2 class="section-title">{{ state.currentModule.name }}</h2>
+        <p class="section-sub">{{ state.currentModule.summary || 'No description' }}</p>
 
-        <section v-if="state.currentModule.functions?.length">
+        <section>
           <h3>Functions</h3>
           <div v-for="fn in state.currentModule.functions" :key="fn.name" class="fn-block">
             <span class="fn-name">{{ fn.name }}</span>(
@@ -131,7 +228,6 @@
     </template>
 
   </template>
-  </div>
 </template>
 
 <script>
@@ -140,17 +236,17 @@ const SAGAS = [
     name: "checkout",
     modules: ["cart", "orders", "payments", "inventory", "notifications", "fulfillment"],
     steps: [
-      { action: "validate_cart(cart_id) — verify items available at quoted prices" },
+      { action: "validate_cart(cart_id) — verify items available" },
       { action: "create_order(cart_id, user_id, address) → Order", compensation: "cancel_order" },
       { action: "reserve_inventory(order_id, items[]) → ReservationId", compensation: "release_stock" },
       { action: "initiate_payment(order_id, amount, method) → Payment", compensation: "initiate_refund" },
       { action: "confirm_order(order_id) → Order", compensation: "none (idempotent)" },
-      { action: "[async] emit OrderConfirmed → triggers fulfillment, notification, audit_log" },
+      { action: "[async] emit OrderConfirmed → triggers fulfillment, notification" },
     ],
     invariants: [
       "Payment must never be captured without a corresponding order record",
       "Inventory must never be deducted for a failed or uncaptured payment",
-      "Saga orchestrator holds the idempotency key, not individual steps",
+      "Saga orchestrator holds the idempotency key",
     ],
   },
   {
@@ -159,7 +255,7 @@ const SAGAS = [
     steps: [
       { action: "validate_refund(order_id, amount, reason)" },
       { action: "create_refund_record(order_id, amount, reason) → RefundRecord" },
-      { action: "initiate_refund(payment_id, amount, idempotency_key) → Refund", compensation: "mark as failed" },
+      { action: "initiate_refund(payment_id, amount, idempotency_key) → Refund", compensation: "mark failed" },
       { action: "restore_inventory(order_id, items[])" },
       { action: "update_order_status(order_id, status: returned)" },
       { action: "[async] notify_user(order_id, refund_amount)" },
@@ -172,7 +268,7 @@ const SAGAS = [
       { action: "validate_payment_method(user_id, method)" },
       { action: "create_subscription(user_id, plan_id) → Subscription", compensation: "cancel_subscription" },
       { action: "create_invoice(subscription_id, plan, period) → Invoice" },
-      { action: "charge_invoice(invoice_id, method) → Payment", compensation: "mark as past_due" },
+      { action: "charge_invoice(invoice_id, method) → Payment", compensation: "mark past_due" },
       { action: "[async] grant_entitlements(user_id, plan)" },
     ],
   },
@@ -202,6 +298,7 @@ const SAGAS = [
 
 export default {
   props: ["state"],
+  data() { return { adaptersData: [] }; },
   computed: {
     catalog() { return this.state.catalog; },
     filteredModules() {
@@ -216,7 +313,7 @@ export default {
       return this.catalog.modules.reduce((s, m) => s + (m.functions?.length || 0), 0);
     },
     adapterModules() {
-      return new Set(this.state.adapters.map(a => a.module)).size;
+      return new Set(this.adaptersData.map(a => a.module)).size;
     },
     adapterGroups() {
       const groups = {};
@@ -230,14 +327,19 @@ export default {
     sagas() { return SAGAS; },
   },
   methods: {
-    goModules() { this.state.view = "modules"; this.state.currentModule = null; this.state.query = ""; },
-    goAdapters() { this.state.view = "adapters"; this.state.currentModule = null; },
-    goSagas() { this.state.view = "sagas"; this.state.currentModule = null; },
-    openModule(m) { this.state.currentModule = m; this.state.view = "contract"; },
+    goHome() { window.scrollTo(0,0); this.state.view = "home"; this.state.currentModule = null; },
+    goModules() { window.scrollTo(0,0); this.state.view = "modules"; this.state.currentModule = null; this.state.query = ""; },
+    goAdapters() { window.scrollTo(0,0); this.state.view = "adapters"; this.state.currentModule = null; },
+    goSagas() { window.scrollTo(0,0); this.state.view = "sagas"; this.state.currentModule = null; },
+    goQuickstart() { window.scrollTo(0,0); this.state.view = "quickstart"; this.state.currentModule = null; },
+    openModule(m) { window.scrollTo(0,0); this.state.currentModule = m; this.state.view = "contract"; },
     jumpTo(name) {
       const m = this.catalog.modules.find(mm => mm.name === name);
       if (m) this.openModule(m);
     },
+  },
+  mounted() {
+    this.adaptersData = this.state.adapters;
   },
 };
 </script>
