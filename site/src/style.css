@@ -1,0 +1,180 @@
+:root {
+  --ink: #0A0A0A;
+  --white: #FFFFFF;
+  --green: #1CC858;
+  --ember: #FF5722;
+  --slate: #F4F4F2;
+  --steel: #1A1A1A;
+  --fog: #888888;
+  --green-tint: #0D2B18;
+  --border-dark: rgba(0,0,0,0.12);
+  --border-light: rgba(255,255,255,0.1);
+  --radius: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--white);
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.nav {
+  position: sticky; top: 0;
+  background: var(--ink);
+  color: var(--white);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  z-index: 10;
+}
+.nav h1 { font-size: 18px; font-weight: 600; }
+.nav h1 span { color: var(--green); }
+.nav a {
+  color: var(--fog);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color .15s;
+}
+.nav a:hover { color: var(--white); }
+.nav a.active { color: var(--green); }
+
+.main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+input[type=text] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius);
+  font-size: 15px;
+  outline: none;
+  transition: border-color .15s;
+}
+input[type=text]:focus { border-color: var(--green); }
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.card:hover { border-color: var(--green); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.card h3 { font-size: 15px; margin-bottom: 4px; }
+.card p { font-size: 13px; color: var(--fog); }
+.card .count { font-size: 12px; color: var(--green); margin-top: 8px; }
+
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.contract-view h2 { font-size: 24px; margin-bottom: 4px; }
+.contract-view .summary { color: var(--fog); margin-bottom: 24px; }
+.contract-view section { margin-bottom: 32px; }
+.contract-view section h3 {
+  font-size: 14px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .05em;
+  color: var(--fog); margin-bottom: 12px;
+}
+.contract-view .fn {
+  padding: 12px 16px;
+  background: var(--slate);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 13px;
+}
+.contract-view .fn .name { color: var(--ember); font-weight: 600; }
+.contract-view .fn .ret { color: var(--green); }
+
+.dep-graph {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.dep-graph .node {
+  padding: 8px 16px;
+  background: var(--slate);
+  border-radius: var(--radius);
+  font-size: 13px;
+  margin-left: 0;
+}
+.dep-graph .node.hard { border-left: 3px solid var(--ember); margin-left: 20px; }
+.dep-graph .node.soft { border-left: 3px solid var(--fog); margin-left: 40px; }
+.dep-graph .node.root { border-left: 3px solid var(--green); font-weight: 600; }
+
+.saga-flow {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.saga-flow .step {
+  padding: 10px 16px;
+  background: var(--slate);
+  border-radius: var(--radius);
+  font-size: 13px;
+  display: flex; align-items: center; gap: 12px;
+}
+.saga-flow .step .idx {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--green);
+  color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  flex-shrink: 0;
+}
+.saga-flow .step.comp {
+  opacity: .7;
+  font-size: 12px;
+}
+.saga-flow .step.comp .idx { background: var(--fog); }
+
+.adapter-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-top: 16px;
+}
+.adapter-table th, .adapter-table td {
+  text-align: left;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-dark);
+}
+.adapter-table th {
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--fog);
+}
+.adapter-table tr:hover td { background: var(--slate); }
+.adapter-table .badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--green-tint);
+  color: var(--green);
+  margin-right: 4px;
+}
+
+.back { display: inline-block; margin-bottom: 16px; color: var(--fog); text-decoration: none; font-size: 14px; }
+.back:hover { color: var(--green); }
+
+.stats-row {
+  display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;
+}
+.stat {
+  padding: 16px 24px;
+  background: var(--slate);
+  border-radius: var(--radius);
+  text-align: center;
+}
+.stat .num { font-size: 28px; font-weight: 700; color: var(--green); }
+.stat .label { font-size: 12px; color: var(--fog); margin-top: 2px; }
