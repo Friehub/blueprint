@@ -297,7 +297,7 @@
           <div v-for="fn in state.currentModule.functions" :key="fn.name" class="fn-block">
             <span class="fn-name">{{ fn.name }}</span>(
             <span v-for="(p, i) in fn.params" :key="p.name">
-              {{ p.name }}<span v-if="p.type">: {{ p.type }}</span><span v-if="i < fn.params.length 1">, </span>
+              {{ p.name }}<span v-if="p.type">: {{ p.type }}</span><span v-if="i < fn.params.length - 1">, </span>
             </span>
             ) <span class="fn-ret">&rarr; {{ fn.returns }}</span>
           </div>

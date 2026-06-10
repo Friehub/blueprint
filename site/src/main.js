@@ -3,7 +3,7 @@ import App from "./App.vue";
 import "./style.css";
 
 const state = reactive({
-  view: "modules",
+  view: "home",
   currentModule: null,
   currentSaga: null,
   query: "",
