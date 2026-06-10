@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "cp ../dist/catalog.json public/catalog.json 2>/dev/null; npx vite dev",
+    "build": "npx vite build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

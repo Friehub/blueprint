@@ -1,9 +1,9 @@
 <template>
   <div class="nav">
     <a class="nav-logo" @click="state.view = 'modules'; state.query = ''"><span>blue</span>printer</a>
-    <a :class="{ active: state.view === 'modules' }" @click="state.view = 'modules'; state.query = ''">Modules</a>
-    <a :class="{ active: state.view === 'adapters' }" @click="state.view = 'adapters'">Adapters</a>
-    <a :class="{ active: state.view === 'sagas' }" @click="state.view = 'sagas'">Sagas</a>
+    <a :class="{ active: state.view === 'modules' }" @click="goModules">Modules</a>
+    <a :class="{ active: state.view === 'adapters' }" @click="goAdapters">Adapters</a>
+    <a :class="{ active: state.view === 'sagas' }" @click="goSagas">Sagas</a>
     <a v-if="state.currentModule" :class="{ active: state.view === 'contract' }" @click="state.view = 'contract'">Contract</a>
     <a class="nav-right" href="https://github.com/Friehub/blueprint" target="_blank">GitHub</a>
   </div>
@@ -96,7 +96,7 @@
 
     <!-- CONTRACT VIEWER -->
     <template v-if="state.view === 'contract' && state.currentModule">
-      <a class="back" @click="state.view = 'modules'">&larr; Back to modules</a>
+      <a class="back" @click="state.view = 'modules'; state.currentModule = null">&larr; Back to modules</a>
       <div class="contract">
         <h2>{{ state.currentModule.name }}</h2>
         <div class="contract-summary">{{ state.currentModule.summary || 'No description' }}</div>
@@ -230,6 +230,9 @@ export default {
     sagas() { return SAGAS; },
   },
   methods: {
+    goModules() { this.state.view = "modules"; this.state.currentModule = null; this.state.query = ""; },
+    goAdapters() { this.state.view = "adapters"; this.state.currentModule = null; },
+    goSagas() { this.state.view = "sagas"; this.state.currentModule = null; },
     openModule(m) { this.state.currentModule = m; this.state.view = "contract"; },
     jumpTo(name) {
       const m = this.catalog.modules.find(mm => mm.name === name);
