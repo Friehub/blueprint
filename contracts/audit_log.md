@@ -15,19 +15,24 @@ getEventsByActor(actor_id, options?) → PaginatedResult<AuditEvent>
 getEventsByResource(resource_type, resource_id) → AuditEvent[]
 exportAuditLog(filters, format) → ExportJob
 getEvent(event_id) → AuditEvent
+verifyChain(from, to) → ChainVerificationReport
 ```
 
 **Types**
 ```
-AuditEvent { id, actor, action, resource, changes?, ip_address?, metadata, created_at }
+AuditEvent { id, actor, action, resource, changes?, ip_address?, metadata, created_at, chain_hash, previous_hash? }
 AuditActor { type: user | system | api_key, id, name? }
 AuditResource { type, id, name? }
 ExportFormat = json | csv
+ChainVerificationReport { from, to, total_events, chain_intact: bool, breaks: ChainBreak[] }
+ChainBreak { index, event_id, expected_previous_hash, actual_previous_hash, reason }
 ```
 
 **Invariants**
 - Audit events must never be deleted or modified after creation
 - `recordEvent` must be non-blocking -- it must not add latency to the calling operation
+- Each new audit event must include a `chain_hash` computed from the event content concatenated with the `chain_hash` of the preceding event, forming an immutable hash chain
+- `verifyChain` must detect any break in the chain: a missing event, a modified event hash, or an inconsistency between the stored `previous_hash` and the actual hash of the preceding event. Any break must be surfaced immediately in the `ChainVerificationReport`
 
 **Providers:** custom append-only table, Axiom, Datadog, custom event stream
 

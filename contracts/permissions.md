@@ -14,6 +14,8 @@ canAll(user_id, actions, resource) → boolean
 canAny(user_id, actions, resource) → boolean
 grantPermission(user_id, action, resource) → void
 revokePermission(user_id, action, resource) → void
+denyPermission(user_id, action, resource, reason?) → void
+revokeDeny(user_id, action, resource) → void
 getPermissions(user_id) → Permission[]
 createRole(name, permissions) → Role
 assignRole(user_id, role_id) → void
@@ -24,11 +26,14 @@ assignRole(user_id, role_id) → void
 Permission { action, resource, conditions? }
 Role { id, name, permissions }
 AccessDecision = allowed | denied
+ExplicitDeny { user_id, action, resource, reason?, created_at }
 ```
 
 **Invariants**
 - `can` must be deterministic for the same inputs at the same instant
 - Role inheritance must be acyclic
+- An explicit deny for the requesting identity always overrides any role-level grant -- deny wins over allow when both are present for the same identity, action, and resource combination
+- `denyPermission` must take effect immediately and must not require cache invalidation or propagation delay
 
 **Providers:** Casbin, custom RBAC, AWS IAM, OPA
 

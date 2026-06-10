@@ -10,6 +10,7 @@ export interface ParsedArgs {
   generateSubcommand: GenerateSubcommand | undefined;
   root: string | undefined;
   strict: boolean | undefined;
+  strictVersion: boolean | undefined;
   help: boolean | undefined;
   version: boolean | undefined;
   output: string | undefined;
@@ -30,7 +31,7 @@ export interface ParsedArgs {
   unknown: string[];
 }
 
-const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name", "--minimal", "--prompts", "--adapter", "--namespace", "--aliases", "--obfuscate"]);
+const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name", "--minimal", "--prompts", "--adapter", "--namespace", "--aliases", "--obfuscate", "--strict-version"]);
 const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters", "generate", "prototype", "schema", "verify", "implement", "mcp"]);
 const ADAPTER_SUBCOMMANDS = new Set(["list", "add", "remove", "show", "verify", "search"]);
 const GENERATE_SUBCOMMANDS = new Set(["interfaces", "adapters", "tests", "all"]);
@@ -43,6 +44,7 @@ export function parseArguments(args: string[]): ParsedArgs {
     generateSubcommand: undefined,
     root: undefined,
     strict: undefined,
+    strictVersion: undefined,
     help: undefined,
     version: undefined,
     output: undefined,
@@ -126,6 +128,8 @@ export function parseArguments(args: string[]): ParsedArgs {
       parsed.root = args[++i];
     } else if (arg === "--strict") {
       parsed.strict = true;
+    } else if (arg === "--strict-version") {
+      parsed.strictVersion = true;
     } else if (arg === "--help" || arg === "-h") {
       parsed.help = true;
     } else if (arg === "--version" || arg === "-v") {

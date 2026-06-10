@@ -31,13 +31,14 @@ Appeal { id, violation_id, reason, evidence?, status: pending|approved|rejected,
 AppealResolution { appeal_id, decision: approved|rejected, reviewer, reason, resolved_at }
 SafetyStats { total_checked, total_flagged, total_blocked, appeals_filed, appeals_upheld, appeals_rejected }
 SafetyOptions { policies?: string[], threshold?, include_explanation?, mode: sync|async }
-Policy = hate_speech | harassment | violence | self_harm | sexual | spam | misinformation | illegal
+Policy = hate_speech | harassment | violence | self_harm | sexual | spam | misinformation | illegal | prompt_injection
 ```
 
 **Invariants**
 - `checkContent` must never return `safe: true` when any active policy decision has `passed: false`
 - A violation reported by the `automated` source must be reviewed by a human before it is permanently resolved
 - `appealViolation` on a violation that is already under appeal must return the existing appeal, not create a duplicate
+- Any content passed to `llm_gateway` functions must be screened by `checkContent` with the `prompt_injection` policy enabled before it is used as part of a prompt
 
 **Providers:** OpenAI Moderation API, Perspective API, Azure Content Safety, AWS Comprehend, custom classifier
 

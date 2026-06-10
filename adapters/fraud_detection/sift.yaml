@@ -14,7 +14,11 @@ implements:
   - isBlocked
   - getRiskHistory
 
-does_not_implement: []
+does_not_implement:
+  - submitFeedback
+  - getFeedbackHistory
+  - requestBlockReview
+  - resolveBlockReview
 
 config:
   required:

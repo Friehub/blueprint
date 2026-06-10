@@ -27,6 +27,11 @@ ProcessingJob { id, asset_id, status, result_url?, created_at }
 Transformation { width?, height?, format?, quality?, crop? }
 ```
 
+**Invariants**
+- Any URL submitted for media processing, upload, or transcoding must be validated against a configured allowlist of permitted domains before the URL is used
+- Any URL that resolves to a private IP address range (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8) or a cloud metadata endpoint (169.254.169.254) must be rejected unconditionally
+- Redirect following must be disabled or constrained to the originally allowed domain
+
 **Providers:** Cloudinary, AWS MediaConvert + S3, Uploadcare, imgix
 
 ---

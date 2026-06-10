@@ -369,6 +369,31 @@ export async function handleVerify(result: { value: Catalog | null }, config: Pa
   }
   const verification = await verifyImplementation(config.target, config.module, result.value!, verifyAliases, config.obfuscate);
 
+  // Version check (E-1): compare adapter version against catalog
+  if (config.provider) {
+    const { loadAdapter } = await import("../core/adapters/load.js");
+    const adaptersDir = join(root, "adapters");
+    const { adapter } = await loadAdapter(adaptersDir, config.module, config.provider);
+    if (adapter) {
+      const mod = result.value!.modules.find((m) => m.name === config.module);
+      if (mod && mod.version) {
+        const adapterMajor = parseInt(adapter.version.split(".")[0] ?? "0", 10);
+        const catalogMajor = parseInt(mod.version.split(".")[0] ?? "0", 10);
+        if (adapterMajor < catalogMajor) {
+          const msg = `Version mismatch: adapter ${config.provider} v${adapter.version} is behind contract v${mod.version}. Update the adapter.`;
+          if (config.strictVersion) {
+            console.error(msg);
+            process.exit(1);
+          } else {
+            console.warn(`Warning: ${msg}`);
+          }
+        } else if (adapterMajor > catalogMajor) {
+          console.warn(`Warning: adapter ${config.provider} v${adapter.version} is ahead of contract v${mod.version}. Update the contract first.`);
+        }
+      }
+    }
+  }
+
   if (verification.issues.length > 0) {
     console.error(`Verification issues for ${config.module}:`);
     for (const issue of verification.issues) {

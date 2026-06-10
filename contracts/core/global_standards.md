@@ -194,3 +194,99 @@ export const metadata = {
   adapter_version: "2.0.1",
 }
 ```
+
+---
+
+## 8. Transport Security
+
+These requirements are inherited by every module in the catalog unless a specific exception is declared in the module's system-level integrations section.
+
+### 8.1 TLS Requirement
+
+All external-facing endpoints must be served exclusively over TLS 1.2 or higher. TLS 1.0 and 1.1 are not permitted. Connections received without TLS must either be rejected outright or redirected to the HTTPS counterpart with a `301 Moved Permanently` status.
+
+### 8.2 Cipher Requirements
+
+Implementations must support only ciphers that provide forward secrecy (ECDHE or DHE key exchange). Ciphers using static RSA key exchange, NULL encryption, or RC4 are not permitted.
+
+### 8.3 Inter-Service Communication
+
+All communication between services within the same deployment must use TLS. Mutual TLS (mTLS) is strongly recommended and is required for any service that handles PII, financial data, or authentication tokens on behalf of another service.
+
+Where mTLS is not feasible (proxied environments, sidecar termination), the module must declare the mechanism by which service identity is verified (header-based tokens, network policy, or workload identity).
+
+### 8.4 HSTS
+
+Every browser-facing endpoint must send the `Strict-Transport-Security` header with a minimum `max-age` of 31536000 seconds (1 year) and the `includeSubDomains` directive. The `preload` directive should be included if the domain is submitted to browser preload lists.
+
+API-only endpoints that are never consumed by browsers are exempt from the HSTS requirement but must still serve over TLS.
+
+### 8.5 Certificate Requirements
+
+Certificates must be issued by a trusted public Certificate Authority or, for internal services, by an internal CA whose root is distributed to all services in the deployment. Self-signed certificates are permitted only for development and test environments.
+
+### 8.6 Exception Process
+
+---
+
+## 11. Deployment Permissions
+
+### 11.1 Service Identity Isolation
+
+Each module must have its own service identity and must not share credentials with other modules. Service identities must be scoped to the module's own data stores and resources.
+
+### 11.2 Credential Separation
+
+Each module's service identity must have access only to the data stores it owns. Modules must not have write access to tables or buckets owned by other modules even if they have read access for cross-module queries.
+
+### 11.3 Minimum Permission Declaration
+
+The deployment documentation for each module must declare the minimum permission set required: which databases, queues, caches, and external services the module needs access to, and whether each access is read or write. A module that fails to declare its permission set must be denied by default at deployment time.
+
+A module may declare an exception to any transport security requirement by documenting the following in its system-level integrations section:
+
+- The specific requirement being exempted
+- The reason for the exemption (e.g. "TLS is terminated at the load balancer; internal traffic runs on a private network with network policies")
+- The compensating control that replaces the exempted requirement
+- The review date after which the exemption expires and must be reassessed
+
+Exceptions must have a defined expiry and cannot be permanent.
+
+---
+
+## 9. Request Validation
+
+The `request_validation` module defines universal payload validation requirements. Every module that accepts external input inherits the following by default:
+
+- Payload size must be validated against a declared maximum before any processing
+- String fields must be validated against an allowed character set
+- Structured inputs must be validated against their declared type before business logic runs
+- Inputs used in database queries, shell commands, template rendering, or HTML/XML output must pass through context-aware escaping or parameterisation
+
+Modules may declare exceptions in their system-level integrations section with a documented compensating control.
+
+---
+
+## 10. Brute Force Protection
+
+These requirements apply universally to every credential-checking function across all modules. A credential-checking function is any function that accepts a secret or token and returns a boolean pass/fail decision that gates access to a protected resource. This includes but is not limited to: password verification, API key validation, TOTP verification, recovery code use, backup code use, and password reset token submission.
+
+### 10.1 Attempt Limits
+
+Each credential-checking function must enforce a maximum of 5 failed attempts per identity within a rolling 15-minute window. The count must be per-function and per-identity -- a failure on `signIn` must not affect the limit on `verifyTotp` for the same identity.
+
+### 10.2 Lockout
+
+When the attempt limit is exceeded, the identity must be locked for a minimum of 15 minutes. During lockout, all credential-checking functions for that identity must return a generic `rate_limited` error. The lockout must not reveal whether the identity exists in the system.
+
+### 10.3 Distributed Attacks
+
+For distributed attacks where failed attempts originate from multiple IP addresses, the lockout must be based on identity, not source IP. A single identity locked out from one IP must be locked out from all IPs. Conversely, IP-based rate limiting (handled by the `rate_limiting` module) applies independently and must not be confused with credential lockout.
+
+### 10.4 Notification
+
+When a lockout is triggered, the module must emit an event consumable by the `notifications` and `security_monitoring` modules. The event must include the identity identifier, the function that triggered the lockout, and the lockout duration, but must not include the attempted credential value.
+
+### 10.5 Administrator Override
+
+An authorized administrator may unlock a locked identity before the lockout expiry. The override must be recorded in `audit_log` with the administrator identity, the target identity, the reason for override, and the timestamp. The override must not disable the lockout mechanism for future attempts.

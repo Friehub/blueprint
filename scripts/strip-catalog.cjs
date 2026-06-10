@@ -7,7 +7,7 @@
  * The full catalog.json stays in the repo for development.
  * catalog.min.json ships in the npm package.
  */
-const { readFileSync, writeFileSync } = require("fs");
+const { readFileSync, writeFileSync, existsSync, unlinkSync } = require("fs");
 const { join } = require("path");
 
 const ROOT = join(__dirname, "..");
@@ -44,6 +44,12 @@ const minified = {
 
 const outPath = join(ROOT, "dist", "catalog.min.json");
 writeFileSync(outPath, JSON.stringify(minified, null, 2));
+
+// Remove full catalog.json from dist -- only catalog.min.json ships to npm
+const fullPath = join(ROOT, "dist", "catalog.json");
+if (existsSync(fullPath)) unlinkSync(fullPath);
+
 console.log(`Stripped ${full.modules.length} modules + ${full.core.length} core to dist/catalog.min.json`);
 console.log(`  Full: ${JSON.stringify(full).length} bytes`);
 console.log(`  Min:  ${JSON.stringify(minified).length} bytes`);
+console.log(`  Removed full catalog.json from dist (not needed at runtime)`);

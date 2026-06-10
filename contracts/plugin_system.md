@@ -17,26 +17,33 @@ unloadPlugin(plugin_id) → void
 enablePlugin(plugin_id) → void
 disablePlugin(plugin_id) → void
 validateInterface(plugin_id) → ValidationReport
+verifyPluginSignature(plugin_id) → SignatureVerification
 listHooks() → HookPoint[]
 triggerHook(hook_name, context) → HookResult
+registerPublisher(publisher_id, public_key) → void
+removePublisher(publisher_id) → void
 ```
 
 **Types**
 ```
 Plugin { id, name, version, description, hooks: string[], dependencies: string[], status: registered|loaded|active|disabled|error, manifest: PluginManifest }
-PluginManifest { name, version, author, requires, hooks, config_schema, permissions }
+PluginManifest { name, version, author, requires, hooks, config_schema, permissions, signature?, publisher_id? }
 ValidationReport { plugin_id, valid: bool, interface_errors: InterfaceError[], dependency_errors: string[] }
 InterfaceError { hook, expected, actual, severity }
 HookPoint { name, description, parameters, return_type }
 HookResult { hook_name, results: HandlerResult[], aggregated, errors }
 HandlerResult { plugin_id, success, data?, error? }
 PluginPermissions { filesystem?, network?, environment?, process? }
+SignatureVerification { plugin_id, valid: bool, publisher_id, message }
+Publisher { id, name, public_key, status: active|revoked, created_at }
 ```
 
 **Invariants**
 - A plugin must declare all the hooks it implements — implementing an undeclared hook is a contract violation
 - Plugins must be isolated from each other — one plugin's failure must not affect other plugins or the host application
 - `disablePlugin` must not unload the plugin from memory — it must only prevent it from responding to hooks
+- Every plugin must carry a valid signature from a registered publisher before it can be loaded, regardless of source. `loadPlugin` must call `verifyPluginSignature` and reject loading if the signature is invalid or the publisher is not in the registry.
+- The `PluginManifest` must include a `signature` field and a `publisher_id` field. A manifest missing either is not valid for loading.
 
 **Providers:** custom, PluginB, Webpack (loader system), VSCode (extension host)
 

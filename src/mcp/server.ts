@@ -472,6 +472,8 @@ async function startMCP() {
   await server.connect(transport);
   console.error("Engineering Blueprinter MCP server running on stdio");
   console.error(`Root directory: ${ROOT_DIR}`);
+  console.error("SECURITY: This server binds to localhost by default via stdio.");
+  console.error("If you expose it beyond localhost, you MUST configure token-based authentication.");
 }
 
 startMCP().catch((err) => {

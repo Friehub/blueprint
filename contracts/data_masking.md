@@ -17,6 +17,7 @@ anonymize(value, strategy) → AnonymizedValue
 registerMaskingRule(name, config) → MaskingRule
 listMaskingRules(data_type?) → MaskingRule[]
 redactLog(log_entry, rules) → RedactedEntry
+scanForPii(document_or_schema) → PiiClassification[]
 ```
 
 **Types**
@@ -29,6 +30,7 @@ AnonymizedValue { original_type, anonymized, strategy: generalization|perturbati
 MaskingRule { id, name, data_type, field_pattern, strategy, reversible, created_at }
 RedactedEntry { original, redacted, rules_applied: string[] }
 MaskingConfig { strategy, character, preserve_prefix?, preserve_suffix?, regex_pattern?, reversible? }
+PiiClassification { field, category: email|phone|ssn|credit_card|address|name|dob|ip|custom, confidence, suggested_strategy }
 ```
 
 **Invariants**
@@ -104,4 +106,4 @@ gensense_data_masking_operations_total          { strategy }
 ### Module Dependencies
 * **Depends On:** encryption
 * **Emits To:** (none)
-* **Recommends:** audit_log, config
+* **Recommends:** audit_log, config, data_catalog (classification rules derived from schema metadata can seed the masking rule registry automatically)

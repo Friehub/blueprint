@@ -26,6 +26,9 @@ ApiKeyValidation { valid, user_id?, scopes?, reason? }
 **Invariants**
 - The raw key must only be returned at creation time, never again
 - `validateApiKey` must update `last_used_at` without blocking the response
+- Generated keys must have a minimum entropy of 128 bits. Keys must be encoded using base64url or hex format.
+- Every generated key must include a mandatory prefix that identifies the key type (e.g. `sk_live_` for live secret keys, `pk_test_` for test publishable keys). The prefix scheme must allow programmatic distinction between credential types and enable GitHub secret scanning pattern matching.
+- Key material must be stored using a slow, key-stretching hashing algorithm (bcrypt with cost >= 10, scrypt, or Argon2id). Fast hashes (SHA-256, MD5) are not acceptable for key storage.
 
 ---
 

@@ -13,10 +13,14 @@ scoreTransaction(transaction, context) → RiskScore
 scoreSignUp(data, context) → RiskScore
 scoreLogin(user_id, context) → RiskScore
 reportFraud(transaction_id, reason) → FraudReport
-blockEntity(entity_type, entity_id, reason) → void
+blockEntity(entity_type, entity_id, reason, options?) → void
 unblockEntity(entity_type, entity_id) → void
 isBlocked(entity_type, entity_id) → boolean
 getRiskHistory(entity_type, entity_id) → RiskScore[]
+submitFeedback(entity_type, entity_id, outcome, metadata) → FeedbackEvent
+getFeedbackHistory(entity_type, entity_id) → FeedbackEvent[]
+requestBlockReview(entity_type, entity_id, reason) → BlockReview
+resolveBlockReview(review_id, decision, reason) → void
 ```
 
 **Types**
@@ -24,7 +28,15 @@ getRiskHistory(entity_type, entity_id) → RiskScore[]
 RiskScore { score, level: low|medium|high|critical, signals, recommendation: allow|review|block }
 FraudReport { id, entity_type, entity_id, reason, reporter_id, created_at }
 RiskContext { ip_address, device_fingerprint?, geo?, user_agent? }
+FeedbackEvent { id, entity_type, entity_id, outcome: confirmed_fraud|false_positive|incorrect_scoring, metadata, submitted_by, created_at }
+BlockReview { id, entity_type, entity_id, reason, status: pending|approved|rejected, requested_by, created_at, resolved_at? }
+BlockOptions { reason, expires_at?, review_required?: bool }
 ```
+
+**Invariants**
+- Every `blockEntity` call must specify a stated reason. Blocks created by automated scoring must be reviewable by a human operator through `requestBlockReview`.
+- A `blockEntity` call without an `expires_at` or without a declared review schedule is a contract violation.
+- A block created by automated scoring that is later resolved through `resolveBlockReview` must feed back into the scoring model via `submitFeedback` to improve future accuracy.
 
 **Providers:** Sift, Sardine, custom ML, rules engine
 

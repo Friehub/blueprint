@@ -37,6 +37,7 @@ Capability = chat | streaming | tools | vision | json_mode | function_calling
 - `chat` must return a complete response; partial or interrupted responses must surface an error
 - `chatStream` must emit a final chunk with `done: true` and accumulated usage when complete
 - The gateway must enforce `context_window` limits -- if total tokens exceed the model's limit, it must reject or truncate rather than silently fail
+- All user-supplied inputs passed to `chat` or `chatStream` must be screened by `content_safety.checkContent` with the `prompt_injection` policy enabled before being used as part of a prompt. Requests containing prompt injection must be rejected.
 
 **Providers:** OpenAI, Anthropic, Google Vertex AI, AWS Bedrock, NVIDIA NIM, Ollama, together.ai, custom
 
@@ -116,6 +117,6 @@ gensense_llm_gateway_requests_total           { model, provider, status }
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none -- wraps external provider API)
+* **Depends On:** content_safety
 * **Emits To:** events
 * **Recommends:** caching (for response caching), telemetry, rate_limiting

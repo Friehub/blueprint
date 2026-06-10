@@ -30,6 +30,9 @@ SignedUrl { url, expires_at, method: GET | PUT }
 **Invariants**
 - Signed upload URLs must enforce `content_type` and `max_size` constraints when provided
 - `deleteFile` must be idempotent -- deleting a non-existent key must not throw
+- Any URL submitted for signed upload, copy, or move must be validated against a configured allowlist of permitted domains or CIDR ranges before the URL is used
+- Any URL that resolves to a private IP address range (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8) or a cloud metadata endpoint (169.254.169.254) must be rejected unconditionally
+- Redirect following must be disabled or constrained to the originally allowed domain
 
 **Providers:** AWS S3, Cloudflare R2, Supabase Storage, MinIO, local disk
 

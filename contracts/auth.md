@@ -32,6 +32,13 @@ AuthProvider = email | google | github | apple | microsoft | phone
 - `signIn` must not return a Session for unverified accounts when verification is required
 - `refreshToken` must reject expired or revoked refresh tokens
 - `requestPasswordReset` must not reveal whether an email exists in the system
+- Any state-mutating function callable via a browser session must require a CSRF token in addition to the session token. The CSRF token must be validated before any state change occurs.
+- CSRF tokens must be cryptographically random, bound to the issuing session, and invalidated on session expiry or revocation
+- Completion of any authentication step that elevates privilege must trigger a new session identifier -- the pre-authentication session must be invalidated and replaced. This applies to initial authentication, MFA completion, role elevation, and tenant or workspace switches
+- `signIn` must return the same error and response timing whether the failure is caused by an unknown identity or an incorrect credential. Both cases must be indistinguishable to the caller in response body, status code, and response time.
+- `signUp` must return a generic success response whether or not the provided email or identifier already exists in the system. Follow-up actions (such as account verification) must be handled out-of-band, not revealed in the sign-up response.
+- All credential comparisons in `signIn` must use a constant-time comparison function to prevent timing side-channel leaks of which validation step failed
+- When a user has MFA enabled, `signIn` must return a session with `status: partial` after successful first-factor authentication. A full `status: active` session must not be issued until MFA is completed. No operation requiring an authenticated session may proceed against a `partial` session.
 
 **Providers:** Supabase Auth, Auth0, Clerk, Firebase Auth, custom JWT
 

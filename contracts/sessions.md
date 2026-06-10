@@ -19,12 +19,15 @@ extendSession(session_id) → Session
 
 **Types**
 ```
-Session { id, user_id, device, ip_address?, created_at, last_active_at, expires_at }
+Session { id, user_id, device, ip_address?, created_at, last_active_at, expires_at, status: partial|active|suspicious }
 ```
 
 **Invariants**
 - Revoked sessions must not be reactivated
 - `getSessions` must return active sessions only unless `include_revoked: true` is passed
+- Session cookies must set `SameSite` to `Strict` or `Lax`, `HttpOnly`, and `Secure` when the connection is over HTTPS
+- A session identifier must be regenerated on authentication completion and on every privilege escalation (MFA completion, role elevation, tenant switch)
+- When a request arrives using a session token and the request context differs materially from the session's creation context, the module must set `status` to `suspicious` and emit an event consumable by `security_monitoring` and `fraud_detection`. A material difference includes: country change, device class change, or simultaneous use from two geographically distant locations. The definition of material difference must be a configurable policy.
 
 **Providers:** Redis, database, JWT stores
 

@@ -182,6 +182,7 @@ type ListSecretsInput = {
 6. Deprecated versions are retained for a minimum of 7 days after rotation to allow in-flight consumers to migrate; deletion before 7 days is a contract violation.
 7. `updateSecretValue` and `confirmRotation` must increment `currentVersion` atomically; concurrent rotation calls must be serialised per secret.
 8. Expired secrets (past `expiresAt`) transition to `DEPRECATED` automatically; `getSecretValue` on an expired secret returns `SECRET_EXPIRED`.
+9. Callers of `getSecretValue` and any other function that evaluates `SecretGrant` must present a verifiable identity token before any grant evaluation occurs. An unauthenticated caller must receive `UNAUTHENTICATED`, not `ACCESS_DENIED`. The `UNAUTHENTICATED` response must be indistinguishable in timing and body from the response an authenticated caller receives when their grant check fails, so that neither the existence of the secret nor the grant state can be inferred from the error alone.
 
 ---
 

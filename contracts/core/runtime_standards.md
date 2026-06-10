@@ -109,3 +109,27 @@ If a module uses queues, workers, webhooks, retries, or high-volume operational 
 ## 7. Inheritance Rule
 
 All module contracts inherit this file by default. Module docs should reference it explicitly and only restate the runtime rules that differ from the shared standard.
+
+---
+
+## 8. DDoS Mitigation
+
+### 8.1 Perimeter Defence Declaration
+
+Every module that exposes a publicly reachable endpoint must declare its DDoS mitigation strategy in its system-level integrations section. The declaration must state whether the module relies on an external managed mitigation layer (Cloudflare, AWS Shield, GCP Cloud Armor, Azure DDoS Protection) or implements its own mitigation.
+
+### 8.2 Mitigation Layer Availability
+
+The module must specify its behaviour when the mitigation layer is unavailable -- whether the module continues serving traffic at reduced capacity, enters a read-only mode, or shuts down non-critical endpoints. A module that continues serving must document the maximum sustained request rate it can handle without the mitigation layer.
+
+### 8.3 Unauthenticated Request Rate
+
+Any module that exposes a publicly reachable endpoint must declare its maximum acceptable unauthenticated request rate. This rate applies to requests that have not yet proven identity through any authentication mechanism. The rate must be expressed as requests per second per source IP, with a default maximum of 100 requests per second unless the module documents a higher limit.
+
+### 8.4 Unauthenticated Rate Limit Tier
+
+Requests without proven identity form a distinct rate limit scope from authenticated requests. The `rate_limiting` module must apply a more aggressive rate limit to this tier -- by default, unauthenticated limits must be at least 10x stricter than authenticated limits for the same endpoint. A module that cannot maintain this ratio must document the reason.
+
+### 8.5 Connection Flood Handling
+
+Modules that accept persistent connections (WebSocket, SSE, long-poll) must declare a maximum connection rate per source IP. Excess connections beyond the declared rate must be rejected with a `429` response before a connection is established. The module must not accept a connection only to close it after detecting overload -- rejection must happen before resource allocation.

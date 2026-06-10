@@ -30,6 +30,12 @@ DeliveryStatus = pending | success | failed
 **Invariants**
 - Failed deliveries must be retried with exponential backoff up to a configurable maximum
 - Payloads must be signed with the endpoint secret using HMAC-SHA256
+- Endpoint registration must be rejected if no secret is provided -- a non-empty secret is mandatory
+- Every dispatched payload must include a canonical timestamp in the signature input
+- The receiver must reject any delivery where the timestamp in the signature is older than 5 minutes -- replay attacks with captured valid signatures are ineffective after this window
+- Any URL submitted for endpoint registration must be validated against a configured allowlist of permitted domains before the URL is used
+- Any URL that resolves to a private IP address range (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8) or a cloud metadata endpoint (169.254.169.254) must be rejected unconditionally
+- Redirect following must be disabled or constrained to the originally allowed domain
 
 **Providers:** custom implementation, Svix, Hookdeck
 
