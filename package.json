@@ -91,14 +91,14 @@
     "build": "tsc -p tsconfig.json && node scripts/build-catalog.cjs && node scripts/strip-catalog.cjs && node scripts/hash-catalog.cjs",
     "check": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit --strict",
-    "test": "npx tsx --test 'src/**/*.test.ts'",
-    "test:mcp": "npx tsx --test 'src/mcp/*.test.ts'",
+    "test": "node --test 'dist/**/*.test.js'",
+    "test:mcp": "node --test 'dist/mcp/*.test.js'",
     "precommit": "bash scripts/pre-commit.sh",
     "check:publish": "bash scripts/check-publish.sh",
     "test:integration": "npm run build && bash scripts/integration-test.sh",
     "prerelease": "npm run build && bash scripts/pre-commit.sh",
     "link": "npm run build && npm link",
-    "docs": "npm run build && cp dist/catalog.json site/public/catalog.json && cd site && npx vite build"
+    "docs": "npm run build && cp dist/catalog.json site/public/catalog.json && cd site && npm ci && npx vite build"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",

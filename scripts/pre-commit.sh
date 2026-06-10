@@ -35,9 +35,9 @@ fi
 echo ""
 
 # 3. Run all tests
-echo "--- Running all tests (170 expected) ---"
+echo "--- Running all tests ---"
 set +e
-npx tsx --test 'src/**/*.test.ts' 2>&1
+node --test dist/**/*.test.js 2>&1
 TEST_EXIT=$?
 set -e
 if [ "$TEST_EXIT" -eq 0 ]; then
