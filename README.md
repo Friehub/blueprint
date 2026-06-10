@@ -284,19 +284,11 @@ v0.3.0 targets: C# generator, Kotlin generator, RAG index, `design_system` MCP t
 
 ## Contributing
 
-Submit a PR adding a contract `.md` file that satisfies the four inclusion rules. Include or justify the absence of adapter definitions for at least one provider. The parser rejects malformed contracts in CI.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add contracts, adapters, and generators.
 
-Run `bash scripts/pre-commit.sh` before committing. This checks strict TypeScript compilation, builds dist + compiled catalog, runs all tests, validates catalog loading, smoke-tests generation in all 5 languages, and validates adapter language declarations.
+To report a security vulnerability, see [SECURITY.md](SECURITY.md).
 
-For new adapters, declare language support in the YAML:
-
-```yaml
-name: my_provider
-module: payments
-languages: [typescript, python, go]
-```
-
-If omitted, the adapter defaults to all 5 languages.
+Our community standards are documented in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ---
 
