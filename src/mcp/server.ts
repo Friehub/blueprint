@@ -470,7 +470,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function startMCP() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Engineering Blueprinter MCP server running on stdio");
+  console.error("Blueprint MCP server running on stdio");
   console.error(`Root directory: ${ROOT_DIR}`);
   console.error("SECURITY: This server binds to localhost by default via stdio.");
   console.error("If you expose it beyond localhost, you MUST configure token-based authentication.");

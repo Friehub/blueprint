@@ -1,4 +1,4 @@
-# Engineering Blueprinter
+# Blueprint
 
 Every backend system is made of the same puzzles: payments, notifications, auth, caching, queues. The implementations differ. The interface does not. Stripe and Paystack both process payments. Twilio and Vonage both send texts. Redis and Memcached both cache things.
 
