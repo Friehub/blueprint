@@ -7,3 +7,4 @@ scenario/
 generated/
 my-saas/
 .DS_Store
+*.tgz
