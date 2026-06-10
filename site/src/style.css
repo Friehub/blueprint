@@ -95,6 +95,9 @@ body {
 .home-section h2 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
 .home-section p { font-size: 15px; color: var(--ink); margin-bottom: 12px; line-height: 1.7; }
 .home-section .stats { margin-top: 8px; }
+.feature-list { padding-left: 20px; margin-top: 8px; }
+.feature-list li { font-size: 14px; line-height: 1.7; margin-bottom: 10px; }
+.feature-list li strong { color: var(--mint); }
 
 /* Pipeline */
 .pipeline {
@@ -130,6 +133,7 @@ body {
   font-size: 14px; font-weight: 700;
 }
 .qs-step h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.qs-text { font-size: 14px; color: var(--ink); line-height: 1.7; margin: 8px 0; }
 .qs-code {
   display: block;
   padding: 10px 14px;

@@ -2,10 +2,10 @@
   <div class="nav">
     <a class="nav-logo" @click="goHome"><span>blue</span>printer</a>
     <a :class="{ active: state.view === 'home' }" @click="goHome">Home</a>
+    <a :class="{ active: state.view === 'quickstart' }" @click="goQuickstart">Quick Start</a>
     <a :class="{ active: state.view === 'modules' }" @click="goModules">Modules</a>
     <a :class="{ active: state.view === 'adapters' }" @click="goAdapters">Adapters</a>
     <a :class="{ active: state.view === 'sagas' }" @click="goSagas">Sagas</a>
-    <a :class="{ active: state.view === 'quickstart' }" @click="goQuickstart">Quick Start</a>
     <a v-if="state.currentModule" :class="{ active: state.view === 'contract' }" @click="state.view = 'contract'">Contract</a>
     <a class="nav-right" href="https://github.com/Friehub/blueprint" target="_blank">GitHub</a>
   </div>
@@ -36,6 +36,14 @@
         <h2>What is Blueprint?</h2>
         <p>Every backend system is made of the same puzzles: payments, notifications, auth, caching, queues. The implementations differ. The interface does not. Stripe and Paystack both process payments. Twilio and Vonage both send texts. Redis and Memcached both cache things.</p>
         <p>Blueprint captures that shape. It defines what <strong>initiatePayment</strong> must guarantee, what errors it can throw, and how it behaves under load — once, in one place, so an AI agent or a new team member never has to guess.</p>
+        <p>The catalog covers the full backend surface area: billing, orders, inventory, search, queuing, fraud detection, AI/ML gateways, data pipelines, compliance, real-time collaboration, infrastructure primitives, and more. Each module is a self-contained contract specifying its function signatures, data types, behavioural invariants, system-level constraints (consistency, delivery, multi-region), and dependencies on other modules.</p>
+        <p>Because every contract follows the same strict structure, the entire catalog can be parsed, validated, and reasoned about programmatically. This enables four capabilities that a collection of markdown files cannot provide:</p>
+        <ul class="feature-list">
+          <li><strong>Dependency resolution</strong> — selecting <em>billing</em> automatically pulls in <em>payments</em>, <em>users</em>, <em>notifications</em>, <em>audit_log</em>, and <em>usage_metering</em>. The resolver walks the full transitive graph so you know the true cost of every module before you start implementing.</li>
+          <li><strong>Multi-language code generation</strong> — from a single contract, generators produce typed interfaces, adapter skeletons, and conformance tests in TypeScript, Python, Go, Rust, and Java. The same contract works across your entire stack.</li>
+          <li><strong>Provider abstraction</strong> — the payments contract is identical whether backed by Stripe, Paystack, or Adyen. Switching providers means changing one line in your adapter selection, not rewriting business logic. Each adapter declares exactly which functions it implements and which it explicitly does not.</li>
+          <li><strong>AI agent integration</strong> — the MCP server exposes all 155 modules, their dependencies, database schemas, sagas, and distributed patterns as 12 tools that AI agents can query directly over stdio.</li>
+        </ul>
       </div>
 
       <div class="home-section">
@@ -67,43 +75,61 @@
     <template v-if="state.view === 'quickstart'">
       <div class="main">
         <h2 class="section-title">Quick Start</h2>
+        <p class="section-sub">From zero to generated code in five steps.</p>
+
         <div class="qs-step">
           <div class="qs-num">1</div>
           <div>
-            <h3>Install</h3>
+            <h3>Install the CLI</h3>
             <code class="qs-code">npm install -g @friehub/blueprint</code>
+            <p class="qs-text">This installs the <strong>blueprint</strong> command, all 5 code generators, the MCP server, and the adapter registry. The contract catalog is compiled into the package so no separate download is needed.</p>
           </div>
         </div>
+
         <div class="qs-step">
           <div class="qs-num">2</div>
           <div>
-            <h3>Browse the catalog</h3>
-            <code class="qs-code">blueprint list</code>
-            <code class="qs-code">blueprint inspect payments</code>
+            <h3>Understand modules and their overlap</h3>
+            <p class="qs-text">Modules are not isolated islands. Most modules depend on others. When you select <strong>billing</strong>, you also get <strong>payments</strong>, <strong>users</strong>, <strong>notifications</strong>, <strong>audit_log</strong>, and <strong>usage_metering</strong> — the resolver walks the full transitive graph automatically. This is not a limitation; it is the point. A billing system that does not notify users or log changes is incomplete.</p>
+            <p class="qs-text">The dependency graph reveals overlaps before you write code. If two modules share a dependency, that component needs to exist once and be shared. If a module's dependency chain is too expensive for what it provides, you know before committing to implementation. The resolver makes these trade-offs visible, not hidden.</p>
+            <p class="qs-text">To see the full cost of a module:</p>
+            <code class="qs-code">blueprint resolve --modules billing</code>
             <code class="qs-code">blueprint graph billing</code>
+            <p class="qs-text">The first command lists every module that billing requires. The second draws a visual tree showing hard dependencies (required) and soft dependencies (recommended).</p>
           </div>
         </div>
+
         <div class="qs-step">
           <div class="qs-num">3</div>
           <div>
             <h3>Select adapters</h3>
+            <p class="qs-text">Each module can be backed by different providers. The payments contract is the same whether you use Stripe, Paystack, or Adyen. Select the providers for your project:</p>
             <code class="qs-code">blueprint adapters add stripe payments</code>
             <code class="qs-code">blueprint adapters add redis caching</code>
+            <code class="qs-code">blueprint adapters add bullmq queues</code>
+            <p class="qs-text">The adapter selection is stored in <strong>blueprint.json</strong>. Every adapter declares which contract functions it implements and which it does not. CI validates that no function is left uncovered accidentally.</p>
           </div>
         </div>
+
         <div class="qs-step">
           <div class="qs-num">4</div>
           <div>
             <h3>Generate code</h3>
+            <p class="qs-text">Each generator produces three artefacts per module: a typed interface (what you code against), an adapter skeleton (wired to the real SDK with TODO stubs), and a conformance test (proves the adapter satisfies the contract).</p>
+            <code class="qs-code">blueprint generate --lang typescript</code>
             <code class="qs-code">blueprint generate --lang python --module payments</code>
             <code class="qs-code">blueprint generate --lang go --namespace acme</code>
+            <p class="qs-text">Use <strong>--namespace</strong> to prefix all generated identifiers with a project name, <strong>--aliases</strong> to replace function names via a JSON5 map, or <strong>--obfuscate</strong> to replace all names with deterministic hashes from a secret seed.</p>
           </div>
         </div>
+
         <div class="qs-step">
           <div class="qs-num">5</div>
           <div>
-            <h3>Verify implementations</h3>
+            <h3>Verify and iterate</h3>
+            <p class="qs-text">Check that your implementation satisfies the contract:</p>
             <code class="qs-code">blueprint verify ./src/payments/stripe.ts --module payments</code>
+            <p class="qs-text">Verification checks that every contract function is implemented, return types match, and nothing required is missing. If you use aliases or obfuscation, pass the same flags to verify for accurate reverse-mapping.</p>
           </div>
         </div>
       </div>
