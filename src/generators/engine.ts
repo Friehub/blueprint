@@ -11,6 +11,8 @@ import type {
   LanguageGenerator,
 } from "./types.js";
 
+import type { AliasMap } from "./types.js";
+
 export type GenerateOptions = {
   language: Language;
   type: GenerationType;
@@ -18,6 +20,8 @@ export type GenerateOptions = {
   provider?: string;
   outputDir: string;
   namespace?: string;
+  aliases?: AliasMap;
+  obfuscate?: string;
 };
 
 export type EngineResult = {
@@ -59,6 +63,8 @@ export async function generate(
     provider: options.provider,
   };
   if (options.namespace) context.namespace = options.namespace;
+  if (options.aliases) context.aliases = options.aliases;
+  if (options.obfuscate) context.obfuscate = options.obfuscate;
 
   let result: GeneratorResult;
 

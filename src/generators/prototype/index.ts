@@ -1,7 +1,8 @@
 import type { Catalog, ModuleContract } from "../../core/catalog.js";
 import type { AdapterDefinition } from "../../core/adapters/types.js";
-import type { GeneratedFile, GeneratorResult } from "../types.js";
+import type { GeneratedFile, GeneratorResult, AliasMap } from "../types.js";
 import { pascalCase, camelCase } from "../types.js";
+import { resolveConfigAlias } from "../aliases.js";
 
 export type PrototypeOptions = {
   name: string;
@@ -9,6 +10,7 @@ export type PrototypeOptions = {
   adapters: Record<string, string>;
   outputDir: string;
   language?: string;
+  aliases?: AliasMap;
 };
 
 export function generatePrototype(
@@ -24,7 +26,7 @@ export function generatePrototype(
     files.push(generateTsConfig());
     files.push(generateGitignore());
     files.push(generateReadme(options, adapters));
-    files.push(generateEnvExample(adapters));
+    files.push(generateEnvExample(adapters, Object.keys(options.adapters), options.aliases));
     files.push(generateConfig(options, adapters, catalog));
     files.push(generateEntryPoint(options, adapters, catalog));
   } catch (error) {
@@ -116,7 +118,7 @@ function generateReadme(options: PrototypeOptions, adapters: AdapterDefinition[]
     path: "README.md",
     content: `# ${options.name}
 
-Generated scaffold from Engineering Blueprinter contracts.
+Generated project scaffold.
 
 Language: ${langLabel}
 Modules: ${options.modules.length}
@@ -146,16 +148,29 @@ ${buildCmd}
   };
 }
 
-function generateEnvExample(adapters: AdapterDefinition[]): GeneratedFile {
-  const lines: string[] = ["# Environment Variables", ""];
+function generateEnvExample(adapters: AdapterDefinition[], selectedModules: string[], aliases?: AliasMap): GeneratedFile {
+  const selected = adapters.filter((a) => selectedModules.includes(a.module));
 
-  for (const adapter of adapters) {
-    lines.push(`# ${adapter.description || adapter.name}`);
+  const lines: string[] = [
+    "# Environment Variables",
+    "# WARNING: Never commit this file with real values.",
+    "# Add .env to your .gitignore and use a secrets manager in production.",
+    "",
+  ];
+
+  for (const adapter of selected) {
+    lines.push(`# ${adapter.description || adapter.module} (${adapter.name})`);
     for (const field of adapter.config.required) {
       if (field.secret) {
-        lines.push(`${field.name.toUpperCase()}=your_${field.name}_here`);
+        const aliased = resolveConfigAlias(field.name, aliases);
+        lines.push(`${aliased.toUpperCase()}=your_${aliased}_here`);
       }
     }
+    lines.push("");
+  }
+
+  if (selected.length === 0) {
+    lines.push("# No adapters selected. Run 'blueprint adapters add <provider> <module>' first.");
     lines.push("");
   }
 
@@ -185,10 +200,11 @@ function generateConfig(options: PrototypeOptions, adapters: AdapterDefinition[]
 
     const configFields = adapter.config.required
       .map((f) => {
+        const aliased = resolveConfigAlias(f.name, options.aliases);
         if (f.secret) {
-          return `  ${f.name}: process.env.${f.name.toUpperCase()}!,`;
+          return `  ${aliased}: process.env.${aliased.toUpperCase()}!,`;
         }
-        return `  ${f.name}: process.env.${f.name.toUpperCase()} || '',`;
+        return `  ${aliased}: process.env.${aliased.toUpperCase()} || '',`;
       })
       .join("\n");
 

@@ -1,5 +1,7 @@
 import { readFile } from "node:fs/promises";
 import type { Catalog, ModuleContract, ContractFunction } from "./catalog.js";
+import type { AliasMap } from "../generators/types.js";
+import { obfuscateName } from "../generators/aliases.js";
 
 export type VerificationIssue = {
   module: string;
@@ -23,6 +25,8 @@ export async function verifyImplementation(
   implementationFile: string,
   moduleName: string,
   catalog: Catalog,
+  aliases?: AliasMap,
+  obfuscateSeed?: string,
 ): Promise<VerificationResult> {
   const mod = catalog.modules.find((m) => m.name === moduleName);
 
@@ -55,16 +59,26 @@ export async function verifyImplementation(
   const implFns = extractFunctions(content);
 
   for (const fn of mod.functions) {
-    const implFn = implFns.find((f) => f.name === fn.name);
+    const expectedName = fn.name;
+    const aliasedOrObfuscated = obfuscateSeed
+      ? obfuscateName(obfuscateSeed, expectedName)
+      : aliases?.functions?.[expectedName] ?? expectedName;
+
+    // Try matching by aliased/obfuscated name first, then by contract name
+    const implFn = implFns.find((f) => f.name === aliasedOrObfuscated)
+      ?? implFns.find((f) => f.name === expectedName);
 
     if (!implFn) {
       const expectedSig = formatSignature(fn);
+      const msg = aliasedOrObfuscated !== expectedName
+        ? `Missing: "${expectedName}" (aliased as "${aliasedOrObfuscated}")`
+        : `Missing: ${expectedSig}`;
       issues.push({
         module: moduleName,
         kind: "missing",
         function: fn.name,
         expected: expectedSig,
-        message: `Missing: ${expectedSig}`,
+        message: msg,
       });
     } else {
       const issues = compareReturnTypes(fn, implFn, moduleName);

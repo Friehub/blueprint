@@ -2,6 +2,7 @@ import type { ModuleContract, ContractFunction } from "../../core/catalog.js";
 import type { AdapterDefinition } from "../../core/adapters/types.js";
 import { adapterSupportsLanguage } from "../../core/adapters/types.js";
 import type { Language, GeneratorContext, GeneratorResult, GeneratedFile, LanguageGenerator } from "../types.js";
+import { resolveAlias, resolveModuleAlias, resolveClassAlias, resolveConfigAlias, obfuscateName } from "../aliases.js";
 import { pascalCase, camelCase, mapType } from "../types.js";
 import {
   generateTypeDefinition,
@@ -16,6 +17,31 @@ export class JavaGenerator implements LanguageGenerator {
   name = "Java Generator";
   protected context: GeneratorContext | null = null;
 
+  private nsPath(base: string): string {
+    return this.context?.namespace ? `${pascalCase(this.context.namespace)}/${base}` : base;
+  }
+
+  private resolveFnName(name: string): string {
+    if (this.context?.obfuscate) return obfuscateName(this.context.obfuscate, name);
+    return resolveAlias(name, this.context?.aliases);
+  }
+
+  private resolveModName(name: string): string {
+    if (this.context?.obfuscate) return obfuscateName(this.context.obfuscate, name);
+    return resolveModuleAlias(name, this.context?.aliases);
+  }
+
+  private resolveClsName(name: string, provider: string): string {
+    if (this.context?.obfuscate) return obfuscateName(this.context.obfuscate, provider + "_" + name);
+    const defaultName = `${pascalCase(provider)}Adapter`;
+    return resolveClassAlias(defaultName, this.context?.aliases);
+  }
+
+  private resolveCfgName(name: string): string {
+    if (this.context?.obfuscate) return obfuscateName(this.context.obfuscate, name);
+    return resolveConfigAlias(name, this.context?.aliases);
+  }
+
   generateInterfaces(context: GeneratorContext): GeneratorResult {
     this.context = context;
     const files: GeneratedFile[] = [];
@@ -24,7 +50,7 @@ export class JavaGenerator implements LanguageGenerator {
 
     for (const mod of modules) {
       try {
-        files.push({ path: `interfaces/${pascalCase(mod.name)}Contract.java`, content: this.generateModuleInterface(mod) });
+        files.push({ path: this.nsPath(`interfaces/${pascalCase(this.resolveModName(mod.name))}Contract.java`), content: this.generateModuleInterface(mod) });
       } catch (error) {
         errors.push(`Failed to generate interface for ${mod.name}: ${error instanceof Error ? error.message : error}`);
       }
@@ -47,7 +73,7 @@ export class JavaGenerator implements LanguageGenerator {
       try {
         const mod = context.catalog.modules.find((m) => m.name === adapter.module);
         if (!mod) { errors.push(`Module ${adapter.module} not found for adapter ${adapter.name}`); continue; }
-        files.push({ path: `adapters/${pascalCase(adapter.name)}Adapter.java`, content: this.generateAdapterClass(adapter, mod) });
+        files.push({ path: this.nsPath(`adapters/${pascalCase(adapter.name)}Adapter.java`), content: this.generateAdapterClass(adapter, mod) });
       } catch (error) {
         errors.push(`Failed to generate adapter ${adapter.name}: ${error instanceof Error ? error.message : error}`);
       }
@@ -69,7 +95,7 @@ export class JavaGenerator implements LanguageGenerator {
       try {
         const mod = context.catalog.modules.find((m) => m.name === adapter.module);
         if (!mod) { errors.push(`Module ${adapter.module} not found for adapter ${adapter.name}`); continue; }
-        files.push({ path: `__tests__/${adapter.name}AdapterTest.java`, content: this.generateConformanceTest(adapter, mod) });
+        files.push({ path: this.nsPath(`__tests__/${adapter.name}AdapterTest.java`), content: this.generateConformanceTest(adapter, mod) });
       } catch (error) {
         errors.push(`Failed to generate test for ${adapter.name}: ${error instanceof Error ? error.message : error}`);
       }
@@ -95,12 +121,11 @@ export class JavaGenerator implements LanguageGenerator {
   }
 
   private generateModuleInterface(mod: ModuleContract): string {
-    const versionNote = mod.version ? `v${mod.version}` : "version not specified";
     const ns = this.context?.namespace ? `${pascalCase(this.context.namespace)}_` : "";
-    const interfaceName = `${ns}${pascalCase(mod.name)}Contract`;
+    const interfaceName = `${ns}${pascalCase(this.resolveModName(mod.name))}Contract`;
     const lines: string[] = [
-      `// ${interfaceName}.java — ${versionNote} — contracts/${mod.name}.md`,
-      `// Auto-generated from contracts/${mod.name}.md -- namespace: "${this.context?.namespace ?? "none"}"`,
+      `// ${interfaceName}.java`,
+      `// Do not edit directly. Generated code.`,
       "",
       "import java.util.Optional;",
       "import java.util.concurrent.CompletableFuture;",
@@ -108,8 +133,9 @@ export class JavaGenerator implements LanguageGenerator {
       `public interface ${interfaceName} {`,
     ];
     for (const fn of mod.functions) {
-      const ret = mapType(fn.returns, "java");
-      lines.push(`    CompletableFuture<${ret}> ${camelCase(fn.name)}(${generateParamsList(fn)});`);
+      const aliasedFn = { ...fn, name: this.resolveFnName(fn.name) };
+      const ret = mapType(aliasedFn.returns, "java");
+      lines.push(`    CompletableFuture<${ret}> ${camelCase(aliasedFn.name)}(${generateParamsList(aliasedFn)});`);
     }
     lines.push("}");
     return lines.join("\n");
@@ -117,12 +143,12 @@ export class JavaGenerator implements LanguageGenerator {
 
   private generateAdapterClass(adapter: AdapterDefinition, mod: ModuleContract): string {
     const ns = this.context?.namespace ? `${pascalCase(this.context.namespace)}_` : "";
-    const interfaceName = `${ns}${pascalCase(mod.name)}Contract`;
+    const interfaceName = `${ns}${pascalCase(this.resolveModName(mod.name))}Contract`;
     const adapterPascal = pascalCase(adapter.name);
-    const className = `${ns}${adapterPascal}Adapter`;
+    const className = `${ns}${this.resolveClsName(adapter.name, adapter.name)}`;
     const lines: string[] = [
       `// ${className}.java`,
-      `// Auto-generated adapter for ${adapter.name} → ${mod.name} -- namespace: "${this.context?.namespace ?? "none"}"`,
+      `// Do not edit directly. Generated code.`,
       "",
       "import java.util.Optional;",
       "import java.util.concurrent.CompletableFuture;",
@@ -131,26 +157,27 @@ export class JavaGenerator implements LanguageGenerator {
     ];
 
     for (const f of adapter.config.required) {
-      lines.push(`    private final ${mapType(f.type, "java")} ${camelCase(f.name)};`);
+      lines.push(`    private final ${mapType(f.type, "java")} ${camelCase(this.resolveCfgName(f.name))};`);
     }
     lines.push("");
 
-    const configArgs = adapter.config.required.map((f) => `${mapType(f.type, "java")} ${camelCase(f.name)}`).join(", ");
+    const configArgs = adapter.config.required.map((f) => `${mapType(f.type, "java")} ${camelCase(this.resolveCfgName(f.name))}`).join(", ");
     lines.push(`    public ${className}(${configArgs}) {`);
     for (const f of adapter.config.required) {
-      lines.push(`        this.${camelCase(f.name)} = ${camelCase(f.name)};`);
+      lines.push(`        this.${camelCase(this.resolveCfgName(f.name))} = ${camelCase(this.resolveCfgName(f.name))};`);
     }
     lines.push("    }");
     lines.push("");
 
     for (const fn of mod.functions) {
+      const aliasedFn = { ...fn, name: this.resolveFnName(fn.name) };
       if (adapter.implements.includes(fn.name)) {
-        lines.push(this.generateAdapterMethod(fn));
+        lines.push(this.generateAdapterMethod(aliasedFn));
       } else {
         const msg = adapter.does_not_implement?.includes(fn.name)
           ? `Not supported by ${adapter.name}: ${fn.name}`
           : `Not yet implemented: ${fn.name}`;
-        lines.push(this.generateUnimplementedMethod(fn, msg));
+        lines.push(this.generateUnimplementedMethod(aliasedFn, msg));
       }
     }
     lines.push("}");
@@ -170,12 +197,12 @@ export class JavaGenerator implements LanguageGenerator {
   }
 
   private generateConformanceTest(adapter: AdapterDefinition, mod: ModuleContract): string {
-    const interfaceName = `${pascalCase(mod.name)}Contract`;
+    const interfaceName = `${pascalCase(this.resolveModName(mod.name))}Contract`;
     const adapterPascal = pascalCase(adapter.name);
-    const className = `${adapterPascal}Adapter`;
+    const className = this.resolveClsName(adapter.name, adapter.name);
     const lines: string[] = [
       `// ${className}Test.java`,
-      `// Auto-generated conformance test for ${adapter.name} → ${mod.name}`,
+      `// Do not edit directly. Generated code.`,
       "",
       "import org.junit.jupiter.api.Test;",
       "import static org.junit.jupiter.api.Assertions.*;",

@@ -5,12 +5,21 @@ export type Language = "typescript" | "rust" | "python" | "go" | "java";
 
 export type GenerationType = "interfaces" | "adapters" | "tests" | "all";
 
+export interface AliasMap {
+  functions?: Record<string, string>;
+  modules?: Record<string, string>;
+  classes?: Record<string, string>;
+  config?: Record<string, string>;
+}
+
 export interface GeneratorContext {
   catalog: Catalog;
   adapters: AdapterDefinition[];
   module: string | undefined;
   provider: string | undefined;
   namespace?: string;
+  aliases?: AliasMap;
+  obfuscate?: string;
 }
 
 export interface GeneratedFile {

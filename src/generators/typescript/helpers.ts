@@ -94,7 +94,7 @@ export function generateSharedTypes(): string {
 
 export function generateIndex(moduleNames: string[]): string {
   const lines: string[] = [
-    "// Auto-generated module index",
+    "// Generated module index",
     "",
     "export * from './shared.js';",
     "",

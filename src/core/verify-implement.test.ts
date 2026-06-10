@@ -132,3 +132,44 @@ describe("implement edge cases", () => {
     }
   });
 });
+
+  it("detects aliased functions when reverse map is provided", async () => {
+    const result = await loadCatalogFromRoot(ROOT, "loose");
+    const moduleName = "payments";
+    const tmpFile = "/tmp/blueprint-verify-test/aliased_payments.ts";
+    const { writeFileSync, mkdirSync } = await import("node:fs");
+    mkdirSync("/tmp/blueprint-verify-test", { recursive: true });
+    writeFileSync(tmpFile, "async chargeCustomer(orderId: string, amount: number, currency: string, method: string): Promise<Payment> {\n  return {} as Payment;\n}");
+
+    // Without aliases: initiatePayment should be missing
+    const noAliases = await verifyImplementation(tmpFile, moduleName, result.value!);
+    const initiatedMissing = noAliases.issues.find((i) => i.function === "initiatePayment");
+    assert.ok(initiatedMissing, "initiatePayment should be missing without aliases");
+
+    // With aliases: should find by aliased name
+    const aliases = { functions: { initiatePayment: "chargeCustomer" } };
+    const withAliases = await verifyImplementation(tmpFile, moduleName, result.value!, aliases);
+    const stillMissing = withAliases.issues.find((i) => i.function === "initiatePayment");
+    assert.ok(!stillMissing, "initiatePayment should not be missing when aliased to chargeCustomer");
+  });
+
+  it("detects obfuscated functions when seed is provided", async () => {
+    const result = await loadCatalogFromRoot(ROOT, "loose");
+    const moduleName = "payments";
+    const { obfuscateName } = await import("../generators/aliases.js");
+    const obfuscated = obfuscateName("test-seed", "initiatePayment");
+    const tmpFile = "/tmp/blueprint-verify-test/obfuscated_payments.ts";
+    const { writeFileSync, mkdirSync } = await import("node:fs");
+    mkdirSync("/tmp/blueprint-verify-test", { recursive: true });
+    writeFileSync(tmpFile, "async " + obfuscated + "(orderId: string, amount: number, currency: string, method: string): Promise<Payment> {\n  return {} as Payment;\n}");
+
+    // Without seed: initiatePayment should be missing
+    const noSeed = await verifyImplementation(tmpFile, moduleName, result.value!);
+    const missingNoSeed = noSeed.issues.find((i) => i.function === "initiatePayment");
+    assert.ok(missingNoSeed, "initiatePayment should be missing without seed");
+
+    // With seed: should find by obfuscated name
+    const withSeed = await verifyImplementation(tmpFile, moduleName, result.value!, undefined, "test-seed");
+    const missingWithSeed = withSeed.issues.find((i) => i.function === "initiatePayment");
+    assert.ok(!missingWithSeed, "initiatePayment should not be missing when obfuscated with correct seed");
+  });

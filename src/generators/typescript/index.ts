@@ -3,6 +3,7 @@ import type { AdapterDefinition } from "../../core/adapters/types.js";
 import { adapterSupportsLanguage } from "../../core/adapters/types.js";
 import type { Language, GeneratorContext, GeneratorResult, GeneratedFile, LanguageGenerator } from "../types.js";
 import { pascalCase, camelCase, mapType } from "../types.js";
+import { resolveAlias, resolveModuleAlias, resolveClassAlias, resolveConfigAlias, obfuscateName } from "../aliases.js";
 import { generateTypeDefinition, generateFunctionSignature, generateParamsList, generateIndex, getSdkHint, generateSharedTypes } from "./helpers.js";
 
 const SDK_IMPORTS: Record<string, string> = {
@@ -30,22 +31,48 @@ export class TypeScriptGenerator implements LanguageGenerator {
   name = "TypeScript Generator";
   protected context: GeneratorContext | null = null;
 
+  private nsPath(base: string): string {
+    return this.context?.namespace ? `${pascalCase(this.context.namespace)}/${base}` : base;
+  }
+
+  private resolveFnName(name: string): string {
+    if (this.context?.obfuscate) return obfuscateName(this.context.obfuscate, name);
+    return resolveAlias(name, this.context?.aliases);
+  }
+
+  private resolveModName(name: string): string {
+    if (this.context?.obfuscate) return obfuscateName(this.context.obfuscate, name);
+    return resolveModuleAlias(name, this.context?.aliases);
+  }
+
+  private resolveClsName(name: string, provider: string): string {
+    if (this.context?.obfuscate) return obfuscateName(this.context.obfuscate, provider + "_" + name);
+    const defaultName = `${pascalCase(provider)}Adapter`;
+    return resolveClassAlias(defaultName, this.context?.aliases);
+  }
+
+  private resolveCfgName(name: string): string {
+    if (this.context?.obfuscate) return obfuscateName(this.context.obfuscate, name);
+    return resolveConfigAlias(name, this.context?.aliases);
+  }
+
   generateInterfaces(context: GeneratorContext): GeneratorResult {
     this.context = context;
     const files: GeneratedFile[] = [];
     const errors: string[] = [];
     let modules = this.resolveModules(context);
 
-    files.push({ path: "interfaces/shared.ts", content: generateSharedTypes() });
+    files.push({ path: this.nsPath("interfaces/shared.ts"), content: generateSharedTypes() });
 
     for (const mod of modules) {
       try {
-        files.push({ path: `interfaces/${mod.name}.ts`, content: this.generateModuleInterface(mod) });
+        const aliasedName = this.resolveModName(mod.name);
+        files.push({ path: this.nsPath(`interfaces/${aliasedName}.ts`), content: this.generateModuleInterface(mod) });
       } catch (error) {
         errors.push(`Failed to generate interface for ${mod.name}: ${error instanceof Error ? error.message : error}`);
       }
     }
-    files.push({ path: "interfaces/index.ts", content: generateIndex(modules.map((m) => m.name)) });
+    files.push({ path: this.nsPath("interfaces/index.ts"), content: generateIndex(modules.map((m) => this.resolveModName(m.name))) });
     return { files, errors };
   }
 
@@ -64,7 +91,8 @@ export class TypeScriptGenerator implements LanguageGenerator {
       try {
         const mod = context.catalog.modules.find((m) => m.name === adapter.module);
         if (!mod) { errors.push(`Module ${adapter.module} not found for adapter ${adapter.name}`); continue; }
-        files.push({ path: `adapters/${adapter.module}/${adapter.name}.ts`, content: this.generateAdapterClass(adapter, mod) });
+        const aliasedMod = this.resolveModName(adapter.module);
+        files.push({ path: this.nsPath(`adapters/${aliasedMod}/${adapter.name}.ts`), content: this.generateAdapterClass(adapter, mod) });
       } catch (error) {
         errors.push(`Failed to generate adapter ${adapter.name}: ${error instanceof Error ? error.message : error}`);
       }
@@ -86,7 +114,8 @@ export class TypeScriptGenerator implements LanguageGenerator {
       try {
         const mod = context.catalog.modules.find((m) => m.name === adapter.module);
         if (!mod) { errors.push(`Module ${adapter.module} not found for adapter ${adapter.name}`); continue; }
-        files.push({ path: `__tests__/${adapter.module}/${adapter.name}.test.ts`, content: this.generateConformanceTest(adapter, mod) });
+        const aliasedMod = this.resolveModName(adapter.module);
+        files.push({ path: this.nsPath(`__tests__/${aliasedMod}/${adapter.name}.test.ts`), content: this.generateConformanceTest(adapter, mod) });
       } catch (error) {
         errors.push(`Failed to generate test for ${adapter.name}: ${error instanceof Error ? error.message : error}`);
       }
@@ -112,53 +141,58 @@ export class TypeScriptGenerator implements LanguageGenerator {
   }
 
   private generateModuleInterface(mod: ModuleContract): string {
-    const versionNote = mod.version ? `v${mod.version}` : "version not specified";
     const ns = this.context?.namespace ? `${pascalCase(this.context.namespace)}_` : "";
+    const aliasedModName = pascalCase(this.resolveModName(mod.name));
     const lines: string[] = [
-      `// ${mod.name}.ts — ${versionNote} — contracts/${mod.name}.md`,
-      `// Auto-generated from contracts/${mod.name}.md -- namespace: "${this.context?.namespace ?? "none"}"`,
-      `// Types are inferred from naming conventions. Review before production use.`,
+      `// ${ns}${aliasedModName}Contract`,
+      `// Do not edit directly. Generated code.`,
       "",
     ];
     for (const type of mod.types) {
       lines.push(generateTypeDefinition(type));
       lines.push("");
     }
-    const interfaceName = `${ns}${pascalCase(mod.name)}Contract`;
+    const interfaceName = `${ns}${aliasedModName}Contract`;
     lines.push(`export interface ${interfaceName} {`);
-    for (const fn of mod.functions) lines.push(generateFunctionSignature(fn));
+    for (const fn of mod.functions) {
+      const aliasedFn = { ...fn, name: this.resolveFnName(fn.name) };
+      lines.push(generateFunctionSignature(aliasedFn));
+    }
     lines.push("}");
     return lines.join("\n");
   }
 
   private generateAdapterClass(adapter: AdapterDefinition, mod: ModuleContract): string {
     const ns = this.context?.namespace ? `${pascalCase(this.context.namespace)}_` : "";
+    const aliasedModName = pascalCase(this.resolveModName(mod.name));
+    const aliasedInterface = `${ns}${aliasedModName}Contract`;
+    const className = `${ns}${this.resolveClsName(adapter.name, adapter.name)}`;
     const lines: string[] = [
       `// ${adapter.name}.ts`,
-      `// Auto-generated adapter for ${adapter.name} → ${mod.name} -- namespace: "${this.context?.namespace ?? "none"}"`,
-      `// Types are inferred from naming conventions. Review before production use.`,
+      `// Do not edit directly. Generated code.`,
       "",
       getSdkImport(adapter.name),
-      `import type { ${ns}${pascalCase(mod.name)}Contract } from '../interfaces/${mod.name}';`,
+      `import type { ${aliasedInterface} } from '../interfaces/${this.resolveModName(mod.name)}';`,
       "",
     ];
 
-    const className = `${ns}${pascalCase(adapter.name)}Adapter`;
-    const configFields = adapter.config.required.map((f) => `  ${f.name}: ${mapType(f.type, "typescript")};`).join("\n");
-    lines.push(`export class ${className} implements ${pascalCase(mod.name)}Contract {`);
+    const configFields = adapter.config.required.map((f) => `  ${this.resolveCfgName(f.name)}: ${mapType(f.type, "typescript")};`).join("\n");
+    lines.push(`export class ${className} implements ${aliasedInterface} {`);
     lines.push(`  constructor(private config: {`);
     lines.push(configFields);
     lines.push(`  }) {}`);
     lines.push("");
 
     for (const fn of mod.functions) {
+      const aliasedName = this.resolveFnName(fn.name);
+      const aliasedFn = { ...fn, name: aliasedName };
       if (adapter.implements.includes(fn.name)) {
-        lines.push(this.generateAdapterMethod(fn, adapter.name));
+        lines.push(this.generateAdapterMethod(aliasedFn, adapter.name));
       } else {
         const notSupportedMessage = adapter.does_not_implement?.includes(fn.name)
           ? `Not supported by ${adapter.name}: ${fn.name}`
           : `Not yet implemented: ${fn.name}`;
-        lines.push(this.generateUnimplementedMethod(fn, notSupportedMessage));
+        lines.push(this.generateUnimplementedMethod(aliasedFn, notSupportedMessage));
       }
     }
     lines.push("}");
@@ -189,30 +223,31 @@ export class TypeScriptGenerator implements LanguageGenerator {
   }
 
   private generateConformanceTest(adapter: AdapterDefinition, mod: ModuleContract): string {
-    const className = `${pascalCase(adapter.name)}Adapter`;
-    const interfaceName = `${pascalCase(mod.name)}Contract`;
+    const aliasedModName = this.resolveModName(mod.name);
+    const aliasedInterface = `${pascalCase(aliasedModName)}Contract`;
+    const className = this.resolveClsName(adapter.name, adapter.name);
     const lines: string[] = [
       `// ${adapter.name}.test.ts`,
-      `// Auto-generated conformance test for ${adapter.name} → ${mod.name}`,
+      `// Do not edit directly. Generated code.`,
       "",
-      `import { ${className} } from '../adapters/${mod.name}/${adapter.name}';`,
-      `import type { ${interfaceName} } from '../interfaces/${mod.name}';`,
+      `import { ${className} } from '../adapters/${aliasedModName}/${adapter.name}';`,
+      `import type { ${aliasedInterface} } from '../interfaces/${aliasedModName}';`,
       "",
-      `describe('${className} implements ${interfaceName}', () => {`,
-      `  const adapter: ${interfaceName} = new ${className}({`,
+      `describe('${className} implements ${aliasedInterface}', () => {`,
+      `  const adapter: ${aliasedInterface} = new ${className}({`,
     ];
 
     const testConfigs = adapter.config.required.map((f) => {
-      const val = f.type === "number" ? 0 : "false";
-      return `    ${f.name}: 'test'`;
+      return `    ${this.resolveCfgName(f.name)}: 'test'`;
     }).join(",\n");
     lines.push(testConfigs);
     lines.push(`  });`);
     lines.push("");
 
     for (const fn of mod.functions) {
-      lines.push(`  it('has ${fn.name} method', () => {`);
-      lines.push(`    expect(typeof adapter.${camelCase(fn.name)}).toBe('function');`);
+      const aliasedName = this.resolveFnName(fn.name);
+      lines.push(`  it('has ${aliasedName} method', () => {`);
+      lines.push(`    expect(typeof adapter.${aliasedName}).toBe('function');`);
       lines.push(`  });`);
     }
     lines.push(`});`);

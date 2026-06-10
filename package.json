@@ -2,7 +2,16 @@
   "name": "@friehub/blueprint",
   "version": "0.2.0",
   "description": "A domain contract catalogue for backend development. 155 module contracts, 83 adapters, 5 languages, AI-ready via 12 MCP tools.",
-  "keywords": ["contract", "domain", "backend", "code-generation", "adapter", "blueprint", "ai", "mcp"],
+  "keywords": [
+    "contract",
+    "domain",
+    "backend",
+    "code-generation",
+    "adapter",
+    "blueprint",
+    "ai",
+    "mcp"
+  ],
   "license": "MIT",
   "author": "Friehub",
   "repository": {
@@ -33,8 +42,11 @@
     "CHANGELOG.md",
     "LICENSE"
   ],
+  "blueprint": {
+    "catalogHash": "6df6033e2ab4b165cdd623b0d3acdb82d6375941a39897cf8c3d520e5c7f3e5b"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.json && node scripts/build-catalog.cjs",
+    "build": "tsc -p tsconfig.json && node scripts/build-catalog.cjs && node scripts/strip-catalog.cjs && node scripts/hash-catalog.cjs",
     "check": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit --strict",
     "test": "npx tsx --test 'src/**/*.test.ts'",

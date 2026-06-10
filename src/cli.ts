@@ -15,7 +15,8 @@ import {
   handleResolve, handleAdapters, handleGenerate,
   handlePrototype, handleSchema, handleBuild, handleVerify, handleImplement,
 } from "./cli/commands.js";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve as pathResolve } from "node:path";
 
@@ -31,7 +32,33 @@ function getVersion(): string {
   }
 }
 
+function verifyCatalogHash(): void {
+  const pkgPath = pathResolve(__dirname, "../package.json");
+  const minCatalogPath = pathResolve(__dirname, "../dist/catalog.min.json");
+  if (!existsSync(minCatalogPath)) return;
+
+  try {
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
+    const expectedHash = pkg.blueprint?.catalogHash;
+    if (!expectedHash) return;
+
+    const catalog = readFileSync(minCatalogPath, "utf8");
+    const actualHash = createHash("sha256").update(catalog).digest("hex");
+
+    if (actualHash !== expectedHash) {
+      console.error("Catalog integrity check failed.");
+      console.error("  Expected: " + expectedHash);
+      console.error("  Actual:   " + actualHash);
+      console.error("The catalog has been modified or corrupted. Reinstall the package to fix.");
+      process.exit(1);
+    }
+  } catch {
+    // If we can't verify, proceed (e.g. running from source during development)
+  }
+}
+
 async function main() {
+  verifyCatalogHash();
   registerGenerator(new TypeScriptGenerator());
   registerGenerator(new PythonGenerator());
   registerGenerator(new GoGenerator());

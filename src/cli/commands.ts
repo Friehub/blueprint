@@ -251,6 +251,11 @@ export async function handleGenerate(result: { value: Catalog | null }, config: 
   const { adapters } = await loadAdapters(adaptersDir);
   const genOpts: Record<string, unknown> = { language, type, module: config.module, provider: config.provider, outputDir };
   if (config.namespace) genOpts.namespace = config.namespace;
+  if (config.aliases) {
+    const { loadAliases } = await import("../generators/aliases.js");
+    genOpts.aliases = loadAliases(config.aliases);
+  }
+  if (config.obfuscate) genOpts.obfuscate = config.obfuscate;
   const { written, errors } = await generateAndWrite(result.value!, adapters, genOpts as any);
   if (errors.length > 0) {
     console.error("Generation errors:");
@@ -357,7 +362,12 @@ export async function handleVerify(result: { value: Catalog | null }, config: Pa
     process.exit(1);
   }
 
-  const verification = await verifyImplementation(config.target, config.module, result.value!);
+  let verifyAliases: { functions?: Record<string, string>; modules?: Record<string, string>; classes?: Record<string, string>; config?: Record<string, string> } | undefined;
+  if (config.aliases) {
+    const { loadAliases } = await import("../generators/aliases.js");
+    verifyAliases = loadAliases(config.aliases) ?? undefined;
+  }
+  const verification = await verifyImplementation(config.target, config.module, result.value!, verifyAliases, config.obfuscate);
 
   if (verification.issues.length > 0) {
     console.error(`Verification issues for ${config.module}:`);

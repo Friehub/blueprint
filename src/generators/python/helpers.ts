@@ -113,7 +113,7 @@ class PaginatedResult[T]:
 
 export function generateIndex(moduleNames: string[]): string {
   const lines: string[] = [
-    "# Auto-generated module index",
+    "# Generated module index",
     "",
     "from .shared import *",
     "",

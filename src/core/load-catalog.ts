@@ -39,9 +39,11 @@ export async function loadCatalogFromRoot(rootDir: string, mode: ParseMode): Pro
     };
   }
 
-  // Fallback: load pre-compiled catalog from dist/catalog.json
+  // Fallback: load pre-compiled catalog from dist/catalog.min.json (or catalog.json)
   // This ships with the npm package so code generation works without raw contracts.
-  const catalogPath = join(rootDir, "dist", "catalog.json");
+  const minCatalogPath = join(rootDir, "dist", "catalog.min.json");
+  const fullCatalogPath = join(rootDir, "dist", "catalog.json");
+  const catalogPath = existsSync(minCatalogPath) ? minCatalogPath : fullCatalogPath;
   try {
     const text = await readFile(catalogPath, "utf8");
     const catalog = JSON.parse(text) as Catalog;

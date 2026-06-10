@@ -25,10 +25,12 @@ export interface ParsedArgs {
   minimal: boolean;
   prompts: boolean;
   namespace?: string;
+  aliases?: string;
+  obfuscate?: string;
   unknown: string[];
 }
 
-const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name", "--minimal", "--prompts", "--adapter", "--namespace"]);
+const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name", "--minimal", "--prompts", "--adapter", "--namespace", "--aliases", "--obfuscate"]);
 const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters", "generate", "prototype", "schema", "verify", "implement", "mcp"]);
 const ADAPTER_SUBCOMMANDS = new Set(["list", "add", "remove", "show", "verify", "search"]);
 const GENERATE_SUBCOMMANDS = new Set(["interfaces", "adapters", "tests", "all"]);
@@ -162,6 +164,10 @@ export function parseArguments(args: string[]): ParsedArgs {
       parsed.target = args[++i];
     } else if (arg === "--namespace" && i + 1 < args.length) {
       parsed.namespace = args[++i];
+    } else if (arg === "--aliases" && i + 1 < args.length) {
+      parsed.aliases = args[++i];
+    } else if (arg === "--obfuscate" && i + 1 < args.length) {
+      parsed.obfuscate = args[++i];
     } else if (arg.startsWith("-") && !KNOWN_FLAGS.has(arg)) {
       parsed.unknown.push(arg);
     }
