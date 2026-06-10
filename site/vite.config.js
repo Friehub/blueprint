@@ -1,14 +1,13 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import { readFileSync, readdirSync, existsSync } from "fs";
-import { resolve } from "path";
+import { copyFileSync, readFileSync, readdirSync, existsSync, writeFileSync, mkdirSync } from "fs";
+import { resolve, dirname } from "path";
 import { parse as parseYaml } from "yaml";
 
 const rootDir = resolve(__dirname, "..");
-const catalogPath = resolve(rootDir, "dist", "catalog.json");
 const adaptersDir = resolve(rootDir, "adapters");
 
-function loadAdapters() {
+function buildAdapterJson() {
   const adapters = [];
   if (!existsSync(adaptersDir)) return adapters;
   const modules = readdirSync(adaptersDir, { withFileTypes: true });
@@ -20,30 +19,20 @@ function loadAdapters() {
       try {
         const content = readFileSync(resolve(adaptersDir, entry.name, file), "utf8");
         const parsed = parseYaml(content);
-        adapters.push({
-          name: parsed.name,
-          module: parsed.module,
-          implements: parsed.implements || [],
-          languages: parsed.languages || null,
-        });
+        adapters.push({ name: parsed.name, module: parsed.module, implements: parsed.implements || [], languages: parsed.languages || null });
       } catch {}
     }
   }
   return adapters;
 }
 
+// Write adapters.json into the public dir so it's served as a static file
+const publicDir = resolve(__dirname, "public");
+mkdirSync(publicDir, { recursive: true });
+writeFileSync(resolve(publicDir, "adapters.json"), JSON.stringify(buildAdapterJson()));
+
 export default defineConfig({
   plugins: [vue()],
   base: "./",
   build: { outDir: "dist", emptyOutDir: true },
-  define: {
-    __CATALOG__: (() => {
-      try {
-        return JSON.stringify(JSON.parse(readFileSync(catalogPath, "utf8")));
-      } catch {
-        return JSON.stringify({ modules: [], core: [] });
-      }
-    })(),
-    __ADAPTERS__: JSON.stringify(loadAdapters()),
-  },
 });

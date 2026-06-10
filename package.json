@@ -98,7 +98,7 @@
     "test:integration": "npm run build && bash scripts/integration-test.sh",
     "prerelease": "npm run build && bash scripts/pre-commit.sh",
     "link": "npm run build && npm link",
-    "docs": "npm run build && cd site && npx vite build"
+    "docs": "npm run build && cp dist/catalog.json site/public/catalog.json && cd site && npx vite build"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",
