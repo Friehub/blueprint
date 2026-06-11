@@ -399,17 +399,24 @@ export default {
   props: ["state"],
   data() { return { adaptersData: [] }; },
   computed: {
-    catalog() { return this.state.catalog; },
+    catalog() { return this.state.catalog || { modules: [], core: [] }; },
     filteredModules() {
+      const cat = this.catalog;
+      if (!cat?.modules) return [];
       const q = (this.state.query || "").toLowerCase();
-      return this.catalog.modules.filter(m =>
+      return cat.modules.filter(m =>
         m.name.toLowerCase().includes(q) ||
         (m.summary || "").toLowerCase().includes(q) ||
         (m.functions || []).some(f => f.name.toLowerCase().includes(q))
       );
     },
     totalFunctions() {
-      return this.catalog.modules.reduce((s, m) => s + (m.functions?.length || 0), 0);
+      const cat = this.catalog;
+      if (!cat?.modules) return 0;
+      return cat.modules.reduce((s, m) => s + (m.functions?.length || 0), 0);
+    },
+    totalFunctions() {
+      return this.state.catalog.modules.reduce((s, m) => s + (m.functions?.length || 0), 0);
     },
     adapterModules() {
       return new Set(this.adaptersData.map(a => a.module)).size;
@@ -460,7 +467,9 @@ export default {
     goMcp() { window.scrollTo(0,0); this.state.view = "mcp"; this.state.currentModule = null; },
     openModule(m) { window.scrollTo(0,0); this.state.currentModule = m; this.state.view = "contract"; },
     jumpTo(name) {
-      const m = this.catalog.modules.find(mm => mm.name === name);
+      const cat = this.catalog;
+      if (!cat?.modules) return;
+      const m = cat.modules.find(mm => mm.name === name);
       if (m) this.openModule(m);
     },
   },
