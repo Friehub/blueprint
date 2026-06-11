@@ -310,13 +310,20 @@
           </div>
         </section>
 
-        <section v-if="state.currentModule.hardDeps?.length || state.currentModule.softDeps?.length">
+        <section>
           <h3>Dependencies</h3>
-          <div class="dep-graph">
-            <div class="dep-node dep-root">{{ state.currentModule.name }}</div>
-            <div v-for="dep in state.currentModule.hardDeps" :key="dep" class="dep-node dep-hard" @click="jumpTo(dep)">{{ dep }} (hard)</div>
-            <div v-for="dep in state.currentModule.softDeps" :key="dep" class="dep-node dep-soft" @click="jumpTo(dep)">{{ dep }} (soft)</div>
+          <div class="dep-tree">
+            <DepNode
+              :name="state.currentModule.name"
+              :depth="0"
+              :is-root="true"
+              :expanded="true"
+              :visited="new Set()"
+              :catalog="catalog"
+              :on-jump="jumpTo"
+            />
           </div>
+          <p v-if="!state.currentModule.hardDeps?.length && !state.currentModule.softDeps?.length" style="color:var(--fog);font-size:13px;margin-top:8px">No dependencies</p>
         </section>
       </div>
     </template>
@@ -325,6 +332,47 @@
 </template>
 
 <script>
+const DepNode = {
+  name: "DepNode",
+  props: {
+    name: String, depth: Number, isRoot: Boolean,
+    expanded: Boolean, visited: Set, catalog: Object, onJump: Function,
+  },
+  data() { return { open: this.expanded }; },
+  computed: {
+    module() { return this.catalog.modules.find(m => m.name === this.name); },
+    hardDeps() { return (this.module?.hardDeps || []).filter(d => !this.visited.has(d)); },
+    softDeps() { return (this.module?.softDeps || []).filter(d => !this.visited.has(d)); },
+    allDeps() { return [...this.hardDeps, ...this.softDeps]; },
+  },
+  template: `
+    <div class="dep-tree-node" :style="{ paddingLeft: depth * 20 + 'px' }">
+      <div class="dep-row" :class="{ root: isRoot, hard: !isRoot && name, soft: false }" @click="onJump(name)">
+        <span v-if="allDeps.length" class="dep-toggle" @click.stop="open = !open">{{ open ? '▾' : '▸' }}</span>
+        <span v-else class="dep-toggle" style="visibility:hidden">▸</span>
+        <span class="dep-name">{{ name }}</span>
+        <span v-if="isRoot" class="dep-badge root-badge">selected</span>
+        <span v-else-if="module?.hardDeps?.includes(name)" class="dep-badge">hard</span>
+        <span v-else class="dep-badge soft-badge">soft</span>
+      </div>
+      <div v-if="open && allDeps.length" class="dep-children">
+        <DepNode
+          v-for="dep in hardDeps" :key="dep"
+          :name="dep" :depth="depth + 1" :is-root="false"
+          :expanded="false" :visited="new Set([...visited, name])"
+          :catalog="catalog" :on-jump="onJump"
+        />
+        <DepNode
+          v-for="dep in softDeps" :key="dep"
+          :name="dep" :depth="depth + 1" :is-root="false"
+          :expanded="false" :visited="new Set([...visited, name])"
+          :catalog="catalog" :on-jump="onJump"
+        />
+      </div>
+    </div>
+  `,
+};
+
 const SAGAS = [
   {
     name: "checkout",
@@ -392,6 +440,7 @@ const SAGAS = [
 
 export default {
   props: ["state"],
+  components: { DepNode },
   data() { return { adaptersData: [] }; },
   computed: {
     catalog() { return this.state.catalog; },

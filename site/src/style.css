@@ -201,20 +201,30 @@ body {
   font-size: 12.5px;
 }
 
-/* === Dep graph === */
-.dep-graph { display: flex; flex-direction: column; gap: 4px; }
-.dep-node {
-  padding: 8px 14px;
-  background: var(--slate);
-  border-radius: 8px;
+/* === Dep tree === */
+.dep-tree { margin-top: 4px; }
+.dep-tree-node { }
+.dep-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
   font-size: 13px;
   cursor: pointer;
   transition: background .15s;
+  margin-bottom: 2px;
 }
-.dep-node:hover { background: #e8e8e6; }
-.dep-root { border-left: 3px solid var(--mint); font-weight: 600; }
-.dep-hard { border-left: 3px solid var(--ember); margin-left: 20px; }
-.dep-soft { border-left: 3px solid var(--fog); margin-left: 40px; }
+.dep-row:hover { background: var(--slate); }
+.dep-row.root { font-weight: 600; }
+.dep-toggle { color: var(--fog); font-size: 11px; width: 14px; cursor: pointer; user-select: none; }
+.dep-name { flex: 1; }
+.dep-badge {
+  font-size: 10px; font-weight: 600;
+  padding: 1px 7px; border-radius: 4px;
+  background: var(--slate); color: var(--fog);
+}
+.root-badge { background: var(--mint); color: var(--white); }
+.soft-badge { background: transparent; border: 1px solid var(--border); }
+.dep-children { margin-left: 8px; border-left: 1.5px solid var(--border); padding-left: 4px; }
 
 /* === Saga === */
 .saga-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
