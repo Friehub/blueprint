@@ -316,9 +316,10 @@
             <DepNode
               :name="state.currentModule.name"
               :depth="0"
-              :is-root="true"
+              :root-name="state.currentModule.name"
+              :dep-type="'hard'"
               :expanded="true"
-              :visited="new Set()"
+              :visited="[]"
               :catalog="catalog"
               :on-jump="jumpTo"
             />
@@ -335,37 +336,35 @@
 const DepNode = {
   name: "DepNode",
   props: {
-    name: String, depth: Number, isRoot: Boolean,
-    expanded: Boolean, visited: Set, catalog: Object, onJump: Function,
+    name: String, depth: Number, rootName: String, depType: String,
+    expanded: Boolean, visited: Array, catalog: Object, onJump: Function,
   },
   data() { return { open: this.expanded }; },
   computed: {
     module() { return this.catalog.modules.find(m => m.name === this.name); },
-    hardDeps() { return (this.module?.hardDeps || []).filter(d => !this.visited.has(d)); },
-    softDeps() { return (this.module?.softDeps || []).filter(d => !this.visited.has(d)); },
-    allDeps() { return [...this.hardDeps, ...this.softDeps]; },
+    deps() {
+      const hard = (this.module?.hardDeps || []).filter(d => !this.visited.includes(d));
+      const soft = (this.module?.softDeps || []).filter(d => !this.visited.includes(d));
+      return [
+        ...hard.map(d => ({ name: d, type: 'hard' })),
+        ...soft.map(d => ({ name: d, type: 'soft' })),
+      ];
+    },
   },
   template: `
-    <div class="dep-tree-node" :style="{ paddingLeft: depth * 20 + 'px' }">
-      <div class="dep-row" :class="{ root: isRoot, hard: !isRoot && name, soft: false }" @click="onJump(name)">
-        <span v-if="allDeps.length" class="dep-toggle" @click.stop="open = !open">{{ open ? '▾' : '▸' }}</span>
+    <div class="dep-tree-node">
+      <div class="dep-row" :class="{ root: name === rootName }" @click="onJump(name)">
+        <span v-if="deps.length" class="dep-toggle" @click.stop="open = !open">{{ open ? '▾' : '▸' }}</span>
         <span v-else class="dep-toggle" style="visibility:hidden">▸</span>
         <span class="dep-name">{{ name }}</span>
-        <span v-if="isRoot" class="dep-badge root-badge">selected</span>
-        <span v-else-if="module?.hardDeps?.includes(name)" class="dep-badge">hard</span>
-        <span v-else class="dep-badge soft-badge">soft</span>
+        <span v-if="name === rootName" class="dep-badge root-badge">selected</span>
+        <span v-else class="dep-badge" :class="{ 'dep-hard': depType === 'hard' }">{{ depType }}</span>
       </div>
-      <div v-if="open && allDeps.length" class="dep-children">
+      <div v-if="open && deps.length" class="dep-children">
         <DepNode
-          v-for="dep in hardDeps" :key="dep"
-          :name="dep" :depth="depth + 1" :is-root="false"
-          :expanded="false" :visited="new Set([...visited, name])"
-          :catalog="catalog" :on-jump="onJump"
-        />
-        <DepNode
-          v-for="dep in softDeps" :key="dep"
-          :name="dep" :depth="depth + 1" :is-root="false"
-          :expanded="false" :visited="new Set([...visited, name])"
+          v-for="dep in deps" :key="dep.name"
+          :name="dep.name" :depth="depth + 1" :root-name="rootName" :dep-type="dep.type"
+          :expanded="false" :visited="[...visited, name]"
           :catalog="catalog" :on-jump="onJump"
         />
       </div>

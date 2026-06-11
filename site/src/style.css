@@ -224,6 +224,7 @@ body {
 }
 .root-badge { background: var(--mint); color: var(--white); }
 .soft-badge { background: transparent; border: 1px solid var(--border); }
+.dep-hard { background: var(--ember); color: var(--white); }
 .dep-children { margin-left: 8px; border-left: 1.5px solid var(--border); padding-left: 4px; }
 
 /* === Saga === */
