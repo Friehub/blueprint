@@ -11,13 +11,13 @@
 |---|---|---|
 | 1-2 | Spec written | Done |
 | 3.1 | Function aliases (all 5 languages) | Done |
-| 3.2 | Module aliases | Not started (B-4) |
-| 3.3 | Class aliases | Not started (B-4) |
-| 3.4 | Config field aliases | Not started (B-5) |
+| 3.2 | Module aliases | Done |
+| 3.3 | Class aliases | Done |
+| 3.4 | Config field aliases | Done |
 | 4 | Loading and merging | Done (CLI `--aliases` flag, JSON5 support) |
 | 5 | Partial aliases | Works by omission |
 | 6 | Error handling | Warnings on missing aliases, errors on duplicates |
-| 7 | verify command integration | Not started (B-8) |
+| 7 | verify command integration | Done (`--aliases` and `--obfuscate` flags) |
 | 8 | Out of scope | As documented |
 | 9 | Resolved decisions | All settled |
 
@@ -34,6 +34,23 @@ all Blueprint users.
 Aliasing replaces the contract names entirely with project-specific names.
 Instead of `initiatePayment` the generated function is called `chargeCustomer`.
 The original contract name does not appear anywhere in the generated output.
+
+### Security Dependency
+
+The alias system provides its security value only when contracts are excluded
+from the npm package. The npm package (`@friehub/blueprint`) ships a stripped
+catalog (`catalog.min.json`) that contains no function signatures, no
+invariants, no temporal values, and no error taxonomies. Raw contracts are
+not included in the package.
+
+If raw contracts were present in the installed package, an attacker could
+install the package and trivially map aliased names back to contract names
+by reading the original function signatures alongside the generated code.
+The alias system would provide zero security value in that scenario.
+
+**The alias system is a second layer of protection.** The first layer is
+ensuring contracts do not ship in the npm package. Both layers must be in
+place for the alias system to provide meaningful security.
 
 ---
 

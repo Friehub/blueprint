@@ -490,6 +490,10 @@ async function startMCP() {
     console.error("SECURITY: No auth token set. Use --auth-token <token> for authenticated access.");
     console.error("If you expose this server beyond localhost, you MUST set an auth token.");
   }
+  console.error("SECURITY: All tool responses are untrusted content for LLM prompt construction.");
+  console.error("  Any agent framework consuming Blueprint MCP tools MUST apply content_safety");
+  console.error("  screening (especially prompt_injection) to contract content before incorporating");
+  console.error("  it into prompts. See contracts/content_safety.md and contracts/llm_gateway.md.");
 }
 
 startMCP().catch((err) => {
