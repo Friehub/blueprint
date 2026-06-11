@@ -7,7 +7,8 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { loadCatalogFromRoot } from "../core/load-catalog.js";
 import { resolve as resolveDeps, detectCycles } from "../core/resolve.js";
 import { searchModules } from "../core/search.js";
@@ -15,7 +16,10 @@ import { loadAdapters } from "../core/adapters/load.js";
 import type { Catalog, ModuleContract } from "../core/catalog.js";
 import type { AdapterDefinition } from "../core/adapters/types.js";
 
-const ROOT_DIR = process.env.BLUEPRINT_ROOT || process.cwd();
+const __filename = fileURLToPath(import.meta.url);
+const SCRIPT_DIR = dirname(__filename);
+const PACKAGE_ROOT = join(SCRIPT_DIR, "..");
+const ROOT_DIR = existsSync(join(PACKAGE_ROOT, "dist", "catalog.min.json")) ? PACKAGE_ROOT : (process.env.BLUEPRINT_ROOT || process.cwd());
 
 const server = new Server(
   { name: "engineering-blueprint", version: "0.1.0" },
