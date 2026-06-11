@@ -313,16 +313,13 @@
         <section>
           <h3>Dependencies</h3>
           <div class="dep-tree">
-            <DepNode
-              :name="state.currentModule.name"
-              :depth="0"
-              :root-name="state.currentModule.name"
-              :dep-type="'hard'"
-              :expanded="true"
-              :visited="[]"
-              :catalog="catalog"
-              :on-jump="jumpTo"
-            />
+            <div v-for="node in depTree" :key="node.name + node.depth" class="dep-row" :style="{ paddingLeft: (node.depth * 20 + 8) + 'px' }" @click="jumpTo(node.name)">
+              <span v-if="node.hasChildren" class="dep-toggle" @click.stop="toggleDep(node.key)">{{ node.open ? '▾' : '▸' }}</span>
+              <span v-else class="dep-toggle" style="visibility:hidden">▸</span>
+              <span class="dep-name">{{ node.name }}</span>
+              <span v-if="node.depth === 0" class="dep-badge root-badge">selected</span>
+              <span v-else class="dep-badge" :class="{ 'dep-hard': node.type === 'hard' }">{{ node.type }}</span>
+            </div>
           </div>
           <p v-if="!state.currentModule.hardDeps?.length && !state.currentModule.softDeps?.length" style="color:var(--fog);font-size:13px;margin-top:8px">No dependencies</p>
         </section>
@@ -333,45 +330,6 @@
 </template>
 
 <script>
-const DepNode = {
-  name: "DepNode",
-  props: {
-    name: String, depth: Number, rootName: String, depType: String,
-    expanded: Boolean, visited: Array, catalog: Object, onJump: Function,
-  },
-  data() { return { open: this.expanded }; },
-  computed: {
-    module() { return this.catalog.modules.find(m => m.name === this.name); },
-    deps() {
-      const hard = (this.module?.hardDeps || []).filter(d => !this.visited.includes(d));
-      const soft = (this.module?.softDeps || []).filter(d => !this.visited.includes(d));
-      return [
-        ...hard.map(d => ({ name: d, type: 'hard' })),
-        ...soft.map(d => ({ name: d, type: 'soft' })),
-      ];
-    },
-  },
-  template: `
-    <div class="dep-tree-node">
-      <div class="dep-row" :class="{ root: name === rootName }" @click="onJump(name)">
-        <span v-if="deps.length" class="dep-toggle" @click.stop="open = !open">{{ open ? '▾' : '▸' }}</span>
-        <span v-else class="dep-toggle" style="visibility:hidden">▸</span>
-        <span class="dep-name">{{ name }}</span>
-        <span v-if="name === rootName" class="dep-badge root-badge">selected</span>
-        <span v-else class="dep-badge" :class="{ 'dep-hard': depType === 'hard' }">{{ depType }}</span>
-      </div>
-      <div v-if="open && deps.length" class="dep-children">
-        <DepNode
-          v-for="dep in deps" :key="dep.name"
-          :name="dep.name" :depth="depth + 1" :root-name="rootName" :dep-type="dep.type"
-          :expanded="false" :visited="[...visited, name]"
-          :catalog="catalog" :on-jump="onJump"
-        />
-      </div>
-    </div>
-  `,
-};
-
 const SAGAS = [
   {
     name: "checkout",
@@ -439,7 +397,6 @@ const SAGAS = [
 
 export default {
   props: ["state"],
-  components: { DepNode },
   data() { return { adaptersData: [] }; },
   computed: {
     catalog() { return this.state.catalog; },
@@ -468,7 +425,32 @@ export default {
     },
     sagas() { return SAGAS; },
   },
+  data() { return { depOpen: {} }; },
+  computed: {
+    depTree() {
+      const m = this.state.currentModule;
+      if (!m) return [];
+      const result = [];
+      const visited = new Set();
+      const walk = (name, depth, type) => {
+        if (visited.has(name)) return;
+        visited.add(name);
+        const key = name + depth;
+        const mod = this.catalog.modules.find(mm => mm.name === name);
+        const hard = (mod?.hardDeps || []).filter(d => !visited.has(d));
+        const soft = (mod?.softDeps || []).filter(d => !visited.has(d));
+        const children = [...hard.map(d => ({ name: d, type: 'hard' })), ...soft.map(d => ({ name: d, type: 'soft' }))];
+        result.push({ name, depth, type, key, hasChildren: children.length > 0, open: this.depOpen[key] !== false });
+        if (this.depOpen[key] !== false) {
+          for (const c of children) walk(c.name, depth + 1, c.type);
+        }
+      };
+      walk(m.name, 0, 'hard');
+      return result;
+    },
+  },
   methods: {
+    toggleDep(key) { this.depOpen[key] = this.depOpen[key] === false ? true : false; this.$forceUpdate(); },
     goHome() { window.scrollTo(0,0); this.state.view = "home"; this.state.currentModule = null; },
     goModules() { window.scrollTo(0,0); this.state.view = "modules"; this.state.currentModule = null; this.state.query = ""; },
     goAdapters() { window.scrollTo(0,0); this.state.view = "adapters"; this.state.currentModule = null; },

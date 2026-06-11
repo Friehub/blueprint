@@ -203,7 +203,6 @@ body {
 
 /* === Dep tree === */
 .dep-tree { margin-top: 4px; }
-.dep-tree-node { }
 .dep-row {
   display: flex; align-items: center; gap: 6px;
   padding: 6px 10px;
@@ -211,10 +210,9 @@ body {
   font-size: 13px;
   cursor: pointer;
   transition: background .15s;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 .dep-row:hover { background: var(--slate); }
-.dep-row.root { font-weight: 600; }
 .dep-toggle { color: var(--fog); font-size: 11px; width: 14px; cursor: pointer; user-select: none; }
 .dep-name { flex: 1; }
 .dep-badge {
@@ -223,9 +221,7 @@ body {
   background: var(--slate); color: var(--fog);
 }
 .root-badge { background: var(--mint); color: var(--white); }
-.soft-badge { background: transparent; border: 1px solid var(--border); }
-.dep-hard { background: var(--ember); color: var(--white); }
-.dep-children { margin-left: 8px; border-left: 1.5px solid var(--border); padding-left: 4px; }
+.dep-hard { background: var(--ember) !important; color: var(--white) !important; }
 
 /* === Saga === */
 .saga-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
