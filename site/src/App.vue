@@ -429,14 +429,15 @@ export default {
   computed: {
     depTree() {
       const m = this.state.currentModule;
-      if (!m) return [];
+      const cat = this.state.catalog;
+      if (!m || !cat?.modules) return [];
       const result = [];
       const visited = new Set();
       const walk = (name, depth, type) => {
         if (visited.has(name)) return;
         visited.add(name);
         const key = name + depth;
-        const mod = this.catalog.modules.find(mm => mm.name === name);
+        const mod = cat.modules.find(mm => mm.name === name);
         const hard = (mod?.hardDeps || []).filter(d => !visited.has(d));
         const soft = (mod?.softDeps || []).filter(d => !visited.has(d));
         const children = [...hard.map(d => ({ name: d, type: 'hard' })), ...soft.map(d => ({ name: d, type: 'soft' }))];
