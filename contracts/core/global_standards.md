@@ -145,6 +145,10 @@ Every log line emitted by a module must include these fields in JSON-structured 
 
 *Prohibited fields (never log these)*: `password`, `password_hash`, `access_token`, `refresh_token`, `card_number`, `cvv`, `expiry`, `raw_api_key`.
 
+### Observability Privacy Extension
+
+The prohibited fields list above applies to structured logs. It must also be enforced in tracing span attributes and metric label values. Tracing spans must not include raw tokens, full credential values, or PII as span attributes. Metric labels must not include user identifiers, email addresses, or any value with high cardinality that could also be PII (cardinality explosion + PII leak). An implementation that correctly masks log output but includes a raw API key as a span attribute violates this requirement.
+
 ---
 
 ## 6. Deployment Order
@@ -229,7 +233,17 @@ Certificates must be issued by a trusted public Certificate Authority or, for in
 
 ---
 
-## 11. Deployment Permissions
+## 11. CSRF Protection
+
+CSRF protection is a universal requirement for all state-mutating functions that are callable via a browser session. Every module that exposes such functions must implement either the synchronizer token pattern or the double-submit cookie pattern.
+
+The synchronizer token pattern: the server generates a cryptographically random token, binds it to the session, and includes it in rendered forms or as a response header. The client must submit this token with every state-mutating request. The server validates the submitted token against the session-bound token before executing the function.
+
+The double-submit cookie pattern: the server sets a cryptographically random token as a cookie that is not accessible via JavaScript (HttpOnly is not set, but the value must not be readable by XSS). The client must read this cookie and include its value as a request header. The server validates that the header value matches the cookie value.
+
+Both patterns require that the token be at least 128 bits of entropy, bound to the issuing session, and invalidated on session expiry or revocation. Modules may declare an exception in their system-level integrations section if they are never consumed by browsers (API-only endpoints).
+
+## 12. Deployment Permissions
 
 ### 11.1 Service Identity Isolation
 
@@ -275,9 +289,9 @@ These requirements apply universally to every credential-checking function acros
 
 Each credential-checking function must enforce a maximum of 5 failed attempts per identity within a rolling 15-minute window. The count must be per-function and per-identity -- a failure on `signIn` must not affect the limit on `verifyTotp` for the same identity.
 
-### 10.2 Lockout
+### 10.2 Progressive Lockout
 
-When the attempt limit is exceeded, the identity must be locked for a minimum of 15 minutes. During lockout, all credential-checking functions for that identity must return a generic `rate_limited` error. The lockout must not reveal whether the identity exists in the system.
+When the attempt limit is exceeded, the identity must be locked. The lockout duration escalates with each occurrence within a rolling 24-hour window: first lockout is 15 minutes, second is 1 hour, third is 24 hours, fourth and subsequent are permanent pending administrator review. During lockout, all credential-checking functions for that identity must return a generic `rate_limited` error. The lockout must not reveal whether the identity exists in the system. The attempt counter resets when the lockout expires, but the escalation level does not reset within the 24-hour window.
 
 ### 10.3 Distributed Attacks
 
@@ -290,3 +304,7 @@ When a lockout is triggered, the module must emit an event consumable by the `no
 ### 10.5 Administrator Override
 
 An authorized administrator may unlock a locked identity before the lockout expiry. The override must be recorded in `audit_log` with the administrator identity, the target identity, the reason for override, and the timestamp. The override must not disable the lockout mechanism for future attempts.
+
+### 10.6 Response Timing Floor
+
+All credential-checking endpoints must enforce a minimum response time floor. If the actual credential validation completes in less than the floor duration, the response must be artificially delayed to match the floor. The floor must be at least 200ms. This prevents timing attacks where an attacker measures response time to distinguish between fast paths (identity not found, no comparison performed) and slow paths (identity found, hash comparison executed). The floor applies regardless of whether the credential validation passed or failed.

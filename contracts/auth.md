@@ -39,6 +39,8 @@ AuthProvider = email | google | github | apple | microsoft | phone
 - `signUp` must return a generic success response whether or not the provided email or identifier already exists in the system. Follow-up actions (such as account verification) must be handled out-of-band, not revealed in the sign-up response.
 - All credential comparisons in `signIn` must use a constant-time comparison function to prevent timing side-channel leaks of which validation step failed
 - When a user has MFA enabled, `signIn` must return a session with `status: partial` after successful first-factor authentication. A full `status: active` session must not be issued until MFA is completed. No operation requiring an authenticated session may proceed against a `partial` session.
+- Refresh token rotation must track the rotation family. When `token_reuse_detected` is triggered, all tokens in the same rotation family must be revoked, not just the current session. A rotation family is the chain of refresh tokens issued from the original token, including any parallel branches created by token theft.
+- All error codes returned to callers in HTTP responses must be translated to project-specific opaque codes. The contract-level error taxonomy is for internal use and logging only. The translation layer must map each contract error code to a project-defined opaque string. The mapping must be injectable and configurable per deployment.
 
 **Providers:** Supabase Auth, Auth0, Clerk, Firebase Auth, custom JWT
 

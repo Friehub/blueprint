@@ -28,6 +28,7 @@ Session { id, user_id, device, ip_address?, created_at, last_active_at, expires_
 - Session cookies must set `SameSite` to `Strict` or `Lax`, `HttpOnly`, and `Secure` when the connection is over HTTPS
 - A session identifier must be regenerated on authentication completion and on every privilege escalation (MFA completion, role elevation, tenant switch)
 - When a request arrives using a session token and the request context differs materially from the session's creation context, the module must set `status` to `suspicious` and emit an event consumable by `security_monitoring` and `fraud_detection`. A material difference includes: country change, device class change, or simultaneous use from two geographically distant locations. The definition of material difference must be a configurable policy.
+- Access tokens must be bound to the TLS session or to a device fingerprint at issuance. A token presented from a different TLS session or device fingerprint than the one it was issued to must be rejected regardless of whether the token has expired.
 
 **Providers:** Redis, database, JWT stores
 
