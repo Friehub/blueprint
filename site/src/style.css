@@ -332,6 +332,38 @@ body {
 .arch-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
 .arch-card p { font-size: 13px; color: var(--fog); line-height: 1.6; }
 
+/* === Design Tool === */
+.design-root { display: flex; height: calc(100vh - 56px); overflow: hidden; }
+.design-sidebar { width: 200px; min-width: 200px; border-right: 1.5px solid var(--border); padding: 14px; overflow-y: auto; }
+.design-sidebar h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--fog); margin-bottom: 8px; }
+.ds-search { width: 100%; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 12px; outline: none; margin-bottom: 8px; }
+.ds-search:focus { border-color: var(--mint); }
+.ds-list { display: flex; flex-direction: column; gap: 2px; }
+.ds-item { display: flex; justify-content: space-between; padding: 4px 6px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: background .1s; }
+.ds-item:hover { background: var(--slate); }
+.ds-item.added { color: var(--mint); font-weight: 600; }
+.ds-fncount { color: var(--fog); font-size: 10px; }
+.design-canvas { flex: 1; position: relative; overflow: auto; }
+.design-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+.ds-line { stroke: var(--ember); stroke-width: 2; }
+.ds-line.soft { stroke: var(--fog); stroke-dasharray: 4 4; stroke-width: 1.5; }
+.ds-card { position: absolute; width: 180px; padding: 10px 12px; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); cursor: pointer; font-size: 13px; z-index: 1; transition: border-color .15s, box-shadow .15s; }
+.ds-card:hover { border-color: var(--mint); }
+.ds-card.selected { border-color: var(--mint); box-shadow: 0 0 0 2px rgba(28,200,88,0.2); }
+.ds-card-name { display: block; font-weight: 600; }
+.ds-card-fn { font-size: 11px; color: var(--fog); }
+.ds-remove { position: absolute; top: 2px; right: 6px; background: none; border: none; color: var(--fog); cursor: pointer; font-size: 14px; line-height: 1; padding: 0 2px; }
+.ds-remove:hover { color: var(--ember); }
+.ds-empty { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--fog); font-size: 14px; }
+.design-info { width: 220px; min-width: 220px; border-left: 1.5px solid var(--border); padding: 14px; overflow-y: auto; font-size: 13px; }
+.design-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.ds-label { color: var(--fog); font-size: 12px; margin-bottom: 4px; }
+.ds-stats p { font-size: 12px; color: var(--fog); margin-bottom: 4px; }
+.ds-info-block { margin-bottom: 12px; }
+.ds-info-block p { font-size: 12px; line-height: 1.6; }
+.ds-export { width: 100%; padding: 8px; margin-top: 12px; border: 1.5px solid var(--mint); border-radius: 6px; background: var(--white); color: var(--mint); font-size: 12px; font-weight: 600; cursor: pointer; }
+.ds-export:hover { background: var(--mint); color: var(--white); }
+
 /* === Back link === */
 .back { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 16px; color: var(--fog); text-decoration: none; font-size: 13px; font-weight: 500; cursor: pointer; }
 .back:hover { color: var(--mint); }

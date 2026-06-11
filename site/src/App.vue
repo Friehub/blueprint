@@ -5,6 +5,7 @@
     <a :class="{ active: state.view === 'quickstart' }" @click="goQuickstart">Quick Start</a>
     <a :class="{ active: state.view === 'mcp' }" @click="goMcp">MCP</a>
     <a :class="{ active: state.view === 'architecture' }" @click="goArchitecture">Architecture</a>
+    <a :class="{ active: state.view === 'design' }" @click="goDesign">Design</a>
     <a :class="{ active: state.view === 'modules' }" @click="goModules">Modules</a>
     <a :class="{ active: state.view === 'adapters' }" @click="goAdapters">Adapters</a>
     <a :class="{ active: state.view === 'sagas' }" @click="goSagas">Sagas</a>
@@ -268,6 +269,50 @@
       </div>
     </template>
 
+    <!-- DESIGN TOOL -->
+    <template v-if="state.view === 'design'">
+      <div class="design-root">
+        <div class="design-sidebar">
+          <h4>Add Modules</h4>
+          <input type="text" v-model="designQuery" class="ds-search" placeholder="Search..." />
+          <div class="ds-list">
+            <div v-for="m in designAvailable" :key="m.name" class="ds-item" @click="addToDesign(m)" :class="{ added: isOnCanvas(m.name) }">
+              <span>{{ m.name }}</span>
+              <span class="ds-fncount">{{ m.functions?.length || 0 }}fn</span>
+            </div>
+          </div>
+        </div>
+        <div class="design-canvas" ref="canvas">
+          <svg class="design-lines" v-if="designConnections.length">
+            <line v-for="(c, i) in designConnections" :key="i" :x1="c.x1" :y1="c.y1" :x2="c.x2" :y2="c.y2" class="ds-line" :class="{ hard: c.type==='hard', soft: c.type==='soft' }" />
+          </svg>
+          <div v-for="dm in designModules" :key="dm.name" class="ds-card" :class="{ selected: designSelected === dm.name }" :style="{ left: dm.x + 'px', top: dm.y + 'px' }" @click.stop="designSelected = dm.name">
+            <span class="ds-card-name">{{ dm.name }}</span>
+            <span class="ds-card-fn">{{ dm.fnCount }} functions</span>
+            <button class="ds-remove" @click.stop="removeFromDesign(dm.name)">x</button>
+          </div>
+          <div v-if="!designModules.length" class="ds-empty">Click modules from the sidebar to add them to the canvas</div>
+        </div>
+        <div class="design-info" v-if="designSelected">
+          <h4>{{ designSelected }}</h4>
+          <div class="ds-info-block" v-if="designSelectedModule">
+            <p v-if="designSelectedModule.summary">{{ designSelectedModule.summary }}</p>
+            <p class="ds-label">Hard deps: <span v-if="designSelectedModule.hardDeps?.length">{{ designSelectedModule.hardDeps.join(', ') }}</span><span v-else>none</span></p>
+            <p class="ds-label">Soft deps: <span v-if="designSelectedModule.softDeps?.length">{{ designSelectedModule.softDeps.join(', ') }}</span><span v-else>none</span></p>
+          </div>
+          <button class="ds-export" @click="exportDesign">Export Design</button>
+        </div>
+        <div class="design-info" v-else>
+          <p class="ds-label">Click a module to inspect it</p>
+          <div class="ds-stats" v-if="designModules.length">
+            <p>Modules: {{ designModules.length }}</p>
+            <p>Hard connections: {{ designConnections.filter(c => c.type==='hard').length }}</p>
+            <p>Topology: {{ designTopology }}</p>
+          </div>
+        </div>
+      </div>
+    </template>
+
     <!-- MODULES -->
     <template v-if="state.view === 'modules'">
       <div class="main">
@@ -463,7 +508,7 @@ const SAGAS = [
 
 export default {
   props: ["state"],
-  data() { return { adaptersData: [], depOpen: {} }; },
+  data() { return { adaptersData: [], depOpen: {}, designQuery: "", designModules: [], designSelected: null }; },
   computed: {
     catalog() { return this.state?.catalog || { modules: [], core: [] }; },
     filteredModules() {
@@ -496,7 +541,7 @@ export default {
       return Object.values(groups).sort((a, b) => a.module.localeCompare(b.module));
     },
     sagas() { return SAGAS; },
-    depTree() {
+    depTree() { /* ... existing depTree code stays the same ... */
       try {
         const m = this.state?.currentModule;
         const cat = this.state?.catalog;
@@ -513,16 +558,30 @@ export default {
           const soft = (mod.softDeps || []).filter(d => d && !visited.has(d));
           const children = [...hard.map(d => ({ name: d, type: 'hard' })), ...soft.map(d => ({ name: d, type: 'soft' }))];
           result.push({ name, depth, type, key, hasChildren: children.length > 0, open: this.depOpen?.[key] !== false });
-          if (this.depOpen?.[key] !== false) {
-            for (const c of children) if (c?.name) walk(c.name, depth + 1, c.type);
-          }
+          if (this.depOpen?.[key] !== false) { for (const c of children) if (c?.name) walk(c.name, depth + 1, c.type); }
         };
         walk(m.name, 0, 'hard');
         return result;
-      } catch (e) {
-        console.error('depTree error:', e);
-        return [];
-      }
+      } catch (e) { return []; }
+    },
+    designAvailable() { const q = (this.designQuery || '').toLowerCase(); const cat = this.state.catalog; if (!cat?.modules) return []; return cat.modules.filter(m => m.name.toLowerCase().includes(q)).slice(0, 30); },
+    designSelectedModule() { if (!this.designSelected) return null; return this.state.catalog?.modules?.find(m => m.name === this.designSelected); },
+    designConnections() {
+      const lines = []; const placed = new Set(this.designModules.map(d => d.name));
+      for (const dm of this.designModules) {
+        const mod = this.state.catalog?.modules?.find(m => m.name === dm.name); if (!mod) continue;
+        (mod.hardDeps || []).forEach(dep => {
+          if (placed.has(dep)) { const target = this.designModules.find(d => d.name === dep); if (target) lines.push({ x1: dm.x + 90, y1: dm.y + 20, x2: target.x + 90, y2: target.y + 20, type: 'hard' }); }
+        });
+        (mod.softDeps || []).forEach(dep => {
+          if (placed.has(dep)) { const target = this.designModules.find(d => d.name === dep); if (target) lines.push({ x1: dm.x + 90, y1: dm.y + 20, x2: target.x + 90, y2: target.y + 20, type: 'soft' }); }
+        });
+      } return lines;
+    },
+    designTopology() {
+      const n = this.designModules.length; if (n === 0) return '';
+      const depCount = this.designConnections.length;
+      if (n <= 5) return 'Monolith'; if (n <= 15 && depCount <= 20) return 'Modular Monolith'; if (depCount > 20) return 'Microservices'; return 'Modular Monolith';
     },
   },
   methods: {
@@ -534,6 +593,11 @@ export default {
     goQuickstart() { window.scrollTo(0,0); this.state.view = "quickstart"; this.state.currentModule = null; },
     goMcp() { window.scrollTo(0,0); this.state.view = "mcp"; this.state.currentModule = null; },
     goArchitecture() { window.scrollTo(0,0); this.state.view = "architecture"; this.state.currentModule = null; },
+    goDesign() { window.scrollTo(0,0); this.state.view = "design"; this.state.currentModule = null; },
+    addToDesign(m) { if (this.designModules.find(d => d.name === m.name)) return; this.designModules.push({ name: m.name, x: 40 + (this.designModules.length % 5) * 200, y: 40 + Math.floor(this.designModules.length / 5) * 80, fnCount: m.functions?.length || 0 }); this.designSelected = m.name; },
+    removeFromDesign(name) { this.designModules = this.designModules.filter(d => d.name !== name); if (this.designSelected === name) this.designSelected = null; },
+    isOnCanvas(name) { return !!this.designModules.find(d => d.name === name); },
+    exportDesign() { const output = { modules: this.designModules.map(m => m.name), topology: this.designTopology, connections: this.designConnections.length, exported: new Date().toISOString() }; alert(JSON.stringify(output, null, 2)); },
     openModule(m) { window.scrollTo(0,0); this.state.currentModule = m; this.state.view = "contract"; },
     jumpTo(name) {
       const cat = this.catalog;
