@@ -31,7 +31,7 @@ export interface ParsedArgs {
   unknown: string[];
 }
 
-const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name", "--minimal", "--prompts", "--adapter", "--namespace", "--aliases", "--obfuscate", "--strict-version"]);
+const KNOWN_FLAGS = new Set(["--root", "--strict", "--help", "-h", "--version", "-v", "--output", "--modules", "--format", "--compact", "--quiet", "--module", "--lang", "--name", "--minimal", "--prompts", "--adapter", "--namespace", "--aliases", "--obfuscate", "--strict-version", "--auth-token"]);
 const COMMANDS = new Set(["build", "resolve", "list", "inspect", "graph", "search", "adapters", "generate", "prototype", "schema", "verify", "implement", "mcp"]);
 const ADAPTER_SUBCOMMANDS = new Set(["list", "add", "remove", "show", "verify", "search"]);
 const GENERATE_SUBCOMMANDS = new Set(["interfaces", "adapters", "tests", "all"]);

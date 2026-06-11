@@ -21,6 +21,8 @@ const SCRIPT_DIR = dirname(__filename);
 const PACKAGE_ROOT = join(SCRIPT_DIR, "..");
 const ROOT_DIR = existsSync(join(PACKAGE_ROOT, "dist", "catalog.min.json")) ? PACKAGE_ROOT : (process.env.BLUEPRINT_ROOT || process.cwd());
 
+const AUTH_TOKEN = process.argv.find((a, i) => a === "--auth-token") ? process.argv[process.argv.indexOf("--auth-token") + 1] : null;
+
 const server = new Server(
   { name: "engineering-blueprint", version: "0.1.0" },
   { capabilities: { tools: {} } },
@@ -212,6 +214,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  if (AUTH_TOKEN) {
+    const token = (request.params as any)?._meta?.auth_token || (request.params as any)?.arguments?._auth_token;
+    if (token !== AUTH_TOKEN) {
+      return { content: [{ type: "text", text: "Unauthorized: valid auth_token required" }] };
+    }
+  }
   await loadData();
   const { name, arguments: args } = request.params;
   const input = (args || {}) as Record<string, unknown>;
@@ -476,8 +484,12 @@ async function startMCP() {
   await server.connect(transport);
   console.error("Blueprint MCP server running on stdio");
   console.error(`Root directory: ${ROOT_DIR}`);
-  console.error("SECURITY: This server binds to localhost by default via stdio.");
-  console.error("If you expose it beyond localhost, you MUST configure token-based authentication.");
+  if (AUTH_TOKEN) {
+    console.error("Authentication: enabled (--auth-token provided)");
+  } else {
+    console.error("SECURITY: No auth token set. Use --auth-token <token> for authenticated access.");
+    console.error("If you expose this server beyond localhost, you MUST set an auth token.");
+  }
 }
 
 startMCP().catch((err) => {
