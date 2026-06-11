@@ -69,7 +69,7 @@
       <div class="home-section">
         <h2>Stats</h2>
         <div class="stats">
-          <div class="stat"><div class="stat-num">{{ catalog.modules.length }}</div><div class="stat-label">Module contracts</div></div>
+          <div class="stat"><div class="stat-num">{{ catalog?.modules?.length || 0 }}</div><div class="stat-label">Module contracts</div></div>
           <div class="stat"><div class="stat-num">{{ adapterModules }}</div><div class="stat-label">Modules with adapters</div></div>
           <div class="stat"><div class="stat-num">{{ totalFunctions }}</div><div class="stat-label">Function signatures</div></div>
           <div class="stat"><div class="stat-num">83</div><div class="stat-label">Provider adapters</div></div>
@@ -207,7 +207,7 @@
     <template v-if="state.view === 'modules'">
       <div class="main">
         <h2 class="section-title">Modules</h2>
-        <p class="section-sub">Browse all {{ catalog.modules.length }} contracts. Click any module to see its functions, types, invariants, and dependencies.</p>
+        <p class="section-sub">Browse all {{ catalog?.modules?.length || 0 }} contracts. Click any module to see its functions, types, invariants, and dependencies.</p>
 
         <div class="search-wrap">
           <span class="search-icon">&#128269;</span>
@@ -323,6 +323,7 @@
           </div>
           <p v-if="!state.currentModule.hardDeps?.length && !state.currentModule.softDeps?.length" style="color:var(--fog);font-size:13px;margin-top:8px">No dependencies</p>
         </section>
+
       </div>
     </template>
 
@@ -397,9 +398,9 @@ const SAGAS = [
 
 export default {
   props: ["state"],
-  data() { return { adaptersData: [] }; },
+  data() { return { adaptersData: [], depOpen: {} }; },
   computed: {
-    catalog() { return this.state.catalog || { modules: [], core: [] }; },
+    catalog() { return this.state?.catalog || { modules: [], core: [] }; },
     filteredModules() {
       try {
         const cat = this.state?.catalog;
@@ -418,7 +419,7 @@ export default {
       return cat.modules.reduce((s, m) => s + (m.functions?.length || 0), 0);
     },
     adapterModules() {
-      return new Set(this.adaptersData.map(a => a.module)).size;
+      return new Set(this.state.adapters.map(a => a.module)).size;
     },
     adapterGroups() {
       const groups = {};
@@ -430,9 +431,6 @@ export default {
       return Object.values(groups).sort((a, b) => a.module.localeCompare(b.module));
     },
     sagas() { return SAGAS; },
-  },
-  data() { return { depOpen: {} }; },
-  computed: {
     depTree() {
       try {
         const m = this.state?.currentModule;
