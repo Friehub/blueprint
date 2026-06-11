@@ -14,6 +14,8 @@ The catalog contains **155 module contracts** covering payments, billing, auth, 
 
 **155 modules. 83 adapters. 5 languages. 12 MCP tools. 204 tests. No ambiguity.**
 
+Documentation site: **[blueprint.friehub.cloud](https://blueprint.friehub.cloud)** — browse all contracts, adapters, sagas, and dependency graphs.
+
 ---
 
 ## How it works
@@ -292,4 +294,4 @@ Our community standards are documented in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.m
 
 ---
 
-*Version 0.2.0*
+*Version 0.2.1*
