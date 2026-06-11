@@ -58,6 +58,11 @@ LockStatus { name, holder_id, acquired_at, expires_at, is_expired }
 ### Backpressure
 * If the lock backend is saturated, `acquire` must fail with a timeout error rather than queuing indefinitely.
 
+### Algorithm
+* **Recommended:** Redlock algorithm for distributed mutual exclusion with fencing tokens. ZooKeeper/etcd for strongly consistent lock services. PostgreSQL advisory locks for single-database deployments.
+* **Details:** Redlock uses multiple independent Redis instances for quorum-based locking. ZooKeeper/etcd provide linearizable operations with watches for lock notification. PostgreSQL advisory locks are simpler but limited to single database. Tradeoff: Redlock is fast but has caveats with clock skew; ZooKeeper/etcd are strongly consistent but add complexity; PostgreSQL locks are simple but not distributed.
+* **Atomicity:** Lock acquisition must be atomic with fencing token generation. A lock must not be granted to two holders simultaneously. Fencing tokens must monotonically increase to prevent stale lock operations.
+
 ### Error Taxonomy
 ### Module-Specific Errors
 ```

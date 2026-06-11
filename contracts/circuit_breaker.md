@@ -59,6 +59,11 @@ BreakerMetrics { total_calls, total_failures, total_successes, open_duration_ms 
 ### Backpressure
 * When a breaker is open, calls must fail fast with a `circuit_open` error rather than blocking or queueing.
 
+### Algorithm
+* **Recommended:** State machine with three states: closed (normal), open (failing fast), half-open (testing recovery). Sliding window failure counting for threshold detection.
+* **Details:** Closed state tracks failures in a sliding window. When failure threshold is exceeded, transition to open. After recovery timeout, transition to half-open and allow limited requests. If half-open requests succeed, transition back to closed; if they fail, return to open. Tradeoff: sliding window provides time-based failure rate; simple counter is easier but doesn't account for failure velocity.
+* **Atomicity:** State transitions must be atomic. A breaker must not be in an inconsistent state during transition. Half-open state must limit concurrent test requests to prevent thundering herd on recovery.
+
 ### Error Taxonomy
 ### Module-Specific Errors
 ```

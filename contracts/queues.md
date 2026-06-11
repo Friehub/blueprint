@@ -107,6 +107,11 @@ Job (waiting):
 * When queue capacity is reached, the adapter must reject or defer work predictably; it must not accept unbounded work silently.
 * `enqueue` should return a retryable response when the queue is full.
 
+### Algorithm
+* **Recommended:** FIFO per-partition ordering for standard job processing. Priority queues for mixed-criticality workloads. Delay queues for scheduled execution.
+* **Details:** FIFO ordering is preserved within a partition (queue or topic partition). Priority queues require explicit priority metadata on enqueue. Delay queues use timestamp-based scheduling with polling or timer-wheel implementations. Tradeoff: FIFO is simplest but doesn't support priority; priority queues add overhead for ordering guarantees.
+* **Atomicity:** Job enqueue must be atomic with state transition. A job must not be visible to consumers until the enqueue transaction commits. At-least-once delivery requires idempotent consumers.
+
 ### Storage Model
 * **Model:** Broker-backed durable queue with an operational dead-letter store.
 * **Details:** The implementation may use Redis, SQS, RabbitMQ, Kafka, or a managed abstraction, but failed jobs must remain queryable until retention expiry.

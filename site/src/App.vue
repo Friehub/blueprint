@@ -278,8 +278,8 @@
           <input type="text" v-model="designQuery" class="ds-search" placeholder="Search..." />
           <div class="ds-list">
             <div v-for="m in designAvailable" :key="m.name" class="ds-item" @click="addToDesign(m)" :class="{ added: isOnCanvas(m.name) }">
-              <span>{{ m.name }}</span>
-              <span class="ds-fncount">{{ m.functions?.length || 0 }}fn</span>
+              <span class="ds-item-name">{{ m.name }}</span>
+              <span class="ds-fncount">{{ m.transitiveCount }} deps</span>
             </div>
           </div>
         </div>
@@ -565,7 +565,17 @@ export default {
         return result;
       } catch (e) { return []; }
     },
-    designAvailable() { const q = (this.designQuery || '').toLowerCase(); const cat = this.state.catalog; if (!cat?.modules) return []; return cat.modules.filter(m => m.name.toLowerCase().includes(q)).slice(0, 30); },
+    designAvailable() {
+      const q = (this.designQuery || '').toLowerCase();
+      const cat = this.state.catalog;
+      if (!cat?.modules) return [];
+      return cat.modules.filter(m => m.name.toLowerCase().includes(q)).slice(0, 30).map(m => {
+        const mod = cat.modules.find(mm => mm.name === m.name);
+        const vis = new Set(); const walk = (n) => { if (vis.has(n)) return; vis.add(n); const mm = cat.modules.find(x => x.name === n); if (mm) for (const d of mm.hardDeps || []) walk(d); };
+        walk(m.name);
+        return { ...m, transitiveCount: vis.size - 1 };
+      });
+    },
     designSelectedModule() { if (!this.designSelected) return null; return this.state.catalog?.modules?.find(m => m.name === this.designSelected); },
     designConnections() {
       const lines = []; const placed = new Set(this.designModules.map(d => d.name));
@@ -595,7 +605,39 @@ export default {
     goMcp() { window.scrollTo(0,0); this.state.view = "mcp"; this.state.currentModule = null; },
     goArchitecture() { window.scrollTo(0,0); this.state.view = "architecture"; this.state.currentModule = null; },
     goDesign() { window.scrollTo(0,0); this.state.view = "design"; this.state.currentModule = null; },
-    addToDesign(m) { if (this.designModules.find(d => d.name === m.name)) return; this.designModules.push({ name: m.name, x: 40 + (this.designModules.length % 5) * 200, y: 40 + Math.floor(this.designModules.length / 5) * 80, fnCount: m.functions?.length || 0 }); this.designSelected = m.name; },
+    addToDesign(m) {
+      if (!m) return;
+      const cat = this.state.catalog;
+      if (!cat?.modules) return;
+      const placed = new Set(this.designModules.map(d => d.name));
+      const queue = [m.name];
+      const allNames = new Set();
+      let idx = this.designModules.length;
+
+      while (queue.length) {
+        const name = queue.shift();
+        if (allNames.has(name)) continue;
+        allNames.add(name);
+        const mod = cat.modules.find(mm => mm.name === name);
+        if (!mod) continue;
+        for (const dep of mod.hardDeps || []) {
+          if (!allNames.has(dep) && !placed.has(dep)) queue.push(dep);
+        }
+      }
+
+      for (const name of allNames) {
+        if (placed.has(name)) continue;
+        placed.add(name);
+        this.designModules.push({
+          name,
+          x: 40 + (idx % 5) * 200,
+          y: 40 + Math.floor(idx / 5) * 80,
+          fnCount: cat.modules.find(mm => mm.name === name)?.functions?.length || 0,
+        });
+        idx++;
+      }
+      this.designSelected = m.name;
+    },
     removeFromDesign(name) { this.designModules = this.designModules.filter(d => d.name !== name); if (this.designSelected === name) this.designSelected = null; },
     isOnCanvas(name) { return !!this.designModules.find(d => d.name === name); },
     exportDesign() { const output = { modules: this.designModules.map(m => m.name), topology: this.designTopology, connections: this.designConnections.length, exported: new Date().toISOString() }; alert(JSON.stringify(output, null, 2)); },

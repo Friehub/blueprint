@@ -58,6 +58,11 @@ ServiceGraph { nodes: Service[], edges: { source, target, protocol }[] }
 ### Backpressure
 * If the registry is under heavy write load, health updates must be batched or sampled rather than dropped silently.
 
+### Algorithm
+* **Recommended:** gossip protocol for eventual consistency in service discovery. Health-based routing with weighted endpoints. Client-side load balancing with circuit breaking integration.
+* **Details:** Gossip protocol propagates service state efficiently across nodes with eventual consistency. Health-based routing weights endpoints by health status (healthy > degraded > down). Client-side load balancing reduces latency by avoiding extra hops. Tradeoff: gossip protocol is scalable but eventual; centralized registry is consistent but single point of failure.
+* **Atomicity:** Service registration must be atomic with endpoint addition. Health updates must be atomic with state transition. Deregistration must not affect in-flight requests.
+
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
 

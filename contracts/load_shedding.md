@@ -60,6 +60,11 @@ Priority = critical | high | medium | low | background
 ### Backpressure
 * Shedding IS the backpressure mechanism -- when capacity is exceeded, requests are rejected with a `retry_after` hint rather than queued.
 
+### Algorithm
+* **Recommended:** Token bucket for burst-tolerant admission control. Fixed-window counters for simple capacity tracking. Adaptive shedding based on SLO budget consumption.
+* **Details:** Token bucket allows bursts up to bucket capacity while enforcing average rate. Fixed-window counters are simpler but have boundary burst issues. Adaptive shedding monitors SLO budget consumption and adjusts admission thresholds dynamically. Tradeoff: token bucket is more complex but handles bursts better; fixed-window is simpler but less smooth.
+* **Atomicity:** Admission decisions must be atomic with capacity updates. A request must not be admitted if it would cause capacity violation. Race conditions must not allow over-admission.
+
 ### Error Taxonomy
 ### Module-Specific Errors
 ```

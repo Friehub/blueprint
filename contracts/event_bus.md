@@ -62,6 +62,11 @@ DeadLetter { id, original_event, subscription_id, failure_reason, failed_at, ret
 ### Backpressure
 * If subscriber lag or publish throughput is saturated, the bus must apply backpressure or bounded buffering rather than unbounded growth.
 
+### Algorithm
+* **Recommended:** Partitioned log for ordered event streaming. Topic-based pub-sub for fan-out delivery. Consumer groups for load balancing across subscribers.
+* **Details:** Partitioned log (e.g., Kafka) provides ordering within a partition and replay capability. Topic-based pub-sub (e.g., NATS) provides low-latency fan-out. Consumer groups enable parallel processing with partition assignment. Tradeoff: partitioned log offers durability and replay but higher latency; pub-sub offers lower latency but less durability.
+* **Atomicity:** Event publish must be atomic with persistence. Events must not be delivered to subscribers before persistence confirmation. At-least-once delivery requires idempotent subscribers.
+
 ### Error Taxonomy
 ### Module-Specific Errors
 ```
