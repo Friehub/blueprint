@@ -401,22 +401,21 @@ export default {
   computed: {
     catalog() { return this.state.catalog || { modules: [], core: [] }; },
     filteredModules() {
-      const cat = this.catalog;
-      if (!cat?.modules) return [];
-      const q = (this.state.query || "").toLowerCase();
-      return cat.modules.filter(m =>
-        m.name.toLowerCase().includes(q) ||
-        (m.summary || "").toLowerCase().includes(q) ||
-        (m.functions || []).some(f => f.name.toLowerCase().includes(q))
-      );
+      try {
+        const cat = this.state?.catalog;
+        if (!cat?.modules) return [];
+        const q = (this.state.query || "").toLowerCase();
+        return cat.modules.filter(m =>
+          m?.name?.toLowerCase().includes(q) ||
+          (m?.summary || "").toLowerCase().includes(q) ||
+          (m?.functions || []).some(f => f?.name?.toLowerCase().includes(q))
+        );
+      } catch { return []; }
     },
     totalFunctions() {
       const cat = this.catalog;
       if (!cat?.modules) return 0;
       return cat.modules.reduce((s, m) => s + (m.functions?.length || 0), 0);
-    },
-    totalFunctions() {
-      return this.state.catalog.modules.reduce((s, m) => s + (m.functions?.length || 0), 0);
     },
     adapterModules() {
       return new Set(this.adaptersData.map(a => a.module)).size;
@@ -435,26 +434,32 @@ export default {
   data() { return { depOpen: {} }; },
   computed: {
     depTree() {
-      const m = this.state.currentModule;
-      const cat = this.state.catalog;
-      if (!m || !cat?.modules) return [];
-      const result = [];
-      const visited = new Set();
-      const walk = (name, depth, type) => {
-        if (visited.has(name)) return;
-        visited.add(name);
-        const key = name + depth;
-        const mod = cat.modules.find(mm => mm.name === name);
-        const hard = (mod?.hardDeps || []).filter(d => !visited.has(d));
-        const soft = (mod?.softDeps || []).filter(d => !visited.has(d));
-        const children = [...hard.map(d => ({ name: d, type: 'hard' })), ...soft.map(d => ({ name: d, type: 'soft' }))];
-        result.push({ name, depth, type, key, hasChildren: children.length > 0, open: this.depOpen[key] !== false });
-        if (this.depOpen[key] !== false) {
-          for (const c of children) walk(c.name, depth + 1, c.type);
-        }
-      };
-      walk(m.name, 0, 'hard');
-      return result;
+      try {
+        const m = this.state?.currentModule;
+        const cat = this.state?.catalog;
+        if (!m || !cat?.modules) return [];
+        const result = [];
+        const visited = new Set();
+        const walk = (name, depth, type) => {
+          if (visited.has(name)) return;
+          visited.add(name);
+          const key = name + depth;
+          const mod = cat.modules.find(mm => mm.name === name);
+          if (!mod) return;
+          const hard = (mod.hardDeps || []).filter(d => d && !visited.has(d));
+          const soft = (mod.softDeps || []).filter(d => d && !visited.has(d));
+          const children = [...hard.map(d => ({ name: d, type: 'hard' })), ...soft.map(d => ({ name: d, type: 'soft' }))];
+          result.push({ name, depth, type, key, hasChildren: children.length > 0, open: this.depOpen?.[key] !== false });
+          if (this.depOpen?.[key] !== false) {
+            for (const c of children) if (c?.name) walk(c.name, depth + 1, c.type);
+          }
+        };
+        walk(m.name, 0, 'hard');
+        return result;
+      } catch (e) {
+        console.error('depTree error:', e);
+        return [];
+      }
     },
   },
   methods: {
