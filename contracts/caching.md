@@ -55,6 +55,12 @@ CacheStats { hits, misses, keys, memory_used }
 ### Backpressure
 * If invalidation load is saturated, the module must defer or batch purges predictably rather than dropping them silently.
 
+### Caching Pattern
+* **Cache-Aside (recommended):** Application reads from cache first, falls back to database on miss, populates cache on read. Suitable for read-heavy workloads with tolerable staleness.
+* **Write-Through:** Application writes to cache and database synchronously. Suitable for write-heavy workloads where cache must always reflect the latest write.
+* **Write-Behind:** Application writes to cache synchronously, database asynchronously. Offers best write performance but risks data loss on cache failure.
+* **Cache invalidation strategy:** Tag-based invalidation is recommended over key-based. Tags allow batch invalidation of related entries without tracking individual keys. The module must document its invalidation strategy.
+
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
 

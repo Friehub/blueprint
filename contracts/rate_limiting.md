@@ -50,6 +50,11 @@ LimitWindow = second | minute | hour | day
 * When a limit is exceeded, the module must return a predictable `retry_after` or equivalent rejection signal.
 * The implementation must not allow over-consumption under concurrent load.
 
+### Algorithm
+* **Recommended:** Sliding window counter for distributed rate limiting (Redis sorted sets + Lua). Token bucket for burst-tolerant per-client limits. Leaky bucket for smoothing request peaks into a steady throughput.
+* **Atomicity:** All limit checks and consumption must be atomic. Read-check-write patterns are not permitted — use Lua scripts or equivalent server-side atomic operations.
+* **Accuracy vs performance tradeoff:** Sliding window log provides exact counts but higher memory. Sliding window counter provides approximate counts with lower memory. Token bucket provides burst tolerance. The implementation must document which algorithm is used and the tradeoff.
+
 ### Storage Model
 * **Model:** Strongly consistent quota store.
 * **Details:** The backing store may be Redis, a relational database, or another atomic counter store, but limit updates must be atomic.
