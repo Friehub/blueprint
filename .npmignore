@@ -1,6 +1,4 @@
 src/
-schemas/
-completions/
 scripts/
 scenario/
 generated/
@@ -11,8 +9,6 @@ node_modules/
 *.md
 !README.md
 !CHANGELOG.md
-!contracts/**/*.md
-!contracts/core/**/*.md
 .DS_Store
 .env
 blueprint.json
