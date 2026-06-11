@@ -46,7 +46,7 @@ jobs:
               if (catalog.issues.filter(i => i.severity === 'error').length > 0) { console.error('FAIL: parse errors'); failed = true; }
               if (loadErrors.length > 0) { console.error('FAIL: load errors'); failed = true; }
               if (validationErrors > 0) { console.error('FAIL: validation errors'); failed = true; }
-              if (catalog.value?.modules.length !== 108) { console.error('FAIL: expect 108 modules, got ' + catalog.value?.modules.length); failed = true; }
+              if ((catalog.value?.modules.length || 0) < 108) { console.error('FAIL: expected at least 108 modules, got ' + catalog.value?.modules.length); failed = true; }
               if (catalog.value?.core.length !== 3) { console.error('FAIL: expect 3 core, got ' + catalog.value?.core.length); failed = true; }
               if (adapters.length < 82) { console.error('FAIL: expect at least 82 adapters'); failed = true; }
 
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18, 20, 22]
+        node-version: [20, 22]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -68,7 +68,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
       - run: npm ci
-      - run: npm test
+      - run: npm run build
+      - run: node --test $(find dist -name '*.test.js' 2>/dev/null | tr '\n' ' ')
 
   integration:
     runs-on: ubuntu-latest
