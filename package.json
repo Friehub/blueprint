@@ -91,7 +91,7 @@
     "build": "tsc -p tsconfig.json && node scripts/build-catalog.cjs && node scripts/strip-catalog.cjs && node scripts/hash-catalog.cjs",
     "check": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit --strict",
-    "test": "node --test 'dist/**/*.test.js'",
+    "test": "node --test dist/**/*.test.js",
     "test:mcp": "node --test 'dist/mcp/*.test.js'",
     "precommit": "bash scripts/pre-commit.sh",
     "check:publish": "bash scripts/check-publish.sh",

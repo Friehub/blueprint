@@ -28,6 +28,7 @@ async function loadData() {
   } catch (e) {
     console.error("Failed to load catalog data", e);
     state.loaded = true;
+    state.catalogError = "Could not load catalog.json. Make sure the site was built with 'npm run docs' from the project root.";
   }
 }
 loadData();
