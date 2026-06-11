@@ -275,41 +275,47 @@
       <div class="design-root">
         <div class="design-sidebar">
           <h4>Add Modules</h4>
-          <input type="text" v-model="designQuery" class="ds-search" placeholder="Search..." />
+          <input type="text" v-model="designQuery" class="ds-search" placeholder="Search modules..." />
           <div class="ds-list">
             <div v-for="m in designAvailable" :key="m.name" class="ds-item" @click="addToDesign(m)" :class="{ added: isOnCanvas(m.name) }">
               <span class="ds-item-name">{{ m.name }}</span>
-              <span class="ds-fncount">{{ m.transitiveCount }} deps</span>
+              <span class="ds-item-summary">{{ m.summary || '' }}</span>
+              <span class="ds-fncount">{{ m.transitiveCount }} transitive</span>
             </div>
+            <div v-if="designAvailable.length === 0" class="ds-empty-list">No modules match</div>
           </div>
         </div>
-        <div class="design-canvas" ref="canvas">
-          <svg class="design-lines" v-if="designConnections.length">
-            <line v-for="(c, i) in designConnections" :key="i" :x1="c.x1" :y1="c.y1" :x2="c.x2" :y2="c.y2" class="ds-line" :class="{ hard: c.type==='hard', soft: c.type==='soft' }" />
-          </svg>
-          <div v-for="dm in designModules" :key="dm.name" class="ds-card" :class="{ selected: designSelected === dm.name }" :style="{ left: dm.x + 'px', top: dm.y + 'px' }" @click.stop="designSelected = dm.name">
-            <span class="ds-card-name">{{ dm.name }}</span>
-            <span class="ds-card-fn">{{ dm.fnCount }} functions</span>
-            <button class="ds-remove" @click.stop="removeFromDesign(dm.name)">x</button>
+        <div class="design-canvas-wrap" ref="canvasWrap" @mousedown="onCanvasMouseDown" @mousemove="onCanvasMouseMove" @mouseup="onCanvasMouseUp" @mouseleave="onCanvasMouseUp">
+          <div class="design-canvas" :style="{ transform: 'translate(' + canvasPan.x + 'px, ' + canvasPan.y + 'px)' }">
+            <svg class="design-lines" v-if="designConnections.length">
+              <line v-for="(c, i) in designConnections" :key="i" :x1="c.x1" :y1="c.y1" :x2="c.x2" :y2="c.y2" class="ds-line" :class="{ hard: c.type==='hard', soft: c.type==='soft' }" />
+            </svg>
+            <div v-for="dm in designModules" :key="dm.name" class="ds-card" :class="{ selected: designSelected === dm.name }" :style="{ left: dm.x + 'px', top: dm.y + 'px' }" @mousedown.stop="onCardMouseDown($event, dm)" @click.stop="designSelected = dm.name">
+              <button class="ds-remove" @click.stop="removeFromDesign(dm.name)">x</button>
+              <span class="ds-card-name">{{ dm.name }}</span>
+              <span class="ds-card-fn">{{ dm.fnCount }} functions</span>
+            </div>
+            <div v-if="!designModules.length" class="ds-empty">Click modules from the sidebar to add them here</div>
           </div>
-          <div v-if="!designModules.length" class="ds-empty">Click modules from the sidebar to add them to the canvas</div>
         </div>
-        <div class="design-info" v-if="designSelected">
-          <h4>{{ designSelected }}</h4>
-          <div class="ds-info-block" v-if="designSelectedModule">
-            <p v-if="designSelectedModule.summary">{{ designSelectedModule.summary }}</p>
+        <div class="design-info">
+          <template v-if="designSelected && designSelectedModule">
+            <h4>{{ designSelected }}</h4>
+            <p class="ds-summary">{{ designSelectedModule.summary || 'No description' }}</p>
             <p class="ds-label">Hard deps: <span v-if="designSelectedModule.hardDeps?.length">{{ designSelectedModule.hardDeps.join(', ') }}</span><span v-else>none</span></p>
             <p class="ds-label">Soft deps: <span v-if="designSelectedModule.softDeps?.length">{{ designSelectedModule.softDeps.join(', ') }}</span><span v-else>none</span></p>
-          </div>
-          <button class="ds-export" @click="exportDesign">Export Design</button>
-        </div>
-        <div class="design-info" v-else>
-          <p class="ds-label">Click a module to inspect it</p>
+            <p class="ds-label">Functions: {{ designSelectedModule.functions?.length || 0 }}</p>
+          </template>
+          <template v-else>
+            <p class="ds-label" v-if="designModules.length">Click a module to inspect it</p>
+            <p class="ds-label" v-else>No modules on canvas</p>
+          </template>
           <div class="ds-stats" v-if="designModules.length">
             <p>Modules: {{ designModules.length }}</p>
             <p>Hard connections: {{ designConnections.filter(c => c.type==='hard').length }}</p>
             <p>Topology: {{ designTopology }}</p>
           </div>
+          <button class="ds-export" @click="exportDesign">Export Design</button>
         </div>
       </div>
     </template>
@@ -509,7 +515,7 @@ const SAGAS = [
 
 export default {
   props: ["state"],
-  data() { return { adaptersData: [], depOpen: {}, designQuery: "", designModules: [], designSelected: null }; },
+  data() { return { adaptersData: [], depOpen: {}, designQuery: "", designModules: [], designSelected: null, canvasPan: { x: 0, y: 0 }, dragCard: null, dragOffs: { x: 0, y: 0 }, panning: false, panStart: { x: 0, y: 0 } }; },
   computed: {
     catalog() { return this.state?.catalog || { modules: [], core: [] }; },
     filteredModules() {
@@ -569,12 +575,12 @@ export default {
       const q = (this.designQuery || '').toLowerCase();
       const cat = this.state.catalog;
       if (!cat?.modules) return [];
-      return cat.modules.filter(m => m.name.toLowerCase().includes(q)).slice(0, 30).map(m => {
+      return cat.modules.filter(m => m.name.toLowerCase().includes(q) || (m.summary || '').toLowerCase().includes(q)).map(m => {
         const mod = cat.modules.find(mm => mm.name === m.name);
         const vis = new Set(); const walk = (n) => { if (vis.has(n)) return; vis.add(n); const mm = cat.modules.find(x => x.name === n); if (mm) for (const d of mm.hardDeps || []) walk(d); };
         walk(m.name);
         return { ...m, transitiveCount: vis.size - 1 };
-      });
+      }).slice(0, 100);
     },
     designSelectedModule() { if (!this.designSelected) return null; return this.state.catalog?.modules?.find(m => m.name === this.designSelected); },
     designConnections() {
@@ -612,7 +618,7 @@ export default {
       const placed = new Set(this.designModules.map(d => d.name));
       const queue = [m.name];
       const allNames = new Set();
-      let idx = this.designModules.length;
+      const depthMap = { [m.name]: 0 };
 
       while (queue.length) {
         const name = queue.shift();
@@ -621,25 +627,47 @@ export default {
         const mod = cat.modules.find(mm => mm.name === name);
         if (!mod) continue;
         for (const dep of mod.hardDeps || []) {
-          if (!allNames.has(dep) && !placed.has(dep)) queue.push(dep);
+          if (!allNames.has(dep)) { queue.push(dep); depthMap[dep] = (depthMap[name] || 0) + 1; }
         }
       }
 
-      for (const name of allNames) {
-        if (placed.has(name)) continue;
-        placed.add(name);
-        this.designModules.push({
-          name,
-          x: 40 + (idx % 5) * 200,
-          y: 40 + Math.floor(idx / 5) * 80,
-          fnCount: cat.modules.find(mm => mm.name === name)?.functions?.length || 0,
-        });
-        idx++;
+      const byDepth = {};
+      for (const name of allNames) { const d = depthMap[name] || 0; if (!byDepth[d]) byDepth[d] = []; byDepth[d].push(name); }
+      const maxDepth = Math.max(...Object.keys(byDepth).map(Number));
+      for (let d = 0; d <= maxDepth; d++) {
+        const names = byDepth[d] || [];
+        for (let i = 0; i < names.length; i++) {
+          const name = names[i];
+          if (placed.has(name)) continue;
+          placed.add(name);
+          this.designModules.push({ name, x: 40 + i * 200, y: 40 + d * 90, fnCount: cat.modules.find(mm => mm.name === name)?.functions?.length || 0 });
+        }
       }
       this.designSelected = m.name;
     },
-    removeFromDesign(name) { this.designModules = this.designModules.filter(d => d.name !== name); if (this.designSelected === name) this.designSelected = null; },
+    removeFromDesign(name) {
+      this.designModules = this.designModules.filter(d => d.name !== name);
+      if (this.designSelected === name) this.designSelected = null;
+    },
     isOnCanvas(name) { return !!this.designModules.find(d => d.name === name); },
+    onCardMouseDown(e, dm) {
+      this.dragCard = dm;
+      this.dragOffs = { x: e.clientX - dm.x, y: e.clientY - dm.y };
+    },
+    onCanvasMouseDown(e) {
+      if (e.target.closest('.ds-card')) return;
+      this.panning = true;
+      this.panStart = { x: e.clientX - this.canvasPan.x, y: e.clientY - this.canvasPan.y };
+    },
+    onCanvasMouseMove(e) {
+      if (this.dragCard) {
+        this.dragCard.x = e.clientX - this.dragOffs.x;
+        this.dragCard.y = e.clientY - this.dragOffs.y;
+      } else if (this.panning) {
+        this.canvasPan = { x: e.clientX - this.panStart.x, y: e.clientY - this.panStart.y };
+      }
+    },
+    onCanvasMouseUp() { this.dragCard = null; this.panning = false; },
     exportDesign() { const output = { modules: this.designModules.map(m => m.name), topology: this.designTopology, connections: this.designConnections.length, exported: new Date().toISOString() }; alert(JSON.stringify(output, null, 2)); },
     openModule(m) { window.scrollTo(0,0); this.state.currentModule = m; this.state.view = "contract"; },
     jumpTo(name) {
