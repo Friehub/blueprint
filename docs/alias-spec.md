@@ -14,6 +14,7 @@
 | 3.2 | Module aliases | Done |
 | 3.3 | Class aliases | Done |
 | 3.4 | Config field aliases | Done |
+| 3.5 | Event topic aliases | Done |
 | 4 | Loading and merging | Done (CLI `--aliases` flag, JSON5 support) |
 | 5 | Partial aliases | Works by omission |
 | 6 | Error handling | Warnings on missing aliases, errors on duplicates |
@@ -92,6 +93,13 @@ or a key management system.
     api_key:        "stripe_secret",
     webhook_secret: "stripe_webhook_token",
   },
+
+  // Event topic aliases
+  topics: {
+    "payment.initiated": "billing.charged",
+    "payment.completed": "billing.settled",
+    "payment.failed":    "billing.declined",
+  },
 }
 ```
 
@@ -140,6 +148,15 @@ Maps adapter constructor parameter names to project-specific names.
 - Changes environment variable names in scoped `.env.example` output
 - Uses aliased names in env vars (security, not contract names)
 - Does NOT affect the internal SDK call logic
+
+### 3.5 Event topic aliases (`topics`) -- IMPLEMENTED
+
+Maps contract event topic names to project-specific topic names.
+
+- Applies to event emission in generated code
+- Applies to event subscription declarations
+- The topic naming convention follows `<module>.<entity>.<verb>` from global_standards.md
+- Topic aliases are applied at generation time; the translation layer is in the generated event emitter code
 
 ---
 

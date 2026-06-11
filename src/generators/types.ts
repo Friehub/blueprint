@@ -10,6 +10,7 @@ export interface AliasMap {
   modules?: Record<string, string>;
   classes?: Record<string, string>;
   config?: Record<string, string>;
+  topics?: Record<string, string>;
 }
 
 export interface GeneratorContext {

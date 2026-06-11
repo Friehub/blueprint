@@ -113,6 +113,16 @@ gensense_zero_trust_identities_active              gauge { service }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Integration with Service Mesh
+
+The `zero_trust_network_policy` module enforces identity verification using the mTLS configuration declared by the `service_mesh` module. The following parameters are consumed from the service mesh deployment configuration:
+
+- **Certificate rotation interval:** The interval at which service certificates are rotated. `verifyServiceIdentity` must reject certificates issued outside the current rotation window.
+- **Traffic policy enforcement mode:** When set to `strict`, the module must deny any inter-service call that does not have a matching `TrustPolicy`. When set to `permissive`, violations are logged but not blocked.
+- **SPIFFE namespace:** The identity namespace used to construct service identity SPIFFE IDs.
+
+The `service_mesh` module declares these parameters in its deployment configuration. This module reads them at startup and caches them for the lifetime of the process. Configuration changes must be picked up on the next restart.
+
 ### Module Dependencies
 * **Depends On:** service_mesh
 * **Emits To:** events

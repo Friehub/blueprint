@@ -91,7 +91,18 @@ gensense_service_mesh_endpoints_total            { service, health }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### mTLS Configuration
+
+The service mesh must expose the following configuration parameters for mTLS enforcement, consumed by the `zero_trust_network_policy` module:
+
+- **Certificate rotation interval:** Default 24 hours, max 7 days. Short-lived certificates limit the window of compromised certificate misuse.
+- **Minimum TLS version:** 1.2 for inter-service communication, 1.3 recommended.
+- **Traffic policy enforcement mode:** `permissive` (log policy violations only) or `strict` (reject policy violations). Production deployments must use `strict`.
+- **Service identity SPIFFE namespace:** The SPIFFE-compatible identity namespace for service identities, e.g. `spiffe://blueprint.local/<service_name>`.
+
+These parameters must be declared in the module's deployment configuration and must be readable by the `zero_trust_network_policy` module at enforcement time.
+
 ### Module Dependencies
 * **Depends On:** (none -- infrastructure primitive)
 * **Emits To:** events
-* **Recommends:** circuit_breaker, telemetry
+* **Recommends:** circuit_breaker, telemetry, zero_trust_network_policy

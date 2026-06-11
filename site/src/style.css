@@ -315,6 +315,23 @@ body {
 .mcp-table tbody tr:hover td { background: var(--slate); }
 .mcp-tool { font-family: var(--mono); font-size: 13px; color: var(--ember); white-space: nowrap; font-weight: 600; }
 
+/* === Architecture === */
+.arch-page section { margin-bottom: 36px; }
+.arch-page section h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.arch-page section p { font-size: 14px; line-height: 1.7; margin-bottom: 10px; color: var(--ink); }
+.arch-page code { font-family: var(--mono); font-size: 13px; background: var(--slate); padding: 1px 5px; border-radius: 3px; }
+.arch-layers { display: flex; flex-direction: column; gap: 8px; }
+.arch-layer { display: flex; gap: 14px; align-items: flex-start; padding: 14px; background: var(--slate); border-radius: var(--radius); }
+.arch-layer-num { width: 28px; height: 28px; min-width: 28px; border-radius: 50%; background: var(--mint); color: var(--white); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+.arch-layer-body { font-size: 13px; line-height: 1.6; }
+.arch-layer-body strong { display: block; font-size: 14px; margin-bottom: 2px; }
+.arch-layer-body em { color: var(--fog); font-size: 12px; }
+.arch-layer-body p { margin-top: 4px; color: var(--ink); font-size: 13px; }
+.arch-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.arch-card { padding: 16px; border: 1.5px solid var(--border); border-radius: var(--radius); }
+.arch-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.arch-card p { font-size: 13px; color: var(--fog); line-height: 1.6; }
+
 /* === Back link === */
 .back { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 16px; color: var(--fog); text-decoration: none; font-size: 13px; font-weight: 500; cursor: pointer; }
 .back:hover { color: var(--mint); }

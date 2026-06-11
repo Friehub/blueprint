@@ -4,6 +4,7 @@
     <a :class="{ active: state.view === 'home' }" @click="goHome">Home</a>
     <a :class="{ active: state.view === 'quickstart' }" @click="goQuickstart">Quick Start</a>
     <a :class="{ active: state.view === 'mcp' }" @click="goMcp">MCP</a>
+    <a :class="{ active: state.view === 'architecture' }" @click="goArchitecture">Architecture</a>
     <a :class="{ active: state.view === 'modules' }" @click="goModules">Modules</a>
     <a :class="{ active: state.view === 'adapters' }" @click="goAdapters">Adapters</a>
     <a :class="{ active: state.view === 'sagas' }" @click="goSagas">Sagas</a>
@@ -200,6 +201,70 @@
             <li><strong>Understand a flow</strong> "What happens during checkout?" calls <em>get_saga</em> to walk through every step, compensation, and failure mode.</li>
           </ul>
         </div>
+      </div>
+    </template>
+
+    <!-- ARCHITECTURE -->
+    <template v-if="state.view === 'architecture'">
+      <div class="main arch-page">
+        <h2 class="section-title">Architecture</h2>
+        <p class="section-sub">Reference architecture for Blueprint-generated backends</p>
+
+        <section>
+          <h3>Three-Layer Security Boundary</h3>
+          <p>Every Blueprint-generated backend should implement security at three distinct layers. Each layer has a specific responsibility and must not be bypassed by the layers above it.</p>
+          <div class="arch-layers">
+            <div class="arch-layer">
+              <div class="arch-layer-num">1</div>
+              <div class="arch-layer-body">
+                <strong>Perimeter</strong> — <em>ip_blocklist, rate_limiting, bot_protection</em>
+                <p>Rejects requests from known-bad IPs, enforces per-IP and per-origin rate limits, applies bot scoring before any authentication runs. Must be stateless, reading from a fast cache (Redis), making binary allow/deny decisions in under 2ms.</p>
+              </div>
+            </div>
+            <div class="arch-layer">
+              <div class="arch-layer-num">2</div>
+              <div class="arch-layer-body">
+                <strong>Identity</strong> — <em>auth, sessions, api_keys</em>
+                <p>Validates credentials, checks session revocation and anomaly state, attaches caller identity to request context. All failures return identical errors with identical timing. No information leakage about which check failed.</p>
+              </div>
+            </div>
+            <div class="arch-layer">
+              <div class="arch-layer-num">3</div>
+              <div class="arch-layer-body">
+                <strong>Authorization</strong> — <em>permissions</em>
+                <p>Checks <code>can()</code> before any business logic executes. Explicit deny returns immediately. Missing grant returns denied. Only explicit allow proceeds. Enforced at the function level, not the route level.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Event Flow</h3>
+          <p>Modules emit events to a central event bus. Each module publishes to its own topic namespace (<code>auth.*</code>, <code>payments.*</code>, etc.). Consumers subscribe to specific topics. The event envelope from <code>global_standards.md</code> is the contract between producers and consumers.</p>
+          <p><strong>Rule:</strong> No consumer may call the producing module's functions in response to an event. This prevents circular dependencies at runtime.</p>
+          <p><strong>Deduplication:</strong> Events use at-least-once delivery. The event <code>id</code> field is the deduplication key. Consumers track processed IDs in a <code>processed_event_ids</code> set in Redis with a TTL equal to the maximum delivery delay.</p>
+        </section>
+
+        <section>
+          <h3>Saga Orchestration</h3>
+          <p>Each saga type runs as a dedicated orchestrator process. The orchestrator maintains saga state in a durable store. Each step is an idempotent function call protected by an idempotency key derived from the saga ID and step number.</p>
+          <p><strong>Compensation:</strong> Every step with side effects must have a corresponding compensation function defined. If a step fails, the orchestrator retries with the same idempotency key until it succeeds or the retry limit is exhausted. When retries are exhausted, the orchestrator runs compensation functions in reverse order.</p>
+        </section>
+
+        <section>
+          <h3>Multi-Tenant Isolation</h3>
+          <p>Two acceptable models with documented tradeoffs.</p>
+          <div class="arch-compare">
+            <div class="arch-card">
+              <h4>Schema-per-Tenant</h4>
+              <p>Each tenant gets their own database schema. Cross-tenant data leakage is prevented at the database level. Schema migrations must be applied to all tenant schemas simultaneously. Appropriate for high-compliance deployments where isolation guarantees must be auditable.</p>
+            </div>
+            <div class="arch-card">
+              <h4>Row-Level Security</h4>
+              <p>Single shared schema with a <code>tenant_id</code> column on every tenant-scoped table. PostgreSQL RLS policies automatically scope every query to the current tenant. Application code must set the tenant context before each query. Operationally simpler but requires correct application-layer enforcement.</p>
+            </div>
+          </div>
+        </section>
       </div>
     </template>
 
@@ -468,6 +533,7 @@ export default {
     goSagas() { window.scrollTo(0,0); this.state.view = "sagas"; this.state.currentModule = null; },
     goQuickstart() { window.scrollTo(0,0); this.state.view = "quickstart"; this.state.currentModule = null; },
     goMcp() { window.scrollTo(0,0); this.state.view = "mcp"; this.state.currentModule = null; },
+    goArchitecture() { window.scrollTo(0,0); this.state.view = "architecture"; this.state.currentModule = null; },
     openModule(m) { window.scrollTo(0,0); this.state.currentModule = m; this.state.view = "contract"; },
     jumpTo(name) {
       const cat = this.catalog;

@@ -39,6 +39,11 @@ export function loadAliases(path: string): AliasMap | null {
   }
 }
 
+export function resolveTopicAlias(topicName: string, aliases?: AliasMap): string {
+  if (!aliases?.topics) return topicName;
+  return aliases.topics[topicName] ?? topicName;
+}
+
 export function resolveAlias(fnName: string, aliases?: AliasMap): string {
   if (!aliases?.functions) return fnName;
   return aliases.functions[fnName] ?? fnName;
