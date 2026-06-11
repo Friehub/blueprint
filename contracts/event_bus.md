@@ -118,4 +118,4 @@ gensense_event_bus_published_total              { topic }
 ### Module Dependencies
 * **Depends On:** (none -- infrastructure primitive)
 * **Emits To:** events
-* **Recommends:** audit_log, telemetry
+* **Recommends:** audit_log, telemetry, circuit_breaker

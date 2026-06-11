@@ -1,4 +1,4 @@
-import type { ModuleContract, ContractFunction } from "../../core/catalog.js";
+import type { ModuleContract, ContractFunction, AlgorithmInfo } from "../../core/catalog.js";
 import type { AdapterDefinition } from "../../core/adapters/types.js";
 import { adapterSupportsLanguage } from "../../core/adapters/types.js";
 import type { Language, GeneratorContext, GeneratorResult, GeneratedFile, LanguageGenerator } from "../types.js";
@@ -128,10 +128,17 @@ export class RustGenerator implements LanguageGenerator {
       `// ${mod.name}.rs`,
       `// Do not edit directly. Generated code.`,
       "",
-      "use async_trait::async_trait;",
-      "use serde::{Deserialize, Serialize};",
-      "",
     ];
+
+    if (mod.algorithm) {
+      lines.push(...this.generateAlgorithmComments(mod.algorithm));
+      lines.push("");
+    }
+
+    lines.push("use async_trait::async_trait;");
+    lines.push("use serde::{Deserialize, Serialize};");
+    lines.push("");
+
     for (const type of mod.types) {
       const defn = generateTypeDefinition(type);
       lines.push(defn);
@@ -148,6 +155,27 @@ export class RustGenerator implements LanguageGenerator {
     lines.push("");
     lines.push(generateErrorEnum(mod.name));
     return lines.join("\n");
+  }
+
+  private generateAlgorithmComments(algorithm: AlgorithmInfo): string[] {
+    const lines: string[] = [
+      "// Algorithm Recommendations",
+      "// ─────────────────────────",
+    ];
+
+    if (algorithm.recommended) {
+      lines.push(`// Recommended: ${algorithm.recommended}`);
+    }
+
+    if (algorithm.details) {
+      lines.push(`// Details: ${algorithm.details}`);
+    }
+
+    if (algorithm.atomicity) {
+      lines.push(`// Atomicity: ${algorithm.atomicity}`);
+    }
+
+    return lines;
   }
 
   private generateAdapterClass(adapter: AdapterDefinition, mod: ModuleContract): string {

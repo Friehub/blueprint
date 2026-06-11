@@ -1,4 +1,4 @@
-import type { ModuleContract, ContractFunction } from "../../core/catalog.js";
+import type { ModuleContract, ContractFunction, AlgorithmInfo } from "../../core/catalog.js";
 import type { AdapterDefinition } from "../../core/adapters/types.js";
 import { adapterSupportsLanguage } from "../../core/adapters/types.js";
 import type { Language, GeneratorContext, GeneratorResult, GeneratedFile, LanguageGenerator } from "../types.js";
@@ -127,11 +127,18 @@ export class JavaGenerator implements LanguageGenerator {
       `// ${interfaceName}.java`,
       `// Do not edit directly. Generated code.`,
       "",
-      "import java.util.Optional;",
-      "import java.util.concurrent.CompletableFuture;",
-      "",
-      `public interface ${interfaceName} {`,
     ];
+
+    if (mod.algorithm) {
+      lines.push(...this.generateAlgorithmComments(mod.algorithm));
+      lines.push("");
+    }
+
+    lines.push("import java.util.Optional;");
+    lines.push("import java.util.concurrent.CompletableFuture;");
+    lines.push("");
+    lines.push(`public interface ${interfaceName} {`);
+
     for (const fn of mod.functions) {
       const aliasedFn = { ...fn, name: this.resolveFnName(fn.name) };
       const ret = mapType(aliasedFn.returns, "java");
@@ -139,6 +146,27 @@ export class JavaGenerator implements LanguageGenerator {
     }
     lines.push("}");
     return lines.join("\n");
+  }
+
+  private generateAlgorithmComments(algorithm: AlgorithmInfo): string[] {
+    const lines: string[] = [
+      "// Algorithm Recommendations",
+      "// ─────────────────────────",
+    ];
+
+    if (algorithm.recommended) {
+      lines.push(`// Recommended: ${algorithm.recommended}`);
+    }
+
+    if (algorithm.details) {
+      lines.push(`// Details: ${algorithm.details}`);
+    }
+
+    if (algorithm.atomicity) {
+      lines.push(`// Atomicity: ${algorithm.atomicity}`);
+    }
+
+    return lines;
   }
 
   private generateAdapterClass(adapter: AdapterDefinition, mod: ModuleContract): string {

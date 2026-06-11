@@ -108,4 +108,4 @@ gensense_distributed_lock_acquire_duration_ms    histogram { lock_name, result }
 ### Module Dependencies
 * **Depends On:** (none -- infrastructure primitive)
 * **Emits To:** events
-* **Recommends:** circuit_breaker, health
+* **Recommends:** circuit_breaker, health, telemetry

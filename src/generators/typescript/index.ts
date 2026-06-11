@@ -148,6 +148,12 @@ export class TypeScriptGenerator implements LanguageGenerator {
       `// Do not edit directly. Generated code.`,
       "",
     ];
+
+    if (mod.algorithm) {
+      lines.push(...this.generateAlgorithmComments(mod.algorithm));
+      lines.push("");
+    }
+
     for (const type of mod.types) {
       lines.push(generateTypeDefinition(type));
       lines.push("");
@@ -160,6 +166,29 @@ export class TypeScriptGenerator implements LanguageGenerator {
     }
     lines.push("}");
     return lines.join("\n");
+  }
+
+  private generateAlgorithmComments(algorithm: AlgorithmInfo): string[] {
+    const lines: string[] = [
+      "/*",
+      " * Algorithm Recommendations",
+      " * ─────────────────────────",
+    ];
+
+    if (algorithm.recommended) {
+      lines.push(` * Recommended: ${algorithm.recommended}`);
+    }
+
+    if (algorithm.details) {
+      lines.push(` * Details: ${algorithm.details}`);
+    }
+
+    if (algorithm.atomicity) {
+      lines.push(` * Atomicity: ${algorithm.atomicity}`);
+    }
+
+    lines.push(" */");
+    return lines;
   }
 
   private generateAdapterClass(adapter: AdapterDefinition, mod: ModuleContract): string {

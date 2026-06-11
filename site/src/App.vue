@@ -5,8 +5,6 @@
     <a :class="{ active: state.view === 'quickstart' }" @click="goQuickstart">Quick Start</a>
     <a :class="{ active: state.view === 'mcp' }" @click="goMcp">MCP</a>
     <a :class="{ active: state.view === 'architecture' }" @click="goArchitecture">Architecture</a>
-    <a :class="{ active: state.view === 'design' }" @click="goDesign">Design</a>
-    <a :class="{ active: state.view === 'operations' }" @click="goOperations">Operations</a>
     <a :class="{ active: state.view === 'modules' }" @click="goModules">Modules</a>
     <a :class="{ active: state.view === 'adapters' }" @click="goAdapters">Adapters</a>
     <a :class="{ active: state.view === 'sagas' }" @click="goSagas">Sagas</a>

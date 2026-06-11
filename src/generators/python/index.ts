@@ -1,4 +1,4 @@
-import type { ModuleContract, ContractFunction } from "../../core/catalog.js";
+import type { ModuleContract, ContractFunction, AlgorithmInfo } from "../../core/catalog.js";
 import type { AdapterDefinition } from "../../core/adapters/types.js";
 import { adapterSupportsLanguage } from "../../core/adapters/types.js";
 import type { Language, GeneratorContext, GeneratorResult, GeneratedFile, LanguageGenerator } from "../types.js";
@@ -130,12 +130,19 @@ export class PythonGenerator implements LanguageGenerator {
       `# ${ns}${pascalCase(this.resolveModName(mod.name))}Contract`,
       `# Do not edit directly. Generated code.`,
       "",
-      "from typing import Optional, Literal",
-      "from dataclasses import dataclass",
-      "from abc import ABC, abstractmethod",
-      "from datetime import datetime",
-      "",
     ];
+
+    if (mod.algorithm) {
+      lines.push(...this.generateAlgorithmDocstring(mod.algorithm));
+      lines.push("");
+    }
+
+    lines.push("from typing import Optional, Literal");
+    lines.push("from dataclasses import dataclass");
+    lines.push("from abc import ABC, abstractmethod");
+    lines.push("from datetime import datetime");
+    lines.push("");
+
     for (const type of mod.types) {
       const defn = generateTypeDefinition(type);
       lines.push(defn);
@@ -150,6 +157,29 @@ export class PythonGenerator implements LanguageGenerator {
     lines.push("");
     lines.push(generateErrorHierarchy(mod.name));
     return lines.join("\n");
+  }
+
+  private generateAlgorithmDocstring(algorithm: AlgorithmInfo): string[] {
+    const lines: string[] = [
+      '"""',
+      "Algorithm Recommendations",
+      "─────────────────────────",
+    ];
+
+    if (algorithm.recommended) {
+      lines.push(`Recommended: ${algorithm.recommended}`);
+    }
+
+    if (algorithm.details) {
+      lines.push(`Details: ${algorithm.details}`);
+    }
+
+    if (algorithm.atomicity) {
+      lines.push(`Atomicity: ${algorithm.atomicity}`);
+    }
+
+    lines.push('"""');
+    return lines;
   }
 
   private generateAdapterClass(adapter: AdapterDefinition, mod: ModuleContract): string {

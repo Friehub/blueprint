@@ -129,5 +129,5 @@ gensense_queues_depth                       gauge { queue_name, status }
 ### Module Dependencies
 * **Depends On:** (none -- infrastructure primitive)
 * **Emits To:** (none)
-* **Recommends:** audit_log
+* **Recommends:** audit_log, circuit_breaker, telemetry
 * **Pagination Sort Key:** Uses cursor-based pagination sorting by `run_at ASC` (next to execute first) on `getJobStatus`.
