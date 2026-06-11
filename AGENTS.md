@@ -1,101 +1,46 @@
-# Blueprint — Agent Handoff Document
+# Blueprint — Agent Guide
 
-## Project Overview
+## What This Is
 
-Blueprint is an open-source catalog of 162 backend domain contracts. Each contract is a markdown file defining function signatures, types, invariants, and system constraints. The project includes 83 provider adapters, 5 code generators (TypeScript, Python, Go, Rust, Java), 12 MCP tools, and a Vite documentation site.
+Blueprint is a catalog of 162 backend domain contracts (payments, auth, caching, etc.) with 83 provider adapters, 5 code generators (TypeScript, Python, Go, Rust, Java), 12 MCP tools, and a Vite docs site.
 
 **Repo:** `github.com/Friehub/blueprint`
 **Package:** `@friehub/blueprint` on npm
 **Docs site:** `blueprint.friehub.cloud`
-**Version:** 0.2.1
+**Version:** 0.2.1 (v2 branch)
 **License:** MIT
 
 ---
 
-## Codebase Structure
+## Codebase Map
 
-```
-/contracts/           # 162 module contracts (.md)
-  core/               # global_standards.md, runtime_standards.md, sagas.md
-/adapters/            # 83 adapter definitions (.yaml)
-/sagas/               # 5 saga flow definitions
-/src/                 # TypeScript source
-  cli.ts              # CLI entry point
-  cli/commands.ts     # Command handlers (list, inspect, generate, etc.)
-  core/               # Parser, resolver, graph, search, verifier, catalog types
-  generators/         # Code generation engine + 5 language plugins
-    typescript/       # TypeScript generator (reference implementation)
-    python/           # Python generator
-    go/               # Go generator
-    rust/             # Rust generator
-    java/             # Java generator
-    prototype/        # Project scaffold generator
-    aliases.ts        # Alias/obfuscation system
-  mcp/server.ts       # MCP server (12 tools)
-  utils/args.ts       # CLI argument parser
-/site/                # Vite documentation site
-  src/                # Vue 3 app (single-file component)
-    App.vue           # All pages: Home, Quick Start, MCP, Architecture, Design, Modules, Adapters, Sagas
-    main.js           # App entry, catalog data loader
-    style.css         # Design system with brand colors
-  vite.config.js      # Build config, injects adapters.json
-/docs/                # Documentation
-  alias-spec.md       # Aliasing specification
-  system-design-strategy.md  # System design tool strategy
-  supply-chain-security.md   # Supply chain governance
-  feature-boundary.md        # Paid vs open feature decisions
-/scripts/             # Build and CI scripts
-/.github/workflows/   # CI and publish workflows
-```
+| Path | What |
+|---|---|
+| `/contracts/*.md` | 162 module contracts (functions, types, invariants, system constraints) |
+| `/contracts/core/` | 3 core standards: global_standards.md, runtime_standards.md, sagas.md |
+| `/adapters/<module>/*.yaml` | 83 adapter definitions (which functions implemented, which languages) |
+| `/sagas/*.md` | 5 saga flow definitions (checkout, refund, subscription, offboarding, dispute) |
+| `/src/cli.ts` | CLI entry point |
+| `/src/core/` | Parser, resolver, graph, search, verifier, catalog types |
+| `/src/generators/` | 5 language generators (typescript, python, go, rust, java) |
+| `/src/generators/aliases.ts` | Alias/obfuscation system (functions, modules, classes, config, topics) |
+| `/src/mcp/server.ts` | MCP server with 12 tools |
+| `/src/utils/args.ts` | CLI argument parser |
+| `/site/src/App.vue` | Single-file Vue 3 app for docs site |
+| `/site/src/style.css` | Brand design system (ink, mint, ember, slate, steel, fog) |
+| `/docs/` | Documentation (alias spec, strategy, governance) |
+| `/scripts/` | Build, CI, and pre-commit scripts |
 
 ---
 
-## Current State of Completeness
+## Contract Format
 
-### Completed (all working):
-- 162 module contracts with full structure (functions, types, invariants, system-level integrations)
-- 83 adapter YAML definitions with per-language declarations
-- 5 code generators (TS, Python, Go, Rust, Java) with namespace, alias, and obfuscation support
-- 12 MCP tools covering module search, dependency resolution, saga retrieval, schema, patterns, validation, suggestions
-- MCP server with `--auth-token` flag and untrusted content warning
-- Recursive dependency tree on docs site (expand/collapse, cycle protection)
-- Interactive system design tool on docs site (click-to-add canvas, auto-connections, topology scoring, export)
-- Architecture page, Quick Start page, MCP page on docs site
-- Security hardening: progressive lockout, timing floor, token binding, observability privacy, refresh token family tracking, error translation, CSRF standard
-- Alias system: functions, modules, classes, config, topics
-- `blueprint verify` with `--aliases` and `--obfuscate` support
-- Compiled catalog (catalog.min.json) strips function signatures, invariants, source paths
-- `.npmignore` cleaned (no contract leaks)
-- All build artifacts excluded from git
-- GitHub Actions CI + publish workflow
-- npm package verified working from clean install
+Every contract in `/contracts/*.md` has this structure:
 
-### Partially Complete (has gaps):
-- Design tool is functional but limited (no drag-to-reposition, no grouping into services, no entity model preview)
-- Some contracts lack operational metadata (algorithm choices, caching patterns, load balancing strategies)
-- No production operations reference page on docs site
-
-### Not Started:
-- Reference database schemas (abstract entity models + multi-DB renderer)
-- System design aggregator MCP tool (`design_system`, `compare_topologies`)
-- Entity model extraction from contract types
-- C# / Kotlin generators
-- RAG index for inference-time retrieval
-- Schema drift detection
-- Service mesh + zero_trust bridge (contracts exist but need operational parameters connected)
-
----
-
-## Contract Structure
-
-Every contract in `/contracts/` is a `.md` file with this structure:
-
-```markdown
+```
 # Module Contract: `module_name`
 
 **Version:** 0.1.0
-
----
 
 ### `module_name`
 Short description
@@ -118,108 +63,84 @@ TypeName = value1 | value2
 
 ---
 
----
-
 ## System-Level Integrations & Constraints
 
 ### Consistency Model
-* **Model:** `strong|eventual|causal`
-* **Details:** Explanation
-
-### Algorithm (add this to infrastructure modules)
-* **Recommended:** Specific algorithm recommendation
-* **Details:** When to use which variant
-
+### Algorithm (for infra modules)
 ### Storage Model
-* **Model:** Description
-* **Details:** Details
-
 ### Observability
-* **Tracing Spans:** pattern
-* **Telemetry Metrics:** metric definitions
-* **SLO Targets:** reference
-
 ### Module Dependencies
-* **Depends On:** modules this requires
-* **Emits To:** events this emits
-* **Recommends:** optional integrations
 ```
 
-The markdown is parsed by `src/core/parser.ts` and related files. The parsed data flows into `catalog.json`.
+The parser extracts this into `catalog.json`. The `dist/catalog.min.json` has the stripped version for npm (no invariants, no raw sections, no source paths).
 
 ---
 
-## How to Add Operational Metadata to Contracts
+## How the Catalog Data Flows
 
-The infrastructure contracts need an `### Algorithm` subsection added to their System-Level Integrations section. This subsection should specify:
-
-1. **Recommended algorithm(s)** for the module's core operation
-2. **When to use each variant** (tradeoffs)
-3. **Atomicity or correctness requirements**
-4. **References** to related modules
-
-Contracts that need this:
-| Contract | What to add |
-|---|---|
-| `rate_limiting` | Sliding window counter (distributed), token bucket (burst-tolerant), leaky bucket (smoothing) |
-| `caching` | Cache-aside (read-heavy), write-through (consistency), write-behind (performance), tag-based invalidation |
-| `queues` | Ordering guarantees (FIFO per partition), at-least-once delivery, dead-letter retention |
-| `load_shedding` | Priority scheme (critical/background), admission control, SLO budget tracking |
-| `circuit_breaker` | State machine (closed/open/half-open), failure threshold, recovery timeout, half-open max requests |
-| `event_bus` | Partitioning strategy, ordering per partition, replay semantics, consumer group rebalancing |
-| `service_mesh` | Load balancing (round-robin, least-connections, consistent hashing), traffic splitting, circuit breaking |
-| `distributed_lock` | Consensus algorithm (Redlock, ZooKeeper, etcd), fencing tokens, lease renewal |
-
-**Format convention for the Algorithm section:**
-```markdown
-### Algorithm
-* **Recommended:** [Primary algorithm] for [use case]. [Alternative] for [different use case].
-* **Details:** Explanation of when to use each variant and the tradeoff.
-* **Atomicity:** Specific correctness requirement.
 ```
+contracts/*.md  →  [parser.ts]  →  catalog.json  →  catalog.min.json (stripped)
+                                                      ↓
+                                            generators, MCP, CLI, docs site
+```
+
+The catalog is loaded at runtime by `load-catalog.ts`. It first checks for markdown files (dev mode), then falls back to `dist/catalog.min.json` (npm mode).
 
 ---
 
-## How to Modify the Docs Site
+## Common Tasks
 
-The docs site is a single Vue 3 file: `/site/src/App.vue`. Key patterns:
+### Adding a new contract
+1. Create `contracts/<name>.md` following the format above
+2. Include Functions, Types, Invariants at minimum
+3. Add System-Level Integrations for production modules
+4. Rebuild: `npm run build`
 
-- **Nav links** are at the top of the template
-- **Each page** is a `<template v-if="state.view === 'pageName'>` block
-- **Methods** are in the `methods: {}` block
-- **Computed properties** are in `computed: {}`
-- **CSS** is in `/site/src/style.css`
-- **To add a new page:** add nav link, add template block, add method for navigation
+### Adding a new adapter
+1. Create `adapters/<module>/<provider>.yaml`
+2. List implemented functions in `implements`
+3. List explicitly not-implemented functions in `does_not_implement`
+4. Add `languages` field listing supported generators
 
-## How to Build and Test
+### Modifying the docs site
+- Edit `/site/src/App.vue` — single-file app
+- Add nav link, add `<template v-if="state.view === 'pageName'>` block, add method
+- CSS in `/site/src/style.css`
+- Build: `cd site && npx vite build`
 
+### Running tests
 ```bash
-# Full build (TS compile + catalog + site)
-npm run build
+npm test                 # all tests
+npm run test:mcp         # MCP server tests only
+bash scripts/pre-commit.sh  # full quality gate
+```
 
-# Build just the docs site
-cd site && npx vite build
-
-# Test
-npm test
-
-# Quick dev server for docs site
-cd site && npm run dev
-
-# Pre-commit check (all the things)
-bash scripts/pre-commit.sh
+### Building
+```bash
+npm run build            # TS compile + catalog generation + stripping + hash
+npm run docs             # full build + docs site
 ```
 
 ---
 
-## Design Patterns to Follow
+## Key Architecture Decisions
 
-1. **Contracts are the source of truth.** Never hardcode operational information in the docs site. Add it to the contract, let the parser extract it, read from `catalog.json` at runtime.
+- **Contracts are the single source of truth.** Never hardcode operational info in the docs site. Add it to the contract, parse it, read from `catalog.json`.
+- **Security defaults are opt-out, not opt-in.** Generated schemas add audit columns, tenant isolation, RLS by default.
+- **Adapters declare language support.** The `languages` field in adapter YAML tells generators whether to generate for that language.
+- **The MCP server binds to localhost by default.** Use `--auth-token` for network-accessible deployments.
+- **Aliases protect generated code, not the catalog.** The npm package ships a stripped catalog (no function names, invariants, or source paths).
 
-2. **The catalog data flows through `state.catalog`.** In the Vue app, catalog data is loaded asynchronously in `main.js` via `fetch('./catalog.json')`. All computed properties access it through `this.state.catalog`.
+---
 
-3. **Infrastructure contracts use the standard format.** Follow the pattern in `rate_limiting`, `caching`, `queues` — functions, types, invariants, providers, then system integrations.
+## Doc Structure for Agents
 
-4. **Adapters are YAML in `/adapters/<module>/`.** Each adapter declares `implements` (function names) and `does_not_implement`. Add a `languages` field listing supported code generators.
+When an agent reads the repo to understand a task, follow this order:
 
-5. **Security defaults are opt-out, not opt-in.** Generated schemas add audit columns, tenant isolation, RLS by default. The engineer removes them if not needed.
+1. **AGENTS.md** (this file) — project map and conventions
+2. **docs/system-design-strategy.md** — where the project is heading (v0.3.0+)
+3. **docs/alias-spec.md** — alias system specification
+4. **CONTRIBUTING.md** — how to add contracts and adapters
+5. **README.md** — public-facing documentation
+
+For contract modifications, read the existing contract first to match the style (indentation, section ordering, invariants tone).
