@@ -1,5 +1,5 @@
 import { classifySectionBody, parseSectionBody } from "./section-body.js";
-import type { ContractFunction, ContractType, ParseIssue, ParseMode, RawSection } from "./catalog.js";
+import type { AlgorithmInfo, ContractFunction, ContractType, ParseIssue, ParseMode, RawSection } from "./catalog.js";
 
 export function collectFunctions(file: string, sections: RawSection[], mode: ParseMode): { items: ContractFunction[]; issues: ParseIssue[] } {
   const items: ContractFunction[] = [];
@@ -126,6 +126,51 @@ export function extractCoreInherits(sections: RawSection[]): string[] {
     }
   }
   return inherits;
+}
+
+export function collectAlgorithmSection(sections: RawSection[]): AlgorithmInfo | undefined {
+  for (const section of sections) {
+    const body = classifySectionBody(section.content, section.startLine, section.endLine);
+    let recommended = "";
+    let details = "";
+    let atomicity = "";
+    let raw = "";
+
+    for (const line of body.lines) {
+      const text = stripTextLine(line);
+      if (!text) continue;
+
+      const recommendedMatch = text.match(/\*\*Recommended:\*\*\s*(.+)/i);
+      if (recommendedMatch) {
+        recommended = recommendedMatch[1]?.trim() ?? "";
+        continue;
+      }
+
+      const detailsMatch = text.match(/\*\*Details:\*\*\s*(.+)/i);
+      if (detailsMatch) {
+        details = detailsMatch[1]?.trim() ?? "";
+        continue;
+      }
+
+      const atomicityMatch = text.match(/\*\*Atomicity:\*\*\s*(.+)/i);
+      if (atomicityMatch) {
+        atomicity = atomicityMatch[1]?.trim() ?? "";
+        continue;
+      }
+
+      raw += text + "\n";
+    }
+
+    if (recommended || details) {
+      return {
+        recommended,
+        details,
+        atomicity: atomicity || undefined,
+        raw: raw.trim(),
+      };
+    }
+  }
+  return undefined;
 }
 
 export function issue(file: string, section: string, startLine: number, endLine: number, message: string, code: ParseIssue["code"], mode: ParseMode): ParseIssue {

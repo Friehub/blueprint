@@ -1,4 +1,4 @@
-import type { ModuleContract, ContractFunction, ContractType } from "../../core/catalog.js";
+import type { ModuleContract, ContractFunction, ContractType, AlgorithmInfo } from "../../core/catalog.js";
 import type { AdapterDefinition } from "../../core/adapters/types.js";
 import { adapterSupportsLanguage } from "../../core/adapters/types.js";
 import type { Language, GeneratorContext, GeneratorResult, GeneratedFile, LanguageGenerator } from "../types.js";

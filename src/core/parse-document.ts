@@ -6,6 +6,7 @@ import type { DocumentEnvelope } from "./envelope.js";
 import {
   collectFunctions, collectTypes, collectTextSections, collectProviders,
   extractDependencies, extractCoreInherits, groupSections, extractSummary, extractVersion, issue,
+  collectAlgorithmSection,
 } from "./collectors.js";
 
 export type ParsedDocument = ModuleContract | CoreContract;
@@ -90,6 +91,7 @@ function parseModuleDocument(
   const integrations = collectTextSections(grouped.get("system-integrations") ?? [], "system-integrations");
   const { hardDeps, softDeps } = extractDependencies(grouped.get("system-integrations") ?? []);
   const coreInherits = extractCoreInherits(grouped.get("system-integrations") ?? []);
+  const algorithm = collectAlgorithmSection(grouped.get("system-integrations") ?? []);
 
   const rawSections = sections;
 
@@ -112,6 +114,7 @@ function parseModuleDocument(
       invariants,
       providers,
       integrations,
+      algorithm,
       hardDeps,
       softDeps,
       coreInherits,

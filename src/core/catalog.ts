@@ -22,6 +22,13 @@ export type RawSection = {
   endLine: number;
 };
 
+export type AlgorithmInfo = {
+  recommended: string;
+  details: string;
+  atomicity?: string;
+  raw: string;
+};
+
 export type ModuleContract = {
   name: string;
   title: string;
@@ -32,6 +39,7 @@ export type ModuleContract = {
   invariants: string[];
   providers: string[];
   integrations: string[];
+  algorithm?: AlgorithmInfo;
   hardDeps: string[];
   softDeps: string[];
   coreInherits: string[];

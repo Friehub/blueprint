@@ -357,14 +357,20 @@ body {
 .ds-card:active { cursor: grabbing; z-index: 4; }
 .ds-card.selected { border-color: var(--mint); box-shadow: 0 0 0 2px rgba(28,200,88,0.2); }
 .ds-card-name { display: block; font-weight: 600; font-size: 13px; }
+.ds-card-auto { font-size: 10px; color: var(--ember); font-weight: 600; display: block; }
 .ds-card-fn { font-size: 11px; color: var(--fog); }
 .ds-remove { position: absolute; top: 3px; right: 6px; background: none; border: none; color: var(--fog); cursor: pointer; font-size: 14px; line-height: 1; padding: 0 2px; z-index: 5; }
 .ds-remove:hover { color: var(--ember); }
+.ds-card.auto { border-style: dashed; opacity: .85; }
+.ds-card.auto .ds-card-name { color: var(--fog); }
 .ds-empty { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--fog); font-size: 14px; pointer-events: none; }
 .design-info { width: 240px; min-width: 240px; border-left: 1.5px solid var(--border); padding: 14px; overflow-y: auto; font-size: 13px; background: var(--white); }
 .design-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
 .ds-label { color: var(--fog); font-size: 12px; margin-bottom: 4px; }
 .ds-summary { font-size: 12px; line-height: 1.5; margin-bottom: 10px; color: var(--ink); }
+.ds-adapters { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.ds-adapter-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--slate); color: var(--fog); cursor: pointer; }
+.ds-adapter-badge.selected { background: var(--mint); color: var(--white); }
 .ds-stats { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
 .ds-stats p { font-size: 12px; color: var(--fog); margin-bottom: 3px; }
 .ds-export { width: 100%; padding: 8px; margin-top: 16px; border: 1.5px solid var(--mint); border-radius: 6px; background: var(--white); color: var(--mint); font-size: 12px; font-weight: 600; cursor: pointer; }
