@@ -17,20 +17,31 @@ listFlags() → Flag[]
 getFlag(flag_key) → Flag
 rolloutToPercent(flag_key, percentage) → Flag
 evaluateAll(user_id, context?) → Record<string, boolean>
+createSegment(name, matchers) → Segment
+updateSegment(segment_id, matchers) → Segment
+deleteSegment(segment_id) → void
+listSegments() → Segment[]
+evaluateSegment(segment_id, user_id, context?) → boolean
 ```
 
 **Types**
 ```
-Flag { key, enabled, rollout_percentage?, rules?, variants? }
+Flag { key, enabled, rollout_percentage?, rules?, segments[]?, variants?, targeting: TargetingRule[] }
 Variant { key, value, weight }
 RolloutRule { attribute, operator, value, percentage }
+Segment { id, name, matchers: SegmentMatcher[], created_at, updated_at }
+SegmentMatcher { attribute, operator: in|not_in|contains|matches|gte|lte|before|after, values: string[] }
+TargetingRule { segment_id | user_ids[] | percentage, variant?, serve: boolean|variant_key }
 ```
 
 **Invariants**
 - Flag evaluation must be consistent for the same `(flag_key, user_id)` pair within a request
 - Archived flags must always return `false` without error
+- Segment matchers must be evaluated in order and the first matching rule determines the segment membership -- a user must not match multiple overlapping segment rules
+- A `TargetingRule` referencing a deleted segment must be treated as `serve: false` -- the evaluation must not throw
+- When a flag has both `rollout_percentage` and `segments`, segment-matched users must bypass the percentage rollout -- segments take priority over percentage
 
-**Providers:** LaunchDarkly, Unleash, Flagsmith, Growthbook, custom database
+**Providers:** LaunchDarkly, Unleash, Flagsmith, Growthbook, Split, custom database
 
 ---
 

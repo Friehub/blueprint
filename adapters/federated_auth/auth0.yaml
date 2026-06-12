@@ -1,0 +1,42 @@
+name: auth0
+module: federated_auth
+version: 1.0.0
+description: Auth0 federated identity adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - connectIdentity
+  - disconnectIdentity
+  - getConnectedIdentities
+  - getIdentity
+  - getProviderConfig
+  - listConfiguredProviders
+  - initiateOAuth
+  - refreshProviderToken
+
+does_not_implement:
+  - handleSamlAssertion
+
+config:
+  required:
+    - name: domain
+      type: string
+      description: Auth0 tenant domain (e.g., tenant.auth0.com)
+    - name: client_id
+      type: string
+      description: Auth0 application client ID
+    - name: client_secret
+      type: string
+      description: Auth0 application client secret
+      secret: true
+  optional:
+    - name: audience
+      type: string
+      description: Auth0 API audience
+    - name: connection
+      type: string
+      description: Default Auth0 connection name
+
+metadata:
+  provider_url: https://auth0.com
+  docs_url: https://auth0.com/docs

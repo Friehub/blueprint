@@ -12,6 +12,11 @@ implements:
   - getFlag
   - rolloutToPercent
   - evaluateAll
+  - createSegment
+  - updateSegment
+  - deleteSegment
+  - listSegments
+  - evaluateSegment
 
 does_not_implement: []
 
