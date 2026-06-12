@@ -1,7 +1,7 @@
 {
   "name": "@friehub/blueprint",
   "version": "0.2.1",
-  "description": "A domain contract catalogue for backend development. 155 module contracts, 83 adapters, 5 languages, AI-ready via 12 MCP tools.",
+  "description": "A domain contract catalogue for backend development. 176 module contracts, 94 adapters, 5 languages, AI-ready via 14 MCP tools.",
   "keywords": [
     "contract",
     "domain",
@@ -16,12 +16,12 @@
   "author": "Friehub",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/friehub/engineering-blueprinter.git"
+    "url": "git+https://github.com/Friehub/blueprint.git"
   },
   "bugs": {
-    "url": "https://github.com/friehub/engineering-blueprinter/issues"
+    "url": "https://github.com/Friehub/blueprint/issues"
   },
-  "homepage": "https://github.com/friehub/engineering-blueprinter#readme",
+  "homepage": "https://github.com/Friehub/blueprint#readme",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
@@ -30,8 +30,7 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "blueprint": "./dist/cli.js",
-    "blueprinter": "./dist/cli.js"
+    "blueprint": "./dist/cli.js"
   },
   "files": [
     "dist/catalog.min.json",
@@ -72,6 +71,10 @@
     "dist/generators/rust/helpers.js",
     "dist/generators/java/index.js",
     "dist/generators/java/helpers.js",
+    "dist/generators/database/index.js",
+    "dist/generators/database/types.js",
+    "dist/generators/database/postgres.js",
+    "dist/generators/database/mongodb.js",
     "dist/generators/prototype/index.js",
     "dist/mcp/server.js",
     "dist/cli/commands.js",
@@ -91,6 +94,7 @@
     "build": "tsc -p tsconfig.json && node scripts/build-catalog.cjs && node scripts/strip-catalog.cjs && node scripts/extract-entities.cjs && node scripts/hash-catalog.cjs",
     "check": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit --strict",
+    "pretest": "npm run build",
     "test": "node --test \"dist/**/*.test.js\"",
     "test:mcp": "node --test 'dist/mcp/*.test.js'",
     "precommit": "bash scripts/pre-commit.sh",

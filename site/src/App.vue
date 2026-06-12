@@ -6,6 +6,7 @@
     <a :class="{ active: state.view === 'mcp' }" @click="goMcp">MCP</a>
     <a :class="{ active: state.view === 'architecture' }" @click="goArchitecture">Architecture</a>
     <a :class="{ active: state.view === 'generators' }" @click="goGenerators">Generators</a>
+    <a :class="{ active: state.view === 'design' }" @click="goDesign">Design &beta;</a>
     <a :class="{ active: state.view === 'modules' }" @click="goModules">Modules</a>
     <a :class="{ active: state.view === 'adapters' }" @click="goAdapters">Adapters</a>
     <a :class="{ active: state.view === 'sagas' }" @click="goSagas">Sagas</a>
@@ -22,9 +23,9 @@
     <!-- HOME -->
     <template v-if="state.view === 'home'">
       <div class="hero">
-        <div class="hero-badge">v0.2.0 &middot; Open Source</div>
+        <div class="hero-badge">v0.2.1 &middot; Open Source</div>
         <h1 class="hero-title">Backend contracts<br/>for <span class="mint">AI agents</span> and engineers</h1>
-        <p class="hero-sub">155 domain modules &middot; 83 adapters &middot; 5 code generators &middot; 12 MCP tools</p>
+        <p class="hero-sub">176 domain modules &middot; 94 adapters &middot; 5 code generators &middot; 14 MCP tools</p>
         <div class="hero-cta">
           <code class="install-cmd">npm install -g @friehub/blueprint</code>
         </div>
@@ -45,20 +46,20 @@
       <div class="home-section">
         <h2>The Solution</h2>
         <p>Blueprint defines the interface for each domain module once: what functions it exposes, what types it uses, what invariants it enforces, what system constraints it operates under, and what other modules it depends on. The same contract works whether you use Stripe, Paystack, or Adyen. The same interface generates code in TypeScript, Python, Go, Rust, and Java.</p>
-        <p>The catalog covers 162 modules across the full backend surface: billing, orders, inventory, search, queuing, fraud detection, AI/ML gateways, data pipelines, compliance, real-time collaboration, infrastructure primitives, and more. Each module is a self-contained contract specifying function signatures, data types, behavioural invariants, system-level constraints (consistency, delivery, multi-region), and dependencies on other modules.</p>
+        <p>The catalog covers 176 modules across the full backend surface: billing, orders, inventory, search, queuing, fraud detection, AI/ML gateways, data pipelines, compliance, real-time collaboration, infrastructure primitives, and more. Each module is a self-contained contract specifying function signatures, data types, behavioural invariants, system-level constraints (consistency, delivery, multi-region), and dependencies on other modules.</p>
         <p>Because every contract follows the same strict structure, the entire catalog can be parsed, validated, and reasoned about programmatically. This enables capabilities that a static collection of markdown files cannot provide:</p>
         <ul class="feature-list">
           <li><strong>Dependency resolution</strong> Selecting <em>billing</em> automatically pulls in <em>payments</em>, <em>users</em>, <em>notifications</em>, <em>audit_log</em>, and <em>usage_metering</em>. The resolver walks the full transitive graph so you know the true cost of every module before you start implementing.</li>
           <li><strong>Multi-language code generation</strong> From a single contract, generators produce typed interfaces, adapter skeletons, and conformance tests in TypeScript, Python, Go, Rust, and Java. The same contract works across your entire stack.</li>
           <li><strong>Provider abstraction</strong> The payments contract is identical whether backed by Stripe, Paystack, or Adyen. Switching providers means changing one line in your adapter selection, not rewriting business logic.</li>
-          <li><strong>AI agent integration</strong> The MCP server exposes all 162 modules, their dependencies, database schemas, sagas, and distributed patterns as 12 tools that AI agents can query directly over stdio.</li>
+          <li><strong>AI agent integration</strong> The MCP server exposes all 176 modules, their dependencies, database schemas, sagas, and distributed patterns as 14 tools that AI agents can query directly over stdio.</li>
         </ul>
       </div>
 
       <div class="home-section">
         <h2>How it works</h2>
         <div class="pipeline">
-          <div class="pipe-step"><strong>1. Contracts</strong><span>155 markdown files define every function, type, and invariant</span></div>
+          <div class="pipe-step"><strong>1. Contracts</strong><span>176 markdown files define every function, type, and invariant</span></div>
           <div class="pipe-arrow">&rarr;</div>
           <div class="pipe-step"><strong>2. Parser</strong><span>Validates and compiles into a typed catalog</span></div>
           <div class="pipe-arrow">&rarr;</div>
@@ -170,12 +171,12 @@
         </div>
 
         <div class="mcp-section">
-          <h3>12 Tools</h3>
-          <p>Once connected, your AI agent has access to these tools:</p>
+          <h3>14 Tools</h3>
+          <p>Once connected, your AI agent has access to 14 tools:</p>
           <table class="mcp-table">
             <thead><tr><th>Tool</th><th>What it gives the agent</th></tr></thead>
             <tbody>
-              <tr><td class="mcp-tool">list_modules</td><td>All 162 modules with function counts and dependency lists</td></tr>
+              <tr><td class="mcp-tool">list_modules</td><td>All 176 modules with function counts and dependency lists</td></tr>
               <tr><td class="mcp-tool">get_module</td><td>Full contract for one module: functions, types, invariants, constraints</td></tr>
               <tr><td class="mcp-tool">search_modules</td><td>Find modules by name, summary, or function name</td></tr>
               <tr><td class="mcp-tool">resolve_deps</td><td>Transitive dependency resolution: every module required by a set</td></tr>
@@ -187,6 +188,8 @@
               <tr><td class="mcp-tool">get_distributed_patterns</td><td>Recommended patterns: saga, outbox, idempotency table, optimistic locking</td></tr>
               <tr><td class="mcp-tool">validate_implementation</td><td>Check a code description against contract invariants; returns violations</td></tr>
               <tr><td class="mcp-tool">suggest_modules</td><td>Given a plain-English description, suggest modules + implementation order</td></tr>
+              <tr><td class="mcp-tool">get_entity_model</td><td>Entity model for a module: fields, types, FK relationships, storage hints</td></tr>
+              <tr><td class="mcp-tool">design_system</td><td>Combined system design: suggests modules + resolves deps + entity models + sagas + schemas</td></tr>
             </tbody>
           </table>
         </div>
