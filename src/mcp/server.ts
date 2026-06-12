@@ -27,7 +27,7 @@ const ROOT_DIR = existsSync(join(PACKAGE_ROOT, "dist", "catalog.min.json")) ? PA
 const AUTH_TOKEN = process.argv.find((a, i) => a === "--auth-token") ? process.argv[process.argv.indexOf("--auth-token") + 1] : null;
 
 const server = new Server(
-  { name: "engineering-blueprint", version: "0.1.0" },
+  { name: "@friehub/blueprint", version: "0.2.1" },
   { capabilities: { tools: {} } },
 );
 

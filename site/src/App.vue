@@ -160,7 +160,7 @@
   "mcpServers": {
     "blueprint": {
       "command": "npx",
-      "args": ["engineering-blueprint", "mcp"]
+      "args": ["@friehub/blueprint", "mcp"]
     }
   }
 }</code>
