@@ -26,7 +26,7 @@ UnreadSummary { total, by_thread: Record<string, number>, by_channel: Record<str
 ```
 
 **Invariants**
-- `markRead` for an already-read message must be a no-op — it must not update the `read_at` timestamp
+- `markRead` for an already-read message must be a no-op -- it must not update the `read_at` timestamp
 - A user must not be able to mark messages as read in a thread they are not a participant of
 - `getUnreadCount` must count messages that were created after the user's last read marker and that the user has access to
 

@@ -31,7 +31,7 @@ Completion { word, description, type: command|option|value }
 ```
 
 **Invariants**
-- `runCommand` must never throw — all errors must be captured as non-zero exit codes in `ExecResult`
+- `runCommand` must never throw -- all errors must be captured as non-zero exit codes in `ExecResult`
 - `getHelp` without a command name must list all top-level commands; with a command name it must show detailed usage for that command
 - `parseArguments` with unknown flags must collect them in the `unknown` array rather than erroring immediately
 

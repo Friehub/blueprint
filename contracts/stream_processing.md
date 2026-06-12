@@ -34,7 +34,7 @@ StreamConfig { checkpoint_interval?, max_parallelism?, error_handling?, exactly_
 
 **Invariants**
 - A stopped stream must checkpoint its current offset before shutdown so it can resume from the correct position
-- `applyTransformation` on a running stream must not affect in-flight events — the new transform applies only to events received after activation
+- `applyTransformation` on a running stream must not affect in-flight events -- the new transform applies only to events received after activation
 - Events that fail processing must be sent to a dead-letter sink, not silently dropped
 
 **Providers:** Kafka Streams, Flink, Spark Streaming, Kinesis Data Analytics, custom

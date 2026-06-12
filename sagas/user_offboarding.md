@@ -8,26 +8,26 @@
 
 ## Steps
 
-1. **initiate_offboarding(user_id, reason)** — Create offboarding record, lock user account
-   **Compensation:** `users.reactivateUser(user_id)` — restore account if offboarding cancelled
+1. **initiate_offboarding(user_id, reason)** -- Create offboarding record, lock user account
+   **Compensation:** `users.reactivateUser(user_id)` -- restore account if offboarding cancelled
 
 2. **cancel_active_subscriptions(user_id)** → `Subscription[]`
-   **Compensation:** `billing.reactivateSubscription(id)` — only available within grace window
+   **Compensation:** `billing.reactivateSubscription(id)` -- only available within grace window
 
 3. **export_user_data(user_id, destinations[])** → `ExportResult`
    **Compensation:** delete exported data if offboarding fails (best-effort)
 
 4. **revoke_api_keys(user_id)** → `void`
-   **Compensation:** none — keys are regenerated if user reactivates
+   **Compensation:** none -- keys are regenerated if user reactivates
 
 5. **schedule_data_deletion(user_id, retention_delay)** → `ScheduledDeletion`
-   **Compensation:** `data_retention.cancelPurge(schedule_id)` — cancel if user reactivates
+   **Compensation:** `data_retention.cancelPurge(schedule_id)` -- cancel if user reactivates
 
 6. **[async]** After retention window: **execute_data_deletion(user_id)** → `ErasureResult`
-   **Compensation:** none — deletion is irreversible
+   **Compensation:** none -- deletion is irreversible
 
 7. **[async] certify_deletion(user_id)** → `Certification`
-   **Compensation:** none — certification is append-only audit record
+   **Compensation:** none -- certification is append-only audit record
 
 8. **[async] notify_user(user_id, completion_summary)** → Notification
    **Compensation:** async, non-blocking

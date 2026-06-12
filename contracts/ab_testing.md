@@ -101,7 +101,7 @@ type CreateExperimentInput = {
   variants: Variant[];
   targetMetrics: TargetMetric[];
   allocationStrategy: AllocationStrategy;
-  trafficPercent: number;          // Percent of eligible subjects enrolled (0–100)
+  trafficPercent: number;          // Percent of eligible subjects enrolled (0--100)
   eligibilityCriteria?: Record<string, unknown>; // e.g. { country: "US", plan: "pro" }
   startDate?: Timestamp;
   endDate?: Timestamp;

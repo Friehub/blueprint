@@ -25,7 +25,7 @@ TypingSubscription { id, channel, handler, status: active|paused }
 
 **Invariants**
 - A user who has not sent a `startTyping` heartbeat within the timeout must be automatically expired from the typing list
-- `stopTyping` must immediately remove the user from the typing indicator list — it must not wait for expiry
+- `stopTyping` must immediately remove the user from the typing indicator list -- it must not wait for expiry
 - A user must not appear in the typing list for a channel they are not a participant of
 
 **Providers:** custom (WebSocket), Presence (Liveblocks, Ably, Pusher)
@@ -83,5 +83,5 @@ gensense_typing_indicators_active_users_total    { channel }
 
 ### Module Dependencies
 * **Depends On:** presence, messaging
-* **Emits To:** (none — ephemeral state only)
+* **Emits To:** (none -- ephemeral state only)
 * **Recommends:** live_updates

@@ -32,7 +32,7 @@ SearchResult { doc_id, title, module, snippet, score }
 
 **Invariants**
 - An API key with `revoked` status must immediately stop working for all API calls
-- `searchDocumentation` must return results sorted by relevance — all results must include a relevance score
+- `searchDocumentation` must return results sorted by relevance -- all results must include a relevance score
 - A breaking change in the changelog must reference the migration guide in the documentation
 
 **Providers:** custom, ReadMe, Stoplight, Postman, SwaggerHub

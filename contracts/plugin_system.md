@@ -39,9 +39,9 @@ Publisher { id, name, public_key, status: active|revoked, created_at }
 ```
 
 **Invariants**
-- A plugin must declare all the hooks it implements — implementing an undeclared hook is a contract violation
-- Plugins must be isolated from each other — one plugin's failure must not affect other plugins or the host application
-- `disablePlugin` must not unload the plugin from memory — it must only prevent it from responding to hooks
+- A plugin must declare all the hooks it implements -- implementing an undeclared hook is a contract violation
+- Plugins must be isolated from each other -- one plugin's failure must not affect other plugins or the host application
+- `disablePlugin` must not unload the plugin from memory -- it must only prevent it from responding to hooks
 - Every plugin must carry a valid signature from a registered publisher before it can be loaded, regardless of source. `loadPlugin` must call `verifyPluginSignature` and reject loading if the signature is invalid or the publisher is not in the registry.
 - The `PluginManifest` must include a `signature` field and a `publisher_id` field. A manifest missing either is not valid for loading.
 

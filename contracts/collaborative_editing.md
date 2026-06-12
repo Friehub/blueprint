@@ -32,9 +32,9 @@ ResolvedOperation { operation_id, resolution: a_wins|b_wins|merge, merged_operat
 ```
 
 **Invariants**
-- Operations must be applied in causal order — concurrent operations must be merged using CRDT semantics
+- Operations must be applied in causal order -- concurrent operations must be merged using CRDT semantics
 - A document's version must increment monotonically with each applied operation, never decrement
-- `getDocument` must return the document state at the latest applied version — partial application must not be visible
+- `getDocument` must return the document state at the latest applied version -- partial application must not be visible
 
 **Providers:** Yjs, Automerge, ShareJS, Liveblocks, custom (CRDT)
 

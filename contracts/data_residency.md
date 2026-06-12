@@ -29,7 +29,7 @@ ComplianceCheck { check, passed: bool, detail, timestamp }
 **Invariants**
 - `routeRequest` for a data domain with a `strict` enforcement must deny any request that would store or process data outside the declared region
 - A data domain with no residency rule must be treated as `soft` enforcement (logged but not blocked)
-- Removing a residency rule must not physically relocate existing data — migration is an explicit separate operation
+- Removing a residency rule must not physically relocate existing data -- migration is an explicit separate operation
 
 **Providers:** custom, AWS S3 (bucket region), GCS (location), Azure (region pinning)
 

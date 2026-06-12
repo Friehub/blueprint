@@ -31,8 +31,8 @@ DashboardView { sla_id, current_uptime_pct, ytd_uptime_pct, breaches_ytd: number
 
 **Invariants**
 - Time within a declared maintenance window must be excluded from uptime calculations
-- A breach must be calculated at the end of the measurement window, not before — partial windows must not trigger breach calculations
-- `reportIncident` must not modify the SLA uptime target — it only records the incident for exclusion or root cause analysis
+- A breach must be calculated at the end of the measurement window, not before -- partial windows must not trigger breach calculations
+- `reportIncident` must not modify the SLA uptime target -- it only records the incident for exclusion or root cause analysis
 
 **Providers:** custom, Pingdom, Statuspage, Datadog SLO, New Relic SLO
 

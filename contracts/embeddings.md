@@ -142,7 +142,7 @@ type SimilarityQueryInput = {
   indexId: EmbeddingIndexId;
   queryVector: number[];
   topK: number;
-  minScore?: number;               // Minimum similarity score (0.0 – 1.0)
+  minScore?: number;               // Minimum similarity score (0.0 -- 1.0)
   filter?: MetadataFilter[];
   includeVector?: boolean;         // Whether to return the raw vector in results
   includeMetadata?: boolean;
@@ -159,7 +159,7 @@ type TextQueryInput = {
 
 type HybridQueryInput = TextQueryInput & {
   keywordQuery?: string;           // Optional BM25/keyword component
-  vectorWeight?: number;           // 0.0–1.0; weight given to semantic vs keyword score
+  vectorWeight?: number;           // 0.0--1.0; weight given to semantic vs keyword score
 };
 
 type SimilarityResult = {

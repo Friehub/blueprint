@@ -72,7 +72,7 @@ type PdfOptions = {
   orientation: PageOrientation;
   margins?: PdfMargins;
   printBackground: boolean;        // Whether to render CSS background colors and images
-  scale?: number;                  // 0.1–2.0; defaults to 1.0
+  scale?: number;                  // 0.1--2.0; defaults to 1.0
   headerTemplate?: string;         // HTML for the page header; printed on each page
   footerTemplate?: string;         // HTML for the page footer; printed on each page
   pageRanges?: string;             // e.g. "1-5, 8, 11-13"

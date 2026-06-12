@@ -32,9 +32,9 @@ PolicyOptions { evaluation_mode: allow_overrides|deny_overrides|first_match, log
 ```
 
 **Invariants**
-- `evaluate` must return a decision for every request — it must never return an ambiguous result
+- `evaluate` must return a decision for every request -- it must never return an ambiguous result
 - A deny rule matching the request context must always override an allow rule when `evaluation_mode` is `deny_overrides`
-- Policy evaluation must be deterministic — the same inputs must always produce the same decision
+- Policy evaluation must be deterministic -- the same inputs must always produce the same decision
 
 **Providers:** OPA (Rego), Casbin, Cedar, Oso, custom
 

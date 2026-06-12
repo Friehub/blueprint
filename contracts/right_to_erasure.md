@@ -31,7 +31,7 @@ ServiceError { service, reason, manual_intervention_required }
 ```
 
 **Invariants**
-- `identifyDataSources` must return every service that holds data for the user — omitting a service is a compliance violation
+- `identifyDataSources` must return every service that holds data for the user -- omitting a service is a compliance violation
 - Data in a service with a legal hold must be excluded from erasure and reported in the result as `legal_hold_active`
 - `certifyDeletion` must include confirmation from every service that holds user data before certification is valid
 

@@ -151,7 +151,7 @@ CREATE TABLE inventory_adjustments (
 **Scheduled expiry (reservation cleanup):**
 * Background worker queries inventory_reservations WHERE status = 'active' AND expires_at < now()
 * For each expired reservation: release stock, emit inventory.stock.released event
-* Idempotent — double-expiry is a no-op
+* Idempotent -- double-expiry is a no-op
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `inventory.<function>`.

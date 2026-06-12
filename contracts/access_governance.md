@@ -33,7 +33,7 @@ RecurringReviewConfig { cadence, reviewer_assignment, auto_revoke: bool, reminde
 **Invariants**
 - A grant with no decision by the review due date must default to `revoke` if `auto_revoke` is enabled, or be flagged as `no_decision` otherwise
 - `completeReview` must fail if any reviewer has pending decisions and the due date has not passed
-- `revokeStaleAccess` must implement the decisions recorded in the review — it must not make its own access decisions
+- `revokeStaleAccess` must implement the decisions recorded in the review -- it must not make its own access decisions
 
 **Providers:** custom, SailPoint, Okra, BetterCloud
 
@@ -49,7 +49,7 @@ RecurringReviewConfig { cadence, reviewer_assignment, auto_revoke: bool, reminde
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_least_once` for review lifecycle and revocation events.
-* **Details:** Duplicate revocation events must be safe — revoking an already-revoked grant is a no-op.
+* **Details:** Duplicate revocation events must be safe -- revoking an already-revoked grant is a no-op.
 
 ### Worker Scaling
 * **Policy:** Review creation, decision submission, and revocation execution must be independently scalable.

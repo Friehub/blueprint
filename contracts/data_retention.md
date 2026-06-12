@@ -31,7 +31,7 @@ ExportResult { policy_id, records_exported, destination, format, size_bytes }
 
 **Invariants**
 - Data must never be purged without first checking for a legal hold or active retention exception
-- `exportBeforePurge` must complete before any records are deleted — a failed export must abort the purge
+- `exportBeforePurge` must complete before any records are deleted -- a failed export must abort the purge
 - A policy targeting a data category that overlaps with another policy must apply the longest retention, not the shortest
 
 **Providers:** custom, AWS S3 Lifecycle, GCS Object Lifecycle, Vault (secret rotation)

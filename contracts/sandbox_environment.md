@@ -32,8 +32,8 @@ CredentialViolation { credential_name, reason: matches_production|not_in_policy,
 ```
 
 **Invariants**
-- An expired sandbox must reject all API calls with a `sandbox_expired` error — resources must be preserved for a grace period before cleanup
-- `resetSandbox` must return the sandbox to its original provisioned state — all modifications since provisioning must be discarded
+- An expired sandbox must reject all API calls with a `sandbox_expired` error -- resources must be preserved for a grace period before cleanup
+- `resetSandbox` must return the sandbox to its original provisioned state -- all modifications since provisioning must be discarded
 - A sandbox must not have access to production resources or real external provider credentials
 - `validateSandboxCredentials` must run automatically at provisioning time. Provisioning must fail if any credential in the sandbox configuration matches a known production credential or falls outside the declared `SandboxCredentialPolicy`
 - Every sandbox template must declare its `credential_policy` before it can be used for provisioning

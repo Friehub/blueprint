@@ -34,7 +34,7 @@ ScheduledReport { id, template_id, cadence, last_run_at, next_run_at }
 
 **Invariants**
 - A control with no evidence source mapped must be reported as `not_evidenced`, never as `compliant`
-- `generateReport` must include all controls defined in the template — omitting a control is a compliance gap
+- `generateReport` must include all controls defined in the template -- omitting a control is a compliance gap
 - Evidence collected outside the report period must not be included in the evidence bundle
 
 **Providers:** custom, Drata, Vanta, SecureFrame, Sprinto

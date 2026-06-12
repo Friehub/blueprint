@@ -28,7 +28,7 @@ MockConfig { delay_ms?, variability?, error_rate?, stateful?, script? }
 ```
 
 **Invariants**
-- A mock endpoint must return its configured response within the configured `delay_ms` — it must not make real network calls
+- A mock endpoint must return its configured response within the configured `delay_ms` -- it must not make real network calls
 - Recorded requests must be stored in the order received and include full headers and body
 - `replayRequests` must resend recorded requests to the original endpoint if a real endpoint is configured for replay
 

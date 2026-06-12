@@ -52,7 +52,7 @@ LimitWindow = second | minute | hour | day
 
 ### Algorithm
 * **Recommended:** Sliding window counter for distributed rate limiting (Redis sorted sets + Lua). Token bucket for burst-tolerant per-client limits. Leaky bucket for smoothing request peaks into a steady throughput.
-* **Atomicity:** All limit checks and consumption must be atomic. Read-check-write patterns are not permitted — use Lua scripts or equivalent server-side atomic operations.
+* **Atomicity:** All limit checks and consumption must be atomic. Read-check-write patterns are not permitted -- use Lua scripts or equivalent server-side atomic operations.
 * **Accuracy vs performance tradeoff:** Sliding window log provides exact counts but higher memory. Sliding window counter provides approximate counts with lower memory. Token bucket provides burst tolerance. The implementation must document which algorithm is used and the tradeoff.
 
 ### Storage Model

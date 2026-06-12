@@ -31,8 +31,8 @@ Severity = low | medium | high | critical
 ```
 
 **Invariants**
-- A blocked IP must be rejected before any authentication or business logic runs — the block check must be the first operation in the request pipeline
-- `isBlocked` must complete in sub-millisecond time for hot-path requests — it must not make external network calls or database queries that add measurable latency
+- A blocked IP must be rejected before any authentication or business logic runs -- the block check must be the first operation in the request pipeline
+- `isBlocked` must complete in sub-millisecond time for hot-path requests -- it must not make external network calls or database queries that add measurable latency
 - An entry with `enforcement: hard` must reject the request with no further processing; `enforcement: soft` must allow the request but log and alert
 - `blockIp` with an IP already covered by an existing CIDR range entry must succeed (the specific IP entry overrides the range for observability)
 - Entries with `expires_at` in the past must be treated as expired and must not affect `isBlocked` results
@@ -60,7 +60,7 @@ Severity = low | medium | high | critical
 
 ### Multi-Region Behavior
 * **Mode:** Blocklist state must be replicated across all regions within a bounded propagation delay (default 60 seconds).
-* **Details:** During propagation delay, a region may serve a request from a recently blocked IP — this is acceptable as long as the delay is documented and the region converges within the declared window.
+* **Details:** During propagation delay, a region may serve a request from a recently blocked IP -- this is acceptable as long as the delay is documented and the region converges within the declared window.
 
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).

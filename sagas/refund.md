@@ -8,7 +8,7 @@
 
 ## Steps
 
-1. **validate_refund(order_id, amount, reason)** — Verify refund is within policy window and amount
+1. **validate_refund(order_id, amount, reason)** -- Verify refund is within policy window and amount
    **Compensation:** none (read-only)
 
 2. **create_refund_record(order_id, amount, reason)** → `RefundRecord`
@@ -17,13 +17,13 @@
 3. **initiate_refund(payment_id, amount, reason, idempotency_key)** → `Refund`
    **Compensation:** If provider rejects, mark refund record as failed (no rollback needed)
 
-4. **restore_inventory(order_id, items[])** — Return items to available stock if physical goods
+4. **restore_inventory(order_id, items[])** -- Return items to available stock if physical goods
    **Compensation:** none (restocking is idempotent)
 
-5. **update_order_status(order_id, status: "returned")** — If full refund
+5. **update_order_status(order_id, status: "returned")** -- If full refund
    **Compensation:** none (idempotent)
 
-6. **[async] notify_user(order_id, refund_amount, method)** — Inform user of completed refund
+6. **[async] notify_user(order_id, refund_amount, method)** -- Inform user of completed refund
    **Compensation:** async, non-blocking
 
 ---

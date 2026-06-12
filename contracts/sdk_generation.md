@@ -29,7 +29,7 @@ SDKOptions { package_name?, namespace?, include_tests?, include_docs?, http_clie
 ```
 
 **Invariants**
-- Generated SDK code must match the OpenAPI spec exactly — a spec change must produce a different SDK version
+- Generated SDK code must match the OpenAPI spec exactly -- a spec change must produce a different SDK version
 - A deprecated SDK must still be downloadable but must not be recommended for new installations
 - The SDK must include typed interfaces for every endpoint and schema in the specification
 

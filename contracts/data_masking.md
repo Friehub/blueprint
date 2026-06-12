@@ -35,7 +35,7 @@ PiiClassification { field, category: email|phone|ssn|credit_card|address|name|do
 
 **Invariants**
 - A masked value with `reversible: false` must never be recoverable through any function in this module
-- `tokenize` and `detokenize` must be authenticated — any caller without a valid token context must receive an error
+- `tokenize` and `detokenize` must be authenticated -- any caller without a valid token context must receive an error
 - `redactLog` must preserve the log structure (timestamp, level, correlation_id) while masking only sensitive fields
 
 **Providers:** custom, AWS Macie, Microsoft Purview, Privitar, Protegrity
@@ -52,7 +52,7 @@ PiiClassification { field, category: email|phone|ssn|credit_card|address|name|do
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_most_once` for masking operations.
-* **Details:** Masking is idempotent — applying the same rule to the same input produces the same output.
+* **Details:** Masking is idempotent -- applying the same rule to the same input produces the same output.
 
 ### Worker Scaling
 * **Policy:** Tokenization, masking, and redaction must scale with data volume independently.

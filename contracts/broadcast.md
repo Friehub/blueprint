@@ -30,7 +30,7 @@ Segment { field, operator, value }
 
 **Invariants**
 - A broadcast must not send to recipients who have opted out of the broadcast channel
-- `cancelBroadcast` must stop delivery to recipients who have not yet received the message — it must not recall delivered messages
+- `cancelBroadcast` must stop delivery to recipients who have not yet received the message -- it must not recall delivered messages
 - `scheduleBroadcast` with a send_at in the past must send immediately
 
 **Providers:** OneSignal, Firebase, SendGrid (broadcast), Mailgun, custom

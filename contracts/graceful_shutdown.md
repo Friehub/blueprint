@@ -27,11 +27,11 @@ Phase = stop_accepting | drain_requests | close_connections | flush_buffers | sh
 ```
 
 **Invariants**
-- `initiateShutdown` must stop accepting new requests immediately — the first phase must complete before any subsequent phase starts
-- The drain phase must allow in-flight requests to complete up to the configured `timeout_ms` — requests exceeding the timeout must be cancelled with a `shutdown_timeout` error
+- `initiateShutdown` must stop accepting new requests immediately -- the first phase must complete before any subsequent phase starts
+- The drain phase must allow in-flight requests to complete up to the configured `timeout_ms` -- requests exceeding the timeout must be cancelled with a `shutdown_timeout` error
 - Resource cleanup must follow the declared phase order: connections before caches before databases before final exit
 - `getShutdownStatus` must return accurate counts of in-flight requests and pending hooks at any point during the shutdown sequence
-- A shutdown hook that fails must not block subsequent hooks in the same phase — failures must be logged but not prevent shutdown progression
+- A shutdown hook that fails must not block subsequent hooks in the same phase -- failures must be logged but not prevent shutdown progression
 
 **Providers:** custom, Kubernetes preStop, systemd, lifecycle managers
 
@@ -47,7 +47,7 @@ Phase = stop_accepting | drain_requests | close_connections | flush_buffers | sh
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_most_once` for shutdown lifecycle events.
-* **Details:** Duplicate shutdown events must be idempotent — subsequent calls to `initiateShutdown` must return the existing sequence.
+* **Details:** Duplicate shutdown events must be idempotent -- subsequent calls to `initiateShutdown` must return the existing sequence.
 
 ### Worker Scaling
 * **Policy:** Shutdown hooks must execute serially within each phase across all workers.

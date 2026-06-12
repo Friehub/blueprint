@@ -33,7 +33,7 @@ CDCConfig { publication?, slot?, batch_size?, poll_interval?, include_old?, incl
 ```
 
 **Invariants**
-- `getChanges` must return changes in LSN order — events must never be reordered within a stream
+- `getChanges` must return changes in LSN order -- events must never be reordered within a stream
 - A `truncate` operation must be captured as a single event, not as individual row deletions
 - If the source schema changes and `capture_ddl` is enabled, the stream must not drop events during the schema transition
 
@@ -111,6 +111,6 @@ gensense_cdc_events_total                     { table, operation }
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — reads directly from database WAL)
+* **Depends On:** (none -- reads directly from database WAL)
 * **Emits To:** events, event_bus
 * **Recommends:** stream_processing, event_bus, storage

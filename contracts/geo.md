@@ -94,7 +94,7 @@ type ForwardGeocodeResult = {
   longitude: number;
   countryCode: Iso3166Alpha2;
   placeId?: string;                // Provider-assigned place identifier
-  confidence: number;              // 0.0 – 1.0
+  confidence: number;              // 0.0 -- 1.0
 };
 
 type Country = {

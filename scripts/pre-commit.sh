@@ -136,7 +136,38 @@ else
 fi
 echo ""
 
-# 7. Check for no missing file extensions in imports (common TS gotcha)
+# 7. Check for em dash / en dash characters in contracts and sagas
+echo "--- Checking for unicode dashes in contracts/ and sagas/ ---"
+bad_dashes=$(python3 -c "
+import os, sys
+found = []
+for root, dirs, files in os.walk('contracts'):
+    for f in files:
+        if f.endswith('.md'):
+            path = os.path.join(root, f)
+            for i, line in enumerate(open(path, encoding='utf-8'), 1):
+                if '\u2014' in line or '\u2013' in line:
+                    found.append(f'{path}:{i}')
+for root, dirs, files in os.walk('sagas'):
+    for f in files:
+        if f.endswith('.md'):
+            path = os.path.join(root, f)
+            for i, line in enumerate(open(path, encoding='utf-8'), 1):
+                if '\u2014' in line or '\u2013' in line:
+                    found.append(f'{path}:{i}')
+if found:
+    print('\n'.join(found))
+" 2>/dev/null)
+if [ -z "$bad_dashes" ]; then
+  pass
+else
+  echo "  Found unicode dash characters (— or –) in markdown files. Use -- instead:"
+  echo "$bad_dashes" | head -10
+  fail
+fi
+echo ""
+
+# 8. Check for no missing file extensions in imports (common TS gotcha)
 echo "--- Checking import extensions (.js) ---"
 bad_imports=$(grep -rn "from '.*\.ts'" src/ 2>/dev/null || true)
 if [ -z "$bad_imports" ]; then

@@ -99,7 +99,7 @@ type ImportSchemaDefinition = {
   targetModule: string;            // e.g. "users", "catalog", "crm_leads"
   targetOperation: string;         // e.g. "createUser", "upsertProduct", "createLead"
   columns: ColumnMapping[];
-  maxErrorRate: number;            // 0.0 – 1.0; fraction of rows allowed to have errors before INVALID
+  maxErrorRate: number;            // 0.0 -- 1.0; fraction of rows allowed to have errors before INVALID
   onDuplicate: "SKIP" | "UPDATE" | "ERROR";
 };
 

@@ -28,7 +28,7 @@ ReconnectOptions { last_event_id, batch_size, since }
 
 **Invariants**
 - `pushUpdate` must deliver the delta to all active subscriptions matching the resource type and filter
-- `reconnect` must replay missed events starting from `last_event_id` — no events before that ID must be replayed
+- `reconnect` must replay missed events starting from `last_event_id` -- no events before that ID must be replayed
 - A subscription that fails to acknowledge heartbeats within the timeout must be marked as `reconnecting`
 
 **Providers:** WebSocket, SSE, Phoenix Channels, Socket.IO, custom

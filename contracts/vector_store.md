@@ -31,8 +31,8 @@ CollectionConfig { dimension, metric, index_type: hnsw|ivf|flat, index_params? }
 ```
 
 **Invariants**
-- `search` must return results ordered by descending similarity score — every result must include its score
-- Vectors upserted to a collection must match the collection's declared dimension — mismatched dimensions must be rejected
+- `search` must return results ordered by descending similarity score -- every result must include its score
+- Vectors upserted to a collection must match the collection's declared dimension -- mismatched dimensions must be rejected
 - A vector deleted from the store must be removed from the search index before the next search query returns
 
 **Providers:** Chroma, Pinecone, Weaviate, Qdrant, Milvus, pgvector

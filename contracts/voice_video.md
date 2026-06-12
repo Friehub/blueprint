@@ -37,7 +37,7 @@ RoomConfig { max_participants, max_duration, recording_enabled, transcription_en
 ```
 
 **Invariants**
-- `joinRoom` must return a ParticipantToken with a valid JWT that expires — tokens cannot have infinite validity
+- `joinRoom` must return a ParticipantToken with a valid JWT that expires -- tokens cannot have infinite validity
 - A participant must not be able to join a room that has already ended
 - Recording and transcription must not start without explicit consent (if consent enforcement is enabled for the room)
 

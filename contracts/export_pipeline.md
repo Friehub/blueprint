@@ -31,7 +31,7 @@ ManifestEntry { file_name, size_bytes, record_count, checksum, created_at }
 ```
 
 **Invariants**
-- An export with a `schedule` must not run overlapping executions — a new run must not start if the previous run is still active
+- An export with a `schedule` must not run overlapping executions -- a new run must not start if the previous run is still active
 - Exported files must include a manifest record with checksums so consumers can verify integrity
 - `cancelExport` must stop the current batch at the next file boundary, not mid-record
 

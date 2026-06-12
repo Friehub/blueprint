@@ -32,7 +32,7 @@ LineageEntry { dataset_id, source, target, transformation, created_at }
 
 **Invariants**
 - A dataset marked as containing PII must have at least one governance tag specifying the data classification
-- `addLineage` must not create cycles in the lineage graph — upstream + downstream must be a DAG
+- `addLineage` must not create cycles in the lineage graph -- upstream + downstream must be a DAG
 - Archived datasets must not appear in search results by default
 
 **Providers:** Amundsen, DataHub, Atlan, Alation, custom
@@ -76,7 +76,7 @@ registerDataset   → catalog.dataset.registered  { dataset_id, name, domain }
 ```
 Lineage retention:
     duration:       indefinite (lineage is append-only)
-    on_expiry:      N/A — lineage is never purged
+    on_expiry:      N/A -- lineage is never purged
 
   Dataset staleness:
     duration:       90 days without update

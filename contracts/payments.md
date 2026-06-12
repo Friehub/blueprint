@@ -167,7 +167,7 @@ CREATE INDEX idx_wallet_transactions_wallet ON wallet_transactions(wallet_id, cr
 ### Distributed System Patterns
 
 **Saga pattern (initiatePayment):**
-* Step 1: Create payment record (status: pending) — local transaction
+* Step 1: Create payment record (status: pending) -- local transaction
 * Step 2: Call provider (async, with idempotency key)
 * Step 3: On provider success: update status → completed, emit PaymentCompleted event
 * Compensation: On step 2 failure: update status → failed, emit PaymentFailed, refund if wallet was debited

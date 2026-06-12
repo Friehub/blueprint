@@ -163,7 +163,7 @@ CREATE TABLE order_returns (
 * Step 5: Confirm order (status: confirmed) and inventory via inventory.confirmStock
 * Compensation on step 3 failure: cancel order (no payment yet)
 * Compensation on step 4 failure: release inventory, cancel order
-* Compensation on step 5 failure: payment was captured but order confirm failed — retry idempotently
+* Compensation on step 5 failure: payment was captured but order confirm failed -- retry idempotently
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `orders.<function>`.

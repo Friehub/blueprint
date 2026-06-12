@@ -32,9 +32,9 @@ GraphQLError { message, path, locations?, extensions }
 ```
 
 **Invariants**
-- `executeQuery` must resolve fields in order of declaration within a single type — field ordering must be deterministic
-- A resolver that uses `DataLoader` must batch all keys from a single parent selection before resolving — N+1 queries are a contract violation
-- `createSubscription` must support backpressure — if the subscriber is slower than the publisher, the buffer must fill before dropping events rather than unbounded memory growth
+- `executeQuery` must resolve fields in order of declaration within a single type -- field ordering must be deterministic
+- A resolver that uses `DataLoader` must batch all keys from a single parent selection before resolving -- N+1 queries are a contract violation
+- `createSubscription` must support backpressure -- if the subscriber is slower than the publisher, the buffer must fill before dropping events rather than unbounded memory growth
 - Schema changes that remove a field must be preceded by a deprecation period of at least one major version
 
 **Providers:** Apollo Server, Yoga GraphQL, GraphQL.js, codegen, custom
@@ -87,6 +87,6 @@ gensense_graphql_queries_total           { operation_name, result }
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none — wraps external GraphQL library or provider)
+* **Depends On:** (none -- wraps external GraphQL library or provider)
 * **Emits To:** events
 * **Recommends:** caching (for DataLoader memoization), rate_limiting (for query complexity limits), telemetry
