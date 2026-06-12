@@ -13,6 +13,9 @@ import { loadCatalogFromRoot } from "../core/load-catalog.js";
 import { resolve as resolveDeps, detectCycles } from "../core/resolve.js";
 import { searchModules } from "../core/search.js";
 import { loadAdapters } from "../core/adapters/load.js";
+import { postgresRenderer } from "../generators/database/postgres.js";
+import { mongoDbRenderer } from "../generators/database/mongodb.js";
+import type { Entity } from "../generators/database/types.js";
 import type { Catalog, ModuleContract } from "../core/catalog.js";
 import type { AdapterDefinition } from "../core/adapters/types.js";
 
@@ -30,6 +33,7 @@ const server = new Server(
 
 let catalog: Catalog | null = null;
 let adapters: AdapterDefinition[] = [];
+let entities: Entity[] = [];
 
 async function loadData() {
   if (!catalog) {
@@ -37,6 +41,12 @@ async function loadData() {
     catalog = result.value!;
     const adapterResult = await loadAdapters(`${ROOT_DIR}/adapters`);
     adapters = adapterResult.adapters;
+    const entitiesPath = join(ROOT_DIR, "dist", "entities.json");
+    if (existsSync(entitiesPath)) {
+      try {
+        entities = JSON.parse(readFileSync(entitiesPath, "utf8"));
+      } catch { entities = []; }
+    }
   }
 }
 
@@ -188,6 +198,26 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
     },
     {
+      name: "get_entity_model",
+      description: "Get the entity model (fields, types, relationships) for a module, generated from contract type definitions",
+      inputSchema: {
+        type: "object",
+        properties: { module: { type: "string", description: "Module name" } },
+        required: ["module"],
+      },
+    },
+    {
+      name: "design_system",
+      description: "Given a plain-English description of a system, returns suggested modules, resolved dependencies, entity models, relevant sagas, and database schemas in a single response",
+      inputSchema: {
+        type: "object",
+        properties: {
+          description: { type: "string", description: "What you want to build (e.g., 'a checkout flow with fraud detection')" },
+          language: { type: "string", description: "Optional: filter adapters by language" },
+        },
+      },
+    },
+    {
       name: "validate_implementation",
       description: "Check an implementation description against the module contract invariants. Returns violations if any.",
       inputSchema: {
@@ -320,15 +350,33 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (!mod) return { content: [{ type: "text", text: `Module "${modName}" not found` }] };
 
         const schemaSection = extractSectionContent(mod, "database schema");
-        if (!schemaSection) {
-          return {
-            content: [{
-              type: "text",
-              text: `No database schema defined yet for "${modName}". Database schemas will be added to all modules in a future update. The schema for engine "${engine}" would include DDL for tables, indexes, constraints, and design decisions (e.g., amount as BIGINT in smallest unit, optimistic locking version columns, partial indexes for active records).`,
-            }],
-          };
+        if (schemaSection) {
+          return { content: [{ type: "text", text: schemaSection }] };
         }
-        return { content: [{ type: "text", text: schemaSection }] };
+
+        // Generate DDL from entity model
+        const renderer = engine === "mongodb" ? mongoDbRenderer : postgresRenderer;
+        const moduleEntities = entities.filter((e) => e.module === modName);
+        if (moduleEntities.length > 0) {
+          const ddl = renderer.generateDDL(moduleEntities, modName);
+          return { content: [{ type: "text", text: ddl }] };
+        }
+
+        return {
+          content: [{
+            type: "text",
+            text: `No database schema or entity model found for "${modName}". Entities are generated from contract type definitions during build.`,
+          }],
+        };
+      }
+
+      case "get_entity_model": {
+        const entModName = input.module as string;
+        const moduleEntities = entities.filter((e) => e.module === entModName);
+        if (moduleEntities.length === 0) {
+          return { content: [{ type: "text", text: `No entities found for module "${entModName}"` }] };
+        }
+        return { content: [{ type: "text", text: JSON.stringify(moduleEntities, null, 2) }] };
       }
 
       case "get_saga": {
@@ -469,6 +517,56 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             text: JSON.stringify(result, null, 2),
           }],
         };
+      }
+
+      case "design_system": {
+        const desc = (input.description as string) || "";
+
+        const searchResults = searchModules(catalog!, desc);
+        const suggested = searchResults.slice(0, 8).map((r) => r.module.name);
+
+        let resolved: string[] = [];
+        let cycles: string[][] = [];
+        if (suggested.length > 0) {
+          cycles = detectCycles(catalog!);
+          const resolvedResult = resolveDeps(catalog!, suggested);
+          resolved = resolvedResult.modules.map((m: any) => m.name);
+        }
+
+        const sagaFiles = getSagaFiles();
+        const matchedSagas = sagaFiles.map((f) => f.replace(/\.md$/, "")).filter((sagaName) => {
+          const content = readSagaContent(sagaName);
+          if (!content) return false;
+          const lower = content.toLowerCase();
+          return desc.split(" ").some((word) => word.length > 3 && lower.includes(word.toLowerCase()));
+        });
+
+        const entityModels: Record<string, Entity[]> = {};
+        for (const modName of suggested) {
+          const modEntities = entities.filter((e) => e.module === modName);
+          if (modEntities.length > 0) entityModels[modName] = modEntities;
+        }
+
+        const schemas: Record<string, string> = {};
+        const pg = postgresRenderer;
+        for (const modName of suggested) {
+          const moduleEntities = entities.filter((e) => e.module === modName);
+          if (moduleEntities.length > 0) {
+            schemas[modName] = pg.generateDDL(moduleEntities, modName);
+          }
+        }
+
+        const result = {
+          description: desc,
+          suggested_modules: suggested,
+          ...(cycles.length > 0 ? { cycles_detected: cycles } : { total_modules_with_deps: resolved.length }),
+          matched_sagas: matchedSagas.length > 0 ? matchedSagas : undefined,
+          entity_count: Object.keys(entityModels).length,
+          entities_by_module: entityModels,
+          database_schemas_by_module: schemas,
+        };
+
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
       }
 
       default:

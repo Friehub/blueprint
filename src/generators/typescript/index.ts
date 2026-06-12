@@ -68,6 +68,7 @@ export class TypeScriptGenerator implements LanguageGenerator {
       try {
         const aliasedName = this.resolveModName(mod.name);
         files.push({ path: this.nsPath(`interfaces/${aliasedName}.ts`), content: this.generateModuleInterface(mod) });
+        files.push({ path: this.nsPath(`graphql/${aliasedName}.graphql`), content: this.generateGraphQLTypes(mod) });
       } catch (error) {
         errors.push(`Failed to generate interface for ${mod.name}: ${error instanceof Error ? error.message : error}`);
       }
@@ -166,6 +167,97 @@ export class TypeScriptGenerator implements LanguageGenerator {
     }
     lines.push("}");
     return lines.join("\n");
+  }
+
+  private generateGraphQLTypes(mod: ModuleContract): string {
+    const lines: string[] = [
+      `# ${mod.name} GraphQL types`,
+      `# Auto-generated from Blueprint contract`,
+      "",
+    ];
+
+    for (const type of mod.types) {
+      const raw = type.raw;
+      if (raw.includes("{")) {
+        const match = raw.match(/\{([^}]+)\}/s);
+        const body = match?.[1];
+        if (body) {
+          const fields = body.split(",").map((f) => f.trim()).filter(Boolean);
+          lines.push(`type ${type.name} {`);
+          for (const field of fields) {
+            const clean = field.replace(/\?$/, "");
+            const optional = field.endsWith("?");
+            const gqlType = this.toGraphQLType(clean);
+            if (gqlType.endsWith("]")) {
+              lines.push(`  ${clean}: [${gqlType.slice(0, -1)}]${optional ? "" : "!"}`);
+            } else {
+              lines.push(`  ${clean}: ${gqlType}${optional ? "" : "!"}`);
+            }
+          }
+          lines.push("}");
+          lines.push("");
+        }
+      } else if (raw.startsWith("type ")) {
+        const parts = raw.replace("type ", "").split("=");
+        if (parts.length === 2) {
+          const body = parts[1] || "";
+          const values = body.split("|").map((s) => s.trim()).filter((s) => s);
+          if (values.length > 0 && values.every((v) => /^[a-zA-Z]/.test(v))) {
+            lines.push(`enum ${type.name} {`);
+            for (const val of values) {
+              lines.push(`  ${val.replace(/\s+/g, "_").toUpperCase()}`);
+            }
+            lines.push("}");
+            lines.push("");
+          }
+        }
+      }
+    }
+
+    const queryFields: string[] = [];
+    const mutationFields: string[] = [];
+    for (const fn of mod.functions) {
+      const aliasedName = this.resolveFnName(fn.name);
+      const args = fn.params.map((p) => `$${p.name}: ${this.toGraphQLInputType(p.type || "string")}`).join(", ");
+      const ret = fn.returns;
+      if (fn.name.startsWith("get") || fn.name.startsWith("list") || fn.name.startsWith("search") || fn.name.startsWith("find")) {
+        queryFields.push(`  ${aliasedName}(${args}): ${ret}`);
+      } else {
+        mutationFields.push(`  ${aliasedName}(${args}): ${ret}`);
+      }
+    }
+
+    if (queryFields.length > 0) {
+      lines.push(`type Query {`);
+      lines.push(...queryFields);
+      lines.push("}");
+      lines.push("");
+    }
+    if (mutationFields.length > 0) {
+      lines.push(`type Mutation {`);
+      lines.push(...mutationFields);
+      lines.push("}");
+      lines.push("");
+    }
+
+    return lines.join("\n");
+  }
+
+  private toGraphQLType(fieldName: string): string {
+    if (fieldName.endsWith("_at") || fieldName === "created_at" || fieldName === "updated_at") return "String";
+    if (fieldName.endsWith("_count")) return "Int";
+    if (fieldName.endsWith("_amount") || fieldName.endsWith("_price") || fieldName.endsWith("_total")) return "Float";
+    if (fieldName.startsWith("is_") || fieldName.startsWith("has_")) return "Boolean";
+    if (fieldName.endsWith("_id") || fieldName === "id") return "ID";
+    if (fieldName.endsWith("[]")) return `[${this.toGraphQLType(fieldName.slice(0, -2))}]`;
+    return "String";
+  }
+
+  private toGraphQLInputType(type: string): string {
+    const map: Record<string, string> = {
+      string: "String", number: "Float", boolean: "Boolean", integer: "Int",
+    };
+    return map[type] || type;
   }
 
   private generateAlgorithmComments(algorithm: AlgorithmInfo): string[] {

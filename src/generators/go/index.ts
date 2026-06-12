@@ -52,7 +52,9 @@ export class GoGenerator implements LanguageGenerator {
 
     for (const mod of modules) {
       try {
-        files.push({ path: this.nsPath(`interfaces/${this.resolveModName(mod.name)}.go`), content: this.generateModuleInterface(mod) });
+        const aliasedName = this.resolveModName(mod.name);
+        files.push({ path: this.nsPath(`interfaces/${aliasedName}.go`), content: this.generateModuleInterface(mod) });
+        files.push({ path: this.nsPath(`proto/${aliasedName}.proto`), content: this.generateGrpcProto(mod) });
       } catch (error) {
         errors.push(`Failed to generate interface for ${mod.name}: ${error instanceof Error ? error.message : error}`);
       }
@@ -156,6 +158,101 @@ export class GoGenerator implements LanguageGenerator {
     lines.push("");
     lines.push(generateErrorSentinel(mod.name));
     return lines.join("\n");
+  }
+
+  private generateGrpcProto(mod: ModuleContract): string {
+    const lines: string[] = [
+      `syntax = "proto3";`,
+      "",
+    ];
+
+    const needsEmpty = mod.functions.some((fn) => fn.returns === "void");
+    const hasTimestamp = mod.types.some((t) => t.raw?.includes("Timestamp"));
+    if (needsEmpty) {
+      lines.push(`import "google/protobuf/empty.proto";`);
+    }
+    if (hasTimestamp) {
+      lines.push(`import "google/protobuf/timestamp.proto";`);
+    }
+
+    lines.push(`package ${mod.name};`);
+    lines.push(`option go_package = "./proto;${mod.name}";`);
+    lines.push("");
+
+    // Generate message types for struct-like types
+    for (const type of mod.types) {
+      const raw = type.raw;
+      if (raw.includes("{")) {
+        const match = raw.match(/\{([^}]+)\}/s);
+        const body = match?.[1];
+        if (body) {
+          const fields = body.split(",").map((f) => f.trim()).filter(Boolean);
+          lines.push(`message ${type.name} {`);
+          for (let i = 0; i < fields.length; i++) {
+            const f = fields[i];
+            if (!f) continue;
+            const clean = f.replace(/\?$/, "");
+            const protoType = this.toProtoType(f);
+            lines.push(`  ${protoType} ${clean} = ${i + 1};`);
+          }
+          lines.push("}");
+          lines.push("");
+        }
+      }
+    }
+
+    // Generate request/response messages per function
+    const rpcDefs: string[] = [];
+    for (const fn of mod.functions) {
+      const rpcName = pascalCase(fn.name);
+      const ret = fn.returns === "void" ? "google.protobuf.Empty" : fn.returns;
+
+      // Generate request message
+      const reqName = `${rpcName}Request`;
+      lines.push(`message ${reqName} {`);
+      for (let i = 0; i < fn.params.length; i++) {
+        const p = fn.params[i];
+        if (!p) continue;
+        const protoType = this.toProtoType(p.type || "string");
+        lines.push(`  ${protoType} ${p.name} = ${i + 1};`);
+      }
+      lines.push("}");
+      lines.push("");
+
+      // Generate response message
+      const respName = `${rpcName}Response`;
+      lines.push(`message ${respName} {`);
+      const protoRet = ret === "google.protobuf.Empty" ? "bool" : ret;
+      lines.push(`  ${this.toProtoType(protoRet)} result = 1;`);
+      lines.push("}");
+      lines.push("");
+
+      rpcDefs.push(`  rpc ${rpcName}(${reqName}) returns (${respName});`);
+    }
+
+    // Generate service definition
+    if (rpcDefs.length > 0) {
+      lines.push(`service ${pascalCase(mod.name)} {`);
+      lines.push(...rpcDefs);
+      lines.push("}");
+      lines.push("");
+    }
+
+    return lines.join("\n");
+  }
+
+  private toProtoType(typeOrField: string): string {
+    const clean = typeOrField.replace(/\?$/, "").replace(/\[\]$/, "");
+    const map: Record<string, string> = {
+      string: "string", number: "double", boolean: "bool", integer: "int64",
+      void: "google.protobuf.Empty",
+    };
+    const mapped = map[clean];
+    if (mapped) return mapped;
+    if (typeOrField.endsWith("[]")) return `repeated ${clean}`;
+    // Check if it ends with common field names
+    if (clean.endsWith("_at") || clean.includes("Time")) return "google.protobuf.Timestamp";
+    return clean;
   }
 
   private generateAlgorithmComments(algorithm: AlgorithmInfo): string[] {
