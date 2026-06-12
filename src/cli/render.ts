@@ -84,7 +84,7 @@ export function minimalCatalog(catalog: CatalogView) {
 export function generateJsonSchema(catalog: CatalogView) {
   return {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    title: "Engineering Blueprinter Catalog",
+    title: "Blueprint Catalog",
     type: "object",
     properties: {
       modules: {

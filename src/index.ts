@@ -1,4 +1,4 @@
-// Engineering Blueprinter - Public API
+// Blueprint - Public API
 // Import this library as: import { loadCatalog } from '@friehub/blueprint'
 
 export { loadCatalogFromRoot } from "./core/load-catalog.js";
