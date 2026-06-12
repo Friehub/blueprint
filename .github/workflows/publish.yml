@@ -30,7 +30,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run build
-      - run: 'npm publish --access public 2>&1 || echo "WARNING: npm publish failed. Check NPM_TOKEN and package name availability."'
+      - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
