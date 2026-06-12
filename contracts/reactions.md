@@ -108,10 +108,10 @@ Reaction record retention:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `reactions.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_reactions_added_total                    { subject_type, type }
-gensense_reactions_removed_total                  { subject_type }
-gensense_reactions_by_subject_count               gauge { subject_type }
-gensense_reactions_operation_duration_ms           histogram { function }
+blueprint_reactions_added_total                    { subject_type, type }
+blueprint_reactions_removed_total                  { subject_type }
+blueprint_reactions_by_subject_count               gauge { subject_type }
+blueprint_reactions_operation_duration_ms           histogram { function }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details). Reaction add/remove P99 must be < 50ms.
 

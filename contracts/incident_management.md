@@ -218,12 +218,12 @@ CREATE INDEX idx_oncall_active ON oncall_schedules(start_time, end_time);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `incident_management.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_incident_reported_total              { severity }
-gensense_incident_acknowledgement_time        histogram { severity }
-gensense_incident_resolution_time             histogram { severity }
-gensense_incident_escalations_total           { severity }
-gensense_incident_postmortems_overdue         gauge
-gensense_incident_open_total                  gauge { severity }
+blueprint_incident_reported_total              { severity }
+blueprint_incident_acknowledgement_time        histogram { severity }
+blueprint_incident_resolution_time             histogram { severity }
+blueprint_incident_escalations_total           { severity }
+blueprint_incident_postmortems_overdue         gauge
+blueprint_incident_open_total                  gauge { severity }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -90,9 +90,9 @@ Health probe interval:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `service_mesh.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_service_mesh_endpoints_total            { service, health }
-  gensense_service_mesh_routing_changes_total      { service }
-  gensense_service_mesh_health_probe_duration_ms   histogram { service }
+blueprint_service_mesh_endpoints_total            { service, health }
+  blueprint_service_mesh_routing_changes_total      { service }
+  blueprint_service_mesh_health_probe_duration_ms   histogram { service }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

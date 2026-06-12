@@ -71,9 +71,9 @@ updateDealStage → crm.deal.stage.updated    { deal_id, from_stage, to_stage }
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `crm_leads.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_crm_leads_total                    counter { source, status }
-gensense_crm_deals_value_won_total          counter { currency }  ← sum of won values
-gensense_crm_deal_stages_total              gauge { stage }
+blueprint_crm_leads_total                    counter { source, status }
+blueprint_crm_deals_value_won_total          counter { currency }  ← sum of won values
+blueprint_crm_deal_stages_total              gauge { stage }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

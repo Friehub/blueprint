@@ -98,9 +98,9 @@ Snapshot retention:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `seed_data.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_seed_data_applied_total               { environment }
-  gensense_seed_data_snapshot_size_bytes        gauge
-  gensense_seed_data_operation_duration_ms       histogram { operation }
+blueprint_seed_data_applied_total               { environment }
+  blueprint_seed_data_snapshot_size_bytes        gauge
+  blueprint_seed_data_operation_duration_ms       histogram { operation }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

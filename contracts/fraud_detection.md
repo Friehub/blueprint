@@ -201,11 +201,11 @@ CREATE TABLE fraud_feedback (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `fraud_detection.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_fraud_detection_scores_total          { level, recommendation }
-gensense_fraud_detection_blocks_total          { entity_type }
-gensense_fraud_detection_reviews_total         { status }
-gensense_fraud_detection_feedback_total        { outcome }
-gensense_fraud_detection_provider_latency_ms   gauge
+blueprint_fraud_detection_scores_total          { level, recommendation }
+blueprint_fraud_detection_blocks_total          { entity_type }
+blueprint_fraud_detection_reviews_total         { status }
+blueprint_fraud_detection_feedback_total        { outcome }
+blueprint_fraud_detection_provider_latency_ms   gauge
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -201,11 +201,11 @@ Coupon validity:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `promotions.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_promotions_coupon_validations_total       { result }
-gensense_promotions_coupon_redemptions_total       { code }
-gensense_promotions_gift_card_balance_total         gauge { currency }
-gensense_promotions_flash_sale_active_count         gauge
-gensense_promotions_operation_duration_ms           histogram { function }
+blueprint_promotions_coupon_validations_total       { result }
+blueprint_promotions_coupon_redemptions_total       { code }
+blueprint_promotions_gift_card_balance_total         gauge { currency }
+blueprint_promotions_flash_sale_active_count         gauge
+blueprint_promotions_operation_duration_ms           histogram { function }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details). Flash sale lookup P99 must be < 50ms.
 

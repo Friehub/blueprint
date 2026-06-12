@@ -129,9 +129,9 @@ Draft expiry:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `prompt_registry.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_prompt_registry_prompts_total          { status }
-  gensense_prompt_registry_evaluations_total     { result }
-  gensense_prompt_registry_ab_tests_total         { status }
+blueprint_prompt_registry_prompts_total          { status }
+  blueprint_prompt_registry_evaluations_total     { result }
+  blueprint_prompt_registry_ab_tests_total         { status }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

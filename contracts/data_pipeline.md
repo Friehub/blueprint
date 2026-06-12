@@ -115,9 +115,9 @@ Pipeline timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `data_pipeline.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_data_pipeline_runs_total              { status }
-  gensense_data_pipeline_stage_duration_ms       histogram { stage_type }
-  gensense_data_pipeline_records_processed_total  { pipeline_id }
+blueprint_data_pipeline_runs_total              { status }
+  blueprint_data_pipeline_stage_duration_ms       histogram { stage_type }
+  blueprint_data_pipeline_records_processed_total  { pipeline_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

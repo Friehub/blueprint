@@ -86,10 +86,10 @@ Entry edit window:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `changelog.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_changelog_entries_total               { type }
-  gensense_changelog_breaking_changes_total      { impact }
-  gensense_changelog_subscribers_total            { channel }
-  gensense_changelog_notifications_sent_total
+blueprint_changelog_entries_total               { type }
+  blueprint_changelog_breaking_changes_total      { impact }
+  blueprint_changelog_subscribers_total            { channel }
+  blueprint_changelog_notifications_sent_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

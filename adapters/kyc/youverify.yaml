@@ -1,0 +1,48 @@
+name: youverify
+module: kyc
+version: 1.0.0
+description: YouVerify KYC identity verification adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - submitVerification
+  - getVerification
+  - getUserVerification
+  - getVerificationStatus
+  - updateVerification
+  - rejectVerification
+  - approveVerification
+  - listPendingVerifications
+  - expireVerification
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: YouVerify API key
+      secret: true
+  optional:
+    - name: environment
+      type: string
+      default: production
+      description: YouVerify environment (production or sandbox)
+    - name: webhook_url
+      type: string
+      description: Webhook callback URL
+
+dependencies:
+  - module: users
+    purpose: Resolve user identities
+    required: true
+  - module: storage
+    purpose: Store verification documents
+    required: false
+  - module: audit_log
+    purpose: Log KYC events
+    required: false
+
+metadata:
+  provider_url: https://youverify.co
+  docs_url: https://docs.youverify.co

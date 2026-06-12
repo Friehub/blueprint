@@ -153,9 +153,9 @@ CREATE INDEX idx_ledger_postings_account ON ledger_postings(account_id, created_
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `ledger.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_ledger_postings_total              counter { ledger_id }
-gensense_ledger_transactions_total          counter { result: success|failure }
-gensense_ledger_account_balance_snapshot    gauge { account_id }
+blueprint_ledger_postings_total              counter { ledger_id }
+blueprint_ledger_transactions_total          counter { result: success|failure }
+blueprint_ledger_account_balance_snapshot    gauge { account_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

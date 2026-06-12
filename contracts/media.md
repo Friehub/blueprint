@@ -157,12 +157,12 @@ CREATE INDEX idx_jobs_status ON media_processing_jobs(status) WHERE status IN ('
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `media.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_media_operations_total           { function, result }
-gensense_media_operation_duration_ms      histogram { function }
-gensense_media_errors_total               { code }
-gensense_media_assets_total               gauge { type }
-gensense_media_processing_queue_depth     gauge { status }
-gensense_media_storage_usage_bytes        gauge
+blueprint_media_operations_total           { function, result }
+blueprint_media_operation_duration_ms      histogram { function }
+blueprint_media_errors_total               { code }
+blueprint_media_assets_total               gauge { type }
+blueprint_media_processing_queue_depth     gauge { status }
+blueprint_media_storage_usage_bytes        gauge
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

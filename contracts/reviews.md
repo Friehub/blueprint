@@ -129,11 +129,11 @@ Review edit window:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `reviews.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_reviews_created_total                    { subject_type, rating }
-gensense_reviews_moderated_total                  { decision }
-gensense_reviews_flagged_total                    { subject_type }
-gensense_reviews_aggregate_rating                 gauge { subject_type }
-gensense_reviews_operation_duration_ms             histogram { function }
+blueprint_reviews_created_total                    { subject_type, rating }
+blueprint_reviews_moderated_total                  { decision }
+blueprint_reviews_flagged_total                    { subject_type }
+blueprint_reviews_aggregate_rating                 gauge { subject_type }
+blueprint_reviews_operation_duration_ms             histogram { function }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details). Review creation P99 must be < 100ms. Aggregate rating read P99 must be < 30ms.
 

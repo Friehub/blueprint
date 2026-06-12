@@ -160,12 +160,12 @@ CREATE TABLE warehouse_query_budgets (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `data_warehouse.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_data_warehouse_queries_total            { status }
-  gensense_data_warehouse_query_duration_ms        histogram
-  gensense_data_warehouse_bytes_processed_total    { project }
-  gensense_data_warehouse_storage_bytes            gauge { table }
-  gensense_data_warehouse_budget_exceeded_total    { project }
-  gensense_data_warehouse_partition_count          gauge
+blueprint_data_warehouse_queries_total            { status }
+  blueprint_data_warehouse_query_duration_ms        histogram
+  blueprint_data_warehouse_bytes_processed_total    { project }
+  blueprint_data_warehouse_storage_bytes            gauge { table }
+  blueprint_data_warehouse_budget_exceeded_total    { project }
+  blueprint_data_warehouse_partition_count          gauge
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -139,12 +139,12 @@ CREATE INDEX idx_workspace_members_user ON workspace_members(user_id);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `workspaces.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_workspaces_operation_total          counter { function, result: success|failure }
-gensense_workspaces_operation_duration_ms    histogram { function, p50, p95, p99 }
-gensense_workspaces_errors_total             counter { function, error_code }
-gensense_workspaces_active_total             gauge { status }
-gensense_workspaces_members_count            gauge { workspace_id }
-gensense_workspaces_created_total            counter
+blueprint_workspaces_operation_total          counter { function, result: success|failure }
+blueprint_workspaces_operation_duration_ms    histogram { function, p50, p95, p99 }
+blueprint_workspaces_errors_total             counter { function, error_code }
+blueprint_workspaces_active_total             gauge { status }
+blueprint_workspaces_members_count            gauge { workspace_id }
+blueprint_workspaces_created_total            counter
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

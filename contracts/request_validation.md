@@ -117,10 +117,10 @@ Schema cache TTL:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `request_validation.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_request_validation_checks_total        { result }
-gensense_request_validation_rejections_total    { code }
-gensense_request_validation_payload_bytes       histogram
-gensense_request_validation_parse_duration_ms   histogram { schema }
+blueprint_request_validation_checks_total        { result }
+blueprint_request_validation_rejections_total    { code }
+blueprint_request_validation_payload_bytes       histogram
+blueprint_request_validation_parse_duration_ms   histogram { schema }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details). Validation P99 must be < 10ms for payloads under 1MB.
 

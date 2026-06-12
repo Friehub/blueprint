@@ -106,10 +106,10 @@ Identity certificate expiry:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `zero_trust_network_policy.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_zero_trust_identities_active              gauge { service }
-  gensense_zero_trust_verifications_total            { result }
-  gensense_zero_trust_verification_latency_ms         histogram
-  gensense_zero_trust_identities_rotated_total        { service }
+blueprint_zero_trust_identities_active              gauge { service }
+  blueprint_zero_trust_verifications_total            { result }
+  blueprint_zero_trust_verification_latency_ms         histogram
+  blueprint_zero_trust_identities_rotated_total        { service }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -137,11 +137,11 @@ CREATE INDEX idx_verification_expiry ON verification_requests(expires_at) WHERE 
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `kyc.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_kyc_operations_total           { function, result }
-gensense_kyc_operation_duration_ms      histogram { function }
-gensense_kyc_verification_status        gauge { status }
-gensense_kyc_verification_expiry_count  gauge
-gensense_kyc_errors_total               { code }
+blueprint_kyc_operations_total           { function, result }
+blueprint_kyc_operation_duration_ms      histogram { function }
+blueprint_kyc_verification_status        gauge { status }
+blueprint_kyc_verification_expiry_count  gauge
+blueprint_kyc_errors_total               { code }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

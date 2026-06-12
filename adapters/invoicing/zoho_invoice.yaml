@@ -1,0 +1,56 @@
+name: zoho_invoice
+module: invoicing
+version: 1.0.0
+description: Zoho Invoice adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createInvoice
+  - issueInvoice
+  - sendInvoice
+  - getInvoice
+  - listInvoices
+  - recordInvoicePayment
+  - voidInvoice
+  - createCreditNote
+
+does_not_implement: []
+
+config:
+  required:
+    - name: client_id
+      type: string
+      description: Zoho client ID
+      secret: false
+    - name: client_secret
+      type: string
+      description: Zoho client secret
+      secret: true
+    - name: refresh_token
+      type: string
+      description: Zoho refresh token
+      secret: true
+    - name: organization_id
+      type: string
+      description: Zoho organization ID
+      secret: false
+  optional:
+    - name: api_domain
+      type: string
+      default: https://invoice.zoho.com
+      description: Zoho Invoice API domain
+
+dependencies:
+  - module: payments
+    purpose: Process invoice payments
+    required: true
+  - module: notifications
+    purpose: Send invoice emails
+    required: false
+  - module: audit_log
+    purpose: Log invoice events
+    required: false
+
+metadata:
+  provider_url: https://www.zoho.com/invoice
+  docs_url: https://www.zoho.com/invoice/api

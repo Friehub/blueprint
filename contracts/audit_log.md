@@ -99,13 +99,13 @@ Audit retention:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `audit_log.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_audit_log_operation_total              counter { function, result }
-gensense_audit_log_operation_duration_ms        histogram { function }
-gensense_audit_log_errors_total                 counter { function, error_code }
-gensense_audit_log_events_recorded_total         counter { action }
-gensense_audit_log_chain_breaks_total            counter
-gensense_audit_log_export_jobs_total             counter { format, status }
-gensense_audit_log_ingestion_lag_ms             gauge
+blueprint_audit_log_operation_total              counter { function, result }
+blueprint_audit_log_operation_duration_ms        histogram { function }
+blueprint_audit_log_errors_total                 counter { function, error_code }
+blueprint_audit_log_events_recorded_total         counter { action }
+blueprint_audit_log_chain_breaks_total            counter
+blueprint_audit_log_export_jobs_total             counter { format, status }
+blueprint_audit_log_ingestion_lag_ms             gauge
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

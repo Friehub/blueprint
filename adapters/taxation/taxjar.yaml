@@ -2,6 +2,7 @@ name: taxjar
 module: taxation
 version: 1.0.0
 description: TaxJar taxation adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - calculateTax

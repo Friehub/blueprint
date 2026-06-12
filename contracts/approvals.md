@@ -391,14 +391,14 @@ CREATE INDEX idx_approval_decisions_step ON approval_decisions(instance_step_id)
 * **Tracing Spans:** Each workflow instance is a trace root; each step decision is an annotated span. Span attributes include `instanceId`, `workflowId`, `stepId`, and `decision`. Every function call follows `approvals.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_approvals_operation_total              counter { function, result }
-gensense_approvals_operation_duration_ms        histogram { function }
-gensense_approvals_errors_total                 counter { function, error_code }
-gensense_approvals_instances_total               counter { status }
-gensense_approvals_instance_duration_ms          histogram { workflow_id }
-gensense_approvals_step_duration_ms              histogram { step_order }
-gensense_approvals_escalations_total             counter { escalation_tier }
-gensense_approvals_auto_decisions_total          counter { decision }
+blueprint_approvals_operation_total              counter { function, result }
+blueprint_approvals_operation_duration_ms        histogram { function }
+blueprint_approvals_errors_total                 counter { function, error_code }
+blueprint_approvals_instances_total               counter { status }
+blueprint_approvals_instance_duration_ms          histogram { workflow_id }
+blueprint_approvals_step_duration_ms              histogram { step_order }
+blueprint_approvals_escalations_total             counter { escalation_tier }
+blueprint_approvals_auto_decisions_total          counter { decision }
 ```
 * **SLO Targets:** Decision recording P99 ≤ 100ms; instance query P99 ≤ 200ms; escalation timer accuracy ≤ 10 seconds.
 

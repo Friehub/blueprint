@@ -104,10 +104,10 @@ Migration lock:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `migrations.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_migrations_applied_total              { result }
-  gensense_migrations_duration_ms                histogram
-  gensense_migrations_pending_current            gauge
-  gensense_migrations_drift_severity             gauge { severity }
+blueprint_migrations_applied_total              { result }
+  blueprint_migrations_duration_ms                histogram
+  blueprint_migrations_pending_current            gauge
+  blueprint_migrations_drift_severity             gauge { severity }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

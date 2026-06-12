@@ -143,12 +143,12 @@ CREATE TABLE document_edit_locks (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `document_editor.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_documents_total                    gauge { status }
-gensense_document_revisions_total           counter { document_id }
-gensense_document_lock_contention_total     counter { document_id }
-gensense_document_lock_expiry_total         counter { document_id }
-gensense_document_revision_conflict_total   counter { document_id }
-gensense_document_revision_restore_total    counter
+blueprint_documents_total                    gauge { status }
+blueprint_document_revisions_total           counter { document_id }
+blueprint_document_lock_contention_total     counter { document_id }
+blueprint_document_lock_expiry_total         counter { document_id }
+blueprint_document_revision_conflict_total   counter { document_id }
+blueprint_document_revision_restore_total    counter
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

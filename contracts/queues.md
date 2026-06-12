@@ -120,9 +120,9 @@ Job (waiting):
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `queues.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_queues_depth                       gauge { queue_name, status }
-  gensense_queues_job_duration_ms             histogram { queue_name }
-  gensense_queues_dead_letter_total           { queue_name }
+blueprint_queues_depth                       gauge { queue_name, status }
+  blueprint_queues_job_duration_ms             histogram { queue_name }
+  blueprint_queues_dead_letter_total           { queue_name }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

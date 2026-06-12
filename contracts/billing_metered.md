@@ -164,9 +164,9 @@ CREATE INDEX idx_metered_alerts_user ON metered_alerts(user_id);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `billing_metered.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_billing_metered_usage_recorded_total     { metric }
-gensense_billing_metered_aggregation_total        { metric }
-gensense_billing_metered_ingestion_lag_seconds    histogram { metric }
+blueprint_billing_metered_usage_recorded_total     { metric }
+blueprint_billing_metered_aggregation_total        { metric }
+blueprint_billing_metered_ingestion_lag_seconds    histogram { metric }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -1,0 +1,47 @@
+name: slack
+module: notifications
+version: 1.0.0
+description: Slack webhook notification channel adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - sendPush
+  - getNotifications
+  - markRead
+  - markAllRead
+  - getUnreadCount
+
+does_not_implement:
+  - sendEmail
+  - sendSMS
+  - sendInApp
+  - updatePreferences
+  - getPreferences
+
+config:
+  required:
+    - name: webhook_url
+      type: string
+      description: Slack incoming webhook URL
+      secret: true
+  optional:
+    - name: default_channel
+      type: string
+      default: "#general"
+      description: Default Slack channel
+    - name: username
+      type: string
+      default: Blueprint
+      description: Bot display name
+    - name: icon_emoji
+      type: string
+      description: Bot icon emoji
+
+dependencies:
+  - module: audit_log
+    purpose: Log notification events
+    required: false
+
+metadata:
+  provider_url: https://slack.com
+  docs_url: https://api.slack.com/messaging/webhooks

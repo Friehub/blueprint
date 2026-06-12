@@ -136,12 +136,12 @@ CREATE INDEX idx_sms_delivery_events_message ON sms_delivery_events(message_id);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `sms.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_sms_operation_total               counter { function, result: success|failure }
-gensense_sms_operation_duration_ms         histogram { function, p50, p95, p99 }
-gensense_sms_errors_total                  counter { function, error_code }
-gensense_sms_messages_sent_total           counter { provider, status }
-gensense_sms_bulk_recipients_total         counter { provider }
-gensense_sms_balance_gauge                 gauge { currency }
+blueprint_sms_operation_total               counter { function, result: success|failure }
+blueprint_sms_operation_duration_ms         histogram { function, p50, p95, p99 }
+blueprint_sms_errors_total                  counter { function, error_code }
+blueprint_sms_messages_sent_total           counter { provider, status }
+blueprint_sms_bulk_recipients_total         counter { provider }
+blueprint_sms_balance_gauge                 gauge { currency }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

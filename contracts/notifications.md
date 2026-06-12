@@ -169,8 +169,8 @@ Device Token Hash:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `notifications.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_notifications_sent_total           { channel, result }
-  gensense_notifications_bounce_total         { channel }
+blueprint_notifications_sent_total           { channel, result }
+  blueprint_notifications_bounce_total         { channel }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

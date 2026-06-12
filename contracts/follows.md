@@ -125,9 +125,9 @@ CREATE TABLE follow_counts (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `follows.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_follows_total                    { direction }
-gensense_follows_relation_count           gauge { user_id }
-gensense_follows_self_follow_rejected_total
+blueprint_follows_total                    { direction }
+blueprint_follows_relation_count           gauge { user_id }
+blueprint_follows_self_follow_rejected_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

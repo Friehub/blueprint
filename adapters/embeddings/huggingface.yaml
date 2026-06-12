@@ -1,0 +1,53 @@
+name: huggingface
+module: embeddings
+version: 1.0.0
+description: Hugging Face inference API embeddings adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - embed
+  - upsertVector
+  - upsertVectorBatch
+  - querySimilar
+  - queryByText
+  - hybridQuery
+
+does_not_implement:
+  - createIndex
+  - getIndex
+  - listIndexes
+  - deleteIndex
+  - getVector
+  - deleteVector
+  - deleteVectorsByFilter
+
+config:
+  required:
+    - name: api_token
+      type: string
+      description: Hugging Face API token
+      secret: true
+  optional:
+    - name: model
+      type: string
+      default: sentence-transformers/all-MiniLM-L6-v2
+      description: Embedding model ID
+    - name: endpoint_url
+      type: string
+      description: Custom inference endpoint URL
+    - name: wait_for_model
+      type: boolean
+      default: false
+      description: Wait for model to load if not ready
+
+dependencies:
+  - module: vector_store
+    purpose: Store and index embedding vectors
+    required: true
+  - module: audit_log
+    purpose: Log embedding operations
+    required: false
+
+metadata:
+  provider_url: https://huggingface.co
+  docs_url: https://huggingface.co/docs/api-inference/index

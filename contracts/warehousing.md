@@ -75,9 +75,9 @@ moveStock           → warehousing.stock.moved       { source_bin_id, dest_bin_
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `warehousing.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_warehousing_active_picking_lists   gauge
-gensense_warehousing_bin_levels_snapshot    gauge { bin_id, variant_id }
-gensense_warehousing_stock_movements_total  counter { warehouse_id }
+blueprint_warehousing_active_picking_lists   gauge
+blueprint_warehousing_bin_levels_snapshot    gauge { bin_id, variant_id }
+blueprint_warehousing_stock_movements_total  counter { warehouse_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

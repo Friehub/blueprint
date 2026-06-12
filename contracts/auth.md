@@ -129,9 +129,9 @@ PasswordResetToken:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `auth.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_auth_signin_total                  { provider, result }
-  gensense_auth_token_refresh_total           { result }
-  gensense_auth_failed_attempts_total         { reason }
+blueprint_auth_signin_total                  { provider, result }
+  blueprint_auth_token_refresh_total           { result }
+  blueprint_auth_failed_attempts_total         { reason }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

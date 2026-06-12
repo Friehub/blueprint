@@ -174,12 +174,12 @@ CREATE INDEX idx_email_events_delivery ON email_delivery_events(delivery_id);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `emails.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_emails_sent_total                 { provider, status }
-gensense_emails_delivery_duration_ms        histogram { provider }
-gensense_emails_bounce_total                { provider, reason }
-gensense_emails_complaint_total             { provider }
-gensense_emails_template_count              gauge { status }
-gensense_emails_provider_latency_ms         gauge { provider }
+blueprint_emails_sent_total                 { provider, status }
+blueprint_emails_delivery_duration_ms        histogram { provider }
+blueprint_emails_bounce_total                { provider, reason }
+blueprint_emails_complaint_total             { provider }
+blueprint_emails_template_count              gauge { status }
+blueprint_emails_provider_latency_ms         gauge { provider }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

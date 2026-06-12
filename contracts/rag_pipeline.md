@@ -103,11 +103,11 @@ Ingestion timeout per document:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `rag_pipeline.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_rag_pipeline_documents_ingested_total    { status }
-  gensense_rag_pipeline_chunks_indexed_total       { status }
-  gensense_rag_pipeline_search_latency_ms           histogram
-  gensense_rag_pipeline_search_results_total        histogram
-  gensense_rag_pipeline_rerank_latency_ms           histogram
+blueprint_rag_pipeline_documents_ingested_total    { status }
+  blueprint_rag_pipeline_chunks_indexed_total       { status }
+  blueprint_rag_pipeline_search_latency_ms           histogram
+  blueprint_rag_pipeline_search_results_total        histogram
+  blueprint_rag_pipeline_rerank_latency_ms           histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

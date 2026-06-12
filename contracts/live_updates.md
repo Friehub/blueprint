@@ -87,9 +87,9 @@ Heartbeat interval:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `live_updates.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_live_updates_active_subscriptions_total    { resource_type }
-  gensense_live_updates_deltas_pushed_total          { resource_type, event }
-  gensense_live_updates_subscription_duration_ms      histogram
+blueprint_live_updates_active_subscriptions_total    { resource_type }
+  blueprint_live_updates_deltas_pushed_total          { resource_type, event }
+  blueprint_live_updates_subscription_duration_ms      histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

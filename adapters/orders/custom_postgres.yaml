@@ -1,0 +1,44 @@
+name: custom_postgres
+module: orders
+version: 1.0.0
+description: Custom PostgreSQL-backed order management adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createOrder
+  - getOrder
+  - getOrdersByUser
+  - transitionOrderStatus
+  - cancelOrder
+
+does_not_implement:
+  - getSellerOrders
+  - getPackagesByOrder
+  - getOrderLinesByPackage
+  - transitionPackageStatus
+  - requestReturn
+  - approveReturn
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: PostgreSQL connection string
+      secret: true
+  optional:
+    - name: pool_size
+      type: integer
+      default: 10
+      description: Database connection pool size
+
+dependencies:
+  - module: inventory
+    purpose: Reserve and release stock on order lifecycle transitions
+    required: false
+  - module: payments
+    purpose: Process payments on order creation
+    required: false
+
+metadata:
+  provider_url: https://www.postgresql.org
+  docs_url: https://www.postgresql.org/docs

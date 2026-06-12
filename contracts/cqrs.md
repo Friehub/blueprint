@@ -109,10 +109,10 @@ Read model staleness:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `cqrs.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_cqrs_commands_executed_total          { command_type, result }
-  gensense_cqrs_queries_executed_total           { query_type }
-  gensense_cqrs_read_model_lag_ms                 gauge { model_name }
-  gensense_cqrs_synchronization_duration_ms        histogram { model_name }
+blueprint_cqrs_commands_executed_total          { command_type, result }
+  blueprint_cqrs_queries_executed_total           { query_type }
+  blueprint_cqrs_read_model_lag_ms                 gauge { model_name }
+  blueprint_cqrs_synchronization_duration_ms        histogram { model_name }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

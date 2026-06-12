@@ -109,10 +109,10 @@ Appeal window:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `content_safety.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_content_safety_checks_total            { policy, result }
-  gensense_content_safety_violations_total        { category, source }
-  gensense_content_safety_appeals_total            { decision }
-  gensense_content_safety_classification_latency_ms  histogram
+blueprint_content_safety_checks_total            { policy, result }
+  blueprint_content_safety_violations_total        { category, source }
+  blueprint_content_safety_appeals_total            { decision }
+  blueprint_content_safety_classification_latency_ms  histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -1,0 +1,42 @@
+name: termii
+module: sms
+version: 1.0.0
+description: Termii SMS delivery adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - send
+  - sendBulk
+  - getDeliveryStatus
+  - getBalance
+  - lookupNumber
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Termii API key
+      secret: true
+  optional:
+    - name: api_url
+      type: string
+      default: https://api.termii.com
+      description: Termii API URL
+    - name: from
+      type: string
+      description: Sender ID or phone number
+    - name: channel
+      type: string
+      default: generic
+      description: SMS channel (generic, dnd)
+
+dependencies:
+  - module: audit_log
+    purpose: Log SMS delivery events
+    required: false
+
+metadata:
+  provider_url: https://termii.com
+  docs_url: https://developers.termii.com

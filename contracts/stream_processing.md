@@ -88,10 +88,10 @@ Checkpoint interval:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `stream_processing.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_stream_processing_events_in_total        { stream_id }
-  gensense_stream_processing_events_out_total       { stream_id }
-  gensense_stream_processing_lag_ms                 gauge { stream_id, partition }
-  gensense_stream_processing_latency_ms             histogram { stream_id }
+blueprint_stream_processing_events_in_total        { stream_id }
+  blueprint_stream_processing_events_out_total       { stream_id }
+  blueprint_stream_processing_lag_ms                 gauge { stream_id, partition }
+  blueprint_stream_processing_latency_ms             histogram { stream_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

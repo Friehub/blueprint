@@ -1,0 +1,44 @@
+name: pipedrive
+module: crm_leads
+version: 1.0.0
+description: Pipedrive CRM leads adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createLead
+  - updateLeadStatus
+  - createDeal
+  - updateDealStage
+  - assignOwner
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_token
+      type: string
+      description: Pipedrive API token
+      secret: true
+  optional:
+    - name: company_domain
+      type: string
+      description: Pipedrive company domain
+    - name: limit
+      type: integer
+      default: 100
+      description: Page limit for list endpoints
+
+dependencies:
+  - module: users
+    purpose: Get user data for lead assignments
+    required: true
+  - module: notifications
+    purpose: Send lead notifications
+    required: false
+  - module: audit_log
+    purpose: Log CRM events
+    required: false
+
+metadata:
+  provider_url: https://www.pipedrive.com
+  docs_url: https://developers.pipedrive.com

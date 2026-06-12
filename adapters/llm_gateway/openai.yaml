@@ -1,0 +1,35 @@
+name: openai
+module: llm_gateway
+version: 1.0.0
+description: OpenAI GPT and embedding model gateway adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - chat
+  - chatStream
+  - getModels
+  - getModelInfo
+  - countTokens
+  - estimateCost
+  - abortRequest
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: OpenAI API key
+      secret: true
+  optional:
+    - name: organization_id
+      type: string
+      description: OpenAI organization ID for multi-org accounts
+    - name: base_url
+      type: string
+      default: "https://api.openai.com/v1"
+      description: Custom API base URL
+
+metadata:
+  provider_url: https://openai.com
+  docs_url: https://platform.openai.com/docs

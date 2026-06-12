@@ -75,9 +75,9 @@ Typing timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `typing_indicators.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_typing_indicators_active_users_total    { channel }
-  gensense_typing_indicators_heartbeats_total     { channel }
-  gensense_typing_indicators_expirations_total
+blueprint_typing_indicators_active_users_total    { channel }
+  blueprint_typing_indicators_heartbeats_total     { channel }
+  blueprint_typing_indicators_expirations_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

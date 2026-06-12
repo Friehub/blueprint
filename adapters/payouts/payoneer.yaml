@@ -1,0 +1,58 @@
+name: payoneer
+module: payouts
+version: 1.0.0
+description: Payoneer payout adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createPayout
+  - getPayout
+  - listPayouts
+  - cancelPayout
+  - retryPayout
+  - schedulePayout
+  - getPayoutSchedule
+
+does_not_implement: []
+
+config:
+  required:
+    - name: client_id
+      type: string
+      description: Payoneer client ID
+      secret: false
+    - name: client_secret
+      type: string
+      description: Payoneer client secret
+      secret: true
+    - name: partner_id
+      type: string
+      description: Payoneer partner ID
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      default: production
+      description: Payoneer environment (production or sandbox)
+    - name: auto_approve
+      type: boolean
+      default: false
+      description: Auto-approve payouts
+
+dependencies:
+  - module: payments
+    purpose: Access payment data for payouts
+    required: true
+  - module: ledger
+    purpose: Track payout ledger entries
+    required: true
+  - module: notifications
+    purpose: Send payout notifications
+    required: false
+  - module: audit_log
+    purpose: Log payout events
+    required: false
+
+metadata:
+  provider_url: https://www.payoneer.com
+  docs_url: https://developer.payoneer.com

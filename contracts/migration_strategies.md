@@ -105,9 +105,9 @@ Dual-write verification window:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `migration_strategies.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_migration_strategies_total          { strategy, result }
-  gensense_migration_strategies_duration_ms    histogram { phase }
-  gensense_migration_strategies_dual_write_conflicts { migration_id }
+blueprint_migration_strategies_total          { strategy, result }
+  blueprint_migration_strategies_duration_ms    histogram { phase }
+  blueprint_migration_strategies_dual_write_conflicts { migration_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

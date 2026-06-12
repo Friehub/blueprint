@@ -1,0 +1,50 @@
+name: aws_eventbridge
+module: event_bus
+version: 1.0.0
+description: AWS EventBridge event bus adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - publish
+  - publishBulk
+  - subscribe
+  - unsubscribe
+  - getSubscriptions
+  - getDeadLetters
+  - retryDeadLetter
+
+does_not_implement:
+  - replay
+
+config:
+  required:
+    - name: access_key_id
+      type: string
+      description: AWS access key ID
+      secret: false
+    - name: secret_access_key
+      type: string
+      description: AWS secret access key
+      secret: true
+    - name: region
+      type: string
+      description: AWS region
+      secret: false
+  optional:
+    - name: event_bus_name
+      type: string
+      default: default
+      description: EventBridge bus name
+    - name: source
+      type: string
+      default: blueprint
+      description: Event source identifier
+    - name: endpoint
+      type: string
+      description: Custom EventBridge endpoint URL
+
+dependencies: []
+
+metadata:
+  provider_url: https://aws.amazon.com/eventbridge
+  docs_url: https://docs.aws.amazon.com/eventbridge

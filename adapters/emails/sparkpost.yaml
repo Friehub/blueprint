@@ -1,0 +1,56 @@
+name: sparkpost
+module: emails
+version: 1.0.0
+description: SparkPost transactional email adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - sendTransactional
+  - sendBulk
+  - createTemplate
+  - updateTemplate
+  - getTemplate
+  - listTemplates
+  - getDeliveryStatus
+  - getDeliveryEvents
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: SparkPost API key
+      secret: true
+    - name: from_email
+      type: string
+      description: Default sender email address
+      secret: false
+  optional:
+    - name: from_name
+      type: string
+      description: Default sender name
+    - name: reply_to
+      type: string
+      description: Default reply-to email address
+    - name: api_base
+      type: string
+      default: https://api.sparkpost.com
+      description: SparkPost API base URL
+    - name: track_opens
+      type: boolean
+      default: true
+      description: Enable open tracking
+    - name: track_clicks
+      type: boolean
+      default: true
+      description: Enable click tracking
+
+dependencies:
+  - module: audit_log
+    purpose: Log email delivery events
+    required: false
+
+metadata:
+  provider_url: https://www.sparkpost.com
+  docs_url: https://developers.sparkpost.com

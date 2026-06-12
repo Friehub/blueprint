@@ -1,0 +1,63 @@
+name: confluence
+module: knowledge_base
+version: 1.0.0
+description: Confluence knowledge base adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createCategory
+  - getCategory
+  - listCategories
+  - createArticle
+  - updateArticle
+  - createRevision
+  - submitForReview
+  - publishArticle
+  - deprecateArticle
+  - archiveArticle
+  - getArticle
+  - getArticleBySlug
+  - listArticles
+  - recordView
+  - submitFeedback
+  - getArticleStats
+
+does_not_implement: []
+
+config:
+  required:
+    - name: base_url
+      type: string
+      description: Confluence instance URL
+      secret: false
+    - name: api_token
+      type: string
+      description: Confluence API token
+      secret: true
+    - name: space_key
+      type: string
+      description: Confluence space key
+      secret: false
+  optional:
+    - name: username
+      type: string
+      description: Confluence username for basic auth
+    - name: limit
+      type: integer
+      default: 25
+      description: Page limit for list endpoints
+
+dependencies:
+  - module: search
+    purpose: Index articles for search
+    required: true
+  - module: users
+    purpose: Resolve author identities
+    required: true
+  - module: audit_log
+    purpose: Log article lifecycle events
+    required: false
+
+metadata:
+  provider_url: https://www.atlassian.com/software/confluence
+  docs_url: https://developer.atlassian.com/cloud/confluence

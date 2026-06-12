@@ -1,0 +1,48 @@
+name: stripe_identity
+module: kyc
+version: 1.0.0
+description: Stripe Identity KYC verification adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - submitVerification
+  - getVerification
+  - getUserVerification
+  - getVerificationStatus
+  - updateVerification
+  - rejectVerification
+  - approveVerification
+  - listPendingVerifications
+  - expireVerification
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Stripe secret API key
+      secret: true
+  optional:
+    - name: api_version
+      type: string
+      default: "2023-10-16"
+      description: Stripe API version
+    - name: verification_template_id
+      type: string
+      description: Stripe Identity verification template ID
+
+dependencies:
+  - module: users
+    purpose: Resolve user identities
+    required: true
+  - module: storage
+    purpose: Store verification documents
+    required: false
+  - module: audit_log
+    purpose: Log KYC events
+    required: false
+
+metadata:
+  provider_url: https://stripe.com/identity
+  docs_url: https://stripe.com/docs/identity

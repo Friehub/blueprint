@@ -165,12 +165,12 @@ CREATE INDEX idx_export_manifests_run ON export_manifests(run_id);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `export_pipeline.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_export_pipeline_runs_total            { status }
-  gensense_export_pipeline_records_total         { export_id }
-  gensense_export_pipeline_bytes_total            { export_id, format }
-  gensense_export_pipeline_duration_ms            histogram { export_id }
-  gensense_export_pipeline_overlap_blocked_total  { export_id }
-  gensense_export_pipeline_destination_fail_total { destination }
+blueprint_export_pipeline_runs_total            { status }
+  blueprint_export_pipeline_records_total         { export_id }
+  blueprint_export_pipeline_bytes_total            { export_id, format }
+  blueprint_export_pipeline_duration_ms            histogram { export_id }
+  blueprint_export_pipeline_overlap_blocked_total  { export_id }
+  blueprint_export_pipeline_destination_fail_total { destination }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -78,11 +78,11 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `grpc.<service>.<method>`.
 * **Telemetry Metrics:**
 ```
-gensense_grpc_requests_total                { service, method, status }
-gensense_grpc_request_duration_ms          histogram { service, method }
-gensense_grpc_messages_sent_total           { service, method, type }
-gensense_grpc_messages_received_total       { service, method, type }
-gensense_grpc_active_streams                gauge { service, method }
+blueprint_grpc_requests_total                { service, method, status }
+blueprint_grpc_request_duration_ms          histogram { service, method }
+blueprint_grpc_messages_sent_total           { service, method, type }
+blueprint_grpc_messages_received_total       { service, method, type }
+blueprint_grpc_active_streams                gauge { service, method }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

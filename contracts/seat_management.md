@@ -143,10 +143,10 @@ Seat assignment:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `seat_management.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_seat_management_assigned_total           gauge { account_id, seat_type }
-gensense_seat_management_limit_total              gauge { account_id, seat_type }
-gensense_seat_management_operations_total         counter { function, result }
-gensense_seat_management_operation_duration_ms     histogram { function }
+blueprint_seat_management_assigned_total           gauge { account_id, seat_type }
+blueprint_seat_management_limit_total              gauge { account_id, seat_type }
+blueprint_seat_management_operations_total         counter { function, result }
+blueprint_seat_management_operation_duration_ms     histogram { function }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details). Seat assignment P99 must be < 100ms.
 

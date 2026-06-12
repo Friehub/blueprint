@@ -286,15 +286,15 @@ CREATE INDEX idx_referral_conversions_referral ON referral_conversions(referral_
 - **Consistency:** Attribution and conversion must be written in the same transaction or via a saga; partial writes that leave a conversion without a referral record are invalid.
 - **Observability:** The full referral funnel (attributed → converted → validated → rewarded) must be traceable as linked spans on a single root trace.
 ```
-gensense_referrals_operation_total          counter { function, result: success|failure }
-gensense_referrals_operation_duration_ms    histogram { function, p50, p95, p99 }
-gensense_referrals_errors_total             counter { function, error_code }
-gensense_referrals_attributed_total         counter { program_id }
-gensense_referrals_converted_total          counter { program_id }
-gensense_referrals_validated_total          counter { program_id }
-gensense_referrals_rewarded_total           counter { reward_type }
-gensense_referrals_invalidated_total        counter { reason }
-gensense_referrals_fraud_detected_total     counter
+blueprint_referrals_operation_total          counter { function, result: success|failure }
+blueprint_referrals_operation_duration_ms    histogram { function, p50, p95, p99 }
+blueprint_referrals_errors_total             counter { function, error_code }
+blueprint_referrals_attributed_total         counter { program_id }
+blueprint_referrals_converted_total          counter { program_id }
+blueprint_referrals_validated_total          counter { program_id }
+blueprint_referrals_rewarded_total           counter { reward_type }
+blueprint_referrals_invalidated_total        counter { reason }
+blueprint_referrals_fraud_detected_total     counter
 ```
 - **Dependencies:** `users` (referrer/referee identity), `billing` or `loyalty` or `payments` (reward fulfillment), `fraud_detection` (self-referral and gaming detection), `notifications` (reward delivery).
 - **Errors:** `PROGRAM_NOT_FOUND`, `CODE_NOT_FOUND`, `CODE_EXPIRED`, `CODE_EXHAUSTED`, `REFERRAL_NOT_FOUND`, `REFEREE_ALREADY_ATTRIBUTED`, `SELF_REFERRAL_DETECTED`, `REWARD_CAP_REACHED`.

@@ -94,14 +94,14 @@ Heartbeat interval:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `websocket_management.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_websocket_management_operation_total           counter { function, result: success|failure }
-gensense_websocket_management_operation_duration_ms     histogram { function, p50, p95, p99 }
-gensense_websocket_management_errors_total              counter { function, error_code }
-gensense_websocket_management_connections_total         gauge { status: active|closed }
-gensense_websocket_management_messages_sent_total       counter { room_id }
-gensense_websocket_management_messages_dropped_total    counter { reason }
-gensense_websocket_management_rooms_active              gauge
-gensense_websocket_management_connection_duration_ms    histogram
+blueprint_websocket_management_operation_total           counter { function, result: success|failure }
+blueprint_websocket_management_operation_duration_ms     histogram { function, p50, p95, p99 }
+blueprint_websocket_management_errors_total              counter { function, error_code }
+blueprint_websocket_management_connections_total         gauge { status: active|closed }
+blueprint_websocket_management_messages_sent_total       counter { room_id }
+blueprint_websocket_management_messages_dropped_total    counter { reason }
+blueprint_websocket_management_rooms_active              gauge
+blueprint_websocket_management_connection_duration_ms    histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

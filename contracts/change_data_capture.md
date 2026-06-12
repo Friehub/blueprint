@@ -104,9 +104,9 @@ Slot retention:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `change_data_capture.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_cdc_events_total                     { table, operation }
-  gensense_cdc_lag_bytes                        gauge { stream_id }
-  gensense_cdc_batch_size                       histogram { stream_id }
+blueprint_cdc_events_total                     { table, operation }
+  blueprint_cdc_lag_bytes                        gauge { stream_id }
+  blueprint_cdc_batch_size                       histogram { stream_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

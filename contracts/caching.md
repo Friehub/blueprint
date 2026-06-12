@@ -95,14 +95,14 @@ CacheEntry:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `caching.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_caching_operation_total                counter { function, result }
-gensense_caching_operation_duration_ms          histogram { function }
-gensense_caching_errors_total                   counter { function, error_code }
-gensense_caching_hits_total                      counter { function }
-gensense_caching_misses_total                    counter { function }
-gensense_caching_keys_total                      gauge
-gensense_caching_memory_used_bytes               gauge
-gensense_caching_tag_invalidations_total         counter
+blueprint_caching_operation_total                counter { function, result }
+blueprint_caching_operation_duration_ms          histogram { function }
+blueprint_caching_errors_total                   counter { function, error_code }
+blueprint_caching_hits_total                      counter { function }
+blueprint_caching_misses_total                    counter { function }
+blueprint_caching_keys_total                      gauge
+blueprint_caching_memory_used_bytes               gauge
+blueprint_caching_tag_invalidations_total         counter
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

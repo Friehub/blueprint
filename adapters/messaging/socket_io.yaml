@@ -1,0 +1,45 @@
+name: socket_io
+module: messaging
+version: 1.0.0
+description: Socket.IO real-time messaging adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - sendMessage
+  - markRead
+  - getUnreadCount
+
+does_not_implement:
+  - createThread
+  - getThread
+  - getThreads
+  - getMessages
+  - editMessage
+  - deleteMessage
+  - addParticipant
+  - removeParticipant
+
+config:
+  required:
+    - name: server_url
+      type: string
+      description: Socket.IO server URL
+      secret: false
+  optional:
+    - name: path
+      type: string
+      default: "/socket.io"
+      description: Socket.IO path
+    - name: auth_token
+      type: string
+      description: Server authentication token
+      secret: true
+
+dependencies:
+  - module: messaging
+    purpose: Real-time message delivery
+    required: true
+
+metadata:
+  provider_url: https://socket.io
+  docs_url: https://socket.io/docs

@@ -100,9 +100,9 @@ Sandbox TTL:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `sandbox_environment.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_sandbox_environment_active_total         { template }
-  gensense_sandbox_environment_provisioned_total   { template }
-  gensense_sandbox_environment_expired_total
+blueprint_sandbox_environment_active_total         { template }
+  blueprint_sandbox_environment_provisioned_total   { template }
+  blueprint_sandbox_environment_expired_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

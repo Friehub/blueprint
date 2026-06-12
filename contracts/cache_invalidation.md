@@ -311,14 +311,14 @@ CREATE INDEX idx_invalidation_jobs_status ON invalidation_jobs(status, triggered
 * **Tracing Spans:** Each invalidation job emits a trace span annotated with `ruleId`, `purgedKeyCount`, `failedKeyCount`, and `durationMs`. Every function call follows `cache_invalidation.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_cache_invalidation_operation_total              counter { function, result }
-gensense_cache_invalidation_operation_duration_ms        histogram { function }
-gensense_cache_invalidation_errors_total                 counter { function, error_code }
-gensense_cache_invalidation_rules_total                   gauge { status }
-gensense_cache_invalidation_jobs_total                    counter { status }
-gensense_cache_invalidation_keys_purged_total             counter { rule_id }
-gensense_cache_invalidation_keys_failed_total             counter { rule_id, error_code }
-gensense_cache_invalidation_lag_ms                       gauge
+blueprint_cache_invalidation_operation_total              counter { function, result }
+blueprint_cache_invalidation_operation_duration_ms        histogram { function }
+blueprint_cache_invalidation_errors_total                 counter { function, error_code }
+blueprint_cache_invalidation_rules_total                   gauge { status }
+blueprint_cache_invalidation_jobs_total                    counter { status }
+blueprint_cache_invalidation_keys_purged_total             counter { rule_id }
+blueprint_cache_invalidation_keys_failed_total             counter { rule_id, error_code }
+blueprint_cache_invalidation_lag_ms                       gauge
 ```
 * **SLO Targets:** Event-to-purge P99 ≤ 500ms; rule creation P99 ≤ 200ms.
 

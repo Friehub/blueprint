@@ -129,10 +129,10 @@ Read receipt retention:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `read_receipts.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_read_receipts_marked_total            { scope }
-gensense_read_receipts_unread_count            gauge { user_id, thread_id }
-gensense_read_receipts_bulk_batch_size         histogram
-gensense_read_receipts_tracking_duration_ms     histogram { function }
+blueprint_read_receipts_marked_total            { scope }
+blueprint_read_receipts_unread_count            gauge { user_id, thread_id }
+blueprint_read_receipts_bulk_batch_size         histogram
+blueprint_read_receipts_tracking_duration_ms     histogram { function }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details). `markRead` P99 must be < 50ms. `getUnreadCount` P99 must be < 30ms.
 

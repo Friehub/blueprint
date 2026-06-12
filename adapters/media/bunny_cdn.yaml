@@ -1,0 +1,51 @@
+name: bunny_cdn
+module: media
+version: 1.0.0
+description: Bunny CDN media processing and delivery adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - uploadMedia
+  - processMedia
+  - getMediaAsset
+  - getVariants
+  - deleteMediaAsset
+  - generateThumbnail
+  - transcodeVideo
+  - getProcessingJob
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Bunny CDN API key
+      secret: true
+    - name: storage_zone
+      type: string
+      description: Bunny CDN storage zone name
+      secret: false
+  optional:
+    - name: pull_zone
+      type: string
+      description: Pull zone name
+    - name: region
+      type: string
+      default: de
+      description: Storage region code
+    - name: video_library_id
+      type: string
+      description: Bunny Stream video library ID
+
+dependencies:
+  - module: storage
+    purpose: Store media assets
+    required: false
+  - module: audit_log
+    purpose: Log media events
+    required: false
+
+metadata:
+  provider_url: https://bunny.net
+  docs_url: https://docs.bunny.net

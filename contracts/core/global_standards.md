@@ -163,12 +163,12 @@ duration_ms:      number
 ```
 
 ### Metrics Specification (Universal)
-Every module must expose the following metrics. Metric names follow the pattern `gensense_<module>_<operation>_<measure>`.
+Every module must expose the following metrics. Metric names follow the pattern `blueprint_<module>_<operation>_<measure>`.
 
 ```
-gensense_<module>_operation_total          counter   { function, result: success|failure }
-gensense_<module>_operation_duration_ms    histogram { function, p50, p95, p99 }
-gensense_<module>_errors_total             counter   { function, error_code }
+blueprint_<module>_operation_total          counter   { function, result: success|failure }
+blueprint_<module>_operation_duration_ms    histogram { function, p50, p95, p99 }
+blueprint_<module>_errors_total             counter   { function, error_code }
 ```
 
 ### Structured Log Fields

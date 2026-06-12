@@ -138,15 +138,15 @@ Acquire timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `connection_pool.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_connection_pool_active_current          gauge { pool_name }
-  gensense_connection_pool_idle_current            gauge { pool_name }
-  gensense_connection_pool_pending_current          gauge { pool_name }
-  gensense_connection_pool_acquire_duration_ms      histogram { pool_name }
-  gensense_connection_pool_evictions_total           { pool_name, reason }
-  gensense_connection_pool_leak_count                gauge { pool_name }
-  gensense_connection_pool_circuit_breaker            gauge { pool_name, state }
-  gensense_connection_pool_health_check_duration_ms   histogram { pool_name }
-  gensense_connection_pool_validation_failures_total  { pool_name }
+blueprint_connection_pool_active_current          gauge { pool_name }
+  blueprint_connection_pool_idle_current            gauge { pool_name }
+  blueprint_connection_pool_pending_current          gauge { pool_name }
+  blueprint_connection_pool_acquire_duration_ms      histogram { pool_name }
+  blueprint_connection_pool_evictions_total           { pool_name, reason }
+  blueprint_connection_pool_leak_count                gauge { pool_name }
+  blueprint_connection_pool_circuit_breaker            gauge { pool_name, state }
+  blueprint_connection_pool_health_check_duration_ms   histogram { pool_name }
+  blueprint_connection_pool_validation_failures_total  { pool_name }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

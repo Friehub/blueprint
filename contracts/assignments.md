@@ -162,11 +162,11 @@ CREATE INDEX idx_submission_audit_sub ON submission_audit(submission_id, created
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `assignments.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_assignments_operation_total            counter { function, result }
-gensense_assignments_operation_duration_ms      histogram { function }
-gensense_assignments_errors_total               counter { function, error_code }
-gensense_assignments_submissions_total           counter { assignment_id, status }
-gensense_assignments_late_submissions_total      counter { assignment_id }
+blueprint_assignments_operation_total            counter { function, result }
+blueprint_assignments_operation_duration_ms      histogram { function }
+blueprint_assignments_errors_total               counter { function, error_code }
+blueprint_assignments_submissions_total           counter { assignment_id, status }
+blueprint_assignments_late_submissions_total      counter { assignment_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

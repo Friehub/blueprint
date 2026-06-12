@@ -172,11 +172,11 @@ CREATE TABLE deployment_rollbacks (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `deployment_hooks.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_deployment_hooks_checks_total         { hook_type, status }
-  gensense_deployment_hooks_deployment_duration_ms  histogram { result }
-  gensense_deployment_hooks_rollbacks_total          { reason }
-  gensense_deployment_hooks_gate_blocked_total
-  gensense_deployment_hooks_smoke_fail_total
+blueprint_deployment_hooks_checks_total         { hook_type, status }
+  blueprint_deployment_hooks_deployment_duration_ms  histogram { result }
+  blueprint_deployment_hooks_rollbacks_total          { reason }
+  blueprint_deployment_hooks_gate_blocked_total
+  blueprint_deployment_hooks_smoke_fail_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

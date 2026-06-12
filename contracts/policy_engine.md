@@ -106,9 +106,9 @@ Policy evaluation cache:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `policy_engine.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_policy_engine_evaluations_total        { policy_name, allowed }
-  gensense_policy_engine_evaluation_duration_ms   histogram { policy_name }
-  gensense_policy_engine_rules_evaluated_total     { policy_name }
+blueprint_policy_engine_evaluations_total        { policy_name, allowed }
+  blueprint_policy_engine_evaluation_duration_ms   histogram { policy_name }
+  blueprint_policy_engine_rules_evaluated_total     { policy_name }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

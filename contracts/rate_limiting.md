@@ -112,10 +112,10 @@ Rate limit window:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `rate_limiting.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_rate_limiting_checks_total               { key, allowed }
-gensense_rate_limiting_tokens_consumed_total       { key, cost }
-gensense_rate_limiting_limit_exceeded_total        { key }
-gensense_rate_limiting_store_latency_ms            histogram { operation }
+blueprint_rate_limiting_checks_total               { key, allowed }
+blueprint_rate_limiting_tokens_consumed_total       { key, cost }
+blueprint_rate_limiting_limit_exceeded_total        { key }
+blueprint_rate_limiting_store_latency_ms            histogram { operation }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details). Rate limit check P99 must be < 5ms.
 

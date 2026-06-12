@@ -1,0 +1,47 @@
+name: telegram
+module: notifications
+version: 1.0.0
+description: Telegram bot API notification channel adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - sendPush
+  - getNotifications
+  - markRead
+  - markAllRead
+  - getUnreadCount
+
+does_not_implement:
+  - sendEmail
+  - sendSMS
+  - sendInApp
+  - updatePreferences
+  - getPreferences
+
+config:
+  required:
+    - name: bot_token
+      type: string
+      description: Telegram bot token
+      secret: true
+  optional:
+    - name: chat_id
+      type: string
+      description: Default chat ID
+    - name: parse_mode
+      type: string
+      default: Markdown
+      description: Message parse mode (Markdown or HTML)
+    - name: disable_web_page_preview
+      type: boolean
+      default: false
+      description: Disable link previews
+
+dependencies:
+  - module: audit_log
+    purpose: Log notification events
+    required: false
+
+metadata:
+  provider_url: https://telegram.org
+  docs_url: https://core.telegram.org/bots/api

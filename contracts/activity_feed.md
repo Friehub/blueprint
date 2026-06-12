@@ -264,13 +264,13 @@ CREATE TABLE feed_entry_hides (
 * **Tracing Spans:** `ingestEvent` spans must carry `eventName`, `actorId`, `entityType`, and `audienceStrategy` as attributes. Every function call creates a span following `activity_feed.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_activity_feed_operation_total              counter { function, result }
-gensense_activity_feed_operation_duration_ms        histogram { function }
-gensense_activity_feed_errors_total                 counter { function, error_code }
-gensense_activity_feed_entries_ingested_total        counter { event_name, audience_strategy }
-gensense_activity_feed_entries_served_total          counter { audience }
-gensense_activity_feed_ingestion_lag_ms              gauge
-gensense_activity_feed_hidden_entries_total
+blueprint_activity_feed_operation_total              counter { function, result }
+blueprint_activity_feed_operation_duration_ms        histogram { function }
+blueprint_activity_feed_errors_total                 counter { function, error_code }
+blueprint_activity_feed_entries_ingested_total        counter { event_name, audience_strategy }
+blueprint_activity_feed_entries_served_total          counter { audience }
+blueprint_activity_feed_ingestion_lag_ms              gauge
+blueprint_activity_feed_hidden_entries_total
 ```
 * **SLO Targets:** Feed query P99 ≤ 50ms; ingestion write P99 ≤ 200ms; ingestion-to-read visibility ≤ 2 seconds.
 

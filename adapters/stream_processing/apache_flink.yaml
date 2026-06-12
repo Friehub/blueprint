@@ -1,0 +1,57 @@
+name: apache_flink
+module: stream_processing
+version: 1.0.0
+description: Apache Flink stream processing adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - defineStream
+  - getStream
+  - listStreams
+  - startStream
+  - stopStream
+  - applyTransformation
+  - addSink
+  - getStreamMetrics
+  - getLag
+
+does_not_implement: []
+
+config:
+  required:
+    - name: cluster_endpoint
+      type: string
+      description: Flink cluster endpoint
+      secret: false
+  optional:
+    - name: deployment_target
+      type: string
+      default: session
+      description: Deployment target (session or application)
+    - name: parallelism
+      type: integer
+      default: 4
+      description: Default parallelism
+    - name: checkpoint_interval_ms
+      type: integer
+      default: 60000
+      description: Checkpoint interval in ms
+    - name: savepoint_enabled
+      type: boolean
+      default: true
+      description: Enable savepoints
+    - name: jar_path
+      type: string
+      description: Path to Flink job JAR
+
+dependencies:
+  - module: event_bus
+    purpose: Source and sink streaming events
+    required: true
+  - module: audit_log
+    purpose: Log stream lifecycle events
+    required: false
+
+metadata:
+  provider_url: https://flink.apache.org
+  docs_url: https://flink.apache.org/documentation

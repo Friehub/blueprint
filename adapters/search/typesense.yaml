@@ -2,6 +2,7 @@ name: typesense
 module: search
 version: 1.0.0
 description: Typesense search adapter
+languages: [typescript, python, go, rust, java]
 
 implements:
   - indexDocument

@@ -98,12 +98,12 @@ Permission cache:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `permissions.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_permissions_operation_total       counter { function, result: success|failure }
-gensense_permissions_operation_duration_ms histogram { function, p50, p95, p99 }
-gensense_permissions_errors_total          counter { function, error_code }
-gensense_permissions_grants_total          counter { action }
-gensense_permissions_revocations_total     counter { action }
-gensense_permissions_evaluations_total     counter { result: allowed|denied }
+blueprint_permissions_operation_total       counter { function, result: success|failure }
+blueprint_permissions_operation_duration_ms histogram { function, p50, p95, p99 }
+blueprint_permissions_errors_total          counter { function, error_code }
+blueprint_permissions_grants_total          counter { action }
+blueprint_permissions_revocations_total     counter { action }
+blueprint_permissions_evaluations_total     counter { result: allowed|denied }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

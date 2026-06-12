@@ -179,12 +179,12 @@ CREATE TABLE event_bus_delivery_attempts (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `event_bus.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_event_bus_published_total              { topic }
-  gensense_event_bus_delivered_total              { topic }
-  gensense_event_bus_dead_letter_total            { topic, reason }
-  gensense_event_bus_subscriber_lag               gauge { topic, subscription }
-  gensense_event_bus_delivery_duration_ms          histogram { topic }
-  gensense_event_bus_dlq_retry_total              { topic }
+blueprint_event_bus_published_total              { topic }
+  blueprint_event_bus_delivered_total              { topic }
+  blueprint_event_bus_dead_letter_total            { topic, reason }
+  blueprint_event_bus_subscriber_lag               gauge { topic, subscription }
+  blueprint_event_bus_delivery_duration_ms          histogram { topic }
+  blueprint_event_bus_dlq_retry_total              { topic }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -142,9 +142,9 @@ Step 4: confirmSettlement(transfer_id, reference)
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `transfers.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_transfers_total                    counter { method, status }
-gensense_transfers_volume_cents             counter { method }
-gensense_transfers_clearing_duration_sec    histogram { method }
+blueprint_transfers_total                    counter { method, status }
+blueprint_transfers_volume_cents             counter { method }
+blueprint_transfers_clearing_duration_sec    histogram { method }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

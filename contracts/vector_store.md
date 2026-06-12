@@ -91,17 +91,17 @@ Index build timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `vector_store.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_vector_store_collections_total           { status }
-  gensense_vector_store_vectors_total              { collection_id }
-  gensense_vector_store_search_latency_ms           histogram { collection_id }
-  gensense_vector_store_index_memory_bytes          gauge { collection_id }
+blueprint_vector_store_collections_total           { status }
+  blueprint_vector_store_vectors_total              { collection_id }
+  blueprint_vector_store_search_latency_ms           histogram { collection_id }
+  blueprint_vector_store_index_memory_bytes          gauge { collection_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Failure Modes
 | Scenario | Behavior |
 |---|---|
-| Index build failure | Mark collection status as failed; retry on next upsert; increment `gensense_vector_store_index_memory_bytes` error |
+| Index build failure | Mark collection status as failed; retry on next upsert; increment `blueprint_vector_store_index_memory_bytes` error |
 | Search backend timeout | Return Timeout error; caller should retry with simpler query or fewer probes |
 | Dimension mismatch on upsert | Return `dimension_mismatch` error immediately; do not retry without fixing dimension |
 | Collection not ready | Return `collection_not_ready`; caller must wait and retry |

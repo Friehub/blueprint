@@ -1,0 +1,54 @@
+name: nats
+module: event_bus
+version: 1.0.0
+description: NATS event bus adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - publish
+  - publishBulk
+  - subscribe
+  - unsubscribe
+  - getSubscriptions
+  - getDeadLetters
+  - retryDeadLetter
+
+does_not_implement:
+  - replay
+
+config:
+  required:
+    - name: url
+      type: string
+      description: NATS server URL
+      secret: false
+  optional:
+    - name: token
+      type: string
+      description: NATS auth token
+      secret: true
+    - name: username
+      type: string
+      description: NATS username
+    - name: password
+      type: string
+      description: NATS password
+      secret: true
+    - name: max_reconnect
+      type: integer
+      default: 60
+      description: Max reconnect attempts
+    - name: reconnect_wait
+      type: integer
+      default: 2000
+      description: Reconnect wait (ms)
+    - name: jetstream_enabled
+      type: boolean
+      default: true
+      description: Enable JetStream for persistence
+
+dependencies: []
+
+metadata:
+  provider_url: https://nats.io
+  docs_url: https://docs.nats.io

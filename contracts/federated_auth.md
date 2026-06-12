@@ -182,11 +182,11 @@ CREATE TABLE federated_tokens (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `federated_auth.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_federated_auth_identities_total        gauge { provider }
-gensense_federated_auth_connections_total       { provider, result }
-gensense_federated_auth_token_refresh_total     { provider, result }
-gensense_federated_auth_saml_assertions_total   { provider, result }
-gensense_federated_auth_oauth_state_expired_total
+blueprint_federated_auth_identities_total        gauge { provider }
+blueprint_federated_auth_connections_total       { provider, result }
+blueprint_federated_auth_token_refresh_total     { provider, result }
+blueprint_federated_auth_saml_assertions_total   { provider, result }
+blueprint_federated_auth_oauth_state_expired_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

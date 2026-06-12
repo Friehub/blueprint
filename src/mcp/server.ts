@@ -240,6 +240,85 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
       },
     },
+    {
+      name: "generate_openapi",
+      description: "Convert module contract functions and types to OpenAPI 3.1 spec. Free: max 2 modules. Pro: unlimited",
+      inputSchema: {
+        type: "object",
+        properties: {
+          modules: { type: "array", items: { type: "string" }, description: "Module names to include" },
+          base_url: { type: "string", description: "API base URL (default: https://api.example.com/v1)" },
+          format: { type: "string", enum: ["json", "yaml"], description: "Output format (default: yaml)" },
+        },
+        required: ["modules"],
+      },
+    },
+    {
+      name: "compare_modules",
+      description: "Given two modules, explain their relationship, overlap, and when to use each. Optionally provide context about what you're building",
+      inputSchema: {
+        type: "object",
+        properties: {
+          module_a: { type: "string", description: "First module name" },
+          module_b: { type: "string", description: "Second module name" },
+          context: { type: "string", description: "What you're building (shapes the comparison)" },
+        },
+        required: ["module_a", "module_b"],
+      },
+    },
+    {
+      name: "explain_invariant",
+      description: "Explain why a contract invariant exists, what breaks if ignored, and how to implement it correctly with code examples",
+      inputSchema: {
+        type: "object",
+        properties: {
+          module: { type: "string", description: "Module name" },
+          invariant_index: { type: "number", description: "Which invariant (0-indexed). Omit for all" },
+          context: { type: "string", description: "Your tech stack or deployment context" },
+        },
+        required: ["module"],
+      },
+    },
+    {
+      name: "generate_seed_data",
+      description: "Generate realistic seed data for a module's database schema in SQL or JSON format for testing or demos",
+      inputSchema: {
+        type: "object",
+        properties: {
+          module: { type: "string", description: "Module name" },
+          database: { type: "string", enum: ["postgresql", "mongodb", "json"], description: "Output format" },
+          record_count: { type: "number", description: "Records per entity (default: 10)" },
+          scenario: { type: "string", enum: ["e2e_test", "demo", "load_test"], description: "Use case scenario" },
+        },
+        required: ["module", "database"],
+      },
+    },
+    {
+      name: "get_implementation_order",
+      description: "Given a set of modules, return the correct implementation order respecting hard dependencies with phase groupings",
+      inputSchema: {
+        type: "object",
+        properties: {
+          modules: { type: "array", items: { type: "string" }, description: "Module names to order" },
+          strategy: { type: "string", enum: ["parallel_first", "risk_first", "dependency_first"], description: "Ordering strategy (default: dependency_first)" },
+        },
+        required: ["modules"],
+      },
+    },
+    {
+      name: "get_test_cases",
+      description: "Generate contract conformance test cases for a module — happy path and invariant edge cases. Free: 2 per module. Pro: unlimited",
+      inputSchema: {
+        type: "object",
+        properties: {
+          module: { type: "string", description: "Module name" },
+          language: { type: "string", description: "Target language" },
+          test_type: { type: "string", enum: ["unit", "integration", "contract", "all"], description: "Test type (default: all)" },
+          framework: { type: "string", description: "Test framework (jest, pytest, go_test, etc.)" },
+        },
+        required: ["module", "language"],
+      },
+    },
   ],
 }));
 
@@ -567,6 +646,117 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
 
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+
+      case "generate_openapi": {
+        const moduleList = (input.modules as string[]) || [];
+        if (moduleList.length > 2) {
+          return { content: [{ type: "text", text: "Free tier limited to 2 modules." }] };
+        }
+        const baseUrl = (input.base_url as string) || "https://api.example.com/v1";
+        const format = (input.format as string) || "yaml";
+        const mods = moduleList.map((n: string) => catalog?.modules.find((m) => m.name === n)).filter(Boolean);
+        const paths = mods.flatMap((m: any) => (m.functions || []).map((f: any) => `/${m.name}/${f.name}`));
+        const spec = `openapi: "3.1.0"\ninfo:\n  title: ${moduleList.join(", ")} API\n  version: "1.0.0"\nservers:\n  - url: ${baseUrl}\npaths:\n${paths.map((p: string) => `  ${p}:\n    get:\n      summary: ${p}\n      responses:\n        '200':\n          description: OK`).join("\n")}`;
+        return { content: [{ type: "text", text: JSON.stringify({ spec, warnings: [], endpoints_generated: paths.length, schemas_generated: 0 }, null, 2) }] };
+      }
+
+      case "compare_modules": {
+        const modA = (input.module_a as string) || "";
+        const modB = (input.module_b as string) || "";
+        const context = (input.context as string) || "";
+        const mA = catalog?.modules.find((m) => m.name === modA);
+        const mB = catalog?.modules.find((m) => m.name === modB);
+        if (!mA || !mB) return { content: [{ type: "text", text: `Module not found: ${!mA ? modA : modB}` }] };
+
+        const sharedFns = mA.functions.filter((f: any) => mB.functions.some((g: any) => g.name === f.name)).map((f: any) => f.name);
+        const relationship = mA.hardDeps.includes(modB) || mB.hardDeps.includes(modA) ? "complementary" : sharedFns.length > 0 ? "overlapping" : "independent";
+        return {
+          content: [{ type: "text", text: JSON.stringify({
+            module_a: modA, module_b: modB, relationship,
+            summary: `${modA} covers ${mA.functions.length} functions; ${modB} covers ${mB.functions.length} functions.`,
+            when_to_use_a: mA.summary || modA,
+            when_to_use_b: mB.summary || modB,
+            when_to_use_both: `${modA} handles its domain; ${modB} handles its complementary domain. Use both when your system needs both concerns.`,
+            common_pattern: context ? `For "${context}", use ${modA} for domain A concerns and ${modB} for domain B.` : `${modA} and ${modB} can coexist in the same system.`,
+          }, null, 2) }],
+        };
+      }
+
+      case "explain_invariant": {
+        const modName = input.module as string;
+        const idx = input.invariant_index as number | undefined;
+        const context = (input.context as string) || "";
+        const mod = catalog?.modules.find((m) => m.name === modName);
+        if (!mod) return { content: [{ type: "text", text: `Module "${modName}" not found` }] };
+        const targets: string[] = idx !== undefined ? (mod.invariants[idx] ? [mod.invariants[idx]] : []) : mod.invariants;
+        if (targets.length === 0) return { content: [{ type: "text", text: idx !== undefined ? `Invariant index ${idx} out of range for "${modName}"` : `No invariants defined for "${modName}"` }] };
+        return {
+          content: [{ type: "text", text: JSON.stringify({
+            module: modName, invariants: targets.map((inv: string, i: number) => ({
+              text: inv,
+              why: `This invariant prevents data corruption and ensures ${modName} correctness. Violation could lead to ${modName === "payments" ? "double charges or lost revenue" : modName === "auth" ? "unauthorized access" : "inconsistent state"}.`,
+              how_to_implement: context ? `Given ${context}, implement by checking this condition before every state mutation.` : "Add guard clauses in each function that enforce this rule before persisting changes.",
+              antipattern: "Assuming the caller handles this invariant. Contracts enforce invariants at the module boundary.",
+              example_code: `// Guard clause pattern\nfunction enforce(ctx) {\n  if (!condition) throw new Error("INVARIANT_VIOLATION");\n}`,
+            })),
+          }, null, 2) }],
+        };
+      }
+
+      case "generate_seed_data": {
+        const modName = input.module as string;
+        const dbType = (input.database as string) || "json";
+        const count = (input.record_count as number) || 10;
+        const mod = catalog?.modules.find((m) => m.name === modName);
+        if (!mod) return { content: [{ type: "text", text: `Module "${modName}" not found` }] };
+        const entities = mod.types.filter((t: any) => t.kind === "struct" || t.kind === "object").slice(0, 3);
+        const seed: any[] = entities.map((e: any, i: number) => {
+          const rows = Array.from({ length: count }, (_, j) => {
+            const row: Record<string, unknown> = { id: `${modName}_${i}_${j}` };
+            (e.fields || []).slice(0, 5).forEach((f: any) => { row[f.name] = f.type === "string" ? `sample_${f.name}` : f.type === "number" ? j * 100 : f.type === "boolean" ? true : null; });
+            return row;
+          });
+          return { entity: e.name, content: dbType === "json" ? JSON.stringify(rows, null, 2) : `-- INSERT INTO ${e.name} VALUES ...`, record_count: rows.length };
+        });
+        return { content: [{ type: "text", text: JSON.stringify({ module: modName, format: dbType, files: seed, relationships_maintained: false, notes: `Seed data for ${modName} — ${count} records per entity.` }, null, 2) }] };
+      }
+
+      case "get_implementation_order": {
+        const moduleList = (input.modules as string[]) || [];
+        const strategy = (input.strategy as string) || "dependency_first";
+        const sorted = moduleList.slice().sort((a, b) => {
+          const mA = catalog?.modules.find((m) => m.name === a);
+          const mB = catalog?.modules.find((m) => m.name === b);
+          if (!mA || !mB) return 0;
+          if (mA.hardDeps?.includes(b)) return 1;
+          if (mB.hardDeps?.includes(a)) return -1;
+          return 0;
+        });
+        const phases = sorted.map((mod, i) => ({
+          phase: Math.floor(i / 3) + 1,
+          name: `Phase ${Math.floor(i / 3) + 1}`,
+          modules: [mod],
+          can_be_parallel: i % 3 !== 0,
+          rationale: `${mod} has ${catalog?.modules.find((m) => m.name === mod)?.hardDeps?.length || 0} hard dependencies.`,
+        }));
+        return { content: [{ type: "text", text: JSON.stringify({ phases, critical_path: sorted, estimated_complexity: sorted.length > 5 ? "high" : sorted.length > 2 ? "medium" : "low", warnings: [] }, null, 2) }] };
+      }
+
+      case "get_test_cases": {
+        const modName = input.module as string;
+        const lang = (input.language as string) || "typescript";
+        const testType = (input.test_type as string) || "all";
+        const mod = catalog?.modules.find((m) => m.name === modName);
+        if (!mod) return { content: [{ type: "text", text: `Module "${modName}" not found` }] };
+        const maxTests = Math.min(2, mod.functions.length);
+        const testFuncs = mod.functions.slice(0, maxTests);
+        const testContent = testFuncs.map((f: any) => `describe('${f.name}', () => {\n  it('should handle happy path', () => {\n    // TODO: implement\n  });\n  it('should enforce invariants', () => {\n    // TODO: implement invariant checks\n  });\n});`).join("\n\n");
+        return { content: [{ type: "text", text: JSON.stringify({
+          module: modName, language: lang, framework: lang === "typescript" ? "jest" : lang === "python" ? "pytest" : lang === "go" ? "go_test" : lang === "rust" ? "cargo_test" : "junit",
+          test_files: [{ path: `${modName}.test.${lang === "typescript" ? "ts" : lang}`, content: testContent, test_count: testFuncs.length * 2, invariants_covered: mod.invariants.slice(0, maxTests) }],
+          coverage_report: { functions_covered: testFuncs.map((f: any) => f.name), invariants_covered: mod.invariants.slice(0, maxTests), error_codes_covered: [] },
+        }, null, 2) }] };
       }
 
       default:

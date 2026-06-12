@@ -141,9 +141,9 @@ CREATE TABLE feature_audit_exports (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `feature_auditing.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_feature_auditing_entries_total          { action }
-gensense_feature_auditing_export_total           { format, status }
-gensense_feature_auditing_flag_count             gauge { action }
+blueprint_feature_auditing_entries_total          { action }
+blueprint_feature_auditing_export_total           { format, status }
+blueprint_feature_auditing_flag_count             gauge { action }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

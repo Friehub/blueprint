@@ -96,10 +96,10 @@ SLO budget window:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `load_shedding.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_load_shedding_admitted_total          { workload, priority }
-  gensense_load_shedding_rejected_total          { workload, priority, reason }
-  gensense_load_shedding_utilization_pct          gauge { workload }
-  gensense_load_shedding_slo_remaining_pct        gauge { workload }
+blueprint_load_shedding_admitted_total          { workload, priority }
+  blueprint_load_shedding_rejected_total          { workload, priority, reason }
+  blueprint_load_shedding_utilization_pct          gauge { workload }
+  blueprint_load_shedding_slo_remaining_pct        gauge { workload }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

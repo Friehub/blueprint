@@ -140,12 +140,12 @@ CREATE INDEX idx_tracking_events_shipment ON tracking_events(shipment_id, occurr
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `shipping.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_shipping_operation_total           counter { function, result: success|failure }
-gensense_shipping_operation_duration_ms     histogram { function, p50, p95, p99 }
-gensense_shipping_errors_total              counter { function, error_code }
-gensense_shipping_shipments_created_total   counter { carrier }
-gensense_shipping_tracking_events_ingested  counter { carrier }
-gensense_shipping_labels_created_total      counter { format }
+blueprint_shipping_operation_total           counter { function, result: success|failure }
+blueprint_shipping_operation_duration_ms     histogram { function, p50, p95, p99 }
+blueprint_shipping_errors_total              counter { function, error_code }
+blueprint_shipping_shipments_created_total   counter { carrier }
+blueprint_shipping_tracking_events_ingested  counter { carrier }
+blueprint_shipping_labels_created_total      counter { format }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

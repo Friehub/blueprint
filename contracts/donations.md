@@ -171,11 +171,11 @@ CREATE TABLE campaign_daily_stats (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `donations.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_donations_campaigns_total              gauge { status }
-gensense_donations_received_total               { currency, status }
-gensense_donations_amount_total                 { currency }  ← sum of amounts
-gensense_donations_certificates_issued_total
-gensense_donations_campaign_funding_rate        gauge { campaign_id }
+blueprint_donations_campaigns_total              gauge { status }
+blueprint_donations_received_total               { currency, status }
+blueprint_donations_amount_total                 { currency }  ← sum of amounts
+blueprint_donations_certificates_issued_total
+blueprint_donations_campaign_funding_rate        gauge { campaign_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

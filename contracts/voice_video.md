@@ -110,10 +110,10 @@ Room max duration:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `voice_video.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_voice_video_rooms_created_total            { status }
-  gensense_voice_video_participants_total             { room_id }
-  gensense_voice_video_recording_duration_ms           histogram
-  gensense_voice_video_transcription_segments_total    { language }
+blueprint_voice_video_rooms_created_total            { status }
+  blueprint_voice_video_participants_total             { room_id }
+  blueprint_voice_video_recording_duration_ms           histogram
+  blueprint_voice_video_transcription_segments_total    { language }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -92,11 +92,11 @@ Challenge token TTL:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `bot_protection.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_bot_protection_challenges_issued_total     { method, endpoint }
-  gensense_bot_protection_challenges_passed_total     { method }
-  gensense_bot_protection_challenges_failed_total      { method, reason }
-  gensense_bot_protection_score_distribution            histogram
-  gensense_bot_protection_bypass_reports_total
+blueprint_bot_protection_challenges_issued_total     { method, endpoint }
+  blueprint_bot_protection_challenges_passed_total     { method }
+  blueprint_bot_protection_challenges_failed_total      { method, reason }
+  blueprint_bot_protection_score_distribution            histogram
+  blueprint_bot_protection_bypass_reports_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

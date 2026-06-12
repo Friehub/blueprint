@@ -168,12 +168,12 @@ CREATE TABLE cdn_invalidations (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `file_upload.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_file_upload_sessions_total            { status }
-gensense_file_upload_chunks_received_total     { session_id }
-gensense_file_upload_scan_results_total        { status }
-gensense_file_upload_cdn_invalidation_total    { status }
-gensense_file_upload_throughput_bytes          gauge
-gensense_file_upload_size_distribution         histogram
+blueprint_file_upload_sessions_total            { status }
+blueprint_file_upload_chunks_received_total     { session_id }
+blueprint_file_upload_scan_results_total        { status }
+blueprint_file_upload_cdn_invalidation_total    { status }
+blueprint_file_upload_throughput_bytes          gauge
+blueprint_file_upload_size_distribution         histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

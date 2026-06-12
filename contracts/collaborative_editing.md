@@ -105,9 +105,9 @@ Session timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `collaborative_editing.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_collaborative_editing_active_sessions_total  { doc_id }
-  gensense_collaborative_editing_operations_total       { type }
-  gensense_collaborative_editing_conflicts_total
+blueprint_collaborative_editing_active_sessions_total  { doc_id }
+  blueprint_collaborative_editing_operations_total       { type }
+  blueprint_collaborative_editing_conflicts_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -121,11 +121,11 @@ Shutdown timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `graceful_shutdown.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_graceful_shutdown_total             { reason, result }
-  gensense_graceful_shutdown_duration_ms       histogram
-  gensense_graceful_shutdown_in_flight_gauge     { phase }
-  gensense_graceful_shutdown_hook_fail_total    { phase }
-  gensense_graceful_shutdown_in_flight_lost_total
+blueprint_graceful_shutdown_total             { reason, result }
+  blueprint_graceful_shutdown_duration_ms       histogram
+  blueprint_graceful_shutdown_in_flight_gauge     { phase }
+  blueprint_graceful_shutdown_hook_fail_total    { phase }
+  blueprint_graceful_shutdown_in_flight_lost_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

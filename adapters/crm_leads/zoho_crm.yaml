@@ -1,0 +1,52 @@
+name: zoho_crm
+module: crm_leads
+version: 1.0.0
+description: Zoho CRM leads adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createLead
+  - updateLeadStatus
+  - createDeal
+  - updateDealStage
+  - assignOwner
+
+does_not_implement: []
+
+config:
+  required:
+    - name: client_id
+      type: string
+      description: Zoho CRM client ID
+      secret: false
+    - name: client_secret
+      type: string
+      description: Zoho CRM client secret
+      secret: true
+    - name: refresh_token
+      type: string
+      description: Zoho CRM refresh token
+      secret: true
+  optional:
+    - name: api_domain
+      type: string
+      default: https://www.zohoapis.com
+      description: Zoho API domain
+    - name: organization_id
+      type: string
+      description: Zoho organization ID
+
+dependencies:
+  - module: users
+    purpose: Get user data for lead assignments
+    required: true
+  - module: notifications
+    purpose: Send lead notifications
+    required: false
+  - module: audit_log
+    purpose: Log CRM events
+    required: false
+
+metadata:
+  provider_url: https://www.zoho.com/crm
+  docs_url: https://www.zoho.com/crm/developer/docs

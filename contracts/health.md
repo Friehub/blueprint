@@ -99,10 +99,10 @@ Liveness probe:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `health.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_health_check_results_total           { check, status }
-gensense_health_dependency_status             gauge { dependency, status }
-gensense_health_probe_duration_ms              histogram { probe_type }
-gensense_health_system_status                  gauge { status }
+blueprint_health_check_results_total           { check, status }
+blueprint_health_dependency_status             gauge { dependency, status }
+blueprint_health_probe_duration_ms              histogram { probe_type }
+blueprint_health_system_status                  gauge { status }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

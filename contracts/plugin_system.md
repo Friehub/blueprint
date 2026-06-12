@@ -111,9 +111,9 @@ Hook execution timeout:
 * **Tracing Spans:** Every plugin hook call creates a span. Span names follow the pattern `plugin_system.<hook_name>`.
 * **Telemetry Metrics:**
 ```
-gensense_plugin_system_plugins_registered_total   { status }
-  gensense_plugin_system_hook_executions_total     { hook_name, result }
-  gensense_plugin_system_hook_duration_ms           histogram { hook_name }
+blueprint_plugin_system_plugins_registered_total   { status }
+  blueprint_plugin_system_hook_executions_total     { hook_name, result }
+  blueprint_plugin_system_hook_duration_ms           histogram { hook_name }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

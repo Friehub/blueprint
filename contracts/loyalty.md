@@ -146,7 +146,7 @@ CREATE INDEX idx_loyalty_redemptions_user ON loyalty_redemptions(user_id, create
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `loyalty.<function>`.
-* **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
+* **Telemetry Metrics:** Emits universal metrics (`blueprint_<module>_operation_total`, `blueprint_<module>_operation_duration_ms`, `blueprint_<module>_errors_total`).
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Failure Modes

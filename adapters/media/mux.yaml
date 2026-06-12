@@ -1,0 +1,53 @@
+name: mux
+module: media
+version: 1.0.0
+description: Mux video processing adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - uploadMedia
+  - processMedia
+  - getMediaAsset
+  - getVariants
+  - deleteMediaAsset
+  - generateThumbnail
+  - transcodeVideo
+  - getProcessingJob
+
+does_not_implement: []
+
+config:
+  required:
+    - name: token_id
+      type: string
+      description: Mux access token ID
+      secret: false
+    - name: token_secret
+      type: string
+      description: Mux access token secret
+      secret: true
+  optional:
+    - name: playback_policy
+      type: string
+      default: public
+      description: Playback policy (public or signed)
+    - name: encoding_tier
+      type: string
+      default: smart
+      description: Encoding tier (smart or baseline)
+    - name: max_resolution
+      type: string
+      default: 1080p
+      description: Maximum output resolution
+
+dependencies:
+  - module: storage
+    purpose: Store media assets
+    required: false
+  - module: audit_log
+    purpose: Log media events
+    required: false
+
+metadata:
+  provider_url: https://www.mux.com
+  docs_url: https://docs.mux.com

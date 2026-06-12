@@ -1,0 +1,43 @@
+name: attio
+module: crm_leads
+version: 1.0.0
+description: Attio CRM leads adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createLead
+  - updateLeadStatus
+  - createDeal
+  - updateDealStage
+  - assignOwner
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_token
+      type: string
+      description: Attio API token
+      secret: true
+  optional:
+    - name: workspace_id
+      type: string
+      description: Attio workspace ID
+    - name: list_id
+      type: string
+      description: Default list ID for leads
+
+dependencies:
+  - module: users
+    purpose: Get user data for lead assignments
+    required: true
+  - module: notifications
+    purpose: Send lead notifications
+    required: false
+  - module: audit_log
+    purpose: Log CRM events
+    required: false
+
+metadata:
+  provider_url: https://attio.com
+  docs_url: https://developers.attio.com

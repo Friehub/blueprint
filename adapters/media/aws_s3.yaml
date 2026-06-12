@@ -1,0 +1,61 @@
+name: aws_s3
+module: media
+version: 1.0.0
+description: AWS S3 media processing with MediaConvert adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - uploadMedia
+  - processMedia
+  - getMediaAsset
+  - getVariants
+  - deleteMediaAsset
+  - generateThumbnail
+  - transcodeVideo
+  - getProcessingJob
+
+does_not_implement: []
+
+config:
+  required:
+    - name: access_key_id
+      type: string
+      description: AWS access key ID
+      secret: false
+    - name: secret_access_key
+      type: string
+      description: AWS secret access key
+      secret: true
+    - name: region
+      type: string
+      description: AWS region
+      secret: false
+    - name: bucket
+      type: string
+      description: S3 bucket name
+      secret: false
+  optional:
+    - name: cloudfront_domain
+      type: string
+      description: CloudFront distribution domain
+    - name: media_convert_role_arn
+      type: string
+      description: MediaConvert IAM role ARN
+    - name: media_convert_endpoint
+      type: string
+      description: MediaConvert custom endpoint
+    - name: kms_key_id
+      type: string
+      description: KMS encryption key ID
+
+dependencies:
+  - module: storage
+    purpose: Store media assets
+    required: false
+  - module: audit_log
+    purpose: Log media events
+    required: false
+
+metadata:
+  provider_url: https://aws.amazon.com/s3
+  docs_url: https://docs.aws.amazon.com/AmazonS3/latest/userguide

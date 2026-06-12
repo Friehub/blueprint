@@ -155,10 +155,10 @@ CREATE INDEX idx_consent_jobs_status ON consent_data_jobs(status, created_at) WH
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `consent.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_consent_records_total               { action }
-  gensense_consent_withdrawals_total           { purpose }
-  gensense_consent_data_jobs_total             { job_type, status }
-  gensense_consent_deletion_duration_ms         histogram
+blueprint_consent_records_total               { action }
+  blueprint_consent_withdrawals_total           { purpose }
+  blueprint_consent_data_jobs_total             { job_type, status }
+  blueprint_consent_deletion_duration_ms         histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -167,11 +167,11 @@ CREATE TABLE topology_failover_events (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `database_topology.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_database_topology_shards_total              { status }
-  gensense_database_topology_replication_lag_ms       gauge { table, node }
-  gensense_database_topology_failovers_total           { reason }
-  gensense_database_topology_rebalance_duration_ms     histogram
-  gensense_database_topology_split_brain_total
+blueprint_database_topology_shards_total              { status }
+  blueprint_database_topology_replication_lag_ms       gauge { table, node }
+  blueprint_database_topology_failovers_total           { reason }
+  blueprint_database_topology_rebalance_duration_ms     histogram
+  blueprint_database_topology_split_brain_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

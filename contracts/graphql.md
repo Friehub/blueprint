@@ -80,10 +80,10 @@ publishSubscription → graphql.subscription.published { topic, subscriber_count
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `graphql.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_graphql_queries_total           { operation_name, result }
-gensense_graphql_field_resolve_duration_ms  histogram { type_name, field_name }
-gensense_graphql_subscription_events_total   { topic }
-gensense_graphql_query_complexity_score      gauge { operation_name }
+blueprint_graphql_queries_total           { operation_name, result }
+blueprint_graphql_field_resolve_duration_ms  histogram { type_name, field_name }
+blueprint_graphql_subscription_events_total   { topic }
+blueprint_graphql_query_complexity_score      gauge { operation_name }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

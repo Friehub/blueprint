@@ -1,0 +1,59 @@
+name: kafka
+module: event_bus
+version: 1.0.0
+description: Apache Kafka event bus adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - publish
+  - publishBulk
+  - subscribe
+  - unsubscribe
+  - getSubscriptions
+  - replay
+  - getDeadLetters
+  - retryDeadLetter
+
+does_not_implement: []
+
+config:
+  required:
+    - name: bootstrap_servers
+      type: string
+      description: Kafka broker list
+      secret: false
+  optional:
+    - name: client_id
+      type: string
+      default: blueprint
+      description: Kafka client ID
+    - name: ssl_enabled
+      type: boolean
+      default: true
+      description: Enable SSL connection
+    - name: sasl_mechanism
+      type: string
+      default: PLAIN
+      description: SASL authentication mechanism
+    - name: sasl_username
+      type: string
+      description: SASL username
+      secret: true
+    - name: sasl_password
+      type: string
+      description: SASL password
+      secret: true
+    - name: group_id
+      type: string
+      default: blueprint-consumer
+      description: Consumer group ID
+    - name: auto_offset_reset
+      type: string
+      default: latest
+      description: Auto offset reset policy
+
+dependencies: []
+
+metadata:
+  provider_url: https://kafka.apache.org
+  docs_url: https://kafka.apache.org/documentation

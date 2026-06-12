@@ -158,13 +158,13 @@ CREATE INDEX idx_statement_matches_status ON bank_statement_matches(status) WHER
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `bank_reconciliation.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_bank_reconciliation_operation_total            counter { function, result }
-gensense_bank_reconciliation_operation_duration_ms      histogram { function }
-gensense_bank_reconciliation_errors_total               counter { function, error_code }
-gensense_bank_reconciliation_runs_total                  counter { status }
-gensense_bank_reconciliation_match_rate                  gauge { account_id }
-gensense_bank_reconciliation_matches_resolved_total      counter { resolution }
-gensense_bank_reconciliation_run_duration_ms             histogram { account_id }
+blueprint_bank_reconciliation_operation_total            counter { function, result }
+blueprint_bank_reconciliation_operation_duration_ms      histogram { function }
+blueprint_bank_reconciliation_errors_total               counter { function, error_code }
+blueprint_bank_reconciliation_runs_total                  counter { status }
+blueprint_bank_reconciliation_match_rate                  gauge { account_id }
+blueprint_bank_reconciliation_matches_resolved_total      counter { resolution }
+blueprint_bank_reconciliation_run_duration_ms             histogram { account_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

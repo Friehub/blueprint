@@ -96,13 +96,13 @@ Trace retention:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `trace_query.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_trace_query_operation_total              counter { function, result: success|failure }
-gensense_trace_query_operation_duration_ms        histogram { function, p50, p95, p99 }
-gensense_trace_query_errors_total                 counter { function, error_code }
-gensense_trace_query_traces_indexed_total         counter
-gensense_trace_query_spans_indexed_total          counter
-gensense_trace_query_query_latency_ms             histogram { query_type }
-gensense_trace_query_trace_retrieval_latency_ms   histogram
+blueprint_trace_query_operation_total              counter { function, result: success|failure }
+blueprint_trace_query_operation_duration_ms        histogram { function, p50, p95, p99 }
+blueprint_trace_query_errors_total                 counter { function, error_code }
+blueprint_trace_query_traces_indexed_total         counter
+blueprint_trace_query_spans_indexed_total          counter
+blueprint_trace_query_query_latency_ms             histogram { query_type }
+blueprint_trace_query_trace_retrieval_latency_ms   histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

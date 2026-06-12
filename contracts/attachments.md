@@ -160,11 +160,11 @@ CREATE INDEX idx_attachment_audit_att ON attachment_audit(attachment_id, created
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `attachments.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_attachments_operation_total            counter { function, result }
-gensense_attachments_operation_duration_ms      histogram { function }
-gensense_attachments_errors_total               counter { function, error_code }
-gensense_attachments_uploaded_bytes_total        counter { mime_type }
-gensense_attachments_preview_generation_duration_ms histogram { status }
+blueprint_attachments_operation_total            counter { function, result }
+blueprint_attachments_operation_duration_ms      histogram { function }
+blueprint_attachments_errors_total               counter { function, error_code }
+blueprint_attachments_uploaded_bytes_total        counter { mime_type }
+blueprint_attachments_preview_generation_duration_ms histogram { status }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -200,13 +200,13 @@ CREATE INDEX idx_catalog_bundles_status ON catalog_bundles(status);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `catalog.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_catalog_operation_total                counter { function, result }
-gensense_catalog_operation_duration_ms          histogram { function }
-gensense_catalog_errors_total                   counter { function, error_code }
-gensense_catalog_products_total                  gauge { status }
-gensense_catalog_variants_per_product            histogram
-gensense_catalog_pricing_rules_total             gauge { rule_type }
-gensense_catalog_search_latency_ms               histogram
+blueprint_catalog_operation_total                counter { function, result }
+blueprint_catalog_operation_duration_ms          histogram { function }
+blueprint_catalog_errors_total                   counter { function, error_code }
+blueprint_catalog_products_total                  gauge { status }
+blueprint_catalog_variants_per_product            histogram
+blueprint_catalog_pricing_rules_total             gauge { rule_type }
+blueprint_catalog_search_latency_ms               histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -77,9 +77,9 @@ Ticket SLA (reply deadline):
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `customer_support.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_support_tickets_open_total         gauge { priority }
-gensense_support_ticket_sla_breach_total    counter { priority }
-gensense_support_average_resolution_ms      histogram
+blueprint_support_tickets_open_total         gauge { priority }
+blueprint_support_ticket_sla_breach_total    counter { priority }
+blueprint_support_average_resolution_ms      histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

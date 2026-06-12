@@ -178,13 +178,13 @@ CREATE INDEX idx_vendor_risks_vendor ON vendor_risks(vendor_id);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `vendor_management.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_vendor_management_operation_total         counter { function, result: success|failure }
-gensense_vendor_management_operation_duration_ms   histogram { function, p50, p95, p99 }
-gensense_vendor_management_errors_total            counter { function, error_code }
-gensense_vendor_management_vendors_total           gauge { status }
-gensense_vendor_management_risks_active            gauge { severity }
-gensense_vendor_management_health_scores           gauge
-gensense_vendor_management_offboardings_total      counter { status }
+blueprint_vendor_management_operation_total         counter { function, result: success|failure }
+blueprint_vendor_management_operation_duration_ms   histogram { function, p50, p95, p99 }
+blueprint_vendor_management_errors_total            counter { function, error_code }
+blueprint_vendor_management_vendors_total           gauge { status }
+blueprint_vendor_management_risks_active            gauge { severity }
+blueprint_vendor_management_health_scores           gauge
+blueprint_vendor_management_offboardings_total      counter { status }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

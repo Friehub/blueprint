@@ -91,9 +91,9 @@ Deprecation minimum window:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `api_versioning.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_api_versioning_versions_active          gauge { strategy }
-  gensense_api_versioning_deprecations_total      { api_name }
-  gensense_api_versioning_requests_total           { api_name, version }
+blueprint_api_versioning_versions_active          gauge { strategy }
+  blueprint_api_versioning_deprecations_total      { api_name }
+  blueprint_api_versioning_requests_total           { api_name, version }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

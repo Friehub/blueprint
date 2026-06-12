@@ -1,0 +1,56 @@
+name: smile_identity
+module: kyc
+version: 1.0.0
+description: Smile Identity KYC verification adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - submitVerification
+  - getVerification
+  - getUserVerification
+  - getVerificationStatus
+  - updateVerification
+  - rejectVerification
+  - approveVerification
+  - listPendingVerifications
+  - expireVerification
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Smile Identity API key
+      secret: true
+    - name: partner_id
+      type: string
+      description: Smile Identity partner ID
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      default: production
+      description: Smile Identity environment (production or sandbox)
+    - name: callback_url
+      type: string
+      description: Webhook callback URL
+    - name: signature_secret
+      type: string
+      description: Webhook signature secret
+      secret: true
+
+dependencies:
+  - module: users
+    purpose: Resolve user identities
+    required: true
+  - module: storage
+    purpose: Store verification documents
+    required: false
+  - module: audit_log
+    purpose: Log KYC events
+    required: false
+
+metadata:
+  provider_url: https://use.smileidentity.com
+  docs_url: https://docs.smileidentity.com

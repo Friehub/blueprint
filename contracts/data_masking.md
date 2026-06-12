@@ -102,9 +102,9 @@ Token expiration:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `data_masking.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_data_masking_operations_total          { strategy }
-  gensense_data_masking_tokens_created_total     { context }
-  gensense_data_masking_redactions_total          { rule }
+blueprint_data_masking_operations_total          { strategy }
+  blueprint_data_masking_tokens_created_total     { context }
+  blueprint_data_masking_redactions_total          { rule }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -87,12 +87,12 @@ ApiKey (with expires_at set):
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `api_keys.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_api_keys_operation_total               counter { function, result }
-gensense_api_keys_operation_duration_ms         histogram { function }
-gensense_api_keys_errors_total                  counter { function, error_code }
-gensense_api_keys_keys_total                     gauge { status }
-gensense_api_keys_validations_total              counter { result }
-gensense_api_keys_rotations_total                counter
+blueprint_api_keys_operation_total               counter { function, result }
+blueprint_api_keys_operation_duration_ms         histogram { function }
+blueprint_api_keys_errors_total                  counter { function, error_code }
+blueprint_api_keys_keys_total                     gauge { status }
+blueprint_api_keys_validations_total              counter { result }
+blueprint_api_keys_rotations_total                counter
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

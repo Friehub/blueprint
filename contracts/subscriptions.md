@@ -124,12 +124,12 @@ CREATE INDEX idx_access_history_user ON access_history(user_id, resource_id);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `subscriptions.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_subscriptions_operation_total           counter { function, result: success|failure }
-gensense_subscriptions_operation_duration_ms     histogram { function, p50, p95, p99 }
-gensense_subscriptions_errors_total              counter { function, error_code }
-gensense_subscriptions_entitlements_active       gauge { type }
-gensense_subscriptions_access_checks_total       counter { result: granted|denied }
-gensense_subscriptions_expirations_total         counter { type }
+blueprint_subscriptions_operation_total           counter { function, result: success|failure }
+blueprint_subscriptions_operation_duration_ms     histogram { function, p50, p95, p99 }
+blueprint_subscriptions_errors_total              counter { function, error_code }
+blueprint_subscriptions_entitlements_active       gauge { type }
+blueprint_subscriptions_access_checks_total       counter { result: granted|denied }
+blueprint_subscriptions_expirations_total         counter { type }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

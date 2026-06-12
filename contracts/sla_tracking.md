@@ -87,9 +87,9 @@ Uptime measurement window:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `sla_tracking.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_sla_tracking_uptime_pct                gauge { sla_id }
-  gensense_sla_tracking_breaches_total             { sla_id }
-  gensense_sla_tracking_credits_accrued             { sla_id }
+blueprint_sla_tracking_uptime_pct                gauge { sla_id }
+  blueprint_sla_tracking_breaches_total             { sla_id }
+  blueprint_sla_tracking_credits_accrued             { sla_id }
 ```
 * **SLO Targets:** This module tracks SLOs for other modules; its own SLO targets are per standards.
 

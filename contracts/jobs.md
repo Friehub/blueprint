@@ -200,13 +200,13 @@ type ListExecutionsInput = {
 - **Observability:** Each execution is a trace root; spans cover queue wait, execution, and retry backoff intervals.
   - **Telemetry Metrics:**
   ```
-  gensense_jobs_registered_total            { status }
-  gensense_jobs_executions_total            { job_name, status }
-  gensense_jobs_execution_duration_ms       histogram { job_name }
-  gensense_jobs_execution_queue_wait_ms     histogram { job_name }
-  gensense_jobs_retry_attempts_total        { job_name }
-  gensense_jobs_exhausted_total             { job_name }
-  gensense_jobs_pending_executions          gauge { job_name }
+  blueprint_jobs_registered_total            { status }
+  blueprint_jobs_executions_total            { job_name, status }
+  blueprint_jobs_execution_duration_ms       histogram { job_name }
+  blueprint_jobs_execution_queue_wait_ms     histogram { job_name }
+  blueprint_jobs_retry_attempts_total        { job_name }
+  blueprint_jobs_exhausted_total             { job_name }
+  blueprint_jobs_pending_executions          gauge { job_name }
   ```
 - **Dependencies:** `queues` (underlying dispatch mechanism for pending executions), `audit_log` (execution history), `notifications` (on exhausted retries).
 - **Errors:** `JOB_NOT_FOUND`, `EXECUTION_NOT_FOUND`, `INVALID_CRON_EXPRESSION`, `CONFLICTING_SCHEDULE`, `EXECUTION_NOT_CANCELLABLE`.

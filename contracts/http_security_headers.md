@@ -76,11 +76,11 @@ validateResponse → http_security_headers.validation_run { endpoint_type, valid
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `http_security_headers.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_http_security_headers_operations_total      { function, result }
-gensense_http_security_headers_operation_duration_ms  histogram { function }
-gensense_http_security_headers_errors_total           { code }
-gensense_http_security_headers_csp_enforced            gauge { endpoint_type }
-gensense_http_security_headers_validation_warnings     gauge { warning_type }
+blueprint_http_security_headers_operations_total      { function, result }
+blueprint_http_security_headers_operation_duration_ms  histogram { function }
+blueprint_http_security_headers_errors_total           { code }
+blueprint_http_security_headers_csp_enforced            gauge { endpoint_type }
+blueprint_http_security_headers_validation_warnings     gauge { warning_type }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

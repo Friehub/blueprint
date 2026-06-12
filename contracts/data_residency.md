@@ -101,9 +101,9 @@ Compliance check interval:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `data_residency.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_data_residency_rules_total             { region, enforcement }
-  gensense_data_residency_routing_decisions_total { allowed }
-  gensense_data_residency_compliance_total         { compliant }
+blueprint_data_residency_rules_total             { region, enforcement }
+  blueprint_data_residency_routing_decisions_total { allowed }
+  blueprint_data_residency_compliance_total         { compliant }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

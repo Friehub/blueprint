@@ -95,10 +95,10 @@ Block entry expiry:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `ip_blocklist.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_ip_blocklist_entries_total             { type, severity }
-  gensense_ip_blocklist_checks_total              { result }
-  gensense_ip_blocklist_imports_total              { feed, entries_added }
-  gensense_ip_blocklist_cache_hit_ratio
+blueprint_ip_blocklist_entries_total             { type, severity }
+  blueprint_ip_blocklist_checks_total              { result }
+  blueprint_ip_blocklist_imports_total              { feed, entries_added }
+  blueprint_ip_blocklist_cache_hit_ratio
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

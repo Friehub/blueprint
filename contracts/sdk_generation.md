@@ -101,9 +101,9 @@ Generation timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `sdk_generation.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_sdk_generation_generated_total           { language, status }
-  gensense_sdk_generation_published_total          { registry }
-  gensense_sdk_generation_downloads_total           { sdk_id }
+blueprint_sdk_generation_generated_total           { language, status }
+  blueprint_sdk_generation_published_total          { registry }
+  blueprint_sdk_generation_downloads_total           { sdk_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -1,0 +1,58 @@
+name: google
+module: embeddings
+version: 1.0.0
+description: Google Cloud embeddings API adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - embed
+  - upsertVector
+  - upsertVectorBatch
+  - querySimilar
+  - queryByText
+  - hybridQuery
+
+does_not_implement:
+  - createIndex
+  - getIndex
+  - listIndexes
+  - deleteIndex
+  - getVector
+  - deleteVector
+  - deleteVectorsByFilter
+
+config:
+  required:
+    - name: project_id
+      type: string
+      description: Google Cloud project ID
+      secret: false
+    - name: api_key
+      type: string
+      description: Google API key
+      secret: true
+  optional:
+    - name: model
+      type: string
+      default: text-embedding-004
+      description: Embedding model name
+    - name: location
+      type: string
+      default: us-central1
+      description: Google Cloud location
+    - name: publisher
+      type: string
+      default: google
+      description: Model publisher
+
+dependencies:
+  - module: vector_store
+    purpose: Store and index embedding vectors
+    required: true
+  - module: audit_log
+    purpose: Log embedding operations
+    required: false
+
+metadata:
+  provider_url: https://cloud.google.com
+  docs_url: https://cloud.google.com/vertex-ai/docs/generative-ai/embeddings

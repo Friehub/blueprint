@@ -1,0 +1,59 @@
+name: amazon_ses
+module: emails
+version: 1.0.0
+description: Amazon SES email delivery adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - sendTransactional
+  - sendBulk
+  - getDeliveryStatus
+  - getDeliveryEvents
+
+does_not_implement:
+  - createTemplate
+  - updateTemplate
+  - getTemplate
+  - listTemplates
+
+config:
+  required:
+    - name: access_key_id
+      type: string
+      description: AWS access key ID
+      secret: false
+    - name: secret_access_key
+      type: string
+      description: AWS secret access key
+      secret: true
+    - name: region
+      type: string
+      description: AWS region
+      secret: false
+    - name: from_email
+      type: string
+      description: Default sender email address
+      secret: false
+  optional:
+    - name: from_name
+      type: string
+      description: Default sender name
+    - name: reply_to
+      type: string
+      description: Default reply-to email address
+    - name: configuration_set
+      type: string
+      description: SES configuration set name
+    - name: feedback_forwarding
+      type: boolean
+      default: true
+      description: Enable feedback forwarding
+
+dependencies:
+  - module: audit_log
+    purpose: Log email delivery events
+    required: false
+
+metadata:
+  provider_url: https://aws.amazon.com/ses
+  docs_url: https://docs.aws.amazon.com/ses

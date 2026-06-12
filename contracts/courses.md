@@ -163,10 +163,10 @@ CREATE INDEX idx_lessons_course_order ON lessons(course_id, lesson_order);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `courses.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_courses_total                        { status }
-  gensense_courses_lessons_total                { course_id }
-  gensense_courses_publications_total
-  gensense_courses_operation_duration_ms         histogram { function }
+blueprint_courses_total                        { status }
+  blueprint_courses_lessons_total                { course_id }
+  blueprint_courses_publications_total
+  blueprint_courses_operation_duration_ms         histogram { function }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

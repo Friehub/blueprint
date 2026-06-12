@@ -86,9 +86,9 @@ Request recording retention:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `api_mock.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_api_mock_endpoints_total              { method }
-  gensense_api_mock_requests_recorded_total     { endpoint_id }
-  gensense_api_mock_responses_sent_total         { endpoint_id, status_code }
+blueprint_api_mock_endpoints_total              { method }
+  blueprint_api_mock_requests_recorded_total     { endpoint_id }
+  blueprint_api_mock_responses_sent_total         { endpoint_id, status_code }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

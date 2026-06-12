@@ -105,12 +105,12 @@ Flag evaluation cache:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `feature_flags.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_feature_flags_operation_total           counter { function, result: success|failure }
-gensense_feature_flags_operation_duration_ms     histogram { function, p50, p95, p99 }
-gensense_feature_flags_errors_total              counter { function, error_code }
-gensense_feature_flags_evaluations_total         counter { flag_key, result: enabled|disabled }
-gensense_feature_flags_active_total              gauge
-gensense_feature_flags_variant_distribution      counter { flag_key, variant }
+blueprint_feature_flags_operation_total           counter { function, result: success|failure }
+blueprint_feature_flags_operation_duration_ms     histogram { function, p50, p95, p99 }
+blueprint_feature_flags_errors_total              counter { function, error_code }
+blueprint_feature_flags_evaluations_total         counter { flag_key, result: enabled|disabled }
+blueprint_feature_flags_active_total              gauge
+blueprint_feature_flags_variant_distribution      counter { flag_key, variant }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

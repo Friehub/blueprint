@@ -107,9 +107,9 @@ Lineage retention:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `data_catalog.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_data_catalog_datasets_total            { status }
-  gensense_data_catalog_searches_total            { result_count }
-  gensense_data_catalog_pii_datasets_total
+blueprint_data_catalog_datasets_total            { status }
+  blueprint_data_catalog_searches_total            { result_count }
+  blueprint_data_catalog_pii_datasets_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

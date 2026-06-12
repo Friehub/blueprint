@@ -136,11 +136,11 @@ CREATE TABLE distributed_lock_fencing (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `distributed_lock.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_distributed_lock_acquire_duration_ms    histogram { lock_name, result }
-  gensense_distributed_lock_contention_total       { lock_name }
-  gensense_distributed_lock_holders_current        gauge { lock_name }
-  gensense_distributed_lock_fencing_gap            gauge { lock_name }
-  gensense_distributed_lock_expiry_reclaim_total   { lock_name }
+blueprint_distributed_lock_acquire_duration_ms    histogram { lock_name, result }
+  blueprint_distributed_lock_contention_total       { lock_name }
+  blueprint_distributed_lock_holders_current        gauge { lock_name }
+  blueprint_distributed_lock_fencing_gap            gauge { lock_name }
+  blueprint_distributed_lock_expiry_reclaim_total   { lock_name }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

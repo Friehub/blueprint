@@ -125,12 +125,12 @@ CREATE INDEX idx_storage_metadata_prefix ON storage_metadata(bucket, key text_pa
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `storage.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_storage_operation_total            counter { function, result: success|failure }
-gensense_storage_operation_duration_ms      histogram { function, p50, p95, p99 }
-gensense_storage_errors_total               counter { function, error_code }
-gensense_storage_objects_total              gauge { bucket }
-gensense_storage_bytes_total                gauge { bucket }
-gensense_storage_transfer_bytes             counter { bucket, operation: upload|download }
+blueprint_storage_operation_total            counter { function, result: success|failure }
+blueprint_storage_operation_duration_ms      histogram { function, p50, p95, p99 }
+blueprint_storage_errors_total               counter { function, error_code }
+blueprint_storage_objects_total              gauge { bucket }
+blueprint_storage_bytes_total                gauge { bucket }
+blueprint_storage_transfer_bytes             counter { bucket, operation: upload|download }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

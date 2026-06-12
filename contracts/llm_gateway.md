@@ -108,11 +108,11 @@ Request timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `llm_gateway.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_llm_gateway_requests_total           { model, provider, status }
-  gensense_llm_gateway_latency_ms               histogram { model }
-  gensense_llm_gateway_tokens_total              { model, direction: input|output }
-  gensense_llm_gateway_cost_total                { model, provider, currency }
-  gensense_llm_gateway_fallback_count           { primary_model, fallback_model }
+blueprint_llm_gateway_requests_total           { model, provider, status }
+  blueprint_llm_gateway_latency_ms               histogram { model }
+  blueprint_llm_gateway_tokens_total              { model, direction: input|output }
+  blueprint_llm_gateway_cost_total                { model, provider, currency }
+  blueprint_llm_gateway_fallback_count           { primary_model, fallback_model }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

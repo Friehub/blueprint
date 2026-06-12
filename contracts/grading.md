@@ -126,7 +126,7 @@ updateGrade        → grading.grade.updated       { grade_id, version }
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `grading.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_grading_operations_total         { function, result }
-gensense_grading_operation_duration_ms    histogram { function }
-gensense_grading_errors_total             { code }
+blueprint_grading_operations_total         { function, result }
+blueprint_grading_operation_duration_ms    histogram { function }
+blueprint_grading_errors_total             { code }
 ```

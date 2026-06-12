@@ -77,9 +77,9 @@ Requisition (pending_approval state):
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `procurement.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_procurement_requisition_volume_total   counter { budget_code }
-gensense_procurement_po_value_cents_total       counter { vendor_id }
-gensense_procurement_pending_approvals_total     gauge
+blueprint_procurement_requisition_volume_total   counter { budget_code }
+blueprint_procurement_po_value_cents_total       counter { vendor_id }
+blueprint_procurement_pending_approvals_total     gauge
 ```
 * **LO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

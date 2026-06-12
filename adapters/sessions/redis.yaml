@@ -1,0 +1,36 @@
+name: redis
+module: sessions
+version: 1.0.0
+description: Redis session store adapter for fast ephemeral session management
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createSession
+  - getSession
+  - revokeSession
+  - extendSession
+  - getSessions
+  - listActiveSessions
+  - revokeAllSessions
+
+does_not_implement: []
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: Redis connection string
+      secret: true
+  optional:
+    - name: key_prefix
+      type: string
+      default: "session:"
+      description: Redis key prefix for session entries
+    - name: default_ttl
+      type: integer
+      default: 86400
+      description: Default session TTL in seconds
+
+metadata:
+  provider_url: https://redis.io
+  docs_url: https://redis.io/docs

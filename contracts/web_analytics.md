@@ -139,12 +139,12 @@ CREATE INDEX idx_analytics_page_views_ingested ON analytics_page_views(ingested_
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `web_analytics.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_web_analytics_operation_total           counter { function, result: success|failure }
-gensense_web_analytics_operation_duration_ms     histogram { function, p50, p95, p99 }
-gensense_web_analytics_errors_total              counter { function, error_code }
-gensense_web_analytics_events_ingested_total     counter { event_type: page_view|conversion|session }
-gensense_web_analytics_events_dropped_total      counter { reason }
-gensense_web_analytics_aggregation_latency_ms    histogram
+blueprint_web_analytics_operation_total           counter { function, result: success|failure }
+blueprint_web_analytics_operation_duration_ms     histogram { function, p50, p95, p99 }
+blueprint_web_analytics_errors_total              counter { function, error_code }
+blueprint_web_analytics_events_ingested_total     counter { event_type: page_view|conversion|session }
+blueprint_web_analytics_events_dropped_total      counter { reason }
+blueprint_web_analytics_aggregation_latency_ms    histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

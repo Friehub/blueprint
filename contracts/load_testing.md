@@ -104,11 +104,11 @@ Max scenario duration:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `load_testing.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_load_testing_runs_total               { scenario, result }
-gensense_load_testing_requests_total           { run_id, status }
-gensense_load_testing_latency                  histogram { run_id, stage }
-gensense_load_testing_sla_violations_total     { scenario, metric }
-gensense_load_testing_active_runs              gauge
+blueprint_load_testing_runs_total               { scenario, result }
+blueprint_load_testing_requests_total           { run_id, status }
+blueprint_load_testing_latency                  histogram { run_id, stage }
+blueprint_load_testing_sla_violations_total     { scenario, metric }
+blueprint_load_testing_active_runs              gauge
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -1,0 +1,53 @@
+name: bigquery
+module: data_warehouse
+version: 1.0.0
+description: Google BigQuery data warehouse adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createTable
+  - getTable
+  - listTables
+  - createView
+  - runQuery
+  - getQueryHistory
+  - addPartition
+  - getStorageUsage
+  - setQueryBudget
+
+does_not_implement: []
+
+config:
+  required:
+    - name: project_id
+      type: string
+      description: Google Cloud project ID
+      secret: false
+  optional:
+    - name: service_account_key
+      type: string
+      description: Service account key JSON
+      secret: true
+    - name: default_dataset
+      type: string
+      description: Default dataset ID
+    - name: location
+      type: string
+      default: US
+      description: BigQuery location
+    - name: maximum_billing_tier
+      type: integer
+      default: 1
+      description: Maximum billing tier
+
+dependencies:
+  - module: reporting
+    purpose: Enable reporting queries
+    required: false
+  - module: audit_log
+    purpose: Log query execution
+    required: false
+
+metadata:
+  provider_url: https://cloud.google.com/bigquery
+  docs_url: https://cloud.google.com/bigquery/docs

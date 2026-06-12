@@ -161,11 +161,11 @@ CREATE INDEX idx_doc_pages_module ON portal_doc_pages(module);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `developer_portal.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_developer_portal_active_keys_total        gauge { status }
-  gensense_developer_portal_api_requests_total       { endpoint, status }
-  gensense_developer_portal_doc_views_total          { category }
-  gensense_developer_portal_key_revocation_lag_ms    gauge
-  gensense_developer_portal_changelog_published_total { type }
+blueprint_developer_portal_active_keys_total        gauge { status }
+  blueprint_developer_portal_api_requests_total       { endpoint, status }
+  blueprint_developer_portal_doc_views_total          { category }
+  blueprint_developer_portal_key_revocation_lag_ms    gauge
+  blueprint_developer_portal_changelog_published_total { type }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

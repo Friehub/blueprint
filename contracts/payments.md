@@ -193,10 +193,10 @@ CREATE INDEX idx_wallet_transactions_wallet ON wallet_transactions(wallet_id, cr
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `payments.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_payments_initiation_total           { method, currency, result }
-  gensense_payments_amount_total               { currency }  ← sum of amounts
-  gensense_payments_refund_total               { reason }
-  gensense_wallet_balance_snapshot             gauge { currency }
+blueprint_payments_initiation_total           { method, currency, result }
+  blueprint_payments_amount_total               { currency }  ← sum of amounts
+  blueprint_payments_refund_total               { reason }
+  blueprint_wallet_balance_snapshot             gauge { currency }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

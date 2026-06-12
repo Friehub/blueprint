@@ -106,9 +106,9 @@ Validation timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `data_quality.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_data_quality_validations_total          { result }
-  gensense_data_quality_score_pct                  gauge { dataset, expectation }
-  gensense_data_quality_degradation_alerts_total
+blueprint_data_quality_validations_total          { result }
+  blueprint_data_quality_score_pct                  gauge { dataset, expectation }
+  blueprint_data_quality_degradation_alerts_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

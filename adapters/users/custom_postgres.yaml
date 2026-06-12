@@ -1,0 +1,46 @@
+name: custom_postgres
+module: users
+version: 1.0.0
+description: Custom PostgreSQL-backed user management adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - getUser
+  - getUserByEmail
+  - createUser
+  - updateUser
+  - deleteUser
+  - searchUsers
+  - banUser
+  - unbanUser
+
+does_not_implement:
+  - getUsersByRole
+  - assignRole
+  - revokeRole
+  - getUserRoles
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: PostgreSQL connection string
+      secret: true
+  optional:
+    - name: pool_size
+      type: integer
+      default: 10
+      description: Database connection pool size
+    - name: schema
+      type: string
+      default: "public"
+      description: Database schema name
+
+dependencies:
+  - module: audit_log
+    purpose: Log user lifecycle events
+    required: false
+
+metadata:
+  provider_url: https://www.postgresql.org
+  docs_url: https://www.postgresql.org/docs

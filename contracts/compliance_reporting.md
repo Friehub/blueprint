@@ -94,9 +94,9 @@ Report generation timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `compliance_reporting.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_compliance_reporting_reports_total           { framework, status }
-  gensense_compliance_reporting_controls_total         { status }
-  gensense_compliance_reporting_evidence_collected_total
+blueprint_compliance_reporting_reports_total           { framework, status }
+  blueprint_compliance_reporting_controls_total         { status }
+  blueprint_compliance_reporting_evidence_collected_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

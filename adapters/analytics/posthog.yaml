@@ -1,0 +1,48 @@
+name: posthog
+module: analytics
+version: 1.0.0
+description: PostHog product analytics adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - trackEvent
+  - identifyUser
+  - trackPageView
+  - getMetrics
+  - getFunnel
+  - getCohort
+  - getRetention
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: PostHog API key
+      secret: true
+    - name: host
+      type: string
+      description: PostHog host URL
+      secret: false
+  optional:
+    - name: project_id
+      type: string
+      description: PostHog project ID
+    - name: personal_api_key
+      type: string
+      description: PostHog personal API key
+      secret: true
+    - name: batch_size
+      type: integer
+      default: 100
+      description: Event batch size
+
+dependencies:
+  - module: audit_log
+    purpose: Log analytics events
+    required: false
+
+metadata:
+  provider_url: https://posthog.com
+  docs_url: https://posthog.com/docs

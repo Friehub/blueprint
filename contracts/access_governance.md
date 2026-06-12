@@ -88,9 +88,9 @@ Review due date:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `access_governance.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_access_governance_reviews_total          { status }
-  gensense_access_governance_decisions_total       { decision }
-  gensense_access_governance_grants_revoked_total   { reason }
+blueprint_access_governance_reviews_total          { status }
+  blueprint_access_governance_decisions_total       { decision }
+  blueprint_access_governance_grants_revoked_total   { reason }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

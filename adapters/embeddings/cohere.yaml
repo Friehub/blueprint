@@ -1,0 +1,54 @@
+name: cohere
+module: embeddings
+version: 1.0.0
+description: Cohere embeddings API adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - embed
+  - upsertVector
+  - upsertVectorBatch
+  - querySimilar
+  - queryByText
+  - hybridQuery
+
+does_not_implement:
+  - createIndex
+  - getIndex
+  - listIndexes
+  - deleteIndex
+  - getVector
+  - deleteVector
+  - deleteVectorsByFilter
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Cohere API key
+      secret: true
+  optional:
+    - name: model
+      type: string
+      default: embed-english-v3.0
+      description: Embedding model name
+    - name: input_type
+      type: string
+      default: search_document
+      description: Input type (search_document, search_query, classification, clustering)
+    - name: truncate
+      type: string
+      default: END
+      description: Truncation behavior (NONE, START, END)
+
+dependencies:
+  - module: vector_store
+    purpose: Store and index embedding vectors
+    required: true
+  - module: audit_log
+    purpose: Log embedding operations
+    required: false
+
+metadata:
+  provider_url: https://cohere.com
+  docs_url: https://docs.cohere.com/reference/embed

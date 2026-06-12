@@ -1,0 +1,46 @@
+name: custom_postgres
+module: inventory
+version: 1.0.0
+description: Custom PostgreSQL-backed inventory management adapter with optimistic locking
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - getStockLevel
+  - getStockLevels
+  - reserveStock
+  - releaseStock
+  - confirmStock
+  - adjustStock
+  - updateStockOnHand
+  - getStockHistory
+  - getLowStockAlerts
+
+does_not_implement: []
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: PostgreSQL connection string
+      secret: true
+  optional:
+    - name: pool_size
+      type: integer
+      default: 10
+      description: Database connection pool size
+    - name: reservation_ttl_minutes
+      type: integer
+      default: 15
+      description: Default reservation expiry in minutes
+
+dependencies:
+  - module: orders
+    purpose: Validate order context for stock reservations
+    required: false
+  - module: catalog
+    purpose: Validate variant existence
+    required: false
+
+metadata:
+  provider_url: https://www.postgresql.org
+  docs_url: https://www.postgresql.org/docs

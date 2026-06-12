@@ -152,12 +152,12 @@ CREATE TABLE messaging_read_receipts (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `messaging.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_messaging_operation_total       counter { function, result: success|failure }
-gensense_messaging_operation_duration_ms histogram { function, p50, p95, p99 }
-gensense_messaging_errors_total          counter { function, error_code }
-gensense_messaging_sent_total            counter { content_type }
-gensense_messaging_threads_active_total  gauge
-gensense_messaging_unread_total          gauge { user_id? }
+blueprint_messaging_operation_total       counter { function, result: success|failure }
+blueprint_messaging_operation_duration_ms histogram { function, p50, p95, p99 }
+blueprint_messaging_errors_total          counter { function, error_code }
+blueprint_messaging_sent_total            counter { content_type }
+blueprint_messaging_threads_active_total  gauge
+blueprint_messaging_unread_total          gauge { user_id? }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

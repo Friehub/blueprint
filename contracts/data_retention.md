@@ -99,9 +99,9 @@ Purge scheduling:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `data_retention.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_data_retention_policies_total          { status }
-  gensense_data_retention_purge_records_total     { policy_id }
-  gensense_data_retention_purge_duration_ms        histogram
+blueprint_data_retention_policies_total          { status }
+  blueprint_data_retention_purge_records_total     { policy_id }
+  blueprint_data_retention_purge_duration_ms        histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

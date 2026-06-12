@@ -98,9 +98,9 @@ Recovery timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `circuit_breaker.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_circuit_breaker_state_changes_total     { breaker_name, state }
-  gensense_circuit_breaker_open_duration_ms        histogram { breaker_name }
-  gensense_circuit_breaker_calls_total             { breaker_name, result }
+blueprint_circuit_breaker_state_changes_total     { breaker_name, state }
+  blueprint_circuit_breaker_open_duration_ms        histogram { breaker_name }
+  blueprint_circuit_breaker_calls_total             { breaker_name, result }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

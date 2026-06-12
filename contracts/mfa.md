@@ -202,10 +202,10 @@ Rate Limit Counter:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `mfa.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_mfa_verification_total              { method, result: success|failure }
-gensense_mfa_backup_code_usage_total         { result: valid|used|exhausted }
-gensense_mfa_method_setup_total              { method }
-gensense_mfa_rate_limit_hits_total           { method }
+blueprint_mfa_verification_total              { method, result: success|failure }
+blueprint_mfa_backup_code_usage_total         { result: valid|used|exhausted }
+blueprint_mfa_method_setup_total              { method }
+blueprint_mfa_rate_limit_hits_total           { method }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

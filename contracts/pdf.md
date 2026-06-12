@@ -163,13 +163,13 @@ type ListPdfJobsInput = {
 - **Observability:** Each job is a trace root; spans cover queue wait, render duration, and storage upload. `pageCount` and `fileSizeBytes` are span attributes.
   - **Telemetry Metrics:**
   ```
-  gensense_pdf_jobs_total               { source_type, status }
-  gensense_pdf_job_duration_ms          histogram { source_type }
-  gensense_pdf_render_duration_ms       histogram { source_type }
-  gensense_pdf_queue_wait_ms            histogram
-  gensense_pdf_artifact_size_bytes      histogram
-  gensense_pdf_queue_depth              gauge { status }
-  gensense_pdf_errors_total             { code }
+  blueprint_pdf_jobs_total               { source_type, status }
+  blueprint_pdf_job_duration_ms          histogram { source_type }
+  blueprint_pdf_render_duration_ms       histogram { source_type }
+  blueprint_pdf_queue_wait_ms            histogram
+  blueprint_pdf_artifact_size_bytes      histogram
+  blueprint_pdf_queue_depth              gauge { status }
+  blueprint_pdf_errors_total             { code }
   ```
 - **Security:** URL and HTML sources must never be rendered in a context with access to internal network addresses (localhost, RFC 1918 ranges); the render sandbox must enforce network egress restrictions.
 - **Backpressure:** If the render queue is saturated, `generatePdf` must fail predictably or defer work rather than creating unbounded backlog.

@@ -159,12 +159,12 @@ CREATE INDEX idx_tenant_members_user ON tenant_members(user_id);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `tenants.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_tenants_operation_total          counter { function, result: success|failure }
-gensense_tenants_operation_duration_ms    histogram { function, p50, p95, p99 }
-gensense_tenants_errors_total             counter { function, error_code }
-gensense_tenants_active_total             gauge { status }
-gensense_tenants_members_total            gauge
-gensense_tenants_invites_sent_total       counter
+blueprint_tenants_operation_total          counter { function, result: success|failure }
+blueprint_tenants_operation_duration_ms    histogram { function, p50, p95, p99 }
+blueprint_tenants_errors_total             counter { function, error_code }
+blueprint_tenants_active_total             gauge { status }
+blueprint_tenants_members_total            gauge
+blueprint_tenants_invites_sent_total       counter
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -217,13 +217,13 @@ type ListIndexesInput = {
 - **Observability:** `querySimilar` and `queryByText` must emit spans annotated with `indexId`, `topK`, `resultCount`, and `queryLatencyMs`.
 - **Telemetry Metrics:**
   ```
-  gensense_embeddings_index_count                gauge { status }
-  gensense_embeddings_vector_count               gauge { index_id }
-  gensense_embeddings_upsert_total               { index_id, result }
-  gensense_embeddings_query_total                { index_id }
-  gensense_embeddings_query_duration_ms          histogram { index_id }
-  gensense_embeddings_embed_total                { model }
-  gensense_embeddings_embed_tokens_total         { model }
+  blueprint_embeddings_index_count                gauge { status }
+  blueprint_embeddings_vector_count               gauge { index_id }
+  blueprint_embeddings_upsert_total               { index_id, result }
+  blueprint_embeddings_query_total                { index_id }
+  blueprint_embeddings_query_duration_ms          histogram { index_id }
+  blueprint_embeddings_embed_total                { model }
+  blueprint_embeddings_embed_tokens_total         { model }
   ```
 - **Backpressure:** If indexing or query load is saturated, requests must be buffered or rejected predictably rather than silently dropped.
 - **Storage model:** Vector indexes must be durably stored; the provider must document replication and rebuild behavior.

@@ -101,11 +101,11 @@ Database refresh:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `ip_intelligence.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_ip_intelligence_lookups_total           { function, result }
-gensense_ip_intelligence_lookup_duration_us      histogram { function }
-gensense_ip_intelligence_threat_distribution     gauge { level }
-gensense_ip_intelligence_database_freshness_ms   gauge
-gensense_ip_intelligence_database_record_count   gauge
+blueprint_ip_intelligence_lookups_total           { function, result }
+blueprint_ip_intelligence_lookup_duration_us      histogram { function }
+blueprint_ip_intelligence_threat_distribution     gauge { level }
+blueprint_ip_intelligence_database_freshness_ms   gauge
+blueprint_ip_intelligence_database_record_count   gauge
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details). Lookup P99 must be < 10ms.
 

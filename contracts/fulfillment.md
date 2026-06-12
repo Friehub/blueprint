@@ -163,10 +163,10 @@ CREATE INDEX idx_fulfillment_events_fulfillment ON fulfillment_events(fulfillmen
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `fulfillment.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_fulfillment_total                  gauge { status }
-gensense_fulfillment_transitions_total      { from_status, to_status }
-gensense_fulfillment_sla_breach_total       { stage }
-gensense_fulfillment_duration_ms            histogram { stage }
+blueprint_fulfillment_total                  gauge { status }
+blueprint_fulfillment_transitions_total      { from_status, to_status }
+blueprint_fulfillment_sla_breach_total       { stage }
+blueprint_fulfillment_duration_ms            histogram { stage }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

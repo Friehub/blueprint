@@ -86,17 +86,17 @@ Span timeout:
 * **Tracing Spans:** Span names follow the pattern `telemetry.<function>`. This module is itself observed.
 * **Telemetry Metrics:**
 ```
-gensense_telemetry_spans_created_total         { status }
-  gensense_telemetry_metrics_recorded_total      { metric_type }
-  gensense_telemetry_export_batch_size           histogram
-  gensense_telemetry_export_duration_ms          histogram
+blueprint_telemetry_spans_created_total         { status }
+  blueprint_telemetry_metrics_recorded_total      { metric_type }
+  blueprint_telemetry_export_batch_size           histogram
+  blueprint_telemetry_export_duration_ms          histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Failure Modes
 | Scenario | Behavior |
 |---|---|
-| Export backend unreachable | Log locally, drop batch, do not block application; increment `gensense_telemetry_export_duration_ms` with error |
+| Export backend unreachable | Log locally, drop batch, do not block application; increment `blueprint_telemetry_export_duration_ms` with error |
 | Export batch full | Flush immediately; do not drop data |
 | Sampling queue overflow | Apply head-sampling, drop lowest-priority spans first |
 

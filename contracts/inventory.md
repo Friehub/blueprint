@@ -160,9 +160,9 @@ CREATE TABLE inventory_adjustments (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `inventory.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_inventory_reservations_active       gauge { variant_id? }
-  gensense_inventory_stock_level               gauge { variant_id, location_id? }
-  gensense_inventory_reservation_expiry_total  counter { reason: expired|confirmed|released }
+blueprint_inventory_reservations_active       gauge { variant_id? }
+  blueprint_inventory_stock_level               gauge { variant_id, location_id? }
+  blueprint_inventory_reservation_expiry_total  counter { reason: expired|confirmed|released }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

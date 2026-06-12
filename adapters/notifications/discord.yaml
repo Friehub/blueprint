@@ -1,0 +1,47 @@
+name: discord
+module: notifications
+version: 1.0.0
+description: Discord webhook notification channel adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - sendPush
+  - getNotifications
+  - markRead
+  - markAllRead
+  - getUnreadCount
+
+does_not_implement:
+  - sendEmail
+  - sendSMS
+  - sendInApp
+  - updatePreferences
+  - getPreferences
+
+config:
+  required:
+    - name: webhook_url
+      type: string
+      description: Discord webhook URL
+      secret: true
+  optional:
+    - name: username
+      type: string
+      default: Blueprint
+      description: Bot display name
+    - name: avatar_url
+      type: string
+      description: Bot avatar URL
+    - name: tts
+      type: boolean
+      default: false
+      description: Text-to-speech enabled
+
+dependencies:
+  - module: audit_log
+    purpose: Log notification events
+    required: false
+
+metadata:
+  provider_url: https://discord.com
+  docs_url: https://discord.com/developers/docs/resources/webhook

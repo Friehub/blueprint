@@ -108,11 +108,11 @@ Evaluation run timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `model_evaluation.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_model_evaluation_runs_total           { model, status }
-gensense_model_evaluation_metric_scores        gauge { model, metric }
-gensense_model_evaluation_regressions_total    { severity }
-gensense_model_evaluation_run_duration_ms      histogram { model }
-gensense_model_evaluation_active_runs          gauge
+blueprint_model_evaluation_runs_total           { model, status }
+blueprint_model_evaluation_metric_scores        gauge { model, metric }
+blueprint_model_evaluation_regressions_total    { severity }
+blueprint_model_evaluation_run_duration_ms      histogram { model }
+blueprint_model_evaluation_active_runs          gauge
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

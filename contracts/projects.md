@@ -151,10 +151,10 @@ Project archival retention:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `projects.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_projects_total                    counter { status }
-gensense_projects_members_total            gauge { role }
-gensense_projects_updates_total            counter { function, result }
-gensense_projects_operation_duration_ms    histogram { function }
+blueprint_projects_total                    counter { status }
+blueprint_projects_members_total            gauge { role }
+blueprint_projects_updates_total            counter { function, result }
+blueprint_projects_operation_duration_ms    histogram { function }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details). Project CRUD P99 must be < 100ms.
 

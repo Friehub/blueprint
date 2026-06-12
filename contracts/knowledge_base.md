@@ -235,11 +235,11 @@ type ListCategoriesInput = {
 - **Observability:** View events carry `articleId`, `locale`, `referrer`, and `sessionId` as span attributes for funnel analysis.
   - **Telemetry Metrics:**
   ```
-  gensense_knowledge_base_articles_total            { status }
-  gensense_knowledge_base_article_views_total        { article_id, locale }
-  gensense_knowledge_base_article_feedback_total     { article_id, vote }
-  gensense_knowledge_base_operation_duration_ms      histogram { function }
-  gensense_knowledge_base_search_index_lag_ms        gauge
+  blueprint_knowledge_base_articles_total            { status }
+  blueprint_knowledge_base_article_views_total        { article_id, locale }
+  blueprint_knowledge_base_article_feedback_total     { article_id, vote }
+  blueprint_knowledge_base_operation_duration_ms      histogram { function }
+  blueprint_knowledge_base_search_index_lag_ms        gauge
   ```
 - **Backpressure:** If indexing or analytics capacity is saturated, publication follow-through must defer or reject predictably rather than losing search sync.
 - **Storage model:** Article revisions and publish state must be durably stored; search index freshness is delegated to the search module.

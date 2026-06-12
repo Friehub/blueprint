@@ -1,0 +1,65 @@
+name: caldav
+module: calendar
+version: 1.0.0
+description: CalDAV calendar adapter (RFC 4791)
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createEvent
+  - publishEvent
+  - getEvent
+  - listEvents
+  - updateEvent
+  - rescheduleEvent
+  - cancelEvent
+  - addAttendee
+  - removeAttendee
+  - respondToInvitation
+  - getAvailability
+  - createRecurringEvent
+  - getOccurrences
+  - updateOccurrence
+  - cancelOccurrence
+
+does_not_implement: []
+
+config:
+  required:
+    - name: server_url
+      type: string
+      description: CalDAV server base URL
+      secret: false
+    - name: username
+      type: string
+      description: CalDAV username
+      secret: false
+    - name: password
+      type: string
+      description: CalDAV password
+      secret: true
+  optional:
+    - name: calendar_path
+      type: string
+      description: Calendar URL path
+    - name: auth_method
+      type: string
+      default: basic
+      description: Authentication method (basic, digest)
+    - name: sync_token
+      type: string
+      description: Sync token for incremental sync
+
+dependencies:
+  - module: users
+    purpose: Resolve attendee identities
+    required: true
+  - module: notifications
+    purpose: Dispatch invitations
+    required: false
+  - module: audit_log
+    purpose: Log calendar events
+    required: false
+
+metadata:
+  provider_url: https://datatracker.ietf.org/doc/rfc4791
+  docs_url: https://datatracker.ietf.org/doc/html/rfc4791

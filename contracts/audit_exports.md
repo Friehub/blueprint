@@ -132,12 +132,12 @@ CREATE INDEX idx_export_job_audit_job ON export_job_audit(job_id, created_at DES
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `audit_exports.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_audit_exports_operation_total             counter { function, result }
-gensense_audit_exports_operation_duration_ms       histogram { function }
-gensense_audit_exports_errors_total                counter { function, error_code }
-gensense_audit_exports_jobs_total                   counter { format, status }
-gensense_audit_exports_exported_bytes_total         counter { format }
-gensense_audit_exports_job_duration_ms              histogram { format, row_count_bucket }
+blueprint_audit_exports_operation_total             counter { function, result }
+blueprint_audit_exports_operation_duration_ms       histogram { function }
+blueprint_audit_exports_errors_total                counter { function, error_code }
+blueprint_audit_exports_jobs_total                   counter { format, status }
+blueprint_audit_exports_exported_bytes_total         counter { format }
+blueprint_audit_exports_job_duration_ms              histogram { format, row_count_bucket }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

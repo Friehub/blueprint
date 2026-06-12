@@ -105,10 +105,10 @@ Lock timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `transaction_isolation.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_transaction_isolation_deadlocks_total    { table }
-  gensense_transaction_isolation_retries_total     { reason }
-  gensense_transaction_isolation_duration_ms        histogram { level }
-  gensense_transaction_isolation_distributed_total   { result }
+blueprint_transaction_isolation_deadlocks_total    { table }
+  blueprint_transaction_isolation_retries_total     { reason }
+  blueprint_transaction_isolation_duration_ms        histogram { level }
+  blueprint_transaction_isolation_distributed_total   { result }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

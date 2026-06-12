@@ -115,10 +115,10 @@ Failure injection max duration:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `chaos_engineering.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_chaos_engineering_experiments_total       { status }
-  gensense_chaos_engineering_failures_injected_total  { type }
-  gensense_chaos_engineering_steadystate_violations
-  gensense_chaos_engineering_rollbacks_total
+blueprint_chaos_engineering_experiments_total       { status }
+  blueprint_chaos_engineering_failures_injected_total  { type }
+  blueprint_chaos_engineering_steadystate_violations
+  blueprint_chaos_engineering_rollbacks_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

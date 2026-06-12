@@ -148,12 +148,12 @@ Session (active):
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `sessions.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_sessions_operation_total        counter { function, result: success|failure }
-gensense_sessions_operation_duration_ms  histogram { function, p50, p95, p99 }
-gensense_sessions_errors_total           counter { function, error_code }
-gensense_sessions_active_total           gauge { user_id? }
-gensense_sessions_revoked_total          counter { reason: user|admin|security|expired }
-gensense_sessions_suspicious_total       counter
+blueprint_sessions_operation_total        counter { function, result: success|failure }
+blueprint_sessions_operation_duration_ms  histogram { function, p50, p95, p99 }
+blueprint_sessions_errors_total           counter { function, error_code }
+blueprint_sessions_active_total           gauge { user_id? }
+blueprint_sessions_revoked_total          counter { reason: user|admin|security|expired }
+blueprint_sessions_suspicious_total       counter
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

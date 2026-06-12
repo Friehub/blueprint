@@ -120,10 +120,10 @@ Max age defaults:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `credential_rotation_policy.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_credential_rotation_active_total        { type, status }
-  gensense_credential_rotation_rotations_total    { type, result }
-  gensense_credential_rotation_expiry_total        { type }
-  gensense_credential_rotation_compromise_total    { severity }
+blueprint_credential_rotation_active_total        { type, status }
+  blueprint_credential_rotation_rotations_total    { type, result }
+  blueprint_credential_rotation_expiry_total        { type }
+  blueprint_credential_rotation_compromise_total    { severity }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -171,12 +171,12 @@ CREATE INDEX idx_es_snapshots_stream ON es_snapshots(stream_id, version DESC);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `event_sourcing.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_event_sourcing_events_appended_total          { stream_id, event_type }
-  gensense_event_sourcing_projections_building           gauge { projection_id }
-  gensense_event_sourcing_snapshot_count                  gauge { stream_id }
-  gensense_event_sourcing_rebuild_lag_ms                  gauge { projection_id }
-  gensense_event_sourcing_version_conflict_total          { stream_id }
-  gensense_event_sourcing_stream_size_bytes              gauge { stream_id }
+blueprint_event_sourcing_events_appended_total          { stream_id, event_type }
+  blueprint_event_sourcing_projections_building           gauge { projection_id }
+  blueprint_event_sourcing_snapshot_count                  gauge { stream_id }
+  blueprint_event_sourcing_rebuild_lag_ms                  gauge { projection_id }
+  blueprint_event_sourcing_version_conflict_total          { stream_id }
+  blueprint_event_sourcing_stream_size_bytes              gauge { stream_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

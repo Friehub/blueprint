@@ -352,14 +352,14 @@ CREATE INDEX idx_ab_observations_experiment ON ab_metric_observations(experiment
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `ab_testing.<function>`. Assignment spans carry `experiment_id`, `variant_id`, and `subject_id` as attributes.
 * **Telemetry Metrics:**
 ```
-gensense_ab_testing_operation_total               counter { function, result }
-gensense_ab_testing_operation_duration_ms         histogram { function }
-gensense_ab_testing_errors_total                  counter { function, error_code }
-gensense_ab_testing_assignments_total              counter { experiment_id, variant_id }
-gensense_ab_testing_exposures_total                counter { experiment_id, variant_id }
-gensense_ab_testing_metrics_recorded_total         counter { experiment_id, metric_name }
-gensense_ab_testing_assignment_cache_hit_ratio     gauge
-gensense_ab_testing_experiment_duration_ms         histogram { status }
+blueprint_ab_testing_operation_total               counter { function, result }
+blueprint_ab_testing_operation_duration_ms         histogram { function }
+blueprint_ab_testing_errors_total                  counter { function, error_code }
+blueprint_ab_testing_assignments_total              counter { experiment_id, variant_id }
+blueprint_ab_testing_exposures_total                counter { experiment_id, variant_id }
+blueprint_ab_testing_metrics_recorded_total         counter { experiment_id, metric_name }
+blueprint_ab_testing_assignment_cache_hit_ratio     gauge
+blueprint_ab_testing_experiment_duration_ms         histogram { status }
 ```
 * **SLO Targets:** `assignVariant` P99 ≤ 10ms (including cache); `recordMetric` P99 ≤ 100ms (async buffered).
 

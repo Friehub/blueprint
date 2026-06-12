@@ -90,10 +90,10 @@ Reconnection backoff:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `sse.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_sse_connections_total               { channel, status }
-  gensense_sse_events_sent_total               { channel }
-  gensense_sse_events_dropped_total             { channel, reason }
-  gensense_sse_connection_duration_ms           histogram { channel }
+blueprint_sse_connections_total               { channel, status }
+  blueprint_sse_events_sent_total               { channel }
+  blueprint_sse_events_dropped_total             { channel, reason }
+  blueprint_sse_connection_duration_ms           histogram { channel }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
@@ -101,7 +101,7 @@ gensense_sse_connections_total               { channel, status }
 | Scenario | Behavior |
 |---|---|
 | Subscriber connection lost | Reconnect using `Last-Event-ID` and replay from last received event |
-| Event buffer full | Drop oldest buffered event per channel, log warning, increment `gensense_sse_events_dropped_total` |
+| Event buffer full | Drop oldest buffered event per channel, log warning, increment `blueprint_sse_events_dropped_total` |
 | Provider unavailable for stream creation | Return ProviderError, do not retry indefinitely |
 
 ### Breaking Change Policy

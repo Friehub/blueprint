@@ -91,9 +91,9 @@ Cron evaluation:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `scheduled_tasks.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_scheduled_tasks_triggers_total         { schedule_id, status }
-  gensense_scheduled_tasks_execution_duration_ms  histogram { schedule_id }
-  gensense_scheduled_tasks_lag_ms                  gauge { schedule_id }
+blueprint_scheduled_tasks_triggers_total         { schedule_id, status }
+  blueprint_scheduled_tasks_execution_duration_ms  histogram { schedule_id }
+  blueprint_scheduled_tasks_lag_ms                  gauge { schedule_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

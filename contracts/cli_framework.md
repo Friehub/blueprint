@@ -100,10 +100,10 @@ Command execution timeout:
 * **Tracing Spans:** Every command execution creates a span. Span names follow the pattern `cli_framework.<command>`.
 * **Telemetry Metrics:**
 ```
-gensense_cli_framework_commands_registered_total  { name }
-  gensense_cli_framework_commands_executed_total   { command, exit_code }
-  gensense_cli_framework_command_duration_ms        histogram { command }
-  gensense_cli_framework_config_loads_total         { result }
+blueprint_cli_framework_commands_registered_total  { name }
+  blueprint_cli_framework_commands_executed_total   { command, exit_code }
+  blueprint_cli_framework_command_duration_ms        histogram { command }
+  blueprint_cli_framework_config_loads_total         { result }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

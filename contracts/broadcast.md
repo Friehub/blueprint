@@ -89,10 +89,10 @@ Broadcast rate limit:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `broadcast.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_broadcast_sent_total                  { channel }
-  gensense_broadcast_delivered_total             { channel, status }
-  gensense_broadcast_recipients_total             { channel }
-  gensense_broadcast_delivery_duration_ms         histogram { channel }
+blueprint_broadcast_sent_total                  { channel }
+  blueprint_broadcast_delivered_total             { channel, status }
+  blueprint_broadcast_recipients_total             { channel }
+  blueprint_broadcast_delivery_duration_ms         histogram { channel }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

@@ -1,0 +1,61 @@
+name: kafka_streams
+module: stream_processing
+version: 1.0.0
+description: Kafka Streams stream processing adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - defineStream
+  - getStream
+  - listStreams
+  - startStream
+  - stopStream
+  - applyTransformation
+  - addSink
+  - getStreamMetrics
+  - getLag
+
+does_not_implement: []
+
+config:
+  required:
+    - name: bootstrap_servers
+      type: string
+      description: Kafka broker list
+      secret: false
+    - name: application_id
+      type: string
+      description: Kafka Streams application ID
+      secret: false
+  optional:
+    - name: schema_registry_url
+      type: string
+      description: Schema Registry URL
+    - name: replication_factor
+      type: integer
+      default: 3
+      description: Default replication factor
+    - name: partitions
+      type: integer
+      default: 3
+      description: Default partition count
+    - name: commit_interval_ms
+      type: integer
+      default: 100
+      description: Commit interval in ms
+    - name: cache_max_bytes
+      type: integer
+      default: 10485760
+      description: Record cache max bytes
+
+dependencies:
+  - module: event_bus
+    purpose: Source and sink streaming events
+    required: true
+  - module: audit_log
+    purpose: Log stream lifecycle events
+    required: false
+
+metadata:
+  provider_url: https://kafka.apache.org/documentation/streams
+  docs_url: https://kafka.apache.org/36/documentation/streams

@@ -328,10 +328,10 @@ CREATE INDEX idx_import_errors_job ON data_import_errors(import_id, row_index);
 * **Tracing Spans:** Each import job is a trace root. Phase transitions are spans annotated with row counts and error rates. The `commitImport` span must link to child spans for each batch write to the target domain.
 * **Telemetry Metrics:**
 ```
-gensense_data_import_jobs_total                 { target_module, status }
-  gensense_data_import_rows_processed_total      { phase, result }
-  gensense_data_import_phase_duration_ms          histogram { phase }
-  gensense_data_import_file_size_bytes             histogram { format }
+blueprint_data_import_jobs_total                 { target_module, status }
+  blueprint_data_import_rows_processed_total      { phase, result }
+  blueprint_data_import_phase_duration_ms          histogram { phase }
+  blueprint_data_import_file_size_bytes             histogram { format }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

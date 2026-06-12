@@ -156,10 +156,10 @@ CREATE INDEX idx_proration_credits_status ON proration_credits(status, expires_a
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `billing_proration.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_billing_proration_calculated_total      { from_plan, to_plan }
-gensense_billing_proration_credits_issued_total
-gensense_billing_proration_credits_expired_total
-gensense_billing_proration_net_revenue_impact     gauge { currency }
+blueprint_billing_proration_calculated_total      { from_plan, to_plan }
+blueprint_billing_proration_credits_issued_total
+blueprint_billing_proration_credits_expired_total
+blueprint_billing_proration_net_revenue_impact     gauge { currency }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

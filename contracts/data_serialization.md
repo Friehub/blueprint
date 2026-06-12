@@ -108,11 +108,11 @@ Schema version retention:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `data_serialization.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_data_serialization_schemas_total        { format }
-  gensense_data_serialization_evolutions_total     { mode, compatible }
-  gensense_data_serialization_validations_total    { mode, result }
-  gensense_data_serialization_migrations_total     { from_format, to_format }
-  gensense_data_serialization_validation_duration_ms histogram
+blueprint_data_serialization_schemas_total        { format }
+  blueprint_data_serialization_evolutions_total     { mode, compatible }
+  blueprint_data_serialization_validations_total    { mode, result }
+  blueprint_data_serialization_migrations_total     { from_format, to_format }
+  blueprint_data_serialization_validation_duration_ms histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

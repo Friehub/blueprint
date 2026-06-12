@@ -91,14 +91,14 @@ Buffer retention:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `analytics.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_analytics_operation_total              counter { function, result }
-gensense_analytics_operation_duration_ms        histogram { function }
-gensense_analytics_errors_total                 counter { function, error_code }
-gensense_analytics_events_tracked_total          counter { event_name }
-gensense_analytics_users_identified_total        counter
-gensense_analytics_page_views_tracked_total      counter
-gensense_analytics_queries_total                 counter { query_type }
-gensense_analytics_buffer_flush_size_bytes       histogram
+blueprint_analytics_operation_total              counter { function, result }
+blueprint_analytics_operation_duration_ms        histogram { function }
+blueprint_analytics_errors_total                 counter { function, error_code }
+blueprint_analytics_events_tracked_total          counter { event_name }
+blueprint_analytics_users_identified_total        counter
+blueprint_analytics_page_views_tracked_total      counter
+blueprint_analytics_queries_total                 counter { query_type }
+blueprint_analytics_buffer_flush_size_bytes       histogram
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

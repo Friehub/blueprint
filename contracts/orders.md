@@ -169,9 +169,9 @@ CREATE TABLE order_returns (
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `orders.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_orders_created_total               { currency }
-  gensense_orders_by_status                   gauge { status }
-  gensense_orders_cancellation_total          { reason }
+blueprint_orders_created_total               { currency }
+  blueprint_orders_by_status                   gauge { status }
+  blueprint_orders_cancellation_total          { reason }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

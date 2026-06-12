@@ -155,12 +155,12 @@ CREATE INDEX idx_bank_account_audit_acc ON bank_account_audit(bank_account_id, c
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `bank_accounts.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_bank_accounts_operation_total              counter { function, result }
-gensense_bank_accounts_operation_duration_ms        histogram { function }
-gensense_bank_accounts_errors_total                 counter { function, error_code }
-gensense_bank_accounts_verifications_total           counter { method, status }
-gensense_bank_accounts_verification_duration_ms      histogram { method }
-gensense_bank_accounts_disabled_total                counter { reason }
+blueprint_bank_accounts_operation_total              counter { function, result }
+blueprint_bank_accounts_operation_duration_ms        histogram { function }
+blueprint_bank_accounts_errors_total                 counter { function, error_code }
+blueprint_bank_accounts_verifications_total           counter { method, status }
+blueprint_bank_accounts_verification_duration_ms      histogram { method }
+blueprint_bank_accounts_disabled_total                counter { reason }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

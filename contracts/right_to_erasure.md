@@ -98,9 +98,9 @@ Erasure execution timeout:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `right_to_erasure.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_right_to_erasure_requests_total           { status }
-  gensense_right_to_erasure_records_deleted_total   { service }
-  gensense_right_to_erasure_certifications_total
+blueprint_right_to_erasure_requests_total           { status }
+  blueprint_right_to_erasure_records_deleted_total   { service }
+  blueprint_right_to_erasure_certifications_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

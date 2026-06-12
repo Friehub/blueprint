@@ -1,0 +1,55 @@
+name: openfga
+module: permissions
+version: 1.0.0
+description: OpenFGA fine-grained authorization adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - can
+  - canAll
+  - canAny
+  - batchCheckPermission
+  - grantPermission
+  - revokePermission
+  - denyPermission
+  - revokeDeny
+  - getPermissions
+
+does_not_implement:
+  - createRole
+  - assignRole
+
+config:
+  required:
+    - name: api_url
+      type: string
+      description: OpenFGA API URL
+      secret: false
+    - name: store_id
+      type: string
+      description: OpenFGA store ID
+      secret: false
+  optional:
+    - name: authorization_model_id
+      type: string
+      description: Authorization model ID
+    - name: api_token
+      type: string
+      description: OpenFGA API token
+      secret: true
+    - name: max_parallel_checks
+      type: integer
+      default: 10
+      description: Max parallel batch checks
+
+dependencies:
+  - module: users
+    purpose: Resolve user identities
+    required: true
+  - module: audit_log
+    purpose: Log permission changes
+    required: false
+
+metadata:
+  provider_url: https://openfga.dev
+  docs_url: https://openfga.dev/docs

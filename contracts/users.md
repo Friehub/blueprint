@@ -131,12 +131,12 @@ CREATE INDEX idx_user_roles_user ON user_roles(user_id);
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `users.<function>`.
 * **Telemetry Metrics:**
 ```
-gensense_users_operation_total           counter { function, result: success|failure }
-gensense_users_operation_duration_ms     histogram { function, p50, p95, p99 }
-gensense_users_errors_total              counter { function, error_code }
-gensense_users_registrations_total       counter { status: success|duplicate|pending_verification }
-gensense_users_deletions_total           counter { reason }
-gensense_users_active_total              gauge
+blueprint_users_operation_total           counter { function, result: success|failure }
+blueprint_users_operation_duration_ms     histogram { function, p50, p95, p99 }
+blueprint_users_errors_total              counter { function, error_code }
+blueprint_users_registrations_total       counter { status: success|duplicate|pending_verification }
+blueprint_users_deletions_total           counter { reason }
+blueprint_users_active_total              gauge
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
