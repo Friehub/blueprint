@@ -1,0 +1,44 @@
+name: pagerduty
+module: incident_response
+version: 1.0.0
+description: PagerDuty incident management adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - reportIncident
+  - getIncident
+  - updateIncident
+  - acknowledgeIncident
+  - resolveIncident
+  - escalateIncident
+  - createPostmortem
+  - getPostmortem
+  - getOnCallSchedule
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: PagerDuty API token
+      secret: true
+    - name: service_id
+      type: string
+      description: Default PagerDuty service ID
+  optional:
+    - name: from_email
+      type: string
+      description: Email of the user making the API call
+    - name: escalation_policy_id
+      type: string
+      description: Default escalation policy
+
+dependencies:
+  - module: notifications
+    purpose: Notify on incident escalation
+    required: false
+
+metadata:
+  provider_url: https://www.pagerduty.com
+  docs_url: https://developer.pagerduty.com/docs

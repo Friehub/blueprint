@@ -1,11 +1,14 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import { copyFileSync, readFileSync, readdirSync, existsSync, writeFileSync, mkdirSync } from "fs";
-import { resolve, dirname } from "path";
+import { readFileSync, readdirSync, existsSync, writeFileSync, mkdirSync, copyFileSync } from "fs";
+import { resolve } from "path";
 import { parse as parseYaml } from "yaml";
 
 const rootDir = resolve(__dirname, "..");
 const adaptersDir = resolve(rootDir, "adapters");
+const distDir = resolve(rootDir, "dist");
+const publicDir = resolve(__dirname, "public");
+const sagasDir = resolve(rootDir, "sagas");
 
 function buildAdapterJson() {
   const adapters = [];
@@ -26,10 +29,56 @@ function buildAdapterJson() {
   return adapters;
 }
 
-// Write adapters.json into the public dir so it's served as a static file
-const publicDir = resolve(__dirname, "public");
+function parseSaga(filePath) {
+  const content = readFileSync(filePath, "utf8");
+  const lines = content.split("\n");
+  const name = (content.match(/^# Saga: `(.+?)`/) || [])[1] || "";
+  const modulesLine = (content.match(/\*\*Modules:\*\* (.+)/) || [])[1] || "";
+  const modules = modulesLine.split(/[→,]+/).map(s => s.trim()).filter(Boolean);
+  const steps = [];
+  let inSteps = false;
+  let currentStep = null;
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (line.startsWith("## Steps")) { inSteps = true; continue; }
+    if (line.startsWith("## ") && !line.startsWith("## Steps")) { inSteps = false; break; }
+    if (!inSteps || !line) continue;
+    const stepMatch = line.match(/^(\d+)\.\s+\*\*(.+?)\*\*(.*)$/);
+    if (stepMatch) {
+      if (currentStep) steps.push(currentStep);
+      currentStep = { action: (stepMatch[2] + stepMatch[3]).trim(), compensation: null };
+      continue;
+    }
+    const compMatch = line.match(/^\*\*Compensation:\*\*\s+(.+)/);
+    if (compMatch && currentStep) { currentStep.compensation = compMatch[1].trim(); }
+  }
+  if (currentStep) steps.push(currentStep);
+  const invariants = [];
+  let inInv = false;
+  for (const line of lines) {
+    if (line.startsWith("## Invariants")) { inInv = true; continue; }
+    if (line.startsWith("## ")) { inInv = false; continue; }
+    if (!inInv) continue;
+    const m = line.match(/^-\s+(.+)/);
+    if (m) invariants.push(m[1].trim());
+  }
+  return { name, modules, steps, invariants };
+}
+
+// Prepare public directory assets
 mkdirSync(publicDir, { recursive: true });
 writeFileSync(resolve(publicDir, "adapters.json"), JSON.stringify(buildAdapterJson()));
+if (existsSync(resolve(distDir, "catalog.json"))) {
+  copyFileSync(resolve(distDir, "catalog.json"), resolve(publicDir, "catalog.json"));
+}
+if (existsSync(resolve(distDir, "entities.json"))) {
+  copyFileSync(resolve(distDir, "entities.json"), resolve(publicDir, "entities.json"));
+}
+// Extract sagas
+const sagas = existsSync(sagasDir)
+  ? readdirSync(sagasDir).filter(f => f.endsWith(".md")).map(f => parseSaga(resolve(sagasDir, f)))
+  : [];
+writeFileSync(resolve(publicDir, "sagas.json"), JSON.stringify(sagas));
 
 export default defineConfig({
   plugins: [vue()],

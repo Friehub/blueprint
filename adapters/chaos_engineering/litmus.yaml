@@ -1,0 +1,36 @@
+name: litmus
+module: chaos_engineering
+version: 1.0.0
+description: Litmus chaos engineering adapter
+languages: [typescript, python, go]
+
+implements:
+  - defineExperiment
+  - getExperiment
+  - listExperiments
+  - runExperiment
+  - stopExperiment
+  - injectFailure
+  - rollbackExperiment
+  - scheduleExperiment
+
+does_not_implement:
+  - validateSteadyState
+
+config:
+  required:
+    - name: api_url
+      type: string
+      description: Litmus API URL
+    - name: api_token
+      type: string
+      description: Litmus API token
+      secret: true
+  optional:
+    - name: project_id
+      type: string
+      description: Litmus project identifier
+
+metadata:
+  provider_url: https://litmuschaos.io
+  docs_url: https://docs.litmuschaos.io

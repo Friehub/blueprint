@@ -41,6 +41,7 @@ export type {
 
 export { renderTemplate } from "./render.js";
 
+export { TypeScriptGenerator } from "./typescript/index.js";
 export { PythonGenerator } from "./python/index.js";
 export { GoGenerator } from "./go/index.js";
 export { RustGenerator } from "./rust/index.js";

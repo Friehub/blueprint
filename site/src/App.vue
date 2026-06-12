@@ -5,6 +5,7 @@
     <a :class="{ active: state.view === 'quickstart' }" @click="goQuickstart">Quick Start</a>
     <a :class="{ active: state.view === 'mcp' }" @click="goMcp">MCP</a>
     <a :class="{ active: state.view === 'architecture' }" @click="goArchitecture">Architecture</a>
+    <a :class="{ active: state.view === 'generators' }" @click="goGenerators">Generators</a>
     <a :class="{ active: state.view === 'modules' }" @click="goModules">Modules</a>
     <a :class="{ active: state.view === 'adapters' }" @click="goAdapters">Adapters</a>
     <a :class="{ active: state.view === 'sagas' }" @click="goSagas">Sagas</a>
@@ -73,8 +74,7 @@
           <div class="stat"><div class="stat-num">{{ catalog?.modules?.length || 0 }}</div><div class="stat-label">Module contracts</div></div>
           <div class="stat"><div class="stat-num">{{ adapterModules }}</div><div class="stat-label">Modules with adapters</div></div>
           <div class="stat"><div class="stat-num">{{ totalFunctions }}</div><div class="stat-label">Function signatures</div></div>
-          <div class="stat"><div class="stat-num">83</div><div class="stat-label">Provider adapters</div></div>
-          <div class="stat"><div class="stat-num">204</div><div class="stat-label">Tests passing</div></div>
+          <div class="stat"><div class="stat-num">{{ state.adapters?.length || 0 }}</div><div class="stat-label">Provider adapters</div></div>
         </div>
       </div>
     </template>
@@ -264,6 +264,69 @@
               <p>Single shared schema with a <code>tenant_id</code> column on every tenant-scoped table. PostgreSQL RLS policies automatically scope every query to the current tenant. Application code must set the tenant context before each query. Operationally simpler but requires correct application-layer enforcement.</p>
             </div>
           </div>
+        </section>
+      </div>
+    </template>
+
+    <!-- GENERATORS -->
+    <template v-if="state.view === 'generators'">
+      <div class="main">
+        <h2 class="section-title">Code Generators</h2>
+        <p class="section-sub">Five language generators produce typed interfaces, adapter skeletons, and conformance tests from the same set of contracts.</p>
+
+        <section>
+          <h3>Available Generators</h3>
+          <div class="gen-grid">
+            <div class="gen-card">
+              <div class="gen-icon">TS</div>
+              <h4>TypeScript</h4>
+              <p>camelCase interfaces with <code>Promise&lt;T&gt;</code> async patterns, Jest-style tests, SDK hints for 12 providers.</p>
+            </div>
+            <div class="gen-card">
+              <div class="gen-icon">Py</div>
+              <h4>Python</h4>
+              <p>snake_case contracts with <code>async def</code>, pytest conformance tests, error class hierarchy.</p>
+            </div>
+            <div class="gen-card">
+              <div class="gen-icon">Go</div>
+              <h4>Go</h4>
+              <p>PascalCase <code>*Service</code> interfaces with <code>(T, error)</code> return patterns, standard testing.</p>
+            </div>
+            <div class="gen-card">
+              <div class="gen-icon">Rs</div>
+              <h4>Rust</h4>
+              <p>snake_case trait definitions with <code>#[async_trait]</code>, <code>thiserror::Error</code> enums, serde types.</p>
+            </div>
+            <div class="gen-card">
+              <div class="gen-icon">Jv</div>
+              <h4>Java</h4>
+              <p>camelCase contracts with <code>CompletableFuture&lt;T&gt;</code>, JUnit 5 tests, async by default.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>How It Works</h3>
+          <p>Every generator reads the same parsed contract catalog. The <code>blueprint generate</code> CLI command accepts:</p>
+          <code class="qs-code">blueprint generate --lang typescript</code>
+          <code class="qs-code">blueprint generate --lang python --module payments</code>
+          <code class="qs-code">blueprint generate --lang go --namespace acme --aliases aliases.json5</code>
+          <p>Each invocation produces three artefact types per module:</p>
+          <ul class="feature-list">
+            <li><strong>Interfaces</strong> — Typed contract with all function signatures, parameter types, and return types</li>
+            <li><strong>Adapters</strong> — Provider-specific implementation stubs wired to real SDKs with TODO markers</li>
+            <li><strong>Tests</strong> — Conformance tests verifying the adapter satisfies every contract function</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Name Protection</h3>
+          <p><strong>--namespace</strong> prefixes all generated names with a project identifier. <strong>--aliases</strong> replaces names entirely from a JSON5 alias file. <strong>--obfuscate</strong> hashes all names deterministically from a secret seed. All three can be combined.</p>
+        </section>
+
+        <section>
+          <h3>Adapting to Your Stack</h3>
+          <p>Each adapter YAML declares which languages it supports in the <code>languages</code> field. Generators only produce code for adapters that explicitly list the target language. If an adapter does not implement certain contract functions, those functions throw at runtime rather than silently missing.</p>
         </section>
       </div>
     </template>
@@ -567,7 +630,7 @@ export default {
       }
       return Object.values(groups).sort((a, b) => a.module.localeCompare(b.module));
     },
-    sagas() { return SAGAS; },
+    sagas() { return this.state.sagas; },
     depTree() { /* ... existing depTree code stays the same ... */
       try {
         const m = this.state?.currentModule;
@@ -638,6 +701,7 @@ export default {
     goQuickstart() { window.scrollTo(0,0); this.state.view = "quickstart"; this.state.currentModule = null; },
     goMcp() { window.scrollTo(0,0); this.state.view = "mcp"; this.state.currentModule = null; },
     goArchitecture() { window.scrollTo(0,0); this.state.view = "architecture"; this.state.currentModule = null; },
+    goGenerators() { window.scrollTo(0,0); this.state.view = "generators"; this.state.currentModule = null; },
     goDesign() { window.scrollTo(0,0); this.state.view = "design"; this.state.currentModule = null; },
     addToDesign(m) {
       if (!m) return;

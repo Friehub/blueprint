@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "cp ../dist/catalog.json public/catalog.json 2>/dev/null; npx vite dev",
+    "dev": "cp ../dist/catalog.json public/catalog.json 2>/dev/null; cp ../dist/entities.json public/entities.json 2>/dev/null; node ../scripts/extract-sagas.cjs 2>/dev/null; npx vite dev",
     "build": "npx vite build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

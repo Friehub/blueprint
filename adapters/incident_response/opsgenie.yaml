@@ -1,0 +1,37 @@
+name: opsgenie
+module: incident_response
+version: 1.0.0
+description: Opsgenie incident management adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - reportIncident
+  - getIncident
+  - updateIncident
+  - acknowledgeIncident
+  - resolveIncident
+  - escalateIncident
+  - getOnCallSchedule
+
+does_not_implement:
+  - createPostmortem
+  - getPostmortem
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Opsgenie API key
+      secret: true
+  optional:
+    - name: base_url
+      type: string
+      default: https://api.opsgenie.com
+      description: Opsgenie API base URL
+    - name: team_name
+      type: string
+      description: Default team for incident assignment
+
+metadata:
+  provider_url: https://www.atlassian.com/software/opsgenie
+  docs_url: https://docs.opsgenie.com

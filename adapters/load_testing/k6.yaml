@@ -1,0 +1,39 @@
+name: k6
+module: load_testing
+version: 1.0.0
+description: k6 load testing adapter
+languages: [typescript, go]
+
+implements:
+  - defineScenario
+  - getScenario
+  - runScenario
+  - getRun
+  - cancelRun
+  - validateSla
+  - compareRuns
+
+does_not_implement:
+  - setSlaThresholds
+
+config:
+  required:
+    - name: api_url
+      type: string
+      description: k6 Cloud API URL or Grafana Cloud k6 endpoint
+    - name: api_token
+      type: string
+      description: k6 Cloud API token
+      secret: true
+  optional:
+    - name: project_id
+      type: string
+      description: k6 Cloud project identifier
+    - name: max_vus
+      type: number
+      default: 100
+      description: Maximum virtual users
+
+metadata:
+  provider_url: https://k6.io
+  docs_url: https://grafana.com/docs/k6

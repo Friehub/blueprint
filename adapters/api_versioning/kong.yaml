@@ -1,0 +1,37 @@
+name: kong
+module: api_versioning
+version: 1.0.0
+description: Kong API gateway version management adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - registerApi
+  - getApi
+  - getCurrentVersion
+  - deprecateVersion
+  - listVersions
+  - setVersioningStrategy
+  - extendSunset
+
+does_not_implement: []
+
+config:
+  required:
+    - name: admin_url
+      type: string
+      description: Kong Admin API URL
+    - name: api_key
+      type: string
+      description: Kong API key
+      secret: true
+  optional:
+    - name: workspace
+      type: string
+      description: Kong workspace name
+    - name: upstream_url
+      type: string
+      description: Default upstream service URL
+
+metadata:
+  provider_url: https://konghq.com
+  docs_url: https://docs.konghq.com
