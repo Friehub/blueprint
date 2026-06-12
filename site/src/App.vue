@@ -23,11 +23,22 @@
     <!-- HOME -->
     <template v-if="state.view === 'home'">
       <div class="hero">
-        <div class="hero-badge">v0.2.1 &middot; Open Source</div>
+        <div class="hero-badge">v0.2.2 &middot; Open Source</div>
         <h1 class="hero-title">Backend contracts<br/>for <span class="mint">AI agents</span> and engineers</h1>
         <p class="hero-sub">176 domain modules &middot; 94 adapters &middot; 5 code generators &middot; 14 MCP tools</p>
         <div class="hero-cta">
-          <code class="install-cmd">npm install -g @friehub/blueprint</code>
+          <div class="install-tabs">
+            <div class="install-tab" :class="{ active: installTab === 'npm' }" @click="installTab = 'npm'">npm</div>
+            <div class="install-tab" :class="{ active: installTab === 'cli' }" @click="installTab = 'cli'">CLI</div>
+          </div>
+          <div v-if="installTab === 'npm'">
+            <code class="install-cmd">npm install -g @friehub/blueprint</code>
+            <p class="install-sub">Requires Node.js 18+</p>
+          </div>
+          <div v-else>
+            <code class="install-cmd">curl -fsSL https://raw.githubusercontent.com/Friehub/blueprint/main/scripts/install.sh | bash</code>
+            <p class="install-sub">Auto-detects your OS &amp; architecture. Downloads from GitHub Releases.</p>
+          </div>
         </div>
         <div class="hero-demo">
           <div class="demo-line"><span class="prompt">$</span> blueprint list</div>
@@ -601,7 +612,7 @@ const SAGAS = [
 
 export default {
   props: ["state"],
-  data() { return { adaptersData: [], depOpen: {}, designQuery: "", designModules: [], designSelected: null, designAdapter: null, canvasPan: { x: 0, y: 0 }, dragCard: null, dragOffs: { x: 0, y: 0 }, panning: false, panStart: { x: 0, y: 0 } }; },
+  data() { return { adaptersData: [], depOpen: {}, installTab: "npm", designQuery: "", designModules: [], designSelected: null, designAdapter: null, canvasPan: { x: 0, y: 0 }, dragCard: null, dragOffs: { x: 0, y: 0 }, panning: false, panStart: { x: 0, y: 0 } }; },
   computed: {
     catalog() { return this.state?.catalog || { modules: [], core: [] }; },
     filteredModules() {

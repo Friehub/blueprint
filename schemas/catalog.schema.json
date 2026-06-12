@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://engineering-blueprinter.dev/schemas/catalog.json",
-  "title": "Engineering Blueprinter Catalog",
-  "description": "Output of `blueprinter build` — all parsed contracts from the contracts/ tree.",
+  "$id": "https://blueprint.friehub.cloud/schemas/catalog.json",
+  "title": "Blueprint Catalog",
+  "description": "Output of `blueprint build` — all parsed contracts from the contracts/ tree.",
   "type": "object",
   "required": ["modules", "core"],
   "properties": {

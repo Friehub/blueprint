@@ -1,6 +1,6 @@
 {
   "name": "@friehub/blueprint",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A domain contract catalogue for backend development. 176 module contracts, 94 adapters, 5 languages, AI-ready via 14 MCP tools.",
   "keywords": [
     "contract",
@@ -88,7 +88,7 @@
     "LICENSE"
   ],
   "blueprint": {
-    "catalogHash": "1e6b154e56e73e5c772823d6d29421f2d74ac2dd2a2eecf90272cec6c9922657"
+    "catalogHash": "da2b5295e5cf0fdcee9e38654adcc9f3125ef4d4e2c71424e267a210a96fa025"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && node scripts/build-catalog.cjs && node scripts/strip-catalog.cjs && node scripts/extract-entities.cjs && node scripts/hash-catalog.cjs",

@@ -14,13 +14,17 @@ const ROOT = join(__dirname, "..");
 const full = JSON.parse(readFileSync(join(ROOT, "dist", "catalog.json"), "utf8"));
 
 function stripModule(mod) {
+  const stripSource = (obj) => {
+    const { source, ...rest } = obj || {};
+    return rest;
+  };
   return {
     name: mod.name,
     title: mod.title,
     version: mod.version,
     summary: mod.summary,
-    functions: mod.functions,
-    types: mod.types,
+    functions: (mod.functions || []).map(stripSource),
+    types: (mod.types || []).map(stripSource),
     hardDeps: mod.hardDeps,
     softDeps: mod.softDeps,
     coreInherits: mod.coreInherits,

@@ -54,3 +54,43 @@ jobs:
           path: site/dist
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  release:
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run build
+
+      - name: Pack npm tarball
+        run: |
+          npm pack
+          echo "TARBALL=$(ls *.tgz)" >> $GITHUB_ENV
+
+      - name: Build linux-x64 binary (SEA)
+        run: |
+          cat > /tmp/sea-config.json <<'EOF'
+          { "main": "dist/cli.js", "output": "dist/blueprint.blob", "disableExperimentalSEAWarning": true }
+          EOF
+          node --experimental-sea-config /tmp/sea-config.json
+          cp "$(which node)" dist-cli/blueprint-linux-x64
+          npx postject dist-cli/blueprint-linux-x64 NODE_SEA_BLOB dist/blueprint.blob \
+            --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
+          strip dist-cli/blueprint-linux-x64 2>/dev/null || true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Blueprint ${{ github.ref_name }}
+          body_path: CHANGELOG.md
+          files: |
+            ${{ env.TARBALL }}
+            scripts/install.sh
+            dist-cli/blueprint-linux-x64
+          generate_release_notes: true

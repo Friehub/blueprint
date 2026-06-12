@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://engineering-blueprinter.dev/schemas/resolved-set.json",
-  "title": "Engineering Blueprinter Resolved Set",
-  "description": "Output of `blueprinter resolve` — selected modules with transitive deps and core contracts.",
+  "$id": "https://blueprint.friehub.cloud/schemas/resolved-set.json",
+  "title": "Blueprint Resolved Set",
+  "description": "Output of `blueprint resolve` — selected modules with transitive deps and core contracts.",
   "type": "object",
   "required": ["modules", "core", "warnings"],
   "properties": {

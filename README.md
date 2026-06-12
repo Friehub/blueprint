@@ -110,7 +110,7 @@ The MCP server exposes 12 tools over stdio. Connect any MCP-compatible AI tool (
   "mcpServers": {
     "blueprint": {
       "command": "npx",
-      "args": ["engineering-blueprint", "mcp"]
+      "args": ["@friehub/blueprint", "mcp"]
     }
   }
 }
