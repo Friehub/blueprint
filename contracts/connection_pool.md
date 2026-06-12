@@ -15,14 +15,22 @@ getPoolStatus(pool_name) → PoolStatus
 resizePool(pool_name, min, max) → void
 drainPool(pool_name) → void
 getPoolMetrics(pool_name) → PoolMetrics
+validateConnection(connection_id) → HealthCheckResult
+registerConnectionLeak(connection_id, threshold_ms) → LeakMonitor
+setPoolResizePolicy(pool_name, policy) → void
+setConnectionHealthCheck(pool_name, config) → void
+evictConnection(connection_id) → void
 ```
 
 **Types**
 ```
-Connection { id, pool_name, acquired_at, idle_since?, borrow_count }
-PoolStatus { name, active, idle, pending, min, max, utilization_pct }
-PoolMetrics { total_acquired, total_released, total_timeout, avg_acquire_ms, avg_usage_ms }
-PoolConfig { min_idle, max_active, max_idle, acquire_timeout_ms, eviction_interval_ms }
+Connection { id, pool_name, acquired_at, idle_since?, borrow_count, last_validated_at?, health: unknown|healthy|degraded|dead }
+PoolStatus { name, active, idle, pending, min, max, utilization_pct, leaked: LeakInfo[] }
+PoolMetrics { total_acquired, total_released, total_timeout, total_evicted, avg_acquire_ms, avg_usage_ms, avg_idle_ms, leak_count, eviction_count }
+PoolConfig { min_idle, max_active, max_idle, acquire_timeout_ms, eviction_interval_ms, max_lifetime_ms, validation_query, test_on_borrow: bool, test_on_return: bool, test_while_idle: bool, leak_detection_threshold_ms }
+LeakMonitor { connection_id, threshold_ms, started_at, status: monitoring|leaked|resolved }
+HealthCheckResult { connection_id, alive: bool, latency_ms, error? }
+ResizePolicy { type: fixed|dynamic|scheduled, min, max, scale_up_factor, scale_down_factor, cooldown_ms }
 ```
 
 **Invariants**
@@ -57,8 +65,28 @@ PoolConfig { min_idle, max_active, max_idle, acquire_timeout_ms, eviction_interv
 
 ### Backpressure
 * When all connections are active and `max_active` is reached, `acquire` must block up to `acquire_timeout_ms` then return a timeout error.
+* The pool must apply backpressure to new acquire requests when `leak_count` exceeds 10% of `max_active` -- new acquires should either fail fast or queue with a reduced timeout.
+
+### Connection Validation
+* `validateConnection` must run the configured `validation_query` against the connection and mark it `dead` on failure.
+* When `test_on_borrow` is enabled, `acquire` must validate the connection before returning it to the caller -- a validation failure must trigger eviction and a retry.
+* When `test_on_return` is enabled, `release` must validate the connection before returning it to the pool -- a validation failure must evict the connection rather than pooling it.
+* `test_while_idle` must run scheduled health checks on idle connections at the `eviction_interval_ms` interval.
+
+### Leak Detection
+* A connection borrowed for longer than `leak_detection_threshold_ms` must be flagged as a potential leak -- the pool must emit a warning event and track the stack trace at acquisition time.
+* `registerConnectionLeak` creates a monitor that watches a specific connection; if the borrow exceeds `threshold_ms` without release, the monitor fires a `connection.leaked` event.
+* A leaked connection that exceeds 2x the leak detection threshold must be forcibly evicted (`evictConnection`).
+
+### Dynamic Pool Resize
+* With `resizePolicy = dynamic`, the pool must automatically scale up when `utilization_pct` exceeds 70% for more than 30 seconds, up to `max` -- scale up is multiplicative by `scale_up_factor`.
+* With `resizePolicy = dynamic`, the pool must automatically scale down when `utilization_pct` is below 30% for more than 60 seconds, down to `min` -- scale down respects a `cooldown_ms` to prevent thrashing.
 
 ### Error Taxonomy
+### Pool Throttling
+* Pool must implement a circuit-breaker state: `open` when leak detection rate exceeds threshold, `half-open` for probation, `closed` for normal operation.
+* When the circuit is `open`, `acquire` must fail immediately with `pool_circuit_open` instead of waiting.
+
 ### Module-Specific Errors
 ```
 acquire:
@@ -87,6 +115,23 @@ Acquire timeout:
   Connection max lifetime:
     duration:       configurable, default 30 minutes
     on_expiry:      close connection after current borrow returns it
+
+  Leak detection threshold:
+    default:        5 minutes
+    on_expiry:      emit leak warning; track stack trace
+
+  Health check interval (when test_while_idle is enabled):
+    default:        30 seconds
+    on_expiry:      run validation_query on idle connections
+
+  Dynamic resize cooldown:
+    default:        60 seconds
+    on_expiry:      allow next resize evaluation
+
+  Circuit breaker:
+    leak_rate_threshold:    10% of max_active over 60 seconds
+    half_open_after_ms:     30 seconds
+    on_circuit_open:        fail acquire immediately
 ```
 
 ### Observability
@@ -97,6 +142,11 @@ gensense_connection_pool_active_current          gauge { pool_name }
   gensense_connection_pool_idle_current            gauge { pool_name }
   gensense_connection_pool_pending_current          gauge { pool_name }
   gensense_connection_pool_acquire_duration_ms      histogram { pool_name }
+  gensense_connection_pool_evictions_total           { pool_name, reason }
+  gensense_connection_pool_leak_count                gauge { pool_name }
+  gensense_connection_pool_circuit_breaker            gauge { pool_name, state }
+  gensense_connection_pool_health_check_duration_ms   histogram { pool_name }
+  gensense_connection_pool_validation_failures_total  { pool_name }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
