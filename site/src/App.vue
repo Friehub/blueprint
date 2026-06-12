@@ -217,21 +217,21 @@
             <div class="arch-layer">
               <div class="arch-layer-num">1</div>
               <div class="arch-layer-body">
-                <strong>Perimeter</strong> — <em>ip_blocklist, rate_limiting, bot_protection</em>
+                <strong>Perimeter</strong> -- <em>ip_blocklist, rate_limiting, bot_protection</em>
                 <p>Rejects requests from known-bad IPs, enforces per-IP and per-origin rate limits, applies bot scoring before any authentication runs. Must be stateless, reading from a fast cache (Redis), making binary allow/deny decisions in under 2ms.</p>
               </div>
             </div>
             <div class="arch-layer">
               <div class="arch-layer-num">2</div>
               <div class="arch-layer-body">
-                <strong>Identity</strong> — <em>auth, sessions, api_keys</em>
+                <strong>Identity</strong> -- <em>auth, sessions, api_keys</em>
                 <p>Validates credentials, checks session revocation and anomaly state, attaches caller identity to request context. All failures return identical errors with identical timing. No information leakage about which check failed.</p>
               </div>
             </div>
             <div class="arch-layer">
               <div class="arch-layer-num">3</div>
               <div class="arch-layer-body">
-                <strong>Authorization</strong> — <em>permissions</em>
+                <strong>Authorization</strong> -- <em>permissions</em>
                 <p>Checks <code>can()</code> before any business logic executes. Explicit deny returns immediately. Missing grant returns denied. Only explicit allow proceeds. Enforced at the function level, not the route level.</p>
               </div>
             </div>
@@ -313,9 +313,9 @@
           <code class="qs-code">blueprint generate --lang go --namespace acme --aliases aliases.json5</code>
           <p>Each invocation produces three artefact types per module:</p>
           <ul class="feature-list">
-            <li><strong>Interfaces</strong> — Typed contract with all function signatures, parameter types, and return types</li>
-            <li><strong>Adapters</strong> — Provider-specific implementation stubs wired to real SDKs with TODO markers</li>
-            <li><strong>Tests</strong> — Conformance tests verifying the adapter satisfies every contract function</li>
+            <li><strong>Interfaces</strong> -- Typed contract with all function signatures, parameter types, and return types</li>
+            <li><strong>Adapters</strong> -- Provider-specific implementation stubs wired to real SDKs with TODO markers</li>
+            <li><strong>Tests</strong> -- Conformance tests verifying the adapter satisfies every contract function</li>
           </ul>
         </section>
 

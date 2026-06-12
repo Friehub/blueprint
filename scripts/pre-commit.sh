@@ -148,6 +148,12 @@ for root, dirs, files in os.walk('contracts'):
             for i, line in enumerate(open(path, encoding='utf-8'), 1):
                 if '\u2014' in line or '\u2013' in line:
                     found.append(f'{path}:{i}')
+for root, dirs, files in os.walk('site/src'):
+    for f in files:
+        path = os.path.join(root, f)
+        for i, line in enumerate(open(path, encoding='utf-8'), 1):
+            if '\u2014' in line or '\u2013' in line:
+                found.append(f'{path}:{i}')
 for root, dirs, files in os.walk('sagas'):
     for f in files:
         if f.endswith('.md'):
