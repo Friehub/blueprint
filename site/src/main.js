@@ -9,6 +9,7 @@ const state = reactive({
   query: "",
   catalog: { modules: [], core: [] },
   adapters: [],
+  entities: [],
   loaded: false,
 });
 
@@ -18,17 +19,18 @@ app.mount("#app");
 // Load catalog and adapters at runtime (not bundled)
 async function loadData() {
   try {
-    const [cat, adp] = await Promise.all([
+    const [cat, adp, ents] = await Promise.all([
       fetch("./catalog.json").then(r => r.json()),
       fetch("./adapters.json").then(r => r.json()),
+      fetch("./entities.json").then(r => r.json()),
     ]);
     state.catalog = cat;
     state.adapters = adp;
+    state.entities = ents;
     state.loaded = true;
   } catch (e) {
-    console.error("Failed to load catalog data", e);
+    console.error("Failed to load data", e);
     state.loaded = true;
-    state.catalogError = "Could not load catalog.json. Make sure the site was built with 'npm run docs' from the project root.";
   }
 }
 loadData();

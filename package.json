@@ -85,7 +85,7 @@
     "LICENSE"
   ],
   "blueprint": {
-    "catalogHash": "c3ed27b83bb5efd6c05bd752e92cc73d1f11cca44ec0253c5e3815cb1288159c"
+    "catalogHash": "509972a5648bdef765dae535cae056baeab99b931080c050920b6aa118544ed2"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && node scripts/build-catalog.cjs && node scripts/strip-catalog.cjs && node scripts/extract-entities.cjs && node scripts/hash-catalog.cjs",
@@ -98,7 +98,7 @@
     "test:integration": "npm run build && bash scripts/integration-test.sh",
     "prerelease": "npm run build && bash scripts/pre-commit.sh",
     "link": "npm run build && npm link",
-    "docs": "npm run build && cp dist/catalog.json site/public/catalog.json && cd site && npm ci && npx vite build"
+    "docs": "npm run build && cp dist/catalog.json site/public/catalog.json && cp dist/entities.json site/public/entities.json && cd site && npm ci && npx vite build"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",

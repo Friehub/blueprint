@@ -431,6 +431,22 @@
           </div>
         </section>
 
+        <section v-if="currentEntities.length">
+          <h3>Entities</h3>
+          <div v-for="ent in currentEntities" :key="ent.entity" class="ent-block">
+            <div class="ent-header">{{ ent.entity }}</div>
+            <div class="ent-fields">
+              <div v-for="f in ent.fields" :key="f.name" class="ent-field">
+                <span class="ent-field-name">{{ f.name }}</span>
+                <span class="ent-field-type">{{ f.type }}</span>
+                <span v-if="f.primaryKey" class="ent-badge pk">PK</span>
+                <span v-if="f.foreignKey" class="ent-badge fk">FK&rarr;{{ f.refEntity }}</span>
+                <span v-if="f.optional" class="ent-badge opt">optional</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section>
           <h3>Dependencies</h3>
           <div class="dep-tree">
@@ -607,6 +623,10 @@ export default {
     designModuleAdapters() {
       if (!this.designSelected) return [];
       return this.state.adapters.filter(a => a.module === this.designSelected);
+    },
+    currentEntities() {
+      if (!this.state.currentModule) return [];
+      return (this.state.entities || []).filter(e => e.module === this.state.currentModule.name);
     },
   },
   methods: {

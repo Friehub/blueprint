@@ -379,3 +379,15 @@ body {
 /* === Back link === */
 .back { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 16px; color: var(--fog); text-decoration: none; font-size: 13px; font-weight: 500; cursor: pointer; }
 .back:hover { color: var(--mint); }
+
+/* === Entity blocks === */
+.ent-block { margin-bottom: 14px; border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.ent-header { background: var(--slate); padding: 8px 14px; font-size: 13px; font-weight: 600; font-family: var(--mono); }
+.ent-fields { }
+.ent-field { display: flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 12px; border-top: 1px solid var(--border); font-family: var(--mono); }
+.ent-field-name { font-weight: 600; min-width: 140px; }
+.ent-field-type { color: var(--fog); min-width: 100px; }
+.ent-badge { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 3px; }
+.pk { background: var(--mint); color: var(--white); }
+.fk { background: var(--ember); color: var(--white); }
+.opt { background: var(--slate); color: var(--fog); }
