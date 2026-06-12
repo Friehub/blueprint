@@ -191,17 +191,153 @@ type ListJobsInput = {
 
 ---
 
-## System-Level Integrations
+## System-Level Integrations & Constraints
 
-- **Idempotency:** Invalidation jobs are idempotent; purging an already-absent key is a no-op at the `caching` layer.
-- **Consistency:** This module subscribes to the platform event bus. Rule matching and job dispatch must use an at-least-once delivery model; duplicate events may trigger duplicate jobs, but idempotent purges make this safe.
-- **Runtime delivery:** Invalidation jobs are delivered `at_least_once`.
-- **Worker scaling:** Purge workers must be independently scalable from event consumption workers.
-- **Multi-region:** The module must declare whether invalidation execution is single-region or active/passive; duplicate event processing across regions must be deduplicated.
-- **Observability:** Each invalidation job emits a trace span annotated with `ruleId`, `purgedKeyCount`, `failedKeyCount`, and `durationMs`. A metric `cache_invalidation_lag_ms` must be maintained to monitor purge latency from event receipt.
-- **Backpressure:** If purge capacity is saturated, matching events must be deferred or queued predictably rather than dropping invalidations silently.
-- **Dead-letter handling:** Failed invalidation jobs that exhaust retries must be retained in an operator-queryable failed state with the original rule and key patterns.
-- **Storage model:** Rule definitions and invalidation job history must be durably stored; high-volume job history may be trimmed by retention policy, but the active rule set must remain strongly consistent.
-- **Dependencies:** `caching` (low-level purge operations), `queues` (event consumption and job dispatch), `config` (cache store configuration references), `audit_log` (manual trigger history).
-- **Errors:** `RULE_NOT_FOUND`, `RULE_DISABLED`, `JOB_NOT_FOUND`, `INVALID_KEY_PATTERN`, `CACHE_STORE_UNAVAILABLE`.
-- **Providers (adapter examples):** Custom implementation on top of Redis SCAN + DEL, Varnish Cache VCL ban rules, Cloudflare Cache Rules API, Fastly Instant Purge, custom tag-based invalidation (Surrogate-Key).
+### Consistency Model
+* **Model:** `eventual`
+* **Details:** Rule matching and purge completion is eventual. The maximum acceptable lag from event receipt to cache purge completion is 500ms under normal load.
+
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for invalidation events.
+* **Details:** Duplicate events may trigger duplicate jobs, but idempotent purges make this safe. Idempotency is per `(ruleId, eventPayload)`.
+
+### Worker Scaling
+* **Policy:** Purge workers must be independently scalable from event consumption workers.
+
+### Multi-Region Behavior
+* **Mode:** The module must declare whether invalidation execution is single-region or active/passive; duplicate event processing across regions must be deduplicated.
+
+### Idempotency Requirements
+* **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+* **Required Functions:**
+  - `createRule(input, idempotency_key?)`
+  - `updateRule(input, idempotency_key?)`
+  - `disableRule(ruleId, idempotency_key?)`
+  - `enableRule(ruleId, idempotency_key?)`
+  - `deleteRule(ruleId, idempotency_key?)`
+  - `triggerInvalidation(input, idempotency_key?)`
+
+### Backpressure
+* If purge capacity is saturated, matching events must be deferred or queued predictably rather than dropping invalidations silently.
+
+### Dead-Letter Handling
+* Failed invalidation jobs that exhaust retries must be retained in an operator-queryable failed state with the original rule and key patterns.
+
+### Error Taxonomy
+* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+* Domain errors: `RULE_NOT_FOUND`, `RULE_DISABLED`, `JOB_NOT_FOUND`, `INVALID_KEY_PATTERN`, `CACHE_STORE_UNAVAILABLE`, `RULE_NAME_CONFLICT`, `PURGE_WORKER_UNAVAILABLE`.
+
+### Event Emission
+All events are emitted using at-least-once delivery with UUID v4 envelope.
+```
+cache_invalidation.rule.created
+cache_invalidation.rule.updated
+cache_invalidation.rule.disabled
+cache_invalidation.rule.enabled
+cache_invalidation.rule.deleted
+cache_invalidation.job.triggered       { ruleId, resolvedKeyPatterns }
+cache_invalidation.job.completed       { ruleId, purgedKeys count }
+cache_invalidation.job.failed          { ruleId, failedKeys }
+```
+
+### Temporal Constraints
+```
+Invalidation job:
+    default_timeout:    30 seconds per job
+    on_exceed:          transition to FAILED; retry up to maxRetries
+
+    max_retries:
+        default:        3
+        on_exhausted:   move to dead-letter; remain queryable
+
+    job_history_retention:
+        default:        30 days
+        on_expiry:      eligible for deletion; aggregates preserved
+
+Rule latency budget:
+    from_event_to_purge: 500ms
+    on_exceed:          increment cache_invalidation_lag_ms; emit alert
+```
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE invalidation_rules (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name              TEXT NOT NULL UNIQUE,
+  description       TEXT,
+  event_name        TEXT NOT NULL,
+  source_module     TEXT,
+  payload_conditions JSONB DEFAULT '[]',
+  key_patterns      JSONB NOT NULL DEFAULT '[]',
+  priority          INTEGER NOT NULL DEFAULT 0,
+  max_retries       INTEGER NOT NULL DEFAULT 3,
+  status            TEXT NOT NULL DEFAULT 'ACTIVE'
+                      CHECK (status IN ('ACTIVE', 'DISABLED')),
+  total_triggered_count INTEGER NOT NULL DEFAULT 0,
+  last_triggered_at TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_invalidation_rules_event ON invalidation_rules(event_name, source_module) WHERE status = 'ACTIVE';
+CREATE INDEX idx_invalidation_rules_priority ON invalidation_rules(priority, created_at);
+
+CREATE TABLE invalidation_jobs (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  rule_id             UUID NOT NULL REFERENCES invalidation_rules(id) ON DELETE CASCADE,
+  status              TEXT NOT NULL DEFAULT 'TRIGGERED'
+                        CHECK (status IN ('TRIGGERED', 'PROCESSING', 'COMPLETED', 'PARTIALLY_COMPLETED', 'FAILED')),
+  resolved_key_patterns TEXT[] NOT NULL DEFAULT '{}',
+  purged_keys         TEXT[] DEFAULT '{}',
+  failed_keys         TEXT[] DEFAULT '{}',
+  triggered_by        UUID,
+  error_message       TEXT,
+  retry_count         INTEGER NOT NULL DEFAULT 0,
+  triggered_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  completed_at        TIMESTAMPTZ
+);
+
+CREATE INDEX idx_invalidation_jobs_rule ON invalidation_jobs(rule_id, triggered_at DESC);
+CREATE INDEX idx_invalidation_jobs_status ON invalidation_jobs(status, triggered_at) WHERE status IN ('TRIGGERED', 'PROCESSING', 'FAILED');
+```
+
+### Storage Model
+* **Model:** Durable rule definition store with invalidation job history.
+* **Details:** Rule definitions and invalidation job history must be durably stored; high-volume job history may be trimmed by retention policy, but the active rule set must remain strongly consistent.
+
+### Observability
+* **Tracing Spans:** Each invalidation job emits a trace span annotated with `ruleId`, `purgedKeyCount`, `failedKeyCount`, and `durationMs`. Every function call follows `cache_invalidation.<function>`.
+* **Telemetry Metrics:**
+```
+gensense_cache_invalidation_operation_total              counter { function, result }
+gensense_cache_invalidation_operation_duration_ms        histogram { function }
+gensense_cache_invalidation_errors_total                 counter { function, error_code }
+gensense_cache_invalidation_rules_total                   gauge { status }
+gensense_cache_invalidation_jobs_total                    counter { status }
+gensense_cache_invalidation_keys_purged_total             counter { rule_id }
+gensense_cache_invalidation_keys_failed_total             counter { rule_id, error_code }
+gensense_cache_invalidation_lag_ms                       gauge
+```
+* **SLO Targets:** Event-to-purge P99 ≤ 500ms; rule creation P99 ≤ 200ms.
+
+### Module Dependencies
+* **Depends On:** caching, queues
+* **Emits To:** events
+* **Recommends:** config, audit_log
+
+### Breaking Change Policy
+- Adding a new pattern interpolation variable syntax is additive and backward-compatible.
+- Removing or renaming a key pattern variable syntax requires a MAJOR version bump.
+- Changing the priority evaluation order (lower vs higher executes first) requires a MAJOR version bump.
+- Adding new required fields to `CreateRuleInput` requires a MAJOR version bump.
+
+### Failure Modes
+| Mode | Cause | Mitigation |
+|------|-------|-----------|
+| Cache store unavailable | Redis/backend down during purge | Retry with backoff; dead-letter after maxRetries; emit CACHE_STORE_UNAVAILABLE |
+| Invalid key pattern | Pattern variable not found in event payload | Log warning; interpolate empty string; continue purge |
+| Job timeout | Too many keys to purge in 30s | Split job into batches; increase by adapter config |
+| Duplicate job execution | Re-delivered event with different key | Idempotent purge is safe; log duplicate for monitoring |
+| Rule name conflict | Duplicate rule name on create | Return RULE_NAME_CONFLICT; enforce UNIQUE constraint |

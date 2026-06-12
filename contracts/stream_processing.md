@@ -95,6 +95,20 @@ gensense_stream_processing_events_in_total        { stream_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Source stream unavailable | Return ProviderError, mark stream as degraded, alert operator |
+| Sink unavailable | Apply backpressure, increase sink lag metric; do not drop events |
+| Checkpoint write failure | Log error, continue processing; next checkpoint retry will cover the gap |
+| Corrupted checkpoint state | Resume from last valid checkpoint; reprocessed events must be idempotent on the output sink |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** event_bus
 * **Emits To:** events

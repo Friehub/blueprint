@@ -62,7 +62,24 @@ ProtobufFieldRule = optional | required | repeated
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+registerSchema:
+    schema_already_exists:     A schema with this name and version already exists | use evolveSchema instead
+    unsupported_format:        Serialization format is not supported | use json, protobuf, avro, msgpack, or yaml
+    invalid_schema:            Schema definition failed validation | fix SchemaField entries
+
+  evolveSchema:
+    compatibility_violation:   Schema evolution violates the declared compatibility mode | adjust changes or relax mode
+    field_number_conflict:     Protobuf field number reused after removal | mark removed field as reserved
+    schema_not_found:          Base schema version not found | verify schema name and version
+
+  validateCompatibility:
+    schemas_not_comparable:    The two schemas are for different formats or unrelated | ensure same format and name
+
+  migrateDocument:
+    migration_not_supported:   Migration path from source to target version is not defined | ensure direct path exists
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -73,12 +90,77 @@ registerSchema     -> serialization.schema.registered  { name, version, format }
 ```
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Schema version retention:
+    duration:       indefinite (schemas are immutable once registered)
+    on_expiry:      N/A -- schemas are never deleted, only deprecated
+
+  Schema deprecation grace period:
+    default:        90 days
+    on_expiry:      deprecated schema may be removed from active registry; existing data remains readable
+
+  Compatibility cache TTL:
+    default:        5 minutes
+    on_expiry:      re-validate compatibility on next check
+```
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `data_serialization.<function>`.
-* **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
+* **Telemetry Metrics:**
+```
+gensense_data_serialization_schemas_total        { format }
+  gensense_data_serialization_evolutions_total     { mode, compatible }
+  gensense_data_serialization_validations_total    { mode, result }
+  gensense_data_serialization_migrations_total     { from_format, to_format }
+  gensense_data_serialization_validation_duration_ms histogram
+```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Storage Model
+* **Model:** Strongly consistent schema registry with immutable version history.
+* **Details:** Schema definitions are immutable once registered; each evolution creates a new version. The registry must support point-in-time queries for any schema version.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE serialization_format AS ENUM ('json', 'protobuf', 'avro', 'msgpack', 'yaml');
+CREATE TYPE compatibility_mode AS ENUM ('backward', 'forward', 'full', 'none');
+
+CREATE TABLE serialization_schemas (
+  name              TEXT NOT NULL,
+  version           INT NOT NULL,
+  format            serialization_format NOT NULL,
+  fields            JSONB NOT NULL,
+  compatibility_mode compatibility_mode NOT NULL DEFAULT 'backward',
+  checksum          TEXT NOT NULL,
+  deprecated        BOOLEAN NOT NULL DEFAULT false,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (name, version)
+);
+
+CREATE INDEX idx_serialization_schemas_name ON serialization_schemas(name, version DESC);
+
+CREATE TABLE serialization_reserved_field_numbers (
+  schema_name   TEXT NOT NULL,
+  version       INT NOT NULL,
+  field_number  INT NOT NULL,
+  PRIMARY KEY (schema_name, version, field_number),
+  FOREIGN KEY (schema_name, version) REFERENCES serialization_schemas(name, version)
+);
+
+CREATE TABLE serialization_compatibility_cache (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  schema_name     TEXT NOT NULL,
+  from_version    INT NOT NULL,
+  to_version      INT NOT NULL,
+  mode            compatibility_mode NOT NULL,
+  compatible      BOOLEAN NOT NULL,
+  issues          JSONB NOT NULL DEFAULT '[]',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at      TIMESTAMPTZ NOT NULL DEFAULT now() + INTERVAL '5 minutes'
+);
+```
 
 ### Module Dependencies
 * **Depends On:** (none)

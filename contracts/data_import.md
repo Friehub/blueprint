@@ -196,17 +196,149 @@ type GetImportErrorsInput = {
 
 ---
 
-## System-Level Integrations
+## System-Level Integrations & Constraints
 
-- **Idempotency:** Each import job is a unique entity; idempotency at the row level is enforced by the `onDuplicate` policy passed to the target domain operation.
-- **Consistency:** Parse, validate, and commit phases run as separate async jobs dispatched via `queues`; each phase transition must be durably written before the next phase begins.
-- **Runtime delivery:** Phase jobs are delivered `at_least_once`; parse and commit workers must tolerate duplicate execution and use durable phase markers.
-- **Worker scaling:** Parse, validation, and commit workers must be independently scalable because their resource profiles differ.
-- **Multi-region:** The deployment must declare whether import processing is single-region or active/passive; duplicate phase pickup across regions must be deduplicated.
-- **Observability:** Each import job is a trace root. Phase transitions are spans annotated with row counts and error rates. The `commitImport` span must link to child spans for each batch write to the target domain.
-- **Backpressure:** If async phase capacity is saturated, new phase work must be deferred or rejected predictably rather than enqueued without bound.
-- **Dead-letter handling:** Parse or commit work that exhausts retry policy must be retained in an operator-queryable failed state with the original file reference and phase metadata.
-- **Storage model:** Uploaded files live in object storage; import state and row error history must remain durable until the terminal retention window expires.
-- **Dependencies:** `storage` (file upload and retention), `queues` (async phase execution), `jobs` (phase timeout enforcement), `reporting` (error report generation), `auth` (upload URL signing).
-- **Errors:** `IMPORT_NOT_FOUND`, `IMPORT_NOT_READY`, `IMPORT_NOT_ABORTABLE`, `UPLOAD_URL_EXPIRED`, `FILE_TOO_LARGE`, `UNSUPPORTED_FORMAT`, `SCHEMA_MISMATCH`, `NO_ERRORS_TO_REPORT`.
-- **Providers (adapter examples):** Custom implementation backed by S3/GCS presigned URLs, AWS Glue (ETL), Flatfile.com, Airbyte (for data pipeline imports), Papa Parse (client-side parse layer reference).
+### Consistency Model
+* **Model:** `strong (default)`
+* **Details:** Import job state must be immediately consistent; phase transitions are ACID
+
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for phase job delivery.
+* **Details:** Parse and commit workers must tolerate duplicate execution and use durable phase markers.
+
+### Worker Scaling
+* **Policy:** Parse, validation, and commit workers must be independently scalable because their resource profiles differ.
+
+### Multi-Region Behavior
+* **Mode:** The deployment must declare whether import processing is single-region or active/passive.
+* **Details:** Duplicate phase pickup across regions must be deduplicated.
+
+### Idempotency Requirements
+* **Standard:** Each import job is a unique entity; idempotency at the row level is enforced by the `onDuplicate` policy passed to the target domain operation.
+
+### Backpressure
+* If async phase capacity is saturated, new phase work must be deferred or rejected predictably rather than enqueued without bound.
+
+### Error Taxonomy
+### Module-Specific Errors
+```
+createImport:
+    unsupported_format:        File format is not supported | use CSV, TSV, XLSX, JSON, or NDJSON
+    file_too_large:            File exceeds maximum allowed size | reduce file size or split into batches
+    schema_mismatch:           Provided schema does not match the target module's expected schema | fix column mappings
+
+  confirmUpload:
+    upload_url_expired:        Presigned upload URL has expired | create a new import job
+    import_not_found:          No import job with that ID | verify importId
+
+  commitImport:
+    import_not_ready:          Import is not in VALIDATED state | wait for validation to complete
+    import_not_abortable:      Import is already in COMMITTING state | wait for completion
+
+  downloadErrorReport:
+    no_errors_to_report:       Import completed with zero errors | no report available
+```
+
+### Event Emission
+All events are emitted using at-least-once delivery with UUID v4 envelope.
+```
+createImport         → import.created                { import_id, target_module, format }
+  confirmUpload       → import.uploaded                { import_id }
+  ─                   → import.parsing.started         { import_id }
+  ─                   → import.parsing.completed       { import_id, total_rows }
+  ─                   → import.validation.started      { import_id }
+  ─                   → import.validation.completed    { import_id, valid_rows, error_rows }
+  ─                   → import.invalid                 { import_id, error_rate }
+  commitImport        → import.committed               { import_id, committed_rows }
+  ─                   → import.partially_committed     { import_id, committed_rows, failed_rows }
+  ─                   → import.failed                  { import_id, reason }
+  abortImport         → import.aborted                 { import_id }
+```
+
+### Temporal Constraints
+```
+Upload URL expiry:
+    duration:       1 hour from createImport
+    on_expiry:      caller must create a new import job
+
+  Retry policy for phase workers:
+    max_attempts:   3
+    backoff:        exponential, 30s initial
+
+  File retention after terminal state:
+    duration:       7 days
+    on_expiry:      delete from object storage
+```
+
+### Storage Model
+* **Model:** Durable import job state with object-storage-backed file uploads.
+* **Details:** Import job records and row error history are persisted in a strongly consistent store. Uploaded files live in object storage.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE import_status AS ENUM (
+  'UPLOADING', 'UPLOADED', 'PARSING', 'PARSED',
+  'VALIDATING', 'VALIDATED', 'INVALID',
+  'COMMITTING', 'COMMITTED', 'PARTIALLY_COMMITTED',
+  'ABORTED', 'FAILED'
+);
+
+CREATE TABLE data_import_jobs (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  target_module     TEXT NOT NULL,
+  target_operation  TEXT NOT NULL,
+  format            TEXT NOT NULL CHECK (format IN ('CSV', 'TSV', 'XLSX', 'JSON', 'NDJSON')),
+  status            import_status NOT NULL DEFAULT 'UPLOADING',
+  schema_def        JSONB NOT NULL,
+  file_name         TEXT,
+  file_size_bytes   BIGINT,
+  total_rows        INT,
+  valid_rows        INT,
+  error_rows        INT,
+  committed_rows    INT,
+  failed_rows       INT,
+  upload_url        TEXT,
+  error_report_url  TEXT,
+  requested_by      UUID NOT NULL,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  completed_at      TIMESTAMPTZ
+);
+
+CREATE INDEX idx_import_status ON data_import_jobs(status) WHERE status NOT IN ('COMMITTED', 'ABORTED', 'FAILED');
+CREATE INDEX idx_import_target ON data_import_jobs(target_module, created_at DESC);
+
+CREATE TABLE data_import_errors (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  import_id       UUID NOT NULL REFERENCES data_import_jobs(id) ON DELETE CASCADE,
+  row_index       INT NOT NULL,
+  phase           TEXT NOT NULL CHECK (phase IN ('PARSING', 'VALIDATION', 'COMMIT')),
+  field           TEXT,
+  error_code      TEXT NOT NULL,
+  error_message   TEXT NOT NULL,
+  raw_value       TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_import_errors_job ON data_import_errors(import_id, row_index);
+```
+
+### Observability
+* **Tracing Spans:** Each import job is a trace root. Phase transitions are spans annotated with row counts and error rates. The `commitImport` span must link to child spans for each batch write to the target domain.
+* **Telemetry Metrics:**
+```
+gensense_data_import_jobs_total                 { target_module, status }
+  gensense_data_import_rows_processed_total      { phase, result }
+  gensense_data_import_phase_duration_ms          histogram { phase }
+  gensense_data_import_file_size_bytes             histogram { format }
+```
+* **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Module Dependencies
+* **Depends On:** storage (file upload and retention), queues (async phase execution), jobs (phase timeout enforcement), reporting (error report generation), auth (upload URL signing)
+* **Emits To:** events
+* **Recommends:** notifications, audit_log
+
+### Providers
+Custom implementation backed by S3/GCS presigned URLs, AWS Glue (ETL), Flatfile.com, Airbyte (for data pipeline imports), Papa Parse (client-side parse layer reference).

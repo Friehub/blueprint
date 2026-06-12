@@ -67,7 +67,24 @@ ReadModelField { name, type, indexed, source_event, source_field }
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+executeCommand:
+    concurrency_conflict:      Expected version does not match write model version | retry with latest version
+    command_not_found:         No handler registered for this command type | verify command_type
+    handler_rejected:          Command handler rejected the command | check error details
+    command_timeout:           Command execution exceeded timeout | command state is indeterminate
+
+  executeQuery:
+    query_not_found:           No handler registered for this query type | verify query_type
+
+  synchronizeModel:
+    projection_not_found:      No projection found for the given projection_id | verify projection_id
+    drift_detected:            Write model and read model are out of sync beyond acceptable threshold | trigger full rebuild
+
+  defineReadModel:
+    model_already_exists:      Read model with this name already exists | use update or different name
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -98,6 +115,42 @@ gensense_cqrs_commands_executed_total          { command_type, result }
   gensense_cqrs_synchronization_duration_ms        histogram { model_name }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Storage Model
+* **Model:** Strongly consistent write model (command side); eventually consistent read model (query side).
+* **Details:** The write model is backed by an ACID-compliant store with optimistic concurrency. The read model is a denormalized projection built asynchronously from the event stream.
+
+### Database Schema
+
+#### PostgreSQL (Write Model)
+```sql
+CREATE TABLE cqrs_command_store (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  command_type    TEXT NOT NULL,
+  payload         JSONB NOT NULL,
+  metadata        JSONB NOT NULL DEFAULT '{}',
+  expected_version INT,
+  result          JSONB,
+  error           TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE cqrs_read_models (
+  name            TEXT PRIMARY KEY,
+  projection_id   TEXT NOT NULL,
+  schema_def      JSONB NOT NULL,
+  status          TEXT NOT NULL DEFAULT 'syncing' CHECK (status IN ('syncing', 'active', 'stale')),
+  last_synced_at  TIMESTAMPTZ,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE cqrs_projection_offsets (
+  projection_id   TEXT PRIMARY KEY,
+  last_event_id   UUID NOT NULL,
+  last_version    BIGINT NOT NULL,
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
 
 ### Module Dependencies
 * **Depends On:** event_sourcing

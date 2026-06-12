@@ -102,6 +102,42 @@ Transfer (clearing state):
 * **Model:** Durable transfer state store with settlement history.
 * **Details:** Clearing and settlement records must remain queryable for audit and reconciliation.
 
+### Distributed System Patterns
+
+**Saga: Transfer Flow (initiate → clear → settle)**
+
+This saga orchestrates the multi-step transfer flow. If any step fails, compensating actions are executed in reverse order.
+
+```
+Step 1: reserveFunds(source_account_id, amount)
+    Action: Debit ledger source account (pending state)
+    Compensate: releaseFunds(source_account_id, amount) — reverse the pending debit
+    Error: insufficient_balance → abort saga, return error
+
+Step 2: validateRouting(routing_details)
+    Action: Verify destination routing against bank directory
+    Compensate: none (read-only validation)
+    Error: invalid_counterparty → abort saga, execute compensate(Step 1)
+
+Step 3: submitToClearing(transfer_id, routing_details, amount)
+    Action: Submit to external clearing network (ACH/Wire/SEPA adapter)
+    Compensate: cancelClearingSubmission(transfer_id) — request cancellation from clearing network
+    Error: compliance_blocked → abort saga, execute compensate(Step 1)
+
+Step 4: confirmSettlement(transfer_id, reference)
+    Action: Final debit source account, credit destination account, mark settled
+    Compensate: reverseSettlement(transfer_id) — post compensating ledger entry
+    Error: settlement_failed → execute compensate(Step 3 → Step 1)
+```
+
+**Idempotency table:**
+- `initiateTransfer`: idempotency key retained 7 days
+- `transitionTransferStatus`: idempotent on `(transfer_id, to_status)` — duplicate transition to same status is a no-op
+
+**Outbox pattern:**
+- Transfer lifecycle events are written to an outbox table in the same transaction as the state change
+- A separate dispatcher reads the outbox and publishes to the event bus
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `transfers.<function>`.
 * **Telemetry Metrics:**
@@ -111,6 +147,19 @@ gensense_transfers_volume_cents             counter { method }
 gensense_transfers_clearing_duration_sec    histogram { method }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** ledger

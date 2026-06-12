@@ -116,6 +116,47 @@ gensense_content_safety_checks_total            { policy, result }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Storage Model
+* **Model:** Strongly consistent violation and appeal record store.
+* **Details:** Violation reports, moderation history, and appeals must be durably persisted for audit. Classification results may be cached ephemerally with a TTL.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE violation_status AS ENUM ('open', 'under_review', 'resolved', 'appealed');
+CREATE TYPE violation_source AS ENUM ('automated', 'user', 'reviewer');
+CREATE TYPE appeal_status AS ENUM ('pending', 'approved', 'rejected');
+
+CREATE TABLE content_safety_violations (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  content_id      TEXT NOT NULL,
+  content_type    TEXT NOT NULL,
+  reason          TEXT NOT NULL,
+  category        TEXT NOT NULL,
+  source          violation_source NOT NULL,
+  status          violation_status NOT NULL DEFAULT 'open',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_safety_violations_status ON content_safety_violations(status) WHERE status IN ('open', 'under_review');
+CREATE INDEX idx_safety_violations_content ON content_safety_violations(content_id);
+
+CREATE TABLE content_safety_appeals (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  violation_id    UUID NOT NULL REFERENCES content_safety_violations(id) ON DELETE CASCADE,
+  reason          TEXT NOT NULL,
+  evidence        TEXT,
+  status          appeal_status NOT NULL DEFAULT 'pending',
+  reviewer        TEXT,
+  resolution_note TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  resolved_at     TIMESTAMPTZ
+);
+
+CREATE INDEX idx_safety_appeals_status ON content_safety_appeals(status) WHERE status = 'pending';
+```
+
 ### Module Dependencies
 * **Depends On:** moderation
 * **Emits To:** events

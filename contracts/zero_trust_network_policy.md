@@ -123,6 +123,20 @@ The `zero_trust_network_policy` module enforces identity verification using the 
 
 The `service_mesh` module declares these parameters in its deployment configuration. This module reads them at startup and caches them for the lifetime of the process. Configuration changes must be picked up on the next restart.
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Identity store unreachable | Deny by default; return no_trust_policy error; log to audit_log |
+| Certificate rotation failure | Old certificate remains valid during grace period; alert operator |
+| Cache stale (identity revoked but cache not yet expired) | Maximum stale window is cache TTL (default 60s); revocation event busts cache |
+| mTLS handshake failure | Return identity verification failure with reason; log to audit_log |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** service_mesh
 * **Emits To:** events

@@ -59,6 +59,22 @@ SDKOptions { package_name?, namespace?, include_tests?, include_docs?, http_clie
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
+### Storage Model
+* **Model:** File-system or object-storage (S3, GCS) for generated SDK packages. Relational database for SDK metadata.
+* **Details:**
+```sql
+CREATE TABLE sdk_packages (
+    id              UUID PRIMARY KEY,
+    api_spec        TEXT NOT NULL,
+    language        TEXT NOT NULL,
+    version         TEXT NOT NULL,
+    status          TEXT NOT NULL DEFAULT 'generated'
+                        CHECK (status IN ('generated', 'published', 'deprecated')),
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (api_spec, language, version)
+);
+```
+
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
 

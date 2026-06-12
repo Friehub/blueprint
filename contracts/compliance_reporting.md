@@ -100,6 +100,57 @@ gensense_compliance_reporting_reports_total           { framework, status }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Storage Model
+* **Model:** Strongly consistent report configuration store with append-only evidence history.
+* **Details:** Report templates, control mappings, and generated reports must be durably persisted. Evidence bundles are append-only and subject to multi-year retention requirements.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE report_status AS ENUM ('generating', 'completed', 'failed');
+CREATE TYPE control_status AS ENUM ('compliant', 'non_compliant', 'not_evidenced', 'exempt');
+
+CREATE TABLE compliance_report_templates (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            TEXT NOT NULL,
+  framework       TEXT NOT NULL,
+  format          TEXT NOT NULL DEFAULT 'pdf',
+  controls        JSONB NOT NULL,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE compliance_reports (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  template_id     UUID NOT NULL REFERENCES compliance_report_templates(id),
+  period          TSTZRANGE NOT NULL,
+  status          report_status NOT NULL DEFAULT 'generating',
+  controls        JSONB NOT NULL DEFAULT '[]',
+  generated_at    TIMESTAMPTZ,
+  EXCLUDE USING gist (template_id WITH =, period WITH &&)
+);
+
+CREATE INDEX idx_compliance_reports_template ON compliance_reports(template_id);
+
+CREATE TABLE compliance_control_mappings (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  control_id      TEXT NOT NULL,
+  evidence_source TEXT NOT NULL,
+  query           TEXT NOT NULL,
+  last_validated  TIMESTAMPTZ,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE compliance_evidence (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  control_id      TEXT NOT NULL,
+  report_id       UUID NOT NULL REFERENCES compliance_reports(id) ON DELETE CASCADE,
+  period          TSTZRANGE NOT NULL,
+  data            JSONB NOT NULL,
+  collected_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
 ### Module Dependencies
 * **Depends On:** audit_log
 * **Emits To:** events

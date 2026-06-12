@@ -71,7 +71,52 @@ A function returning `PaginatedResult<T>` with no results must return `{ data: [
 
 ---
 
-## 4. Event Envelope & Delivery Guarantee
+## 4. Tenancy Standard
+
+These rules apply to every module that stores tenant-scoped data. A module is tenant-scoped if it depends on the `tenants` module or if any of its data is logically partitioned by customer.
+
+### Tenant ID Convention
+
+Every tenant-scoped entity must carry a `tenant_id` column as a foreign key to the `tenants` table. The column must be `NOT NULL` and must be the first column in every primary key or unique constraint that includes it.
+
+```sql
+tenant_id UUID NOT NULL REFERENCES tenants(id)
+```
+
+### Row-Level Security
+
+Tenant-scoped tables must implement Row-Level Security (RLS) in PostgreSQL. The policy must filter by `tenant_id`:
+
+```sql
+ALTER TABLE <table_name> ENABLE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON <table_name>
+  USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
+```
+
+The `current_setting('app.current_tenant_id')` is set by the application at request start and must be immutable for the duration of the request.
+
+### Cross-Tenant Data Isolation
+
+- A function operating on tenant-scoped data must never return data from a tenant other than the caller's tenant.
+- Batch operations that iterate across tenants (admin tools, maintenance jobs) must declare an explicit cross-tenant scope and be logged in `audit_log`.
+- Cross-tenant referential integrity is not permitted unless the referenced entity is a shared global entity (e.g., system-level roles, public settings).
+
+### Tenant Context Propagation
+
+Every tenant-scoped function must accept an implicit or explicit `tenant_id` context. The context may be:
+1. Extracted from the authentication token (JWT claim, API key binding)
+2. Passed as a request header (`X-Tenant-ID`)
+3. Inferred from a subdomain or path prefix
+
+The module must document which propagation mechanism it supports.
+
+### Default Behaviour
+
+If a module does not declare an explicit exception, all its state-mutating functions are assumed to be tenant-scoped when the `tenants` module is in the resolved module set. Generated schemas add `tenant_id` and RLS by default.
+
+---
+
+## 5. Event Envelope & Delivery Guarantee
 
 All events share a common envelope regardless of module.
 
@@ -104,7 +149,7 @@ All required data must be in the event payload to prevent secondary lookup cycle
 
 ---
 
-## 5. Observability Standards
+## 6. Observability Standards
 
 ### Distributed Tracing Convention
 Every function call creates a span. Span names follow the pattern `<module>.<function>`. Spans must be children of the incoming request span when one exists.
@@ -151,7 +196,7 @@ The prohibited fields list above applies to structured logs. It must also be enf
 
 ---
 
-## 6. Deployment Order
+## 7. Deployment Order
 
 From the dependency graph, the safe deployment order is:
 
@@ -180,7 +225,7 @@ Tier 5 (depends on Tier 0-4):
 
 ---
 
-## 7. Contract Evolution Rules
+## 8. Contract Evolution Rules
 
 Contract versions follow semantic versioning (`MAJOR.MINOR.PATCH`).
 - **PATCH**: Clarifications, formatting. No update to adapters needed.
@@ -201,39 +246,39 @@ export const metadata = {
 
 ---
 
-## 8. Transport Security
+## 9. Transport Security
 
 These requirements are inherited by every module in the catalog unless a specific exception is declared in the module's system-level integrations section.
 
-### 8.1 TLS Requirement
+### 9.1 TLS Requirement
 
 All external-facing endpoints must be served exclusively over TLS 1.2 or higher. TLS 1.0 and 1.1 are not permitted. Connections received without TLS must either be rejected outright or redirected to the HTTPS counterpart with a `301 Moved Permanently` status.
 
-### 8.2 Cipher Requirements
+### 9.2 Cipher Requirements
 
 Implementations must support only ciphers that provide forward secrecy (ECDHE or DHE key exchange). Ciphers using static RSA key exchange, NULL encryption, or RC4 are not permitted.
 
-### 8.3 Inter-Service Communication
+### 9.3 Inter-Service Communication
 
 All communication between services within the same deployment must use TLS. Mutual TLS (mTLS) is strongly recommended and is required for any service that handles PII, financial data, or authentication tokens on behalf of another service.
 
 Where mTLS is not feasible (proxied environments, sidecar termination), the module must declare the mechanism by which service identity is verified (header-based tokens, network policy, or workload identity).
 
-### 8.4 HSTS
+### 9.4 HSTS
 
 Every browser-facing endpoint must send the `Strict-Transport-Security` header with a minimum `max-age` of 31536000 seconds (1 year) and the `includeSubDomains` directive. The `preload` directive should be included if the domain is submitted to browser preload lists.
 
 API-only endpoints that are never consumed by browsers are exempt from the HSTS requirement but must still serve over TLS.
 
-### 8.5 Certificate Requirements
+### 9.5 Certificate Requirements
 
 Certificates must be issued by a trusted public Certificate Authority or, for internal services, by an internal CA whose root is distributed to all services in the deployment. Self-signed certificates are permitted only for development and test environments.
 
-### 8.6 Exception Process
+### 9.6 Exception Process
 
 ---
 
-## 11. CSRF Protection
+## 12. CSRF Protection
 
 CSRF protection is a universal requirement for all state-mutating functions that are callable via a browser session. Every module that exposes such functions must implement either the synchronizer token pattern or the double-submit cookie pattern.
 
@@ -243,17 +288,17 @@ The double-submit cookie pattern: the server sets a cryptographically random tok
 
 Both patterns require that the token be at least 128 bits of entropy, bound to the issuing session, and invalidated on session expiry or revocation. Modules may declare an exception in their system-level integrations section if they are never consumed by browsers (API-only endpoints).
 
-## 12. Deployment Permissions
+## 13. Deployment Permissions
 
-### 11.1 Service Identity Isolation
+### 13.1 Service Identity Isolation
 
 Each module must have its own service identity and must not share credentials with other modules. Service identities must be scoped to the module's own data stores and resources.
 
-### 11.2 Credential Separation
+### 13.2 Credential Separation
 
 Each module's service identity must have access only to the data stores it owns. Modules must not have write access to tables or buckets owned by other modules even if they have read access for cross-module queries.
 
-### 11.3 Minimum Permission Declaration
+### 13.3 Minimum Permission Declaration
 
 The deployment documentation for each module must declare the minimum permission set required: which databases, queues, caches, and external services the module needs access to, and whether each access is read or write. A module that fails to declare its permission set must be denied by default at deployment time.
 
@@ -268,7 +313,7 @@ Exceptions must have a defined expiry and cannot be permanent.
 
 ---
 
-## 9. Request Validation
+## 10. Request Validation
 
 The `request_validation` module defines universal payload validation requirements. Every module that accepts external input inherits the following by default:
 
@@ -281,7 +326,7 @@ Modules may declare exceptions in their system-level integrations section with a
 
 ---
 
-## 10. Brute Force Protection
+## 11. Brute Force Protection
 
 These requirements apply universally to every credential-checking function across all modules. A credential-checking function is any function that accepts a secret or token and returns a boolean pass/fail decision that gates access to a protected resource. This includes but is not limited to: password verification, API key validation, TOTP verification, recovery code use, backup code use, and password reset token submission.
 

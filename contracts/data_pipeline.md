@@ -66,7 +66,29 @@ PipelineConfig { timeout?, notifications?, concurrency?, error_handling: abort|s
 * If a destination is saturated, the pipeline must apply backpressure upstream rather than queuing records in memory.
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+definePipeline:
+    pipeline_already_exists:   A pipeline with this name already exists | use a different name
+    invalid_stage_definition:  Stage definition has missing or invalid fields | fix StageDef entries
+
+  runPipeline:
+    pipeline_not_found:        No pipeline with that ID | verify pipeline_id
+    pipeline_paused:           Pipeline is paused | resume before running
+    run_already_in_progress:   A run is already in progress for this pipeline | wait for completion
+
+  retryStage:
+    run_not_found:             No run with that ID | verify run_id
+    stage_not_failed:          Stage did not fail; only failed stages can be retried | check stage status
+    max_retries_exceeded:      Stage has exhausted its retry policy | manual intervention required
+
+  pausePipeline:
+    already_paused:            Pipeline is already paused | no action needed
+
+  deletePipeline:
+    pipeline_not_found:        No pipeline with that ID | verify pipeline_id
+    pipeline_has_active_runs:  Pipeline has active runs | stop runs before deleting
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -98,6 +120,55 @@ gensense_data_pipeline_runs_total              { status }
   gensense_data_pipeline_records_processed_total  { pipeline_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Storage Model
+* **Model:** Strongly consistent pipeline definition and run state store with append-only run history.
+* **Details:** Pipeline definitions and active run state must be immediately consistent. Run history is append-only for audit and retry purposes.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE pipeline_status AS ENUM ('active', 'paused', 'inactive');
+CREATE TYPE pipeline_run_status AS ENUM ('running', 'completed', 'failed', 'partial');
+CREATE TYPE stage_type AS ENUM ('extract', 'transform', 'load');
+
+CREATE TABLE data_pipelines (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            TEXT NOT NULL UNIQUE,
+  stages          JSONB NOT NULL,
+  schedule        TEXT,
+  status          pipeline_status NOT NULL DEFAULT 'active',
+  config          JSONB NOT NULL DEFAULT '{}',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE data_pipeline_runs (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pipeline_id     UUID NOT NULL REFERENCES data_pipelines(id) ON DELETE CASCADE,
+  status          pipeline_run_status NOT NULL DEFAULT 'running',
+  started_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  completed_at    TIMESTAMPTZ,
+  duration_ms     BIGINT
+);
+
+CREATE INDEX idx_pipeline_runs_pipeline ON data_pipeline_runs(pipeline_id, started_at DESC);
+CREATE INDEX idx_pipeline_runs_status ON data_pipeline_runs(status) WHERE status = 'running';
+
+CREATE TABLE data_pipeline_stage_runs (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  run_id          UUID NOT NULL REFERENCES data_pipeline_runs(id) ON DELETE CASCADE,
+  stage_name      TEXT NOT NULL,
+  stage_type      stage_type NOT NULL,
+  status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'running', 'completed', 'failed', 'skipped')),
+  started_at      TIMESTAMPTZ,
+  duration_ms     BIGINT,
+  records_processed BIGINT DEFAULT 0,
+  error           TEXT
+);
+
+CREATE INDEX idx_pipeline_stage_runs_run ON data_pipeline_stage_runs(run_id);
+```
 
 ### Module Dependencies
 * **Depends On:** (none)

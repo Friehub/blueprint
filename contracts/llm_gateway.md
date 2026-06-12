@@ -116,6 +116,22 @@ gensense_llm_gateway_requests_total           { model, provider, status }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| All models unavailable | Return model_unavailable with estimated retry time and available fallback list |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+| Content filter triggered | Return content_filtered error; log filter category for audit |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new model capability: non-breaking if consumers use capability detection; breaking otherwise
+- Changing token counting algorithm: breaking — may affect cost estimates and usage tracking
+
 ### Module Dependencies
 * **Depends On:** content_safety
 * **Emits To:** events

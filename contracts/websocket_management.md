@@ -92,6 +92,32 @@ Heartbeat interval:
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `websocket_management.<function>`.
+* **Telemetry Metrics:**
+```
+gensense_websocket_management_operation_total           counter { function, result: success|failure }
+gensense_websocket_management_operation_duration_ms     histogram { function, p50, p95, p99 }
+gensense_websocket_management_errors_total              counter { function, error_code }
+gensense_websocket_management_connections_total         gauge { status: active|closed }
+gensense_websocket_management_messages_sent_total       counter { room_id }
+gensense_websocket_management_messages_dropped_total    counter { reason }
+gensense_websocket_management_rooms_active              gauge
+gensense_websocket_management_connection_duration_ms    histogram
+```
+* **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Connection send buffer full | Close connection with `going_away` code; increment dropped counter |
+| Room not found for broadcast | Return NotFound; no event emitted |
+| Backend pub-sub unavailable | Fall back to direct in-memory broadcast; log warning |
+| Cross-region bridge unavailable | Broadcast to local connections only; queue cross-region delivery for retry |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** (none)

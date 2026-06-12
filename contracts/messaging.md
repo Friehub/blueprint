@@ -12,7 +12,7 @@ Threaded conversation between users or entities.
 createThread(participants, metadata?) → Thread
 getThread(thread_id) → Thread
 getThreads(user_id, options?) → PaginatedResult<Thread>
-sendMessage(thread_id, sender_id, content) → Message
+sendMessage(thread_id, sender_id, content, reply_to_id?, attachments?, client_id?) → Message
 getMessages(thread_id, options?) → PaginatedResult<Message>
 editMessage(message_id, content) → Message
 deleteMessage(message_id) → void
@@ -32,6 +32,9 @@ MessageContent { type: text | image | file | system, body, attachments? }
 **Invariants**
 - Deleted messages must show a tombstone, not disappear -- the thread history must remain intact
 - A user cannot send a message to a thread they are not a participant of
+- Messages within a thread must have monotonically increasing sequence numbers. Sequence numbers are assigned at persist time and are immutable.
+- `client_id` prevents duplicate optimistic sends: if a message with the same `(thread_id, client_id)` exists, return the existing message instead of creating a duplicate
+- `reply_to_id` must reference an existing message in the same thread; referencing a deleted message is allowed (preserves thread context)
 
 **Providers:** custom database, Stream Chat, Sendbird
 
@@ -67,7 +70,15 @@ MessageContent { type: text | image | file | system, body, attachments? }
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
-* None explicitly defined. Custom events must use the canonical domain envelope.
+```
+sendMessage          → messaging.message.sent           { message_id, thread_id, sender_id, content_type }
+editMessage          → messaging.message.edited          { message_id, thread_id, edit_count }
+deleteMessage        → messaging.message.deleted         { message_id, thread_id }
+markRead             → messaging.thread.read             { thread_id, user_id, last_read_at }
+createThread         → messaging.thread.created          { thread_id, participant_ids }
+addParticipant       → messaging.participant.added       { thread_id, user_id }
+removeParticipant    → messaging.participant.removed     { thread_id, user_id }
+```
 
 ### Temporal Constraints
 ```
@@ -83,14 +94,85 @@ Message retention:
 ### Dead-Letter Handling
 * Failed outbound or relay attempts that exhaust retries must remain queryable in a failed store.
 
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE messaging_threads (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title         TEXT,
+  metadata      JSONB DEFAULT '{}',
+  last_message_at TIMESTAMPTZ,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_threads_updated ON messaging_threads(updated_at DESC);
+
+CREATE TABLE messaging_participants (
+  thread_id   UUID NOT NULL REFERENCES messaging_threads(id) ON DELETE CASCADE,
+  user_id     UUID NOT NULL,
+  joined_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  left_at     TIMESTAMPTZ,
+  PRIMARY KEY (thread_id, user_id)
+);
+
+CREATE INDEX idx_participants_user ON messaging_participants(user_id, joined_at DESC);
+
+CREATE TABLE messaging_messages (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  thread_id   UUID NOT NULL REFERENCES messaging_threads(id) ON DELETE CASCADE,
+  sender_id   UUID NOT NULL,
+  content     JSONB NOT NULL,
+  reply_to_id UUID REFERENCES messaging_messages(id),
+  client_id   TEXT,
+  edit_count  INT NOT NULL DEFAULT 0,
+  deleted     BOOLEAN NOT NULL DEFAULT false,
+  sequence    BIGINT NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_messages_thread ON messaging_messages(thread_id, sequence);
+CREATE UNIQUE INDEX idx_messages_client ON messaging_messages(thread_id, client_id) WHERE client_id IS NOT NULL;
+
+CREATE TABLE messaging_read_receipts (
+  thread_id   UUID NOT NULL,
+  user_id     UUID NOT NULL,
+  last_read_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (thread_id, user_id)
+);
+```
+
 ### Storage Model
 * **Model:** Durable conversation store.
 * **Details:** Threads and messages must remain durable and queryable; deleted messages remain as tombstones.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `messaging.<function>`.
-* **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
+* **Telemetry Metrics:**
+```
+gensense_messaging_operation_total       counter { function, result: success|failure }
+gensense_messaging_operation_duration_ms histogram { function, p50, p95, p99 }
+gensense_messaging_errors_total          counter { function, error_code }
+gensense_messaging_sent_total            counter { content_type }
+gensense_messaging_threads_active_total  gauge
+gensense_messaging_unread_total          gauge { user_id? }
+```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** users

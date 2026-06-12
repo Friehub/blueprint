@@ -66,6 +66,45 @@ ABTestResult { test_id, winner: a|b|tie, metrics: { a: MetricSummary, b: MetricS
 ### Backpressure
 * Evaluation runs against LLM backends must use the llm_gateway module and inherit its backpressure behavior.
 
+### Storage Model
+* **Model:** Relational database (PostgreSQL) for prompt versions, templates, and A/B test configurations.
+* **Details:**
+```sql
+CREATE TABLE prompts (
+    id              UUID PRIMARY KEY,
+    name            TEXT NOT NULL UNIQUE,
+    active_version  INT,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE prompt_versions (
+    id              UUID PRIMARY KEY,
+    prompt_id       UUID NOT NULL REFERENCES prompts(id) ON DELETE CASCADE,
+    version         INT NOT NULL,
+    template        TEXT NOT NULL,
+    variables       TEXT[],
+    status          TEXT NOT NULL DEFAULT 'draft'
+                        CHECK (status IN ('draft', 'active', 'deprecated')),
+    change_reason   TEXT,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (prompt_id, version)
+);
+
+CREATE TABLE ab_tests (
+    id              UUID PRIMARY KEY,
+    prompt_id       UUID NOT NULL REFERENCES prompts(id),
+    variant_a_version INT NOT NULL,
+    variant_b_version INT NOT NULL,
+    config          JSONB,
+    status          TEXT NOT NULL DEFAULT 'running'
+                        CHECK (status IN ('running', 'completed')),
+    started_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_prompt_versions_active ON prompt_versions (prompt_id, version) WHERE status = 'active';
+```
+
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
 

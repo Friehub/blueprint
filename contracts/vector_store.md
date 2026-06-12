@@ -98,6 +98,20 @@ gensense_vector_store_collections_total           { status }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Index build failure | Mark collection status as failed; retry on next upsert; increment `gensense_vector_store_index_memory_bytes` error |
+| Search backend timeout | Return Timeout error; caller should retry with simpler query or fewer probes |
+| Dimension mismatch on upsert | Return `dimension_mismatch` error immediately; do not retry without fixing dimension |
+| Collection not ready | Return `collection_not_ready`; caller must wait and retry |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** embeddings
 * **Emits To:** (none)

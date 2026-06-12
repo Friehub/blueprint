@@ -81,6 +81,19 @@ gensense_typing_indicators_active_users_total    { channel }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Presence backend unreachable | Return ProviderError, caller should retry; stale typing state expires via timeout |
+| WebSocket connection lost | Client must reconnect and re-send `startTyping` for active channels |
+| Heartbeat storm (rapid start/stop) | Module must throttle to at most 1 update per 200ms per channel per user |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** presence, messaging
 * **Emits To:** (none -- ephemeral state only)

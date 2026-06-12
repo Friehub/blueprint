@@ -165,6 +165,9 @@ type ValidationResult = {
 6. Constraint validation runs at write time (`setConfig`) and at `validateConfig` time; a value that violates the constraint must be rejected with a `CONSTRAINT_VIOLATION` error.
 7. Namespaces are derived automatically from the key prefix up to the first `.`; they are not independently created.
 8. All changes are append-only records; no change record may be mutated or deleted after creation.
+9. **Schema validation:** Every value written via `setConfig` must be validated against its declared type and `constraints` before persisting. `STRING` values are validated against `pattern` if set. `NUMBER` values are validated against `minValue`/`maxValue`. `JSON` values are validated against `jsonSchema`. Violations return `CONSTRAINT_VIOLATION` with field-level errors.
+10. **Secret references:** A `SECRET` type value may contain a reference string in the format `secret://<provider>/<path>`, e.g. `secret://aws/secretsmanager/payments/api_key`. The reference is resolved at read time by the configured secrets provider. The resolved value must never be cached in the config cache — only the reference string is cached. If the secrets provider is unreachable at read time, the module must return the cached reference (not the cached resolved value) and emit a warning.
+11. **Hot-reload propagation:** When a config value transitions to `APPLIED` state, the module must broadcast an invalidation notification to all running instances via the configured message bus. Instances must refresh their local cache upon receiving the notification. If the broadcast fails, the cache naturally expires within the 5-second staleness window. No service restart is required for any config change — all changes take effect at runtime.
 
 ---
 
@@ -193,4 +196,17 @@ type ValidationResult = {
 - **Storage model:** The source of truth for configuration must be durable; the cache is an acceleration layer only.
 - **Dependencies:** `caching` (hot-path read layer), `queues` or `events` (cache invalidation broadcast), `audit_log` (change history), `approvals` (for keys requiring approval flows), `encryption` (SECRET value storage).
 - **Errors:** `CONFIG_NOT_FOUND`, `CONSTRAINT_VIOLATION`, `TYPE_IMMUTABLE`, `CHANGE_NOT_FOUND`, `CHANGE_NOT_PENDING`, `ROLLBACK_NOT_AVAILABLE`, `APPROVAL_REQUIRED`.
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 - **Providers (adapter examples):** AWS AppConfig, LaunchDarkly (config layer), HashiCorp Consul, etcd, custom PostgreSQL-backed implementation.

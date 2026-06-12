@@ -30,6 +30,9 @@ DataPoint { timestamp, value }
 **Invariants**
 - `trackEvent` must never throw -- analytics must not cause application errors
 - Events must be buffered and sent asynchronously
+- `identifyUser` must merge traits deterministically: later trait values overwrite earlier ones for the same key; arrays are unioned
+- `getFunnel` must return steps in the order provided in the input; a step with zero count must still appear in the result with `conversion_rate: 0`
+- Metric query results must be consistent within a single query: repeated calls with identical `(metric, period, filters)` within the same minute must return identical values
 
 **Providers:** PostHog, Mixpanel, Amplitude, custom ClickHouse
 
@@ -65,7 +68,13 @@ DataPoint { timestamp, value }
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
-* None explicitly defined. Custom events must use the canonical domain envelope.
+```
+trackEvent        → analytics.event.tracked       { event_name, user_id?, properties_summary }
+identifyUser      → analytics.user.identified     { user_id, trait_count }
+trackPageView     → analytics.page_view.tracked    { url, user_id? }
+```
+
+Note: Custom events tracked via `trackEvent` use the caller-defined `event_name` as the event topic suffix. Analytics-internal events (buffer flush, aggregation complete) are emitted to the tracing layer only.
 
 ### Temporal Constraints
 ```
@@ -80,10 +89,61 @@ Buffer retention:
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `analytics.<function>`.
-* **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
+* **Telemetry Metrics:**
+```
+gensense_analytics_operation_total              counter { function, result }
+gensense_analytics_operation_duration_ms        histogram { function }
+gensense_analytics_errors_total                 counter { function, error_code }
+gensense_analytics_events_tracked_total          counter { event_name }
+gensense_analytics_users_identified_total        counter
+gensense_analytics_page_views_tracked_total      counter
+gensense_analytics_queries_total                 counter { query_type }
+gensense_analytics_buffer_flush_size_bytes       histogram
+```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
 * **Depends On:** (none -- fire and forget)
-* **Emits To:** (none)
-* **Recommends:** queues (for buffered ingestion)
+* **Emits To:** events
+* **Recommends:** queues (for buffered ingestion), data_warehouse (for long-term aggregation)
+
+### Database Schema
+
+#### PostgreSQL (Aggregation Cache & User Traits)
+```sql
+CREATE TABLE analytics_user_traits (
+  user_id     UUID NOT NULL,
+  traits      JSONB NOT NULL DEFAULT '{}',
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id)
+);
+
+CREATE TABLE analytics_metric_cache (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  metric          TEXT NOT NULL,
+  period_start    TIMESTAMPTZ NOT NULL,
+  period_end      TIMESTAMPTZ NOT NULL,
+  value           NUMERIC(19,4),
+  series          JSONB DEFAULT '[]',
+  filters_hash    TEXT,
+  computed_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (metric, period_start, period_end, filters_hash)
+);
+
+CREATE INDEX idx_analytics_metric_cache_lookup ON analytics_metric_cache(metric, period_start DESC);
+```
+
+### Breaking Change Policy
+- Adding new metric types or funnel steps is additive and backward-compatible.
+- Removing or renaming an existing metric name requires a MAJOR version bump.
+- Changing the event buffering strategy from async to sync requires a MAJOR version bump.
+- Adding new required fields to `trackEvent` context requires a MINOR version bump (backward-compatible with default).
+
+### Failure Modes
+| Mode | Cause | Mitigation |
+|------|-------|-----------|
+| Event lost during buffer flush | Provider API timeout | Retry with backoff; dead-letter after 3 attempts; trackEvent never throws |
+| User trait merge conflict | Concurrent identifyUser calls | Last-write-wins; trait-level merge not guaranteed under concurrent writes |
+| Metric query timeout | Large period with high cardinality | Return cached/pre-computed result with staleness warning |
+| Provider rate limit | Exceeded provider throughput | Buffer events; apply client-side rate limiting; emit provider_error |
+| Data loss on service restart | In-memory buffer not flushed | Use persistent buffer (Redis or disk); flush on graceful shutdown |

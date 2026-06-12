@@ -110,6 +110,41 @@ gensense_cdc_events_total                     { table, operation }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Storage Model
+* **Model:** WAL-based change stream with durable LSN tracking.
+* **Details:** Stream configuration and LSN offsets persist in the control table; change events are transient in the WAL and must be consumed before slot retention expires.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE cdc_stream_status AS ENUM ('stopped', 'running', 'failed');
+
+CREATE TABLE cdc_streams (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  table_name      TEXT NOT NULL,
+  source_type     TEXT NOT NULL,
+  status          cdc_stream_status NOT NULL DEFAULT 'stopped',
+  lsn             TEXT,
+  slot_name       TEXT,
+  publication     TEXT,
+  config          JSONB NOT NULL DEFAULT '{}',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_cdc_streams_table ON cdc_streams(table_name);
+CREATE INDEX idx_cdc_streams_status ON cdc_streams(status) WHERE status = 'running';
+
+CREATE TABLE cdc_consumer_offsets (
+  stream_id        UUID NOT NULL REFERENCES cdc_streams(id) ON DELETE CASCADE,
+  consumer_group   TEXT NOT NULL,
+  last_processed_lsn TEXT NOT NULL,
+  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (stream_id, consumer_group)
+);
+```
+
 ### Module Dependencies
 * **Depends On:** (none -- reads directly from database WAL)
 * **Emits To:** events, event_bus

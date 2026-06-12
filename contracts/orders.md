@@ -175,6 +175,22 @@ gensense_orders_created_total               { currency }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Inventory reservation failure during checkout | Cancel order; initiate saga compensation for payment |
+| Payment capture failure | Keep order in pending; retry idempotently; escalate after 3 attempts |
+| Concurrent order status transition | Optimistic lock conflict; return order_locked with retry hint |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new OrderStatus enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+- Adding a new PackageStatus enum value: non-breaking if consumers handle unknown statuses gracefully; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** cart, inventory, payments, users
 * **Emits To:** events

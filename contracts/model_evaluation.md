@@ -69,7 +69,19 @@ EvalConfig { model, dataset_id, metrics, split?, max_samples?, timeout? }
 * Evaluation runs against LLM backends must use the llm_gateway module and inherit its backpressure and fallback behavior.
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+runEvaluation:
+    eval_not_found:           Evaluation ID does not exist | verify eval_id
+    eval_already_running:     Evaluation run is already in progress | wait for completion
+    dataset_not_found:        Dataset referenced in evaluation not found | verify dataset_id
+    model_unavailable:        Model is not responding | retry or use fallback model
+
+  detectRegression:
+    no_baseline_set:          No baseline run configured for this evaluation | call setBaseline first
+    baseline_stale:           Baseline run is older than stale threshold (7 days) | run fresh baseline
+    metric_not_found:         Metric not registered for this evaluation | call registerMetric first
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -97,10 +109,28 @@ Evaluation run timeout:
 * **Telemetry Metrics:**
 ```
 gensense_model_evaluation_runs_total           { model, status }
-  gensense_model_evaluation_metric_scores        gauge { model, metric }
-  gensense_model_evaluation_regressions_total    { severity }
+gensense_model_evaluation_metric_scores        gauge { model, metric }
+gensense_model_evaluation_regressions_total    { severity }
+gensense_model_evaluation_run_duration_ms      histogram { model }
+gensense_model_evaluation_active_runs          gauge
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Evaluation timeout exceeded | Mark run as failed with timeout reason |
+| Model returns error during eval | Log error for the sample, continue with remaining samples |
+| Baseline stale | Return baseline_stale warning; regression detection reports degraded confidence |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new metric: non-breaking
+- Changing baseline comparison algorithm: breaking — existing regressions must be re-evaluated
 
 ### Module Dependencies
 * **Depends On:** (none)

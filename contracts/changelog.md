@@ -32,6 +32,9 @@ NotificationResult { entry_id, subscribers_notified, total_subscribers, failed_d
 - A `major` version entry must contain at least one change of type `breaking`
 - Breaking changes must include a migration guide reference before the entry can be published
 - `listEntries` must return entries sorted by version descending (newest first)
+- `recordEntry` for a version that already exists must return `429 Conflict` unless the existing entry is within the 24-hour edit window and the caller is the original author
+- `subscribe` with no `modules` filter must subscribe the user to all module changelogs; subsequent changes to a new module automatically notify the subscriber
+- A `prerelease` entry must not be the latest entry when listing entries without a prerelease filter -- prerelease entries are excluded from the default list
 
 **Providers:** custom, GitHub Releases, Keep a Changelog, changesets, standard-version
 
@@ -94,3 +97,62 @@ gensense_changelog_entries_total               { type }
 * **Depends On:** (none)
 * **Emits To:** events
 * **Recommends:** notifications, developer_portal, email
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE changelog_entries (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  version           TEXT NOT NULL,
+  entry_type        TEXT NOT NULL CHECK (entry_type IN ('major', 'minor', 'patch', 'prerelease')),
+  changes           JSONB NOT NULL DEFAULT '[]',
+  migration_guide   TEXT,
+  published_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (version)
+);
+
+CREATE INDEX idx_changelog_entries_version ON changelog_entries(version DESC);
+CREATE INDEX idx_changelog_entries_published ON changelog_entries(published_at DESC);
+
+CREATE TABLE changelog_subscriptions (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id           UUID NOT NULL,
+  modules           TEXT[],
+  channel           TEXT NOT NULL CHECK (channel IN ('email', 'webhook', 'slack')),
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (user_id, channel)
+);
+
+CREATE INDEX idx_changelog_subscriptions_user ON changelog_subscriptions(user_id);
+
+CREATE TABLE changelog_notification_log (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  entry_id          UUID NOT NULL REFERENCES changelog_entries(id) ON DELETE CASCADE,
+  subscriber_count  INTEGER NOT NULL,
+  delivered_count   INTEGER NOT NULL DEFAULT 0,
+  failed_deliveries UUID[] DEFAULT '{}',
+  sent_at           TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_changelog_notification_entry ON changelog_notification_log(entry_id);
+```
+
+### Storage Model
+* **Model:** Durable changelog entry store with subscription registry.
+* **Details:** Changelog entries are immutable after the 24-hour edit window. Subscriptions are persistent until unsubscribed.
+
+### Breaking Change Policy
+- Adding new entry types or change types is additive and backward-compatible.
+- Removing or renaming an existing entry type requires a MAJOR version bump.
+- Changing the edit window (24 hours) requires a MAJOR version bump.
+- Adding new required fields to `recordEntry` input requires a MAJOR version bump.
+
+### Failure Modes
+| Mode | Cause | Mitigation |
+|------|-------|-----------|
+| Duplicate version entry | Raced recordEntry calls with same version | Enforce UNIQUE on version; second caller receives CONFLICT |
+| Breaking change without migration guide | Operator bypasses validation | Block recordEntry if change type is 'breaking' and migration_guide is null |
+| Notification delivery failure | Subscriber channel unreachable | Retry 3 times; mark as failed in log; surface in NotificationResult |
+| Edit window expired | Entry published > 24 hours ago | Reject edit; inform user to create new patch entry |
+| Prerelease shown in default list | Missing filter in query | Exclude prerelease entries by default; require explicit filter to include |

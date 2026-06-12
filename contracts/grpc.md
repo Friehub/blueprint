@@ -79,11 +79,27 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 * **Telemetry Metrics:**
 ```
 gensense_grpc_requests_total                { service, method, status }
-  gensense_grpc_request_duration_ms          histogram { service, method }
-  gensense_grpc_messages_sent_total           { service, method, type }
-  gensense_grpc_messages_received_total       { service, method, type }
+gensense_grpc_request_duration_ms          histogram { service, method }
+gensense_grpc_messages_sent_total           { service, method, type }
+gensense_grpc_messages_received_total       { service, method, type }
+gensense_grpc_active_streams                gauge { service, method }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Deadline exceeded | Cancel in-flight call, return DEADLINE_EXCEEDED |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+- Renaming a protobuf field number: breaking — deleted fields must be marked as reserved
 
 ### Module Dependencies
 * **Depends On:** (none -- wraps external gRPC library or provider)

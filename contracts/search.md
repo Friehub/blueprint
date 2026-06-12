@@ -13,6 +13,7 @@ indexDocument(index, id, document) → void
 indexBulk(index, documents) → BulkIndexResult
 removeDocument(index, id) → void
 search(index, query, options?) → SearchResult
+multiSearch(queries) → SearchResult[][]
 suggest(index, partial, field, options?) → Suggestion[]
 reindex(index) → ReindexJob
 getIndexStats(index) → IndexStats
@@ -30,6 +31,10 @@ IndexStats { document_count, index_size, last_updated }
 
 **Invariants**
 - `indexDocument` must be idempotent -- re-indexing the same document must update, not duplicate
+- Facet values in `search` must reflect the document state at index time; stale facet counts are acceptable within the index freshness window
+- `multiSearch` must execute all queries within the same index snapshot; results across queries are consistent within a single point-in-time
+- Filter values in `SearchOptions.filters` must use exact match semantics unless a wildcard or range operator is explicitly specified in the filter definition
+- Index freshness SLA: indexed documents must be searchable within `max_lag` seconds (configurable per index, default 30s)
 
 **Providers:** Typesense, Algolia, Meilisearch, Elasticsearch, PostgreSQL full-text
 
@@ -78,6 +83,19 @@ Index freshness:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `search.<function>`.
 * **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** (none -- wraps external provider)

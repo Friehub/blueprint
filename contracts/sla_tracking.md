@@ -95,5 +95,5 @@ gensense_sla_tracking_uptime_pct                gauge { sla_id }
 
 ### Module Dependencies
 * **Depends On:** health, incident_management
-* **Emits To:** events
+* **Emits To:** events, compliance_reporting (SLA evidence feeds compliance reports)
 * **Recommends:** notifications, billing (for credit calculation), reporting, analytics

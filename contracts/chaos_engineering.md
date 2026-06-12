@@ -69,7 +69,21 @@ InjectionResult { experiment_id, failure, injected: bool, error? }
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+runExperiment:
+    steady_state_violation:    Pre-experiment steady state check failed | fix system health before retry
+    experiment_not_found:      No experiment with that ID | verify experiment_id
+    blast_radius_exceeded:     Experiment targets services outside declared blast radius | narrow experiment scope
+
+  stopExperiment:
+    run_not_found:             No active run for the given run_id | verify run_id
+    already_stopped:           Experiment run already stopped | no action needed
+
+  injectFailure:
+    failure_type_unsupported:  The provider does not support this failure type | use a supported type
+    duration_exceeds_limit:    Requested duration exceeds max of 5 minutes | reduce duration
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -107,6 +121,39 @@ gensense_chaos_engineering_experiments_total       { status }
   gensense_chaos_engineering_rollbacks_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Storage Model
+* **Model:** Strongly consistent experiment state store with append-only run history.
+* **Details:** Experiment definitions, run state, and failure injection results must be durably persisted.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE experiment_status AS ENUM ('draft', 'scheduled', 'running', 'completed', 'rolled_back', 'failed');
+
+CREATE TABLE chaos_experiments (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            TEXT NOT NULL,
+  hypothesis      TEXT NOT NULL,
+  blast_radius    JSONB NOT NULL DEFAULT '{}',
+  allowed_impact  TEXT NOT NULL DEFAULT 'low' CHECK (allowed_impact IN ('low', 'medium', 'high')),
+  status          experiment_status NOT NULL DEFAULT 'draft',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE chaos_experiment_runs (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  experiment_id   UUID NOT NULL REFERENCES chaos_experiments(id) ON DELETE CASCADE,
+  status          TEXT NOT NULL DEFAULT 'running',
+  started_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  completed_at    TIMESTAMPTZ,
+  rollback_data   JSONB
+);
+
+CREATE INDEX idx_chaos_runs_experiment ON chaos_experiment_runs(experiment_id, started_at DESC);
+```
 
 ### Module Dependencies
 * **Depends On:** health, telemetry

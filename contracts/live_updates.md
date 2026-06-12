@@ -93,6 +93,20 @@ gensense_live_updates_active_subscriptions_total    { resource_type }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Subscriber reconnect buffer overflow | Drop oldest events from replay buffer; log dropped event IDs |
+| Broadcast exceeds subscriber capacity | Apply backpressure to publisher; buffer up to configurable limit |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new event type to UpdateDelta: non-breaking if consumers handle unknown event types gracefully; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** presence
 * **Emits To:** events

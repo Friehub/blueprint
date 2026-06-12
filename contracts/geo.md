@@ -180,4 +180,10 @@ This module is stateless and does not emit domain events. Callers are responsibl
 - **Caching:** `resolveIp` results may be cached by the adapter for up to 1 hour per IP. `getCountry` and `listCountries` results may be cached for up to 24 hours. Cache invalidation must be triggered on database updates.
 - **Dependencies:** `ip_intelligence` (VPN/proxy/Tor classification), `caching` (result caching), `rate_limiting` (geocoding is a costly operation and must be rate-limited per caller).
 - **Errors:** `INVALID_IP_ADDRESS`, `INVALID_COORDINATE`, `COUNTRY_NOT_FOUND`, `REGION_NOT_FOUND`, `TIMEZONE_NOT_FOUND`, `UNKNOWN_GEO_RULE`, `GEOCODING_PROVIDER_UNAVAILABLE`.
+- **Failure Modes:**
+  - **IP database staleness:** If the geo database is stale, new IP ranges may be misclassified. Mitigation: auto-update database on a 24h cycle; alert on update failure.
+  - **Geocoding provider outage:** Geocoding provider returns errors or timeouts. Mitigation: failover to secondary provider; cache recent results.
+  - **Rate limit exceeded:** Geocoding API rate limit hit. Mitigation: queue and retry with backoff; increase quota.
+  - **Sanctioned country list not updated:** Outdated OFAC list causes incorrect geo rule evaluation. Mitigation: rule definitions are adapter-configurable; update list independently.
+- **Breaking Change Policy:** Removing a supported geocoding provider is breaking for adapters implementing that provider. Adding new country metadata fields must be optional. `GeoLocation` field changes must be backward-compatible.
 - **Providers (adapter examples):** MaxMind GeoIP2, ipinfo.io, Google Maps Platform (Geocoding API), Mapbox Geocoding, HERE Geocoding, ip-api.com.

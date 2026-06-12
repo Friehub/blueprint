@@ -60,7 +60,19 @@ Phase = stop_accepting | drain_requests | close_connections | flush_buffers | sh
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+initiateShutdown:
+    shutdown_already_initiated:   Shutdown sequence is already in progress | return existing sequence
+    shutdown_timeout_too_short:   Configured timeout is below minimum threshold | adjust timeout
+
+  registerShutdownHook:
+    hook_name_taken:              Hook name already registered | use unique name
+    invalid_phase:                Phase does not exist | use one of: stop_accepting, drain_requests, close_connections, flush_buffers, shutdown
+
+  setShutdownTimeout:
+    timeout_exceeds_max:          Timeout exceeds maximum allowed (300s) | cap at max
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -68,7 +80,9 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 initiateShutdown   → lifecycle.shutdown.started    { reason, deadline }
   Phase complete     → lifecycle.shutdown.phase_done { phase, hooks, duration_ms }
   ─                  → lifecycle.shutdown.completed  { duration_ms }
-                  OR lifecycle.shutdown.timed_out  { duration_ms, in_flight_lost }
+                   OR lifecycle.shutdown.timed_out  { duration_ms, in_flight_lost }
+  registerShutdownHook → lifecycle.shutdown.hook_registered { hook_name, phase }
+  ─                  → lifecycle.shutdown.hook_failed       { hook_name, phase, reason }
 ```
 
 ### Temporal Constraints
@@ -87,6 +101,22 @@ Shutdown timeout:
     on_expiry:      log failure, proceed to next hook
 ```
 
+### Storage Model
+* **Model:** In-memory shutdown state with hook registry.
+* **Details:** Shutdown state is per-instance and does not require persistent storage. Hook definitions may be configured at startup or registered at runtime.
+
+### Failure Modes & Breaking Change Policy
+
+| Failure Mode | Detection | Mitigation |
+|---|---|---|
+| Hook timeout during shutdown | Hook exceeds `per_hook_max` | Log failure; proceed to next hook (fail-open) |
+| Total shutdown timeout exceeded | `shutdown.timed_out` event | Force exit; lost in-flight requests are counted in metric |
+| Drain phase incomplete | In-flight requests remain after drain timeout | Cancel remaining requests; log count |
+| Hook panics during execution | Unhandled exception in hook handler | Recover and continue; log stack trace |
+| Duplicate shutdown initiation | `shutdown_already_initiated` error | Return existing sequence; idempotent |
+
+**Breaking Changes:** Adding a new mandatory phase to the shutdown sequence is breaking for all registered hooks. The `Phase` enum is extensible; removing a phase value is breaking. Hook handler signature changes are breaking.
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `graceful_shutdown.<function>`.
 * **Telemetry Metrics:**
@@ -94,6 +124,8 @@ Shutdown timeout:
 gensense_graceful_shutdown_total             { reason, result }
   gensense_graceful_shutdown_duration_ms       histogram
   gensense_graceful_shutdown_in_flight_gauge     { phase }
+  gensense_graceful_shutdown_hook_fail_total    { phase }
+  gensense_graceful_shutdown_in_flight_lost_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

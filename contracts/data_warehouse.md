@@ -87,6 +87,75 @@ Query timeout:
     on_expiry:      view data is stale; refresh triggered on next query
 ```
 
+### Storage Model
+* **Model:** Durable table/view catalog with query history and partition metadata.
+* **Details:** Table schemas, view definitions, and storage reports must remain queryable for the configured retention period. Query history is append-only.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE warehouse_tables (
+  name              TEXT PRIMARY KEY,
+  schema_def        JSONB NOT NULL,
+  row_count         BIGINT NOT NULL DEFAULT 0,
+  size_bytes        BIGINT NOT NULL DEFAULT 0,
+  partitioning      JSONB,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_queried_at   TIMESTAMPTZ
+);
+
+CREATE TABLE warehouse_views (
+  name              TEXT PRIMARY KEY,
+  query             TEXT NOT NULL,
+  materialized      BOOLEAN NOT NULL DEFAULT false,
+  refresh_interval  INTERVAL,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE warehouse_query_history (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sql_hash          TEXT NOT NULL,
+  duration_ms       INT NOT NULL,
+  bytes_processed   BIGINT NOT NULL DEFAULT 0,
+  cost              NUMERIC(12,4),
+  executed_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  project           TEXT NOT NULL
+);
+
+CREATE INDEX idx_wh_query_history_executed ON warehouse_query_history(executed_at DESC);
+CREATE INDEX idx_wh_query_history_project ON warehouse_query_history(project);
+
+CREATE TABLE warehouse_partitions (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  table_name        TEXT NOT NULL REFERENCES warehouse_tables(name) ON DELETE CASCADE,
+  column_name       TEXT NOT NULL,
+  partition_type    TEXT NOT NULL CHECK (partition_type IN ('range', 'list')),
+  granularity       TEXT NOT NULL CHECK (granularity IN ('day', 'month', 'year')),
+  partition_def     JSONB NOT NULL,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE warehouse_query_budgets (
+  project           TEXT PRIMARY KEY,
+  budget            NUMERIC(12,4) NOT NULL,
+  spent             NUMERIC(12,4) NOT NULL DEFAULT 0,
+  period_start      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+### Failure Modes & Breaking Change Policy
+
+| Failure Mode | Detection | Mitigation |
+|---|---|---|
+| Query exceeds budget | Pre-execution check in `runQuery` | Reject with `budget_exceeded`; alert project owner |
+| Materialized view staleness | `refresh_interval` exceeded | Trigger refresh on next query; emit `warehouse.view.stale` |
+| Cross-region query routed incorrectly | Latency spike or data mismatch | Route to correct region; flag in query metadata |
+| Provider rate limit | `RateLimited` error from provider | Queue and retry with exponential backoff |
+| DDL idempotency failure | Duplicate table creation | Use `CREATE IF NOT EXISTS` semantics |
+
+**Breaking Changes:** Dropping or renaming a column in an existing table schema requires a new table version. Existing views referencing the old schema must be migrated before the breaking change is applied. A deprecation notice must be published at least 2 release cycles before removal.
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `data_warehouse.<function>`.
 * **Telemetry Metrics:**
@@ -95,6 +164,8 @@ gensense_data_warehouse_queries_total            { status }
   gensense_data_warehouse_query_duration_ms        histogram
   gensense_data_warehouse_bytes_processed_total    { project }
   gensense_data_warehouse_storage_bytes            gauge { table }
+  gensense_data_warehouse_budget_exceeded_total    { project }
+  gensense_data_warehouse_partition_count          gauge
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

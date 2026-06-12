@@ -198,9 +198,33 @@ type ListExecutionsInput = {
 - **Worker scaling:** Worker concurrency must be configurable per job class or schedule group.
 - **Multi-region:** The deployment must declare whether scheduled execution is single-region or active/passive; duplicate firing across regions must be deduplicated.
 - **Observability:** Each execution is a trace root; spans cover queue wait, execution, and retry backoff intervals.
+  - **Telemetry Metrics:**
+  ```
+  gensense_jobs_registered_total            { status }
+  gensense_jobs_executions_total            { job_name, status }
+  gensense_jobs_execution_duration_ms       histogram { job_name }
+  gensense_jobs_execution_queue_wait_ms     histogram { job_name }
+  gensense_jobs_retry_attempts_total        { job_name }
+  gensense_jobs_exhausted_total             { job_name }
+  gensense_jobs_pending_executions          gauge { job_name }
+  ```
 - **Dependencies:** `queues` (underlying dispatch mechanism for pending executions), `audit_log` (execution history), `notifications` (on exhausted retries).
 - **Errors:** `JOB_NOT_FOUND`, `EXECUTION_NOT_FOUND`, `INVALID_CRON_EXPRESSION`, `CONFLICTING_SCHEDULE`, `EXECUTION_NOT_CANCELLABLE`.
 - **Providers (adapter examples):** BullMQ, Temporal, Inngest, pg-boss, AWS EventBridge Scheduler, Quirrel.
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+| Execution timeout exceeded | Transition execution to FAILED with timeout error message |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value to ExecutionStatus: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ## Runtime Constraints
 

@@ -233,8 +233,102 @@ type ListCategoriesInput = {
 - **Worker scaling:** Publication sync, indexing, and analytics export must be independently scalable.
 - **Multi-region:** The deployment must declare whether KB publication is single-region or active/passive; duplicate indexing across regions must be deduplicated.
 - **Observability:** View events carry `articleId`, `locale`, `referrer`, and `sessionId` as span attributes for funnel analysis.
+  - **Telemetry Metrics:**
+  ```
+  gensense_knowledge_base_articles_total            { status }
+  gensense_knowledge_base_article_views_total        { article_id, locale }
+  gensense_knowledge_base_article_feedback_total     { article_id, vote }
+  gensense_knowledge_base_operation_duration_ms      histogram { function }
+  gensense_knowledge_base_search_index_lag_ms        gauge
+  ```
 - **Backpressure:** If indexing or analytics capacity is saturated, publication follow-through must defer or reject predictably rather than losing search sync.
 - **Storage model:** Article revisions and publish state must be durably stored; search index freshness is delegated to the search module.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE article_status AS ENUM ('DRAFT', 'IN_REVIEW', 'PUBLISHED', 'DEPRECATED', 'ARCHIVED');
+
+CREATE TABLE categories (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name              TEXT NOT NULL,
+  slug              TEXT NOT NULL,
+  description       TEXT,
+  parent_category_id UUID REFERENCES categories(id),
+  icon              TEXT,
+  sort_order        INT NOT NULL DEFAULT 0,
+  locale            TEXT NOT NULL DEFAULT 'en',
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX idx_category_slug_parent ON categories(parent_category_id, slug) WHERE parent_category_id IS NOT NULL;
+CREATE UNIQUE INDEX idx_category_slug_root ON categories(slug) WHERE parent_category_id IS NULL;
+
+CREATE TABLE articles (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title               TEXT NOT NULL,
+  slug                TEXT NOT NULL,
+  category_id         UUID NOT NULL REFERENCES categories(id),
+  locale              TEXT NOT NULL DEFAULT 'en',
+  format              TEXT NOT NULL DEFAULT 'MARKDOWN',
+  body                TEXT NOT NULL,
+  excerpt             TEXT,
+  tags                TEXT[] NOT NULL DEFAULT '{}',
+  author_id           UUID NOT NULL,
+  reviewed_by         UUID,
+  related_articles    UUID[] NOT NULL DEFAULT '{}',
+  status              article_status NOT NULL DEFAULT 'DRAFT',
+  revision            INT NOT NULL DEFAULT 1,
+  deprecated_by_id    UUID REFERENCES articles(id),
+  meta_description    TEXT,
+  published_at        TIMESTAMPTZ,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX idx_article_slug_locale ON articles(locale, slug) WHERE status != 'ARCHIVED';
+CREATE INDEX idx_articles_category ON articles(category_id, status);
+CREATE INDEX idx_articles_author ON articles(author_id);
+CREATE INDEX idx_articles_status ON articles(status);
+
+CREATE TABLE article_feedback (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  article_id    UUID NOT NULL REFERENCES articles(id),
+  vote          TEXT NOT NULL CHECK (vote IN ('HELPFUL', 'NOT_HELPFUL')),
+  comment       TEXT,
+  submitted_by  UUID,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_feedback_article ON article_feedback(article_id);
+
+CREATE TABLE article_views (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  article_id    UUID NOT NULL REFERENCES articles(id),
+  viewer_id     UUID,
+  session_id    TEXT,
+  referrer      TEXT,
+  viewed_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_views_article ON article_views(article_id, viewed_at DESC);
+```
 - **Dependencies:** `search` (article indexing and retrieval), `approvals` (review workflow), `users` (author identity), `tags` (article tagging system), `localization` (locale validation), `analytics` (view metrics aggregation).
 - **Errors:** `ARTICLE_NOT_FOUND`, `CATEGORY_NOT_FOUND`, `ARTICLE_NOT_EDITABLE`, `SLUG_CONFLICT`, `ARTICLE_NOT_PUBLISHABLE`, `DRAFT_ALREADY_EXISTS`.
 - **Providers (adapter examples):** Custom implementation, Notion API (authoring layer), Intercom Articles, Zendesk Guide, Confluence (internal KB).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Search index unavailable | Article publication succeeds; indexing is retried asynchronously |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new article status enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise

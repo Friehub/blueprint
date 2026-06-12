@@ -62,6 +62,9 @@ BreakingChange { api_id, from_version, to_version, change_type, migration_requir
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
+### Backpressure
+* Version routing and metadata reads are per-request and lightweight. Under extreme concurrent registration or deprecation writes, metadata writes may be queued; reads are never blocked.
+
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
 
@@ -98,3 +101,66 @@ gensense_api_versioning_versions_active          gauge { strategy }
 * **Depends On:** changelog
 * **Emits To:** events
 * **Recommends:** notifications, developer_portal
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE api_versions (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            TEXT NOT NULL,
+  version         TEXT NOT NULL,
+  strategy        TEXT NOT NULL CHECK (strategy IN ('url_path', 'header', 'query_param', 'content_negotiation')),
+  status          TEXT NOT NULL DEFAULT 'current'
+                    CHECK (status IN ('current', 'deprecated', 'sunset')),
+  sunset_date     TIMESTAMPTZ,
+  migration_guide TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (name, version)
+);
+
+CREATE INDEX idx_api_versions_name ON api_versions(name, created_at DESC);
+
+CREATE TABLE api_version_deprecations (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  api_id          UUID NOT NULL REFERENCES api_versions(id) ON DELETE CASCADE,
+  api_name        TEXT NOT NULL,
+  version         TEXT NOT NULL,
+  sunset_date     TIMESTAMPTZ NOT NULL,
+  migration_guide TEXT NOT NULL,
+  deprecation_policy JSONB DEFAULT '{}',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (api_id)
+);
+
+CREATE TABLE api_versioning_strategy_changes (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  api_name        TEXT NOT NULL,
+  from_strategy   TEXT NOT NULL,
+  to_strategy     TEXT NOT NULL,
+  changed_by      UUID,
+  reason          TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_api_strategy_changes_api ON api_versioning_strategy_changes(api_name, created_at DESC);
+```
+
+### Storage Model
+* **Model:** Durable version metadata store with deprecation and strategy change history.
+* **Details:** Version metadata must be immediately consistent and replicated to all regions. Deprecation records are immutable after creation.
+
+### Breaking Change Policy
+- Adding a new versioning strategy is additive and backward-compatible.
+- Removing or renaming an existing strategy requires a MAJOR version bump.
+- Changing the minimum deprecation window (90 days) requires a MAJOR version bump.
+- Adding new required fields to `registerApi` input requires a MAJOR version bump.
+
+### Failure Modes
+| Mode | Cause | Mitigation |
+|------|-------|-----------|
+| Version not found after registration | Replication lag | Use strong consistency for metadata reads; retry with backoff |
+| Sunset not enforced across all regions | Clock skew between regions | Use UTC-based enforcement; allow 1-minute grace period |
+| Deprecation without migration guide | Operator error | Block deprecateVersion if migration_guide is empty; invariant enforced |
+| Strategy change breaks existing clients | Client relies on deprecated strategy | Flag as breaking change; require new version; never mutate existing versions |
+| 410 not returned after sunset | Async sunset job delayed | Run sunset check on every request; cache result for 60 seconds |

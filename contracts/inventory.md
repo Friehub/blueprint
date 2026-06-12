@@ -29,9 +29,12 @@ StockAdjustment { id, variant_id, delta, reason, created_at }
 ```
 
 **Invariants**
-- `available = on_hand - reserved` at all times
-- `confirmStock` must be idempotent -- confirming twice must not double-decrement
-- Reservations must expire automatically if not confirmed
+- `available = on_hand - reserved` at all times.
+- `updateStockOnHand` must use a database-level `CHECK (on_hand >= 0)` constraint to enforce non-negativity. Application-level check is insufficient under concurrent transactions. Use atomic UPDATE with conditional: `UPDATE inventory_stock SET on_hand = on_hand + $delta WHERE variant_id = $id AND on_hand + $delta >= 0 RETURNING on_hand`. If 0 rows returned: return `insufficient_stock` error.
+- `confirmStock` must be idempotent — confirming twice must not double-decrement.
+- `reserveStock` must use the optimistic locking pattern: read version N, then `UPDATE inventory_stock SET reserved = reserved + $qty, version = N + 1 WHERE variant_id = $id AND version = N AND available >= $qty`. If 0 rows updated: retry entire operation (max 3). Prevents double-sell under concurrent checkout load.
+- Reservations must expire automatically if not confirmed. Expiry is configurable per deployment (default 15 minutes). On expiry, release stock atomically and emit `inventory.stock.released`.
+- `adjustStock` delta must not bring `on_hand` below zero unless `reason` is explicitly a correction (e.g. `inventory_count_correction`).
 
 ---
 
@@ -162,6 +165,19 @@ gensense_inventory_reservations_active       gauge { variant_id? }
   gensense_inventory_reservation_expiry_total  counter { reason: expired|confirmed|released }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** catalog (for variant existence validation)

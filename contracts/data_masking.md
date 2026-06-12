@@ -80,7 +80,12 @@ maskField:
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
-* None explicitly defined. Custom events must use the canonical domain envelope.
+```
+tokenize        → masking.token.created          { token_id, context }
+  detokenize      → masking.token.accessed         { token_id, context }
+  registerMaskingRule → masking.rule.created      { rule_id, data_type, strategy }
+  scanForPii     → masking.pii.scanned            { field_count, pii_fields }
+```
 
 ### Temporal Constraints
 ```
@@ -103,7 +108,48 @@ gensense_data_masking_operations_total          { strategy }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Storage Model
+* **Model:** Strongly consistent token-to-value mapping store with encrypted values at rest.
+* **Details:** Token mappings must be strongly consistent to prevent incorrect detokenization. Reversible masking rules are stored with encryption at rest.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE data_masking_rules (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            TEXT NOT NULL UNIQUE,
+  data_type       TEXT NOT NULL,
+  field_pattern   TEXT NOT NULL,
+  strategy        TEXT NOT NULL CHECK (strategy IN ('partial', 'full', 'regex', 'tokenize')),
+  config          JSONB NOT NULL DEFAULT '{}',
+  reversible      BOOLEAN NOT NULL DEFAULT false,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE data_masking_tokens (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  context         TEXT NOT NULL,
+  token_hash      TEXT NOT NULL UNIQUE,
+  encrypted_value BYTEA NOT NULL,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at      TIMESTAMPTZ NOT NULL DEFAULT now() + INTERVAL '24 hours'
+);
+
+CREATE INDEX idx_masking_tokens_context ON data_masking_tokens(context);
+CREATE INDEX idx_masking_tokens_expiry ON data_masking_tokens(expires_at) WHERE expires_at > now();
+
+CREATE TABLE data_masking_pii_classifications (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  field           TEXT NOT NULL,
+  category        TEXT NOT NULL CHECK (category IN ('email', 'phone', 'ssn', 'credit_card', 'address', 'name', 'dob', 'ip', 'custom')),
+  confidence      REAL NOT NULL CHECK (confidence >= 0 AND confidence <= 1),
+  suggested_strategy TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
 ### Module Dependencies
 * **Depends On:** encryption
-* **Emits To:** (none)
-* **Recommends:** audit_log, config, data_catalog (classification rules derived from schema metadata can seed the masking rule registry automatically)
+* **Emits To:** events
+* **Recommends:** audit_log, config, data_catalog

@@ -75,7 +75,17 @@ TargetingRule { segment_id | user_ids[] | percentage, variant?, serve: boolean|v
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
-* None explicitly defined. Custom events must use the canonical domain envelope.
+```
+setFlag              → flag.created                     { flag_key, enabled }
+setFlag (update)     → flag.updated                     { flag_key, changes }
+setFlag(disabled)    → flag.disabled                    { flag_key, disabled_by }
+archiveFlag          → flag.archived                    { flag_key }
+rolloutToPercent     → flag.rollout.updated             { flag_key, percentage }
+isEnabled            → flag.evaluated                   { flag_key, user_id, result, variant? }
+createSegment        → segment.created                  { segment_id, name }
+updateSegment        → segment.updated                  { segment_id, changes }
+deleteSegment        → segment.deleted                  { segment_id }
+```
 
 ### Temporal Constraints
 ```
@@ -93,8 +103,29 @@ Flag evaluation cache:
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `feature_flags.<function>`.
-* **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
+* **Telemetry Metrics:**
+```
+gensense_feature_flags_operation_total           counter { function, result: success|failure }
+gensense_feature_flags_operation_duration_ms     histogram { function, p50, p95, p99 }
+gensense_feature_flags_errors_total              counter { function, error_code }
+gensense_feature_flags_evaluations_total         counter { flag_key, result: enabled|disabled }
+gensense_feature_flags_active_total              gauge
+gensense_feature_flags_variant_distribution      counter { flag_key, variant }
+```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** (none)

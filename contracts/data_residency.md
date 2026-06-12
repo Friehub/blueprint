@@ -61,7 +61,26 @@ ComplianceCheck { check, passed: bool, detail, timestamp }
 * Route decision evaluation must complete within request budget; if the rule store is unavailable, deny with a clear error.
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+declareResidency:
+    rule_already_exists:       A residency rule for this data_domain already exists | use updateResidencyRule
+    invalid_region:            Region is not a valid deployment region | check available regions
+
+  getResidencyRule:
+    rule_not_found:            No residency rule for this data_domain | verify data_domain
+
+  routeRequest:
+    region_unavailable:        Target region is unavailable | use alternative_region from RouteDecision
+    no_rule_found:             No residency rule for any requested data_domain | treat as soft enforcement
+    strict_denial:             Strict enforcement blocks request for this data_domain in target region | use alternative region
+
+  updateResidencyRule:
+    rule_not_found:            No residency rule with that ID | verify rule_id
+
+  removeResidencyRule:
+    rule_not_found:            No residency rule with that ID | verify rule_id
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -87,6 +106,39 @@ gensense_data_residency_rules_total             { region, enforcement }
   gensense_data_residency_compliance_total         { compliant }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Storage Model
+* **Model:** Strongly consistent residency rule store with append-only compliance check history.
+* **Details:** Residency rules must be immediately consistent to prevent incorrect routing. Compliance check results are append-only for audit purposes.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE enforcement_level AS ENUM ('strict', 'soft');
+
+CREATE TABLE data_residency_rules (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  data_domain     TEXT NOT NULL UNIQUE,
+  region          TEXT NOT NULL,
+  enforcement     enforcement_level NOT NULL DEFAULT 'strict',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_residency_rules_region ON data_residency_rules(region);
+
+CREATE TABLE data_residency_compliance (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  data_domain     TEXT NOT NULL,
+  region          TEXT NOT NULL,
+  compliant       BOOLEAN NOT NULL,
+  checks          JSONB NOT NULL DEFAULT '[]',
+  verified_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_residency_compliance_domain ON data_residency_compliance(data_domain, verified_at DESC);
+```
 
 ### Module Dependencies
 * **Depends On:** (none)

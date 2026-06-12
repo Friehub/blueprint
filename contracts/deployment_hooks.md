@@ -101,6 +101,73 @@ Pre-deploy check timeout:
     on_expiry:      rollback not available; manual recovery only
 ```
 
+### Storage Model
+* **Model:** Durable deployment state and hook execution records.
+* **Details:** Deployment phase transitions, check results, and rollback state must be recorded durably for audit.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE deployment_phase AS ENUM (
+  'deploying', 'pre_checks', 'migrating', 'smoke', 'live', 'rolling_back', 'completed', 'failed'
+);
+
+CREATE TABLE deployments (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  phase             deployment_phase NOT NULL DEFAULT 'deploying',
+  result            TEXT,
+  started_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  completed_at      TIMESTAMPTZ,
+  idempotency_key   TEXT UNIQUE
+);
+
+CREATE TABLE deployment_hooks (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name              TEXT NOT NULL,
+  hook_type         TEXT NOT NULL CHECK (hook_type IN ('pre_deploy', 'post_deploy')),
+  action_type       TEXT NOT NULL CHECK (action_type IN ('http_check', 'migration_check', 'script')),
+  enabled           BOOLEAN NOT NULL DEFAULT true,
+  timeout           INT NOT NULL DEFAULT 300,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE deployment_hook_executions (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  deployment_id     UUID NOT NULL REFERENCES deployments(id) ON DELETE CASCADE,
+  hook_id           UUID NOT NULL REFERENCES deployment_hooks(id),
+  status            TEXT NOT NULL CHECK (status IN ('pass', 'fail', 'warn')),
+  detail            TEXT,
+  duration_ms       INT NOT NULL DEFAULT 0,
+  executed_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_deployments_phase ON deployments(phase);
+CREATE INDEX idx_deployment_executions_deploy ON deployment_hook_executions(deployment_id);
+
+CREATE TABLE deployment_rollbacks (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  deployment_id     UUID NOT NULL REFERENCES deployments(id),
+  rollback_type     TEXT NOT NULL CHECK (rollback_type IN ('full', 'partial')),
+  status            TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed', 'failed')),
+  reason            TEXT NOT NULL,
+  triggered_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  completed_at      TIMESTAMPTZ
+);
+```
+
+### Failure Modes & Breaking Change Policy
+
+| Failure Mode | Detection | Mitigation |
+|---|---|---|
+| Pre-deploy check fails | `check_failed` error | Block deployment; notify team |
+| Smoke test fails post-deploy | `smoke_test_failed` error | Auto-trigger rollback |
+| Rollback window expired | `rollback_not_available` error | Manual recovery required; escalate |
+| Hook timeout exceeded | Hook duration > configured timeout | Mark hook as failed; continue if non-critical |
+| Duplicate rollback trigger | Idempotency key collision | Return existing rollback; no double-execution |
+
+**Breaking Changes:** Removing or renaming a hook type that is referenced by active deployment pipelines will break gating. Hook types must be deprecated for one release cycle before removal. `runPreDeployChecks` signature changes must maintain backward compatibility for at least one minor version.
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `deployment_hooks.<function>`.
 * **Telemetry Metrics:**
@@ -108,6 +175,8 @@ Pre-deploy check timeout:
 gensense_deployment_hooks_checks_total         { hook_type, status }
   gensense_deployment_hooks_deployment_duration_ms  histogram { result }
   gensense_deployment_hooks_rollbacks_total          { reason }
+  gensense_deployment_hooks_gate_blocked_total
+  gensense_deployment_hooks_smoke_fail_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

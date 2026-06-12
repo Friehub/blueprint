@@ -32,6 +32,9 @@ Segment { field, operator, value }
 - A broadcast must not send to recipients who have opted out of the broadcast channel
 - `cancelBroadcast` must stop delivery to recipients who have not yet received the message -- it must not recall delivered messages
 - `scheduleBroadcast` with a send_at in the past must send immediately
+- A broadcast with no matching recipients (after opt-out filtering) must transition directly to `sent` with zero delivered count; it must not remain in `sending`
+- `getDeliveryStatus` must reflect the final delivery state for all recipients once the broadcast transitions to `sent`; partial delivery states are only valid while status is `sending` or `partially_delivered`
+- Recipient opt-out status must be checked at send time, not at broadcast creation time -- a recipient who opts out between creation and delivery must not receive the broadcast
 
 **Providers:** OneSignal, Firebase, SendGrid (broadcast), Mailgun, custom
 
@@ -97,3 +100,75 @@ gensense_broadcast_sent_total                  { channel }
 * **Depends On:** notifications
 * **Emits To:** events
 * **Recommends:** analytics, web_analytics, reporting
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE broadcast_messages (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  channel           TEXT NOT NULL,
+  subject           TEXT NOT NULL,
+  content           TEXT NOT NULL,
+  content_type      TEXT NOT NULL DEFAULT 'text/plain',
+  options           JSONB NOT NULL DEFAULT '{}',
+  status            TEXT NOT NULL DEFAULT 'draft'
+                      CHECK (status IN ('draft', 'scheduled', 'sending', 'sent', 'partially_delivered', 'cancelled')),
+  total_recipients  INTEGER NOT NULL DEFAULT 0,
+  delivered_count   INTEGER NOT NULL DEFAULT 0,
+  failed_count      INTEGER NOT NULL DEFAULT 0,
+  opened_count      INTEGER NOT NULL DEFAULT 0,
+  clicked_count     INTEGER NOT NULL DEFAULT 0,
+  bounced_count     INTEGER NOT NULL DEFAULT 0,
+  rate_limit        INTEGER,
+  tracking_enabled  BOOLEAN NOT NULL DEFAULT true,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  send_at           TIMESTAMPTZ,
+  sent_at           TIMESTAMPTZ
+);
+
+CREATE INDEX idx_broadcast_messages_channel ON broadcast_messages(channel, created_at DESC);
+CREATE INDEX idx_broadcast_messages_status ON broadcast_messages(status, send_at) WHERE status IN ('scheduled', 'sending');
+
+CREATE TABLE broadcast_recipients (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  broadcast_id      UUID NOT NULL REFERENCES broadcast_messages(id) ON DELETE CASCADE,
+  user_id           UUID NOT NULL,
+  channel           TEXT NOT NULL,
+  status            TEXT NOT NULL DEFAULT 'pending'
+                      CHECK (status IN ('pending', 'delivered', 'opened', 'clicked', 'bounced', 'failed')),
+  delivered_at      TIMESTAMPTZ,
+  error_reason      TEXT,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (broadcast_id, user_id, channel)
+);
+
+CREATE INDEX idx_broadcast_recipients_broadcast ON broadcast_recipients(broadcast_id, status);
+CREATE INDEX idx_broadcast_recipients_user ON broadcast_recipients(user_id, created_at DESC);
+
+CREATE TABLE broadcast_opt_outs (
+  user_id           UUID NOT NULL,
+  channel           TEXT NOT NULL,
+  opted_out_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, channel)
+);
+```
+
+### Storage Model
+* **Model:** Durable broadcast message store with per-recipient delivery tracking.
+* **Details:** Messages and recipient status use PostgreSQL. Large content bodies may reference object storage for delivery. Opt-out records are checked synchronously at send time.
+
+### Breaking Change Policy
+- Adding new recipient status values is additive and backward-compatible.
+- Removing or renaming an existing status value requires a MAJOR version bump.
+- Changing the default rate limit (1000 recipients/minute) requires a MINOR version bump.
+- Adding new required fields to `createBroadcast` input requires a MAJOR version bump.
+
+### Failure Modes
+| Mode | Cause | Mitigation |
+|------|-------|-----------|
+| Recipient receives despite opt-out | Stale opt-out cache | Check opt-out at send time from primary store; cache is write-through |
+| Delivery tracking lost | Worker crash mid-batch | Recover unprocessed recipients on restart; idempotent delivery |
+| Rate limit exceeded | Burst of scheduled broadcasts | Queue remaining; apply per-channel rate limit; defer to next window |
+| Broadcast scheduled in past | Clock skew across services | Send immediately; clamp send_at to max(now(), send_at) |
+| Partial delivery timeout | Recipient provider slow | Timeout after 24 hours; mark undelivered as failed; emit broadcast.partially_delivered |

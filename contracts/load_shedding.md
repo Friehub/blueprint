@@ -103,6 +103,21 @@ gensense_load_shedding_admitted_total          { workload, priority }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Admission race condition | Optimistic locking on capacity counters; rejected requests receive retry_after hint |
+| SLO budget counter drift | Budget resets on window expiry; temporary over-admission within single window is acceptable |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new priority level: non-breaking if consumers use priority hierarchy fallback; breaking otherwise
+- Changing SLO budget algorithm: breaking — existing budget windows must be migrated
+
 ### Module Dependencies
 * **Depends On:** rate_limiting
 * **Emits To:** events

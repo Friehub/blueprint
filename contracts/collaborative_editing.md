@@ -66,7 +66,21 @@ ResolvedOperation { operation_id, resolution: a_wins|b_wins|merge, merged_operat
 * If operation throughput exceeds processing capacity, the module must batch operations rather than dropping them.
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+applyOperation:
+    doc_not_found:             Document does not exist | verify doc_id
+    version_conflict:          Operation version does not match document's current version | pull latest and retry
+    operation_invalid:         Operation type or position is invalid for current document state | validate before retry
+    session_expired:           Document session has timed out | call openDocument first
+
+  openDocument:
+    doc_locked:                Document is locked by another session | retry or request unlock
+    max_sessions_reached:      Concurrent session limit for this document exceeded | retry after session close
+
+  getDocument:
+    doc_not_found:             Document does not exist | verify doc_id
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -96,6 +110,58 @@ gensense_collaborative_editing_active_sessions_total  { doc_id }
   gensense_collaborative_editing_conflicts_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Storage Model
+* **Model:** Durable document store with append-only operation log. Session state is ephemeral.
+* **Details:** The document body, version, and operation history must be persisted. Cursor positions are ephemeral with TTL. Operation history is append-only and compacted into snapshots periodically.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE operation_type AS ENUM ('insert', 'delete', 'update');
+
+CREATE TABLE collaborative_documents (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  content         TEXT NOT NULL DEFAULT '',
+  version         BIGINT NOT NULL DEFAULT 0,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE collaborative_operations (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  doc_id          UUID NOT NULL REFERENCES collaborative_documents(id) ON DELETE CASCADE,
+  user_id         UUID NOT NULL,
+  operation_type  operation_type NOT NULL,
+  position        INT NOT NULL,
+  data            TEXT NOT NULL,
+  version         BIGINT NOT NULL,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_collab_ops_doc_version ON collaborative_operations(doc_id, version);
+
+CREATE TABLE collaborative_snapshots (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  doc_id          UUID NOT NULL REFERENCES collaborative_documents(id) ON DELETE CASCADE,
+  version         BIGINT NOT NULL,
+  content         TEXT NOT NULL,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_collab_snapshots_doc ON collaborative_snapshots(doc_id, version DESC);
+
+CREATE TABLE collaborative_sessions (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  doc_id          UUID NOT NULL REFERENCES collaborative_documents(id) ON DELETE CASCADE,
+  user_id         UUID NOT NULL,
+  opened_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_activity   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_collab_sessions_active ON collaborative_sessions(doc_id, last_activity DESC);
+```
 
 ### Module Dependencies
 * **Depends On:** document_editor, users

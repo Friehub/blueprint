@@ -61,18 +61,50 @@ Completion { word, description, type: command|option|value }
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+registerCommand:
+    command_already_exists:    A command with that name is already registered | use a different name or override
+    invalid_handler:           Handler is not a valid function | verify handler signature
+
+  runCommand:
+    command_not_found:         No command registered for the given argv | show help with available commands
+    argument_validation_error: Required argument missing or invalid type | show usage for the command
+    execution_error:           Handler threw an error | capture in ExecResult.stderr with exit_code > 0
+
+  loadConfigFile:
+    file_not_found:            Config file path does not exist | use default config
+    parse_error:               Config file could not be parsed | verify file format
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
-* None explicitly defined. Custom events must use the canonical domain envelope.
+```
+registerCommand   → cli.command.registered      { command_name, argument_count }
+  runCommand        → cli.command.executed        { command_name, exit_code, duration_ms }
+                  OR cli.command.failed           { command_name, error_code }
+```
 
 ### Temporal Constraints
-* None explicitly defined.
+```
+Command execution timeout:
+    default:        5 minutes
+    on_expiry:      terminate handler; return exit_code 124
+
+  Config file cache TTL:
+    default:        60 seconds
+    on_expiry:      reload config file on next access
+```
 
 ### Observability
 * **Tracing Spans:** Every command execution creates a span. Span names follow the pattern `cli_framework.<command>`.
-* **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
+* **Telemetry Metrics:**
+```
+gensense_cli_framework_commands_registered_total  { name }
+  gensense_cli_framework_commands_executed_total   { command, exit_code }
+  gensense_cli_framework_command_duration_ms        histogram { command }
+  gensense_cli_framework_config_loads_total         { result }
+```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies

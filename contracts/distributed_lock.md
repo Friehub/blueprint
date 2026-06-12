@@ -95,6 +95,43 @@ Lock TTL:
     on_expiry:      return lock_timeout
 ```
 
+### Storage Model
+* **Model:** Ephemeral lock state with fencing token monotonicity enforcement.
+* **Details:** Lock state may be stored in Redis, ZooKeeper, etcd, or PostgreSQL advisory locks. Fencing tokens must be stored durably enough to guarantee monotonic increase across restarts.
+
+### Database Schema (PostgreSQL advisory lock variant)
+
+```sql
+CREATE TABLE distributed_locks (
+  lock_name         TEXT PRIMARY KEY,
+  holder_id         TEXT NOT NULL,
+  token             TEXT NOT NULL,
+  fencing_token     BIGINT NOT NULL,
+  acquired_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at        TIMESTAMPTZ NOT NULL,
+  version           INT NOT NULL DEFAULT 0
+);
+
+CREATE INDEX idx_locks_expires ON distributed_locks(expires_at)
+  WHERE expires_at < now();
+
+CREATE TABLE distributed_lock_fencing (
+  lock_name         TEXT PRIMARY KEY,
+  last_token        BIGINT NOT NULL DEFAULT 0
+);
+```
+
+### Failure Modes & Breaking Change Policy
+
+| Failure Mode | Detection | Mitigation |
+|---|---|---|
+| Clock skew between lock nodes | Fencing token ordering violated | Use monotonic fencing tokens; reject stale tokens |
+| Lock backend unavailable | `lock_timeout` on acquire | Circuit-break after N consecutive failures; fall back to local pessimistic lock |
+| Split-brain across regions | Two holders believe they hold the same lock | Single-region locking; multi-region requires explicit consensus |
+| Stale lock holder not released | Lock expires at TTL | Auto-release on expiry; holder must extend before deadline |
+
+**Breaking Changes:** Changing the fencing token format or lock backend requires all holders to release locks cleanly before migration. `ttl` maximum reduction is breaking if existing holders rely on longer leases. Adding a new required parameter to `acquire` is breaking.
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `distributed_lock.<function>`.
 * **Telemetry Metrics:**
@@ -102,6 +139,8 @@ Lock TTL:
 gensense_distributed_lock_acquire_duration_ms    histogram { lock_name, result }
   gensense_distributed_lock_contention_total       { lock_name }
   gensense_distributed_lock_holders_current        gauge { lock_name }
+  gensense_distributed_lock_fencing_gap            gauge { lock_name }
+  gensense_distributed_lock_expiry_reclaim_total   { lock_name }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

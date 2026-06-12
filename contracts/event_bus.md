@@ -104,6 +104,77 @@ Topic retention:
 * Events that exhaust delivery retries must transition to the dead-letter queue with the original payload, failure reason, attempt count, and timestamps.
 * `retryDeadLetter` must re-enqueue the event for delivery with a fresh retry budget.
 
+### Storage Model
+* **Model:** Durable event store with topic retention, subscription state, and dead-letter queue.
+* **Details:** Events must be persisted before delivery. Topic retention is configurable per topic.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE event_bus_topics (
+  name              TEXT PRIMARY KEY,
+  retention_days    INT NOT NULL DEFAULT 7,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE event_bus_events (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  topic             TEXT NOT NULL REFERENCES event_bus_topics(name),
+  payload           JSONB NOT NULL,
+  metadata          JSONB NOT NULL,
+  event_version     INT NOT NULL DEFAULT 1,
+  partition_key     TEXT,
+  offset_id         BIGSERIAL,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_events_topic_created ON event_bus_events(topic, created_at DESC);
+
+CREATE TABLE event_bus_subscriptions (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  topic             TEXT NOT NULL REFERENCES event_bus_topics(name),
+  handler           TEXT NOT NULL,
+  filter            JSONB,
+  status            TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'paused')),
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_subscriptions_topic ON event_bus_subscriptions(topic);
+
+CREATE TABLE event_bus_dead_letters (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  topic             TEXT NOT NULL,
+  original_event    JSONB NOT NULL,
+  subscription_id   UUID REFERENCES event_bus_subscriptions(id),
+  failure_reason    TEXT NOT NULL,
+  retry_count       INT NOT NULL DEFAULT 0,
+  failed_at         TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE event_bus_delivery_attempts (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id          UUID NOT NULL REFERENCES event_bus_events(id),
+  subscription_id   UUID NOT NULL REFERENCES event_bus_subscriptions(id),
+  status            TEXT NOT NULL CHECK (status IN ('success', 'failed')),
+  attempt           INT NOT NULL,
+  duration_ms       INT NOT NULL DEFAULT 0,
+  attempted_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+### Failure Modes & Breaking Change Policy
+
+| Failure Mode | Detection | Mitigation |
+|---|---|---|
+| Subscriber lag exceeds threshold | `subscriber_lag` metric high | Scale subscriber consumers; alert operator |
+| Dead-letter queue growing | `dead_letter_total` metric | Review DLQ; retry or escalate |
+| Topic retention exceeded | Events auto-purged | Configure retention per topic; archive critical events |
+| Publish before topic exists | `topic_not_found` error | Auto-create topics on first publish if configured |
+| Delivery retries exhausted | Event transitions to DLQ | Notify operator; preserve full event payload |
+
+**Breaking Changes:** Removing a topic is breaking for all subscribers. Changing the event schema for a topic requires a new event version; subscribers must handle both old and new versions during migration. Topic renaming requires a coordinated migration of publishers and subscribers.
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `event_bus.<function>`.
 * **Telemetry Metrics:**
@@ -112,6 +183,8 @@ gensense_event_bus_published_total              { topic }
   gensense_event_bus_delivered_total              { topic }
   gensense_event_bus_dead_letter_total            { topic, reason }
   gensense_event_bus_subscriber_lag               gauge { topic, subscription }
+  gensense_event_bus_delivery_duration_ms          histogram { topic }
+  gensense_event_bus_dlq_retry_total              { topic }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

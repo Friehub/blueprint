@@ -189,6 +189,9 @@ type DisputeStats = {
 
 ## Invariants
 
+### Scope Clarification
+`disputes` is the comprehensive dispute management module. `chargebacks.md` is a convenience interface for provider-initiated card network chargebacks — every chargeback creates or updates a dispute record in this module. There is no separate chargeback state machine.
+
 1. At most one active (non-`CLOSED`) dispute may exist per `transactionId`. Attempting to open a second dispute returns the existing one.
 2. `submitEvidence` is only valid when dispute is in `EVIDENCE_REQUIRED` state; calling it in any other state returns `DISPUTE_NOT_IN_EVIDENCE_PHASE`.
 3. `acceptDispute` is only valid while dispute is `OPEN` or `EVIDENCE_REQUIRED`; it is never valid after `UNDER_REVIEW` has begun.
@@ -219,4 +222,17 @@ type DisputeStats = {
 - **Observability:** Each dispute is a trace root; spans cover evidence submission, decision receipt, and settlement confirmation.
 - **Dependencies:** `payments` (original transaction lookup), `ledger` (financial settlement), `storage` (evidence files), `fraud_detection` (chargeback pattern analysis), `notifications` (merchant alerts on new disputes and deadlines).
 - **Errors:** `DISPUTE_NOT_FOUND`, `TRANSACTION_NOT_FOUND`, `DUPLICATE_DISPUTE`, `DISPUTE_NOT_IN_EVIDENCE_PHASE`, `DISPUTE_NOT_ACCEPTABLE`, `DISPUTE_ALREADY_RESOLVED`, `EVIDENCE_FILE_NOT_FOUND`.
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 - **Providers (adapter examples):** Stripe Disputes API, Adyen Disputes, Braintree Disputes, custom chargeback management platforms.

@@ -100,10 +100,24 @@ Liveness probe:
 * **Telemetry Metrics:**
 ```
 gensense_health_check_results_total           { check, status }
-  gensense_health_dependency_status             gauge { dependency, status }
-  gensense_health_probe_duration_ms              histogram { probe_type }
+gensense_health_dependency_status             gauge { dependency, status }
+gensense_health_probe_duration_ms              histogram { probe_type }
+gensense_health_system_status                  gauge { status }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Dependency check timeout | Return degraded for that dependency rather than failing the entire probe |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** (none -- infrastructure primitive / wraps external provider)

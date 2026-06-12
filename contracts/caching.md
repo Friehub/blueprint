@@ -29,6 +29,10 @@ CacheStats { hits, misses, keys, memory_used }
 
 **Invariants**
 - `getOrSet` must be atomic -- concurrent calls with the same key must not invoke `factory` more than once (cache stampede prevention)
+- `del` on a non-existent key must be a no-op; it must not throw or return an error
+- `invalidateByTag` must purge all keys that were set with the given tag, regardless of TTL; keys without the matching tag must not be affected
+- `increment` and `decrement` must be atomic; concurrent calls must not produce lost updates
+- `mget` must return partial results if some keys are missing -- a missing key must be `null` in the result map, not an error
 
 **Providers:** Redis, Memcached, Upstash, in-memory (node-cache)
 
@@ -66,7 +70,14 @@ CacheStats { hits, misses, keys, memory_used }
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
-* None explicitly defined. Custom events must use the canonical domain envelope.
+```
+set               → caching.key.set               { key, ttl?, tags? }
+del               → caching.key.deleted            { key }
+invalidateByTag   → caching.tag.invalidated        { tag, keys_affected? }
+invalidateByPrefix → caching.prefix.invalidated     { prefix, keys_affected? }
+```
+
+Note: High-cardinality cache operations may sample event emission to avoid overwhelming the event bus. Sampling rate must be documented by the adapter.
 
 ### Temporal Constraints
 ```
@@ -82,10 +93,35 @@ CacheEntry:
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `caching.<function>`.
-* **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
+* **Telemetry Metrics:**
+```
+gensense_caching_operation_total                counter { function, result }
+gensense_caching_operation_duration_ms          histogram { function }
+gensense_caching_errors_total                   counter { function, error_code }
+gensense_caching_hits_total                      counter { function }
+gensense_caching_misses_total                    counter { function }
+gensense_caching_keys_total                      gauge
+gensense_caching_memory_used_bytes               gauge
+gensense_caching_tag_invalidations_total         counter
+```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
 * **Depends On:** (none -- infrastructure primitive)
-* **Emits To:** (none)
+* **Emits To:** events
 * **Recommends:** (none)
+
+### Breaking Change Policy
+- Adding new cache operations is additive and backward-compatible.
+- Removing or renaming an existing operation requires a MAJOR version bump.
+- Changing the maximum TTL (24 hours) requires a MAJOR version bump.
+- Changing the `getOrSet` atomicity guarantee (lock vs CAS strategy) requires a MAJOR version bump.
+
+### Failure Modes
+| Mode | Cause | Mitigation |
+|------|-------|-----------|
+| Cache stampede | Multiple concurrent misses for same key | getOrSet uses distributed lock or CAS; factory invoked exactly once |
+| Tag invalidation misses some keys | Tag index corruption | Rebuild tag index from full scan; log discrepancy |
+| Increment lost update | Concurrent atomic operations on same key | Use Redis INCR or equivalent atomic primitive |
+| Memcached value size exceeded | Large payload ( > 1MB ) | Compress or split; reject with PAYLOAD_TOO_LARGE |
+| Connection pool exhausted | Burst of concurrent operations | Queue operations; apply circuit breaker; emit warning at 80% pool usage |

@@ -29,7 +29,9 @@ DeliveryStatus = pending | success | failed
 
 **Invariants**
 - Failed deliveries must be retried with exponential backoff up to a configurable maximum
-- Payloads must be signed with the endpoint secret using HMAC-SHA256
+- Exponential backoff formula: `delay = min(2^attempt, max_backoff)` seconds, with jitter of ±25%. Default `max_backoff` is 32 seconds. Maximum retry window is 72 hours from first failure.
+- Payloads must be signed with the endpoint secret using HMAC-SHA256 of `body + "." + timestamp`
+- Payload size must not exceed the endpoint's configured `max_payload_size` (default 256 KiB). Larger payloads are rejected before dispatch with `PAYLOAD_TOO_LARGE`.
 - Endpoint registration must be rejected if no secret is provided -- a non-empty secret is mandatory
 - Every dispatched payload must include a canonical timestamp in the signature input
 - The receiver must reject any delivery where the timestamp in the signature is older than 5 minutes -- replay attacks with captured valid signatures are ineffective after this window
@@ -107,6 +109,19 @@ Webhook delivery:
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `webhooks.<function>`.
 * **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** (none -- wraps external provider)

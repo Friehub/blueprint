@@ -149,18 +149,147 @@ This module consumes events from other modules; it does not emit new domain even
 
 ---
 
-## System-Level Integrations
+## System-Level Integrations & Constraints
 
-- **Idempotency:** `ingestEvent` is idempotent on `idempotencyKey`.
-- **Consistency:** Feed writes are eventually consistent. The acceptable lag between a source event and feed entry availability is ≤ 2 seconds under normal load.
-- **Runtime delivery:** Feed ingestion consumes source events `at_least_once`; duplicate source events must not create duplicate feed entries.
-- **Worker scaling:** Feed ingestion and feed query paths must be independently scalable.
-- **Multi-region:** If feed ingestion is active/active, duplicate event processing across regions must be deduplicated by `idempotencyKey`.
-- **Observability:** `ingestEvent` spans must carry `eventName`, `actorId`, `entityType`, and `audienceStrategy` as attributes.
-- **Real-time delivery:** When new entries are ingested, the module must publish to the `presence` module's push channel for subscribed audiences to enable live feed updates.
-- **Backpressure:** If ingestion capacity is saturated, event processing must defer or queue predictably rather than silently dropping events.
-- **Dead-letter handling:** Failed ingestion records must remain queryable until the retry or review window expires.
-- **Storage model:** Feed entries must be stored in a read-optimized durable projection, typically a sorted-set or append-only table with cursor pagination support.
-- **Dependencies:** `follows` (FOLLOWERS audience resolution), `workspaces` (WORKSPACE audience resolution), `users` (actor display name resolution), `presence` (real-time push of new entries), `permissions` (PUBLIC_PROFILE visibility checks).
-- **Errors:** `ACTIVITY_TYPE_NOT_FOUND` (only for `ingestEvent` when strict mode is enabled), `ENTRY_NOT_FOUND`, `FEED_AUDIENCE_INVALID`.
-- **Providers (adapter examples):** Custom Redis-sorted-set implementation, Stream (GetStream.io), Knock, custom PostgreSQL fan-out with cursor pagination.
+### Consistency Model
+* **Model:** `eventual`
+* **Details:** Feed writes are eventually consistent. The acceptable lag between a source event and feed entry availability is ≤ 2 seconds under normal load.
+
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for event ingestion.
+* **Details:** Duplicate source events must not create duplicate feed entries (idempotent on `idempotencyKey`).
+
+### Worker Scaling
+* **Policy:** Feed ingestion and feed query paths must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** If feed ingestion is active/active, duplicate event processing across regions must be deduplicated by `idempotencyKey`.
+
+### Idempotency Requirements
+* **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+* **Required Functions:**
+  - `ingestEvent(input, idempotency_key?)`
+  - `hideEntry(entryId, reason?, idempotency_key?)`
+  - `unhideEntry(entryId, idempotency_key?)`
+  - `deleteEntriesByActor(actorId, idempotency_key?)`
+  - `deleteEntriesByEntity(entityRef, idempotency_key?)`
+
+### Backpressure
+* If ingestion capacity is saturated, event processing must defer or queue predictably rather than silently dropping events.
+
+### Dead-Letter Handling
+* Failed ingestion records must remain queryable until the retry or review window expires.
+
+### Error Taxonomy
+* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+* Domain errors: `ACTIVITY_TYPE_NOT_FOUND` (only for `ingestEvent` when strict mode is enabled), `ENTRY_NOT_FOUND`, `FEED_AUDIENCE_INVALID`, `FEED_ENTRY_HIDDEN`, `ACTOR_DELETION_IN_PROGRESS`.
+
+### Event Emission
+* This module consumes events from other modules; it does not emit new domain events to avoid recursive feed loops. Internal observability events (e.g. `feed.entry.ingested`) are emitted to the tracing layer only, not to the event bus.
+
+### Temporal Constraints
+```
+Feed entry:
+    retention:          90 days (configurable per tenant)
+    on_expiry:          eligible for deletion
+
+    hide_window:
+        hide:           immediate visibility toggle
+        hard_delete:    not supported; preserve for audit
+
+Actor deletion:
+    processing_window:  7 days
+    on_expiry:          force-complete if entries remain; log for operator
+
+Cursor:
+    stability window:   24 hours
+    on_expiry:          cursor may return stale results; retry from new cursor
+```
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE activity_types (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_name        TEXT NOT NULL UNIQUE,
+  source_module     TEXT NOT NULL,
+  display_template  TEXT NOT NULL,
+  audience_strategy TEXT NOT NULL CHECK (audience_strategy IN ('ACTOR_ONLY', 'FOLLOWERS', 'WORKSPACE', 'ENTITY_WATCHERS', 'PUBLIC')),
+  icon              TEXT,
+  groupable         BOOLEAN NOT NULL DEFAULT false,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE feed_entries (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  activity_type_id  UUID NOT NULL REFERENCES activity_types(id),
+  event_name        TEXT NOT NULL,
+  actor_id          UUID,
+  actor_type        TEXT DEFAULT 'user',
+  actor_display_name TEXT,
+  entity_type       TEXT,
+  entity_id         TEXT,
+  workspace_id      UUID,
+  rendered_text     TEXT NOT NULL,
+  data              JSONB NOT NULL DEFAULT '{}',
+  visible           BOOLEAN NOT NULL DEFAULT true,
+  occurred_at       TIMESTAMPTZ NOT NULL,
+  ingested_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  group_key         TEXT,
+  idempotency_key   TEXT NOT NULL
+);
+
+CREATE INDEX idx_feed_entries_actor ON feed_entries(actor_id, occurred_at DESC) WHERE visible AND actor_id IS NOT NULL;
+CREATE INDEX idx_feed_entries_workspace ON feed_entries(workspace_id, occurred_at DESC) WHERE visible AND workspace_id IS NOT NULL;
+CREATE INDEX idx_feed_entries_entity ON feed_entries(entity_type, entity_id, occurred_at DESC) WHERE visible;
+CREATE INDEX idx_feed_entries_group ON feed_entries(group_key, occurred_at DESC) WHERE group_key IS NOT NULL;
+CREATE UNIQUE INDEX idx_feed_entries_idempotency ON feed_entries(idempotency_key);
+CREATE INDEX idx_feed_entries_ingested_at ON feed_entries(ingested_at) WHERE visible;
+
+CREATE TABLE feed_entry_hides (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  entry_id          UUID NOT NULL REFERENCES feed_entries(id) ON DELETE CASCADE,
+  reason            TEXT,
+  hidden_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (entry_id)
+);
+```
+
+### Storage Model
+* **Model:** Read-optimized durable projection with append-only feed entries.
+* **Details:** Feed entries must be stored in a read-optimized durable projection, typically a sorted-set or append-only table with cursor pagination support. Indexed for audience-based queries (actor, workspace, entity).
+
+### Observability
+* **Tracing Spans:** `ingestEvent` spans must carry `eventName`, `actorId`, `entityType`, and `audienceStrategy` as attributes. Every function call creates a span following `activity_feed.<function>`.
+* **Telemetry Metrics:**
+```
+gensense_activity_feed_operation_total              counter { function, result }
+gensense_activity_feed_operation_duration_ms        histogram { function }
+gensense_activity_feed_errors_total                 counter { function, error_code }
+gensense_activity_feed_entries_ingested_total        counter { event_name, audience_strategy }
+gensense_activity_feed_entries_served_total          counter { audience }
+gensense_activity_feed_ingestion_lag_ms              gauge
+gensense_activity_feed_hidden_entries_total
+```
+* **SLO Targets:** Feed query P99 ≤ 50ms; ingestion write P99 ≤ 200ms; ingestion-to-read visibility ≤ 2 seconds.
+
+### Module Dependencies
+* **Depends On:** follows, workspaces, users, presence, permissions
+* **Emits To:** (none — events consumed only)
+* **Recommends:** notifications (digest generation), search (feed entry indexing)
+
+### Breaking Change Policy
+- Adding a new `AudienceStrategy` value is additive and backward-compatible.
+- Removing or renaming an existing audience strategy requires a MAJOR version bump.
+- Changing the `displayTemplate` rendering behavior for existing entries requires a MAJOR version bump (entries are immutable after render).
+- Adding new required fields to `RegisterActivityTypeInput` requires a MAJOR version bump.
+
+### Failure Modes
+| Mode | Cause | Mitigation |
+|------|-------|-----------|
+| Duplicate feed entry | Re-delivered event with same idempotencyKey | UNIQUE constraint on idempotency_key silently prevents duplicate |
+| Template rendering error | Missing field in event payload | Render empty string for missing variable; log warning |
+| Feed query timeout | Unindexed audience filter | Require index on query filter columns; log slow query |
+| Actor deletion partial failure | Some entries fail to delete | Log failed entry IDs; retry with backoff; escalate after 3 attempts |
+| Ingestion lag exceeds SLO | Event burst exceeds capacity | Buffer in queue; scale ingestion workers; emit lag alert |

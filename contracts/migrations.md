@@ -111,6 +111,21 @@ gensense_migrations_applied_total              { result }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Lock acquisition timeout | Return migration_locked; retry after lock_timeout expires |
+| Migration SQL failure | Return migration_failed with error details; require manual resolution before retry |
+| Rollback with missing down SQL | Return cannot_rollback; require manual DBA intervention |
+| Schema drift detected | Return drift_critical if drift may cause data loss; stop deployment |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new migration record type enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** (none -- infrastructure primitive)
 * **Emits To:** events

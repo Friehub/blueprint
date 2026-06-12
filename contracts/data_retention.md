@@ -105,6 +105,58 @@ gensense_data_retention_policies_total          { status }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Storage Model
+* **Model:** Strongly consistent policy store with append-only purge history.
+* **Details:** Retention policies must be immediately consistent to prevent premature or missed purges. Purge execution logs are append-only for compliance auditing.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE purge_action AS ENUM ('delete', 'anonymize', 'archive');
+CREATE TYPE purge_status AS ENUM ('completed', 'failed', 'partial');
+
+CREATE TABLE data_retention_policies (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            TEXT NOT NULL UNIQUE,
+  scope           TEXT NOT NULL,
+  data_category   TEXT NOT NULL,
+  max_age         INTERVAL NOT NULL,
+  action          purge_action NOT NULL DEFAULT 'delete',
+  exceptions      TEXT[] NOT NULL DEFAULT '{}',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE data_retention_purge_records (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  policy_id       UUID NOT NULL REFERENCES data_retention_policies(id),
+  status          purge_status NOT NULL DEFAULT 'completed',
+  records_purged  BIGINT NOT NULL DEFAULT 0,
+  records_exported BIGINT NOT NULL DEFAULT 0,
+  duration_ms     BIGINT,
+  error           TEXT,
+  completed_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_retention_purges_policy ON data_retention_purge_records(policy_id, completed_at DESC);
+
+CREATE TABLE data_retention_exports (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  policy_id       UUID NOT NULL REFERENCES data_retention_policies(id),
+  destination     TEXT NOT NULL,
+  format          TEXT NOT NULL DEFAULT 'csv',
+  records_exported BIGINT NOT NULL DEFAULT 0,
+  size_bytes      BIGINT,
+  completed_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+### Breaking Change Policy
+- Removing a policy action type: major version bump; existing policies referencing the removed action must be migrated
+- Changing purge execution semantics: major version bump; existing scheduled purges must be re-evaluated
+- Adding retention exception handling: additive, non-breaking
+
 ### Module Dependencies
 * **Depends On:** audit_log, consent
 * **Emits To:** events

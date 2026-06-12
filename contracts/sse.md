@@ -97,6 +97,19 @@ gensense_sse_connections_total               { channel, status }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Subscriber connection lost | Reconnect using `Last-Event-ID` and replay from last received event |
+| Event buffer full | Drop oldest buffered event per channel, log warning, increment `gensense_sse_events_dropped_total` |
+| Provider unavailable for stream creation | Return ProviderError, do not retry indefinitely |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** (none)
 * **Emits To:** (none -- SSE is a push protocol)

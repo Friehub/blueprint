@@ -65,6 +65,11 @@ PolicyOptions { evaluation_mode: allow_overrides|deny_overrides|first_match, log
 ### Backpressure
 * Evaluation must complete within request budget; if evaluation time exceeds a configurable threshold, return a timeout error rather than blocking.
 
+### Algorithm
+* **Recommended:** Rule-tree evaluation with short-circuit optimisation for deny-overrides mode. Policies are compiled into an AST at registration time; evaluation traverses the AST and short-circuits on the first matching deny rule in `deny_overrides` mode.
+* **Details:** Policy rules are ordered by priority within a policy. Rules with higher priority are evaluated first. The evaluation mode (`allow_overrides`, `deny_overrides`, `first_match`) determines how conflicting rules are resolved. `deny_overrides` is the recommended default for security-sensitive policies.
+* **Atomicity:** Policy definition changes (create, update, delete) must be atomic. In-flight evaluations must not see a partially updated policy. Implementations must use versioned policies with atomic activation.
+
 ### Error Taxonomy
 ### Module-Specific Errors
 ```

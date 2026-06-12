@@ -64,7 +64,24 @@ AlertConfig { expectation_id, degradation_threshold_pct, notification_channel, c
 * Validations on large datasets must be sampled or batched rather than processing all rows if the dataset exceeds the configured max_rows.
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+defineExpectation:
+    expectation_already_exists: An expectation with this name already exists for this dataset | use a different name
+    invalid_config:             Expectation config is invalid or incomplete | fix Expectation config fields
+
+  runValidation:
+    expectation_not_found:      No expectation with that ID | verify expectation_id
+    dataset_not_found:          Dataset not found or inaccessible | verify dataset reference
+    validation_timeout:         Validation exceeded the configured timeout | reduce dataset size or increase timeout
+
+  getDatasetHealth:
+    no_expectations:            No expectations defined for this dataset | define expectations first
+    dataset_not_found:          Dataset not found | verify dataset reference
+
+  alertOnDegradation:
+    already_alerted:            Alert already sent for this degradation window | cooldown not yet expired
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -94,6 +111,62 @@ gensense_data_quality_validations_total          { result }
   gensense_data_quality_degradation_alerts_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Storage Model
+* **Model:** Strongly consistent expectation definitions with append-only validation history.
+* **Details:** Expectation definitions and alert configurations must be immediately consistent. Validation results are append-only for trend analysis and scoring.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE expectation_severity AS ENUM ('error', 'warning');
+CREATE TYPE expectation_type AS ENUM ('not_null', 'unique', 'min', 'max', 'pattern', 'reference_integrity', 'custom');
+
+CREATE TABLE data_quality_expectations (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            TEXT NOT NULL,
+  dataset         TEXT NOT NULL,
+  column_name     TEXT,
+  expectation_type expectation_type NOT NULL,
+  config          JSONB NOT NULL DEFAULT '{}',
+  severity        expectation_severity NOT NULL DEFAULT 'error',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (name, dataset)
+);
+
+CREATE TABLE data_quality_validation_runs (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  expectation_id  UUID NOT NULL REFERENCES data_quality_expectations(id) ON DELETE CASCADE,
+  passed          BOOLEAN NOT NULL,
+  row_count       BIGINT NOT NULL,
+  failure_count   BIGINT NOT NULL DEFAULT 0,
+  score_pct       REAL NOT NULL CHECK (score_pct >= 0 AND score_pct <= 100),
+  duration_ms     BIGINT,
+  run_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_dq_runs_expectation ON data_quality_validation_runs(expectation_id, run_at DESC);
+
+CREATE TABLE data_quality_failures (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  run_id          UUID NOT NULL REFERENCES data_quality_validation_runs(id) ON DELETE CASCADE,
+  row_id          TEXT,
+  value           TEXT,
+  reason          TEXT NOT NULL,
+  severity        expectation_severity NOT NULL
+);
+
+CREATE INDEX idx_dq_failures_run ON data_quality_failures(run_id);
+
+CREATE TABLE data_quality_alert_config (
+  expectation_id          UUID PRIMARY KEY REFERENCES data_quality_expectations(id) ON DELETE CASCADE,
+  degradation_threshold_pct REAL NOT NULL,
+  notification_channel    TEXT NOT NULL,
+  cooldown_minutes        INT NOT NULL DEFAULT 60,
+  last_alerted_at         TIMESTAMPTZ
+);
+```
 
 ### Module Dependencies
 * **Depends On:** data_pipeline

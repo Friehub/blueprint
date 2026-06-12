@@ -85,14 +85,73 @@ User soft-delete retention:
     on_expiry:         anonymize or purge according to policy
 ```
 
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE users (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email       TEXT NOT NULL,
+  name        TEXT NOT NULL,
+  avatar_url  TEXT,
+  status      TEXT NOT NULL DEFAULT 'pending_verification'
+                CHECK (status IN ('active', 'banned', 'suspended', 'pending_verification')),
+  metadata    JSONB DEFAULT '{}',
+  deleted_at  TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX idx_users_email ON users(LOWER(email)) WHERE deleted_at IS NULL;
+CREATE INDEX idx_users_status ON users(status) WHERE deleted_at IS NULL;
+
+CREATE TABLE roles (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        TEXT NOT NULL UNIQUE,
+  permissions TEXT[] NOT NULL DEFAULT '{}',
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE user_roles (
+  user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role_id     UUID NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  assigned_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  assigned_by UUID REFERENCES users(id),
+  PRIMARY KEY (user_id, role_id)
+);
+
+CREATE INDEX idx_user_roles_user ON user_roles(user_id);
+```
+
 ### Storage Model
 * **Model:** Durable user profile store.
 * **Details:** User identity, role, and moderation state must be strongly consistent; deleted records must remain anonymizable for compliance.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `users.<function>`.
-* **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
+* **Telemetry Metrics:**
+```
+gensense_users_operation_total           counter { function, result: success|failure }
+gensense_users_operation_duration_ms     histogram { function, p50, p95, p99 }
+gensense_users_errors_total              counter { function, error_code }
+gensense_users_registrations_total       counter { status: success|duplicate|pending_verification }
+gensense_users_deletions_total           counter { reason }
+gensense_users_active_total              gauge
+```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Email uniqueness conflict | Return validation_error with duplicate email info |
+| Soft-delete race condition | Return not_found if record was already deleted; idempotent |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** (none -- owns its own data)

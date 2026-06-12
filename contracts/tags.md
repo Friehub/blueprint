@@ -166,3 +166,17 @@ type MergeTagInput = {
 - **Dependencies:** `search` (tags feed into search index facets), `audit_log` (attachment/detachment history for compliance-tagged entities), `permissions` (restrict which users may attach or delete tags in protected namespaces).
 - **Errors:** `TAG_NOT_FOUND`, `TAG_NAME_CONFLICT`, `TAG_IN_USE`, `ENTITY_REF_INVALID`, `INVALID_TAG_QUERY`, `MERGE_SOURCE_EQUALS_TARGET`.
 - **Providers (adapter examples):** Custom PostgreSQL/Redis implementation, Elasticsearch terms aggregation (for search integration), linear labels API (pattern reference).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable for tag lookup | Return TAG_NOT_FOUND, do not retry indefinitely |
+| attachTag with non-existent entityRef | Return ENTITY_REF_INVALID; caller must provide a valid entity reference |
+| mergeTag source equals target | Return MERGE_SOURCE_EQUALS_TARGET; no-op |
+| deleteTag blocked by protectIfUsed | Return TAG_IN_USE with current usage count |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise

@@ -65,7 +65,21 @@ ProjectionHandler { handle(event), reset(), getState() }
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+appendEvent:
+    stream_not_found:         Stream does not exist | create stream first
+    version_conflict:         Event version does not match expected next version | retry with correct version
+    event_type_unknown:       Event type not registered for this stream | use registered type
+
+  buildProjection:
+    projection_already_exists: Projection name already in use | use unique name
+    handler_invalid:           Projection handler does not implement required interface | fix handler
+
+  rebuildProjection:
+    rebuild_in_progress:       Projection is already being rebuilt | wait for completion
+    rebuild_timeout:           Rebuild exceeded maximum duration | retry; consider snapshot
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -73,6 +87,8 @@ All events are emitted using at-least-once delivery with UUID v4 envelope.
 appendEvent        → eventsourcing.event.appended  { stream_id, event_type, version }
   buildProjection    → eventsourcing.projection.built { projection_id, name }
   rebuildProjection  → eventsourcing.projection.rebuilt { projection_id, events_processed }
+  createSnapshot     → eventsourcing.snapshot.created  { stream_id, version }
+  subscribeToStream  → eventsourcing.subscription.created { stream_id, subscription_id }
 ```
 
 ### Temporal Constraints
@@ -84,7 +100,72 @@ Snapshot frequency:
   Projection rebuild timeout:
     default:        30 minutes
     on_expiry:      mark projection as failed; retry on next update
+
+  Event retention:
+    retention:      configurable per stream, default indefinite
+    on_expiry:      compact older events when snapshot exists
 ```
+
+### Storage Model
+* **Model:** Append-only event store with snapshot cache.
+* **Details:** Events are immutable after append. Snapshots are materialized views of stream state at a given version.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE es_streams (
+  id                TEXT PRIMARY KEY,
+  stream_type       TEXT NOT NULL,
+  current_version   INT NOT NULL DEFAULT 0,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE es_events (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  stream_id         TEXT NOT NULL REFERENCES es_streams(id),
+  version           INT NOT NULL CHECK (version > 0),
+  event_type        TEXT NOT NULL,
+  data              JSONB NOT NULL,
+  metadata          JSONB NOT NULL DEFAULT '{}',
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (stream_id, version)
+);
+
+CREATE INDEX idx_es_events_stream_ver ON es_events(stream_id, version);
+CREATE INDEX idx_es_events_stream_created ON es_events(stream_id, created_at);
+
+CREATE TABLE es_projections (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name              TEXT NOT NULL UNIQUE,
+  handler           TEXT NOT NULL,
+  current_version   INT NOT NULL DEFAULT 0,
+  status            TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('building', 'active', 'stale')),
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE es_snapshots (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  stream_id         TEXT NOT NULL REFERENCES es_streams(id),
+  version           INT NOT NULL,
+  state             JSONB NOT NULL,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (stream_id, version)
+);
+
+CREATE INDEX idx_es_snapshots_stream ON es_snapshots(stream_id, version DESC);
+```
+
+### Failure Modes & Breaking Change Policy
+
+| Failure Mode | Detection | Mitigation |
+|---|---|---|
+| Event version conflict on append | `version_conflict` error | Client must read stream head and retry append |
+| Projection rebuild timeout | `rebuild_timeout` error | Check snapshot exists; retry rebuild with snapshot |
+| Snapshot out of sync with stream | Projection state diverges | Rebuild from zero; compare snapshot with event replay |
+| Event stream compaction removes needed events | Projection cannot replay from beginning | Ensure snapshots exist before compaction; maintain archive |
+
+**Breaking Changes:** Changing the event type schema is breaking. New event types are non-breaking. Removing an event type that a projection depends on is breaking. Projection handler interface changes are breaking for all projections.
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `event_sourcing.<function>`.
@@ -94,6 +175,8 @@ gensense_event_sourcing_events_appended_total          { stream_id, event_type }
   gensense_event_sourcing_projections_building           gauge { projection_id }
   gensense_event_sourcing_snapshot_count                  gauge { stream_id }
   gensense_event_sourcing_rebuild_lag_ms                  gauge { projection_id }
+  gensense_event_sourcing_version_conflict_total          { stream_id }
+  gensense_event_sourcing_stream_size_bytes              gauge { stream_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

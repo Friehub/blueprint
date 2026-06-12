@@ -112,6 +112,20 @@ gensense_transaction_isolation_deadlocks_total    { table }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Coordinator unreachable | Distributed transaction fails with coordinator_unavailable; retry with backoff |
+| Compensation step fails | Log error, alert operator; manual intervention required for orphaned resources |
+| Deadlock detected | Lowest-priority or least-work transaction is rolled back; caller receives deadlock_detected error |
+| Serialization failure | Transaction must be retried entirely by the caller |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** distributed_lock
 * **Emits To:** events

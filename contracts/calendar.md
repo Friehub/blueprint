@@ -236,9 +236,11 @@ type UpdateOccurrenceInput = UpdateEventInput & {
 3. `publishEvent` dispatches invitations exactly once; subsequent calls to `publishEvent` on an already-`CONFIRMED` event are no-ops.
 4. `rescheduleEvent` resets all non-organiser attendee RSVP statuses to `INVITED` and re-dispatches invitations.
 5. A recurring series `RRULE` must be parseable per RFC 5545; invalid RRULE strings return `INVALID_RRULE`.
-6. `getAvailability` considers a slot busy if any event in `CONFIRMED` or `RESCHEDULED` state overlaps with it for a given user.
-7. `updateOccurrence` detaches the occurrence from the series permanently; the detached occurrence is a standalone `CalendarEvent` with no `seriesId`.
-8. Cancelled events and occurrences must remain queryable via `getEvent` and `listEvents`; they must not be physically deleted.
+6. `createEvent` must check for attendee time conflicts before persisting. If a conflict is detected across the full [start_at, end_at) range for any attendee, return `conflict_detected` with `conflicting_event_ids[]`.
+7. `getAvailability` considers a slot busy if any event in `CONFIRMED` or `RESCHEDULED` state overlaps with it for a given user. The conflict window [start_at, end_at) is half-open — sharing an exact end/start time is not a conflict.
+8. Recurring events must expand conflicts lazily per occurrence, not against the full series. `createRecurringEvent` must validate that no occurrence in the query window has a conflict, but must not materialise all occurrences to do so.
+9. `updateOccurrence` detaches the occurrence from the series permanently; the detached occurrence is a standalone `CalendarEvent` with no `seriesId`.
+10. Cancelled events and occurrences must remain queryable via `getEvent` and `listEvents`; they must not be physically deleted.
 
 ---
 
@@ -268,4 +270,17 @@ type UpdateOccurrenceInput = UpdateEventInput & {
 - **Storage model:** Event state and attendee RSVP history must remain durable; recurrence materialisation may be generated on demand.
 - **Dependencies:** `notifications` or `emails` (invitation and cancellation dispatch), `users` (attendee identity resolution), `appointments` (availability data feed for `getAvailability`), `localization` (timezone-aware formatting of event times in notifications).
 - **Errors:** `EVENT_NOT_FOUND`, `SERIES_NOT_FOUND`, `ATTENDEE_NOT_FOUND`, `INVALID_EVENT_DURATION`, `INVALID_RRULE`, `EVENT_NOT_CANCELLABLE`, `ORGANISER_REQUIRED`, `EVENT_NOT_EDITABLE`.
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 - **Providers (adapter examples):** Google Calendar API, Microsoft Graph Calendar, CalDAV (RFC 4791), Apple EventKit, custom PostgreSQL implementation.

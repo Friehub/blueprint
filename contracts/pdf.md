@@ -161,10 +161,69 @@ type ListPdfJobsInput = {
 - **Worker scaling:** Render concurrency must be configurable per source type or render pool.
 - **Multi-region:** The deployment must declare whether rendering is single-region or active/passive; duplicate job pickup across regions must be deduplicated.
 - **Observability:** Each job is a trace root; spans cover queue wait, render duration, and storage upload. `pageCount` and `fileSizeBytes` are span attributes.
+  - **Telemetry Metrics:**
+  ```
+  gensense_pdf_jobs_total               { source_type, status }
+  gensense_pdf_job_duration_ms          histogram { source_type }
+  gensense_pdf_render_duration_ms       histogram { source_type }
+  gensense_pdf_queue_wait_ms            histogram
+  gensense_pdf_artifact_size_bytes      histogram
+  gensense_pdf_queue_depth              gauge { status }
+  gensense_pdf_errors_total             { code }
+  ```
 - **Security:** URL and HTML sources must never be rendered in a context with access to internal network addresses (localhost, RFC 1918 ranges); the render sandbox must enforce network egress restrictions.
 - **Backpressure:** If the render queue is saturated, `generatePdf` must fail predictably or defer work rather than creating unbounded backlog.
 - **Dead-letter handling:** Jobs that exhaust retry policy or fail deterministically must be retained in an operator-queryable failed state until the retention window expires.
 - **Storage model:** Render artifacts live in object storage; job state and failure history must remain queryable in durable storage until expiry.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE pdf_job_status AS ENUM ('QUEUED', 'RENDERING', 'COMPLETED', 'FAILED', 'EXPIRED');
+CREATE TYPE pdf_source_type AS ENUM ('HTML_STRING', 'URL', 'TEMPLATE');
+
+CREATE TABLE pdf_jobs (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  source_type       pdf_source_type NOT NULL,
+  file_name         TEXT NOT NULL,
+  options           JSONB NOT NULL,
+  status            pdf_job_status NOT NULL DEFAULT 'QUEUED',
+  storage_ref       TEXT,
+  download_url      TEXT,
+  download_url_expires_at TIMESTAMPTZ,
+  file_size_bytes   BIGINT,
+  page_count        INT,
+  error_message     TEXT,
+  requested_by      UUID NOT NULL,
+  metadata          JSONB,
+  queued_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+  render_started_at TIMESTAMPTZ,
+  completed_at      TIMESTAMPTZ,
+  expires_at        TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_pdf_jobs_status ON pdf_jobs(status) WHERE status IN ('QUEUED', 'RENDERING', 'FAILED');
+CREATE INDEX idx_pdf_jobs_requested ON pdf_jobs(requested_by, created_at DESC);
+CREATE INDEX idx_pdf_jobs_expiry ON pdf_jobs(expires_at) WHERE status = 'COMPLETED';
+```
 - **Dependencies:** `queues` (async dispatch), `storage` (artifact persistence), `templates` (TEMPLATE source rendering), `jobs` (TTL expiry enforcement).
 - **Errors:** `JOB_NOT_FOUND`, `JOB_NOT_COMPLETE`, `JOB_EXPIRED`, `JOB_NOT_RETRYABLE`, `RENDER_TIMEOUT`, `CONTENT_TOO_LARGE`, `INVALID_URL`, `STORAGE_UNAVAILABLE`.
 - **Providers (adapter examples):** Puppeteer (Chromium headless), Playwright, wkhtmltopdf, WeasyPrint, PDFKit (Node.js), DocRaptor, Gotenberg.
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Render timeout exceeded | Transition job to FAILED with RENDER_TIMEOUT error |
+| Storage unavailable | Job completes but download URL generation fails; artifact stored but inaccessible |
+| Content too large | Return CONTENT_TOO_LARGE error before queuing |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new PDF job status enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise

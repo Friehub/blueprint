@@ -215,8 +215,66 @@ type ListIndexesInput = {
 - **Worker scaling:** Indexing and query workloads must be independently scalable.
 - **Multi-region:** The deployment must declare whether the vector index is single-region or active/active; duplicate writes across regions must be deduplicated by vector ID.
 - **Observability:** `querySimilar` and `queryByText` must emit spans annotated with `indexId`, `topK`, `resultCount`, and `queryLatencyMs`.
+- **Telemetry Metrics:**
+  ```
+  gensense_embeddings_index_count                gauge { status }
+  gensense_embeddings_vector_count               gauge { index_id }
+  gensense_embeddings_upsert_total               { index_id, result }
+  gensense_embeddings_query_total                { index_id }
+  gensense_embeddings_query_duration_ms          histogram { index_id }
+  gensense_embeddings_embed_total                { model }
+  gensense_embeddings_embed_tokens_total         { model }
+  ```
 - **Backpressure:** If indexing or query load is saturated, requests must be buffered or rejected predictably rather than silently dropped.
 - **Storage model:** Vector indexes must be durably stored; the provider must document replication and rebuild behavior.
+
+### Database Schema (pgvector / PostgreSQL variant)
+
+```sql
+CREATE TABLE embedding_indexes (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name              TEXT NOT NULL UNIQUE,
+  dimensions        INT NOT NULL CHECK (dimensions > 0),
+  distance_metric   TEXT NOT NULL CHECK (distance_metric IN ('COSINE', 'EUCLIDEAN', 'DOT_PRODUCT')),
+  model             TEXT NOT NULL,
+  status            TEXT NOT NULL DEFAULT 'CREATING' CHECK (status IN ('CREATING', 'READY', 'UPDATING', 'DELETING')),
+  description       TEXT,
+  metadata          JSONB DEFAULT '{}',
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE embedding_vectors (
+  vector_id         TEXT NOT NULL,
+  index_id          UUID NOT NULL REFERENCES embedding_indexes(id) ON DELETE CASCADE,
+  embedding         vector(1536),        -- dimension set at index creation
+  metadata          JSONB DEFAULT '{}',
+  upserted_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (index_id, vector_id)
+);
+
+CREATE INDEX idx_vectors_index ON embedding_vectors(index_id);
+
+-- Supports filtering queries using GIN index on metadata
+CREATE INDEX idx_vectors_metadata ON embedding_vectors USING GIN (metadata jsonb_path_ops);
+
+-- Supports deleteVectorsByFilter lookups
+CREATE INDEX idx_vectors_metadata_entity ON embedding_vectors ((metadata->>'entityType'), (metadata->>'entityId'))
+  WHERE metadata ? 'entityType';
+```
+
+### Failure Modes & Breaking Change Policy
+
+| Failure Mode | Detection | Mitigation |
+|---|---|---|
+| Dimension mismatch on upsert | `DIMENSION_MISMATCH` error | Validate dimensions against index definition before ingest |
+| Model unavailable for embedding | `MODEL_UNAVAILABLE` error | Retry with backoff; fall back to cached embedding if available |
+| Index not ready for query | `INDEX_NOT_READY` error | Queue query; retry when status transitions to READY |
+| Vector index rebuild required | Index corruption detected | Rebuild from source data; maintain secondary index during rebuild |
+| Content too large for embedding | `CONTENT_TOO_LARGE` error | Chunk content before embedding; recommend max token limit |
+
+**Breaking Changes:** Changing the distance metric on an existing index requires a new index and data migration. Reducing dimensions is breaking for existing vectors. Adding new required fields to metadata is breaking for query filters. The `DistanceMetric` enum is extensible; removing a value is breaking. Model family changes require index recreation.
+
 - **Dependencies:** `storage` (if source content exceeds inline payload limits), `search` (hybrid queries use the keyword layer from `search`), `config` (model endpoint and API key references via the secrets module).
 - **Errors:** `INDEX_NOT_FOUND`, `VECTOR_NOT_FOUND`, `DIMENSION_MISMATCH`, `INVALID_TOP_K`, `MODEL_UNAVAILABLE`, `CONTENT_TOO_LARGE`, `INDEX_NOT_READY`.
 - **Providers (adapter examples):** Pinecone, Weaviate, Qdrant, pgvector (PostgreSQL extension), Chroma, Milvus, OpenAI Embeddings API (generation), Cohere Embed.

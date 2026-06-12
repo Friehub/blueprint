@@ -62,7 +62,27 @@ LineageEntry { dataset_id, source, target, transformation, created_at }
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+registerDataset:
+    dataset_already_exists:     A dataset with this name already exists in the domain | use a different name
+    invalid_schema:             Dataset schema has invalid field definitions | fix FieldDef entries
+
+  getDataset:
+    dataset_not_found:          No dataset with that ID | verify dataset_id
+    dataset_archived:           Dataset is archived | use include_archived flag to access
+
+  addLineage:
+    cycle_detected:             Adding this lineage would create a cycle in the graph | verify upstream/downstream
+    dataset_not_found:          One or more datasets in lineage are not found | verify all dataset IDs
+
+  tagDataset:
+    dataset_not_found:          No dataset with that ID | verify dataset_id
+    tag_required:               PII datasets must have at least one governance tag | add governance tag
+
+  archiveDataset:
+    already_archived:           Dataset is already archived | no action needed
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -92,6 +112,49 @@ gensense_data_catalog_datasets_total            { status }
   gensense_data_catalog_pii_datasets_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Storage Model
+* **Model:** Strongly consistent catalog store with append-only lineage graph.
+* **Details:** Dataset metadata and governance tags must be immediately consistent. Lineage entries are append-only and must support graph traversal queries.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE dataset_status AS ENUM ('active', 'archived');
+
+CREATE TABLE data_catalog_datasets (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            TEXT NOT NULL,
+  domain          TEXT NOT NULL,
+  description     TEXT,
+  schema_def      JSONB NOT NULL DEFAULT '[]',
+  owner           TEXT NOT NULL,
+  tags            TEXT[] NOT NULL DEFAULT '{}',
+  pii             BOOLEAN NOT NULL DEFAULT false,
+  status          dataset_status NOT NULL DEFAULT 'active',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_updated    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX idx_catalog_dataset_name_domain ON data_catalog_datasets(name, domain);
+CREATE INDEX idx_catalog_dataset_domain ON data_catalog_datasets(domain);
+CREATE INDEX idx_catalog_dataset_tags ON data_catalog_datasets USING gin(tags);
+CREATE INDEX idx_catalog_dataset_pii ON data_catalog_datasets(pii) WHERE pii = true;
+
+CREATE TABLE data_catalog_lineage (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  dataset_id      UUID NOT NULL REFERENCES data_catalog_datasets(id) ON DELETE CASCADE,
+  source_id       UUID NOT NULL REFERENCES data_catalog_datasets(id),
+  target_id       UUID NOT NULL REFERENCES data_catalog_datasets(id),
+  transformation  TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT lineage_no_self_loop CHECK (source_id <> target_id)
+);
+
+CREATE INDEX idx_catalog_lineage_source ON data_catalog_lineage(source_id);
+CREATE INDEX idx_catalog_lineage_target ON data_catalog_lineage(target_id);
+```
 
 ### Module Dependencies
 * **Depends On:** data_warehouse

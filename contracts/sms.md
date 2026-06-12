@@ -30,9 +30,15 @@ NumberLookup { valid, carrier?, country_code, line_type: mobile | landline | voi
 
 ## System-Level Integrations & Constraints
 
+### Invariants
+- `send` must reject payloads exceeding `max_size` with a `ValidationError` — truncation without caller consent is not permitted
+- `sendBulk` must process recipients independently — failure for one recipient must not block delivery to others
+- `getDeliveryStatus` for a message that has exhausted all retry attempts must return a terminal failure status
+- A message sent with an `idempotency_key` must not be dispatched more than once — duplicate calls must return the existing DeliveryResult
+
 ### Consistency Model
 * **Model:** `strong (default)`
-* **Details:** Standard transactional consistency
+* **Details:** Delivery log state must be immediately consistent; provider-side delivery status is eventually consistent
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_least_once`
@@ -48,17 +54,31 @@ NumberLookup { valid, carrier?, country_code, line_type: mobile | landline | voi
 
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+* **Required Functions:** `send`, `sendBulk`
 
 ### Backpressure
 * If provider capacity is saturated, the module must return a predictable retry signal or defer sending.
-* `sendBulk` must not allow unbounded backlog growth.
+* `sendBulk` must not allow unbounded backlog growth — implement a configurable max queue depth per provider.
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+send:
+    provider_unreachable:     Provider is not reachable | queue for retry
+    invalid_recipient:        Phone number is invalid or blocked | do not retry
+    content_blocked:          Message content rejected by provider or carrier | do not retry
+
+  sendBulk:
+    partial_failure:          Some recipients failed | inspect failed[] for details
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
-* None explicitly defined. Custom events must use the canonical domain envelope.
+```
+send         → sms.sent               { message_id, recipient, status }
+sendBulk     → sms.bulk.completed     { batch_id, succeeded_count, failed_count }
+getDeliveryStatus → sms.delivery.updated  { message_id, status }
+```
 
 ### Temporal Constraints
 ```
@@ -83,10 +103,61 @@ Send attempts:
 * **Model:** Durable delivery log.
 * **Details:** Send state and failure history must remain queryable during the retention window.
 
+```sql
+CREATE TABLE sms_messages (
+    id              UUID PRIMARY KEY,
+    recipient       VARCHAR(20) NOT NULL,
+    body            TEXT NOT NULL,
+    sender_id       VARCHAR(100),
+    status          VARCHAR(50) NOT NULL DEFAULT 'pending',
+    provider        VARCHAR(100),
+    provider_ref    VARCHAR(255),
+    attempt_count   INTEGER NOT NULL DEFAULT 0,
+    max_attempts    INTEGER NOT NULL DEFAULT 3,
+    last_error      TEXT,
+    idempotency_key VARCHAR(255) UNIQUE,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE sms_delivery_events (
+    id              UUID PRIMARY KEY,
+    message_id      UUID NOT NULL REFERENCES sms_messages(id),
+    status          VARCHAR(50) NOT NULL,
+    provider_status VARCHAR(255),
+    occurred_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_sms_messages_status ON sms_messages(status);
+CREATE INDEX idx_sms_delivery_events_message ON sms_delivery_events(message_id);
+```
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `sms.<function>`.
-* **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
+* **Telemetry Metrics:**
+```
+gensense_sms_operation_total               counter { function, result: success|failure }
+gensense_sms_operation_duration_ms         histogram { function, p50, p95, p99 }
+gensense_sms_errors_total                  counter { function, error_code }
+gensense_sms_messages_sent_total           counter { provider, status }
+gensense_sms_bulk_recipients_total         counter { provider }
+gensense_sms_balance_gauge                 gauge { currency }
+```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Provider unavailable for send | Return provider_unreachable, queue for retry with backoff |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Invalid recipient number | Return invalid_recipient, do not retry |
+| Partial failure in sendBulk | Return partial_failure with succeeded[] and failed[] arrays |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** (none -- wraps external provider)

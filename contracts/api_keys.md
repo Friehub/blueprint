@@ -64,7 +64,12 @@ ApiKeyValidation { valid, user_id?, scopes?, reason? }
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
-* None explicitly defined. Custom events must use the canonical domain envelope.
+```
+createApiKey     → api_keys.key.created        { key_id, user_id, scopes, prefix }
+revokeApiKey     → api_keys.key.revoked        { key_id, user_id }
+rotateApiKey     → api_keys.key.rotated        { key_id, user_id }
+                 → api_keys.key.expiring_soon  { key_id, user_id, expires_at }  (7 days before expiry)
+```
 
 ### Temporal Constraints
 ```
@@ -80,10 +85,77 @@ ApiKey (with expires_at set):
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `api_keys.<function>`.
-* **Telemetry Metrics:** Emits universal metrics (`gensense_<module>_operation_total`, `gensense_<module>_operation_duration_ms`, `gensense_<module>_errors_total`).
+* **Telemetry Metrics:**
+```
+gensense_api_keys_operation_total               counter { function, result }
+gensense_api_keys_operation_duration_ms         histogram { function }
+gensense_api_keys_errors_total                  counter { function, error_code }
+gensense_api_keys_keys_total                     gauge { status }
+gensense_api_keys_validations_total              counter { result }
+gensense_api_keys_rotations_total                counter
+```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
 * **Depends On:** users
 * **Emits To:** events
 * **Recommends:** audit_log, rate_limiting
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE api_keys (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name            TEXT NOT NULL,
+  prefix          TEXT NOT NULL,
+  key_hash        TEXT NOT NULL,
+  key_type        TEXT NOT NULL DEFAULT 'secret'
+                    CHECK (key_type IN ('secret', 'publishable')),
+  environment     TEXT NOT NULL DEFAULT 'live'
+                    CHECK (environment IN ('live', 'test')),
+  scopes          TEXT[] NOT NULL DEFAULT '{}',
+  status          TEXT NOT NULL DEFAULT 'active'
+                    CHECK (status IN ('active', 'revoked', 'expired', 'rotated')),
+  last_used_at    TIMESTAMPTZ,
+  expires_at      TIMESTAMPTZ,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  revoked_at      TIMESTAMPTZ
+);
+
+CREATE INDEX idx_api_keys_user ON api_keys(user_id, status);
+CREATE INDEX idx_api_keys_prefix ON api_keys(prefix);
+CREATE INDEX idx_api_keys_expiry ON api_keys(expires_at) WHERE status = 'active' AND expires_at IS NOT NULL;
+
+CREATE TABLE api_key_audit (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  api_key_id      UUID NOT NULL REFERENCES api_keys(id) ON DELETE CASCADE,
+  action          TEXT NOT NULL CHECK (action IN ('created', 'revoked', 'rotated', 'expired', 'validated')),
+  actor_id        UUID,
+  ip_address      INET,
+  metadata        JSONB DEFAULT '{}',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_api_key_audit_key ON api_key_audit(api_key_id, created_at DESC);
+```
+
+### Storage Model
+* **Model:** Durable key registry with revocation index.
+* **Details:** Raw secrets must be shown only once at creation; the stored record retains only the non-secret metadata and a bcrypt/Argon2id hash needed for validation.
+
+### Breaking Change Policy
+- Adding a new key type or environment value is additive and backward-compatible.
+- Removing or renaming an existing key type requires a MAJOR version bump.
+- Changing the hashing algorithm requires a MAJOR version bump (existing hashes become invalid).
+- Adding new required fields to `createApiKey` input requires a MAJOR version bump.
+
+### Failure Modes
+| Mode | Cause | Mitigation |
+|------|-------|-----------|
+| Key hash collision | Truncated hash from weak algorithm | Use full hash output; log if collision detected |
+| Raw key leaked after creation | Stored in server log | Mask raw key immediately after return; never log key material |
+| Revocation propagation delay | Multi-region replication lag | Use strong consistency for validateApiKey reads; reject if status not confirmed |
+| Expired key accepted | Clock skew between services | Validate expiry using UTC clock; allow 30-second grace period |
+| Rotate returns same key | Concurrency race on rotation | Serialize rotation per key_id; log warning on duplicate |

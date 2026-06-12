@@ -117,6 +117,20 @@ gensense_voice_video_rooms_created_total            { status }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| SFU unavailable | Room creation fails with ProviderError; retry with different region |
+| Recording storage full | Recording fails with provider_error; notify room owner |
+| Transcription engine timeout | Return partial transcription with available segments; do not block the room |
+| Token expiry during active call | Participant is disconnected; client must rejoin with new token |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** users
 * **Emits To:** events

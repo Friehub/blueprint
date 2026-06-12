@@ -111,6 +111,20 @@ gensense_migration_strategies_total          { strategy, result }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Lock timeout during expand phase | Return lock_timeout; retry after backoff |
+| Dual-write verification fails | Return conflict details; do not proceed to contract phase |
+| Rollback exceeds safe window | Return rollback_not_safe; require manual DBA intervention |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new migration strategy: non-breaking if existing strategies remain supported; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** migrations
 * **Emits To:** events

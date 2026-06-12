@@ -104,6 +104,15 @@ gensense_circuit_breaker_state_changes_total     { breaker_name, state }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Storage Model
+* **Model:** In-memory state with optional distributed store for cross-instance coordination.
+* **Details:** By default breaker state is local to the process. When shared state is configured, each state transition writes to the shared store synchronously using atomic compare-and-swap to prevent split-brain during half-open recovery.
+
+### Breaking Change Policy
+- Adding a new state: additive, non-breaking
+- Changing state transition rules: major version bump; existing breakers must re-register
+- Removing a breaker name or renaming: major version bump; all dependent callers must update
+
 ### Module Dependencies
 * **Depends On:** (none -- infrastructure primitive)
 * **Emits To:** events

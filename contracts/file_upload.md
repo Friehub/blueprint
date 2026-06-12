@@ -94,8 +94,88 @@ Upload session timeout:
     on_expiry:      retry invalidation up to 3 times
 ```
 
+### Storage Model
+* **Model:** Durable upload session and file asset store with virus scan metadata.
+* **Details:** Upload sessions are ephemeral (TTL-driven). File assets are durable. Scan results are immutable.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TYPE upload_session_status AS ENUM ('initiated', 'uploading', 'completed', 'cancelled');
+CREATE TYPE virus_status AS ENUM ('pending', 'clean', 'infected', 'error');
+
+CREATE TABLE upload_sessions (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  file_name         TEXT NOT NULL,
+  mime_type         TEXT NOT NULL,
+  total_size        BIGINT NOT NULL,
+  chunk_count       INT NOT NULL,
+  completed_chunks  INT NOT NULL DEFAULT 0,
+  status            upload_session_status NOT NULL DEFAULT 'initiated',
+  expires_at        TIMESTAMPTZ NOT NULL,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_upload_sessions_expires ON upload_sessions(expires_at)
+  WHERE status IN ('initiated', 'uploading');
+
+CREATE TABLE file_assets (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  file_name         TEXT NOT NULL,
+  mime_type         TEXT NOT NULL,
+  size              BIGINT NOT NULL,
+  storage_path      TEXT NOT NULL,
+  checksum          TEXT NOT NULL,
+  virus_status      virus_status NOT NULL DEFAULT 'pending',
+  uploaded_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE virus_scan_results (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  file_id           UUID NOT NULL REFERENCES file_assets(id),
+  status            virus_status NOT NULL,
+  scanner           TEXT NOT NULL,
+  threats           JSONB,
+  scanned_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_scan_results_file ON virus_scan_results(file_id);
+
+CREATE TABLE cdn_invalidations (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  file_id           UUID NOT NULL REFERENCES file_assets(id),
+  paths             JSONB,
+  status            TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed')),
+  attempts          INT NOT NULL DEFAULT 0,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+### Failure Modes & Breaking Change Policy
+
+| Failure Mode | Detection | Mitigation |
+|---|---|---|
+| Upload session timeout | Session expires with no chunks received | Auto-cancel; clean up partial chunks |
+| Checksum mismatch on completion | `completeUpload` checksum validation fails | Reject; client must re-upload corrupted chunks |
+| Virus scan detects infection | `ScanResult.status` = infected | Quarantine file; revoke public URL; notify uploader |
+| CDN invalidation fails after retries | `cdn_invalidations.status` = failed | Retry manually; invalidate via provider UI as fallback |
+| Chunk upload exceeds session limit | `upload_capacity_exceeded` | Reject new uploads; scale chunk ingestion workers |
+
+**Breaking Changes:** Changing the chunk size or checksum algorithm is breaking for in-flight upload sessions. MIME type validation changes may break existing allowed types. `SignedUrl` expiry reduction is breaking for clients with long-running operations.
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `file_upload.<function>`.
+* **Telemetry Metrics:**
+```
+gensense_file_upload_sessions_total            { status }
+gensense_file_upload_chunks_received_total     { session_id }
+gensense_file_upload_scan_results_total        { status }
+gensense_file_upload_cdn_invalidation_total    { status }
+gensense_file_upload_throughput_bytes          gauge
+gensense_file_upload_size_distribution         histogram
+```
+* **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
 * **Depends On:** media

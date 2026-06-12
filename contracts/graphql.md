@@ -81,10 +81,25 @@ publishSubscription → graphql.subscription.published { topic, subscriber_count
 * **Telemetry Metrics:**
 ```
 gensense_graphql_queries_total           { operation_name, result }
-  gensense_graphql_field_resolve_duration_ms  histogram { type_name, field_name }
-  gensense_graphql_subscription_events_total   { topic }
+gensense_graphql_field_resolve_duration_ms  histogram { type_name, field_name }
+gensense_graphql_subscription_events_total   { topic }
+gensense_graphql_query_complexity_score      gauge { operation_name }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+| Invalid schema definition | Return validation error listing offending type/field |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** (none -- wraps external GraphQL library or provider)

@@ -215,11 +215,170 @@ type ListExperimentsInput = {
 
 ---
 
-## System-Level Integrations
+## System-Level Integrations & Constraints
 
-- **Idempotency:** `assignVariant` and `recordExposure` are idempotent on `(experimentId, subjectId)`.
-- **Consistency:** Assignments must be written to durable storage before `assignVariant` returns; in-memory-only assignment breaks the idempotency guarantee across process restarts.
-- **Observability:** All assignment and exposure events must carry the experiment ID and variant ID as trace attributes so downstream analytics can join on experiment participation.
-- **Dependencies:** `feature_flags` (experiments can gate on flags for eligibility), `analytics` (metric observation pipeline), `caching` (assignment cache for hot-path latency), `audit_log` (experiment lifecycle changes).
-- **Errors:** `EXPERIMENT_NOT_FOUND`, `EXPERIMENT_NOT_RUNNING`, `INVALID_ALLOCATION`, `SUBJECT_NOT_ASSIGNED`, `METRIC_NOT_DEFINED`, `VARIANT_NOT_FOUND`, `EXPERIMENT_NOT_STOPPABLE`.
-- **Providers (adapter examples):** Custom Bayesian/frequentist implementation, LaunchDarkly experiments, Optimizely, GrowthBook, Statsig.
+### Consistency Model
+* **Model:** `strong (default)`
+* **Details:** Experiment state transitions, variant assignments, and exposure records must be immediately consistent. Metric observations may be eventually consistent (≤ 5 seconds lag).
+
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for experiment lifecycle events and metric observations.
+* **Details:** Duplicate assignment events must be idempotent on `(experimentId, subjectId)`.
+
+### Worker Scaling
+* **Policy:** Experiment assignment (hot path), metric ingestion (async), and statistical computation must be independently scalable.
+
+### Multi-Region Behavior
+* **Mode:** Experiment definitions are global; assignment and exposure records are region-local.
+* **Details:** A subject must be assigned to the same variant regardless of region. `DETERMINISTIC_HASH` allocation strategy ensures cross-region consistency.
+
+### Idempotency Requirements
+* **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+* **Required Functions:**
+  - `assignVariant(input, idempotency_key?)`
+  - `recordExposure(input, idempotency_key?)`
+  - `recordMetric(input, idempotency_key?)`
+
+### Backpressure
+* If `assignVariant` capacity is saturated (hot-path), the module must degrade gracefully by reading from the assignment cache and deferring write-back. `recordMetric` may buffer and batch under load.
+
+### Error Taxonomy
+* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+* Domain errors: `EXPERIMENT_NOT_FOUND`, `EXPERIMENT_NOT_RUNNING`, `INVALID_ALLOCATION`, `SUBJECT_NOT_ASSIGNED`, `METRIC_NOT_DEFINED`, `VARIANT_NOT_FOUND`, `EXPERIMENT_NOT_STOPPABLE`, `EXPERIMENT_ALREADY_CONCLUDED`, `INVALID_TRANSITION`.
+
+### Event Emission
+All events are emitted using at-least-once delivery with UUID v4 envelope.
+```
+experiment.created
+experiment.started
+experiment.paused
+experiment.resumed
+experiment.stopped
+experiment.concluded           { winningVariantId }
+experiment.variant.assigned    { subjectId, variantId }
+experiment.variant.exposed     { subjectId, variantId }
+experiment.metric.recorded     { subjectId, metricName, value }
+```
+
+### Temporal Constraints
+```
+Experiment:
+    max_duration:       90 days (running)
+    on_expiry:          auto-stop after max_duration; emit experiment.stopped
+
+    pause_max_duration: 30 days
+    on_expiry:          auto-stop; subjects retain assignment
+
+    data_retention:     365 days after conclusion
+    on_expiry:          eligible for anonymisation; aggregate results preserved
+```
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE ab_experiments (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name              TEXT NOT NULL,
+  hypothesis         TEXT,
+  status            TEXT NOT NULL DEFAULT 'draft'
+                      CHECK (status IN ('draft', 'running', 'paused', 'stopped', 'concluded', 'archived')),
+  allocation_strategy TEXT NOT NULL DEFAULT 'DETERMINISTIC_HASH'
+                      CHECK (allocation_strategy IN ('RANDOM', 'DETERMINISTIC_HASH', 'STICKY_SESSION')),
+  traffic_percent   INTEGER NOT NULL CHECK (traffic_percent BETWEEN 0 AND 100),
+  eligibility_criteria JSONB DEFAULT '{}',
+  winning_variant_id UUID,
+  conclusion_notes  TEXT,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  started_at        TIMESTAMPTZ,
+  stopped_at        TIMESTAMPTZ,
+  concluded_at      TIMESTAMPTZ
+);
+
+CREATE INDEX idx_ab_experiments_status ON ab_experiments(status, created_at DESC);
+
+CREATE TABLE ab_variants (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  experiment_id     UUID NOT NULL REFERENCES ab_experiments(id) ON DELETE CASCADE,
+  name              TEXT NOT NULL,
+  description       TEXT,
+  allocation_percent INTEGER NOT NULL CHECK (allocation_percent BETWEEN 0 AND 100),
+  is_control        BOOLEAN NOT NULL DEFAULT false,
+  UNIQUE (experiment_id, is_control) WHERE is_control = true
+);
+
+CREATE INDEX idx_ab_variants_experiment ON ab_variants(experiment_id);
+
+CREATE TABLE ab_target_metrics (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  experiment_id     UUID NOT NULL REFERENCES ab_experiments(id) ON DELETE CASCADE,
+  name              TEXT NOT NULL,
+  metric_type       TEXT NOT NULL CHECK (metric_type IN ('BINARY', 'CONTINUOUS')),
+  is_primary        BOOLEAN NOT NULL DEFAULT false,
+  UNIQUE (experiment_id, name)
+);
+
+CREATE UNIQUE INDEX idx_ab_metrics_one_primary ON ab_target_metrics(experiment_id) WHERE is_primary = true;
+
+CREATE TABLE ab_assignments (
+  experiment_id     UUID NOT NULL REFERENCES ab_experiments(id) ON DELETE CASCADE,
+  subject_id        TEXT NOT NULL,
+  variant_id        UUID NOT NULL REFERENCES ab_variants(id),
+  assigned_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  exposed           BOOLEAN NOT NULL DEFAULT false,
+  exposed_at        TIMESTAMPTZ,
+  PRIMARY KEY (experiment_id, subject_id)
+);
+
+CREATE INDEX idx_ab_assignments_variant ON ab_assignments(variant_id);
+
+CREATE TABLE ab_metric_observations (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  experiment_id     UUID NOT NULL REFERENCES ab_experiments(id) ON DELETE CASCADE,
+  subject_id        TEXT NOT NULL,
+  metric_name       TEXT NOT NULL,
+  value             NUMERIC(19,4) NOT NULL,
+  recorded_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_ab_observations_experiment ON ab_metric_observations(experiment_id, metric_name, recorded_at);
+```
+
+### Storage Model
+* **Model:** Durable experiment metadata and assignment store with append-only metric observations.
+* **Details:** Assignment cache (Redis) sits in front for sub-millisecond `assignVariant` hot path. Experiments and variants use PostgreSQL with strong consistency. Metric observations are append-only for analytical queries.
+
+### Observability
+* **Tracing Spans:** Every function call creates a span. Span names follow the pattern `ab_testing.<function>`. Assignment spans carry `experiment_id`, `variant_id`, and `subject_id` as attributes.
+* **Telemetry Metrics:**
+```
+gensense_ab_testing_operation_total               counter { function, result }
+gensense_ab_testing_operation_duration_ms         histogram { function }
+gensense_ab_testing_errors_total                  counter { function, error_code }
+gensense_ab_testing_assignments_total              counter { experiment_id, variant_id }
+gensense_ab_testing_exposures_total                counter { experiment_id, variant_id }
+gensense_ab_testing_metrics_recorded_total         counter { experiment_id, metric_name }
+gensense_ab_testing_assignment_cache_hit_ratio     gauge
+gensense_ab_testing_experiment_duration_ms         histogram { status }
+```
+* **SLO Targets:** `assignVariant` P99 ≤ 10ms (including cache); `recordMetric` P99 ≤ 100ms (async buffered).
+
+### Module Dependencies
+* **Depends On:** feature_flags, analytics, caching, audit_log
+* **Emits To:** events
+* **Recommends:** notifications (experiment lifecycle alerts), reporting (results dashboards), users (subject identity)
+
+### Breaking Change Policy
+- Adding new experiment status values or allocation strategies is additive and backward-compatible.
+- Removing or renaming an existing status value requires a MAJOR version bump.
+- Changing the `assignVariant` idempotency semantics (hash key composition) requires a MAJOR version bump.
+- Adding new required fields to `CreateExperimentInput` requires a MAJOR version bump.
+
+### Failure Modes
+| Mode | Cause | Mitigation |
+|------|-------|-----------|
+| Assignment inconsistency | Cache miss falls back to different variant | Write-through cache with DB authoritativeness; reconcile on read |
+| Metric lost during ingestion | Buffer overflow under high traffic | Sample or drop oldest; log dropped count |
+| Experiment auto-stopped | max_duration reached | Graceful stop; emit event; preserve data for analysis |
+| Statistical computation timeout | Large dataset with many variants | Stream computation; return partial results with warning |
+| Cross-region hash mismatch | Different hash function implementations | Pin hash algorithm via allocation_strategy config |

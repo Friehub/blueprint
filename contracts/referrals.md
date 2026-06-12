@@ -212,11 +212,103 @@ type ReferralStats = {
 
 ---
 
+## Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE referral_programs (
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name                  TEXT NOT NULL,
+  description           TEXT,
+  active                BOOLEAN NOT NULL DEFAULT true,
+  qualifying_condition  JSONB NOT NULL,
+  reward_rules          JSONB NOT NULL,
+  max_rewards_per_referrer INT,
+  self_referral_allowed BOOLEAN NOT NULL DEFAULT false,
+  code_prefix           TEXT,
+  expiry_days           INT,
+  created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE referral_codes (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  code          TEXT NOT NULL,
+  referrer_id   UUID NOT NULL,
+  program_id    UUID NOT NULL REFERENCES referral_programs(id),
+  usage_count   INT NOT NULL DEFAULT 0,
+  max_usage     INT,
+  active        BOOLEAN NOT NULL DEFAULT true,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at    TIMESTAMPTZ
+);
+
+CREATE UNIQUE INDEX idx_referral_codes_code ON referral_codes(LOWER(code));
+CREATE INDEX idx_referral_codes_referrer ON referral_codes(referrer_id, program_id);
+
+CREATE TABLE referrals (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  code            TEXT NOT NULL,
+  referrer_id     UUID NOT NULL,
+  referee_id      UUID NOT NULL,
+  program_id      UUID NOT NULL REFERENCES referral_programs(id),
+  status          TEXT NOT NULL DEFAULT 'PENDING'
+                    CHECK (status IN ('PENDING', 'CONVERTED', 'EXPIRED')),
+  attributed_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  converted_at    TIMESTAMPTZ,
+  expires_at      TIMESTAMPTZ
+);
+
+CREATE INDEX idx_referrals_referrer ON referrals(referrer_id, status);
+CREATE INDEX idx_referrals_referee ON referrals(referee_id);
+CREATE UNIQUE INDEX idx_referrals_referee_program ON referrals(referee_id, program_id);
+
+CREATE TABLE referral_conversions (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  referral_id         UUID NOT NULL REFERENCES referrals(id) ON DELETE CASCADE,
+  status              TEXT NOT NULL DEFAULT 'PENDING'
+                        CHECK (status IN ('PENDING', 'VALIDATED', 'REWARDED', 'INVALIDATED')),
+  triggering_action   TEXT NOT NULL,
+  action_value        BIGINT,
+  currency            TEXT,
+  invalidation_reason TEXT,
+  recorded_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+  validated_at        TIMESTAMPTZ,
+  rewarded_at         TIMESTAMPTZ
+);
+
+CREATE INDEX idx_referral_conversions_referral ON referral_conversions(referral_id);
+```
+
 ## System-Level Integrations
 
 - **Idempotency:** `issueCode` is idempotent on `(referrerId, programId)`; returns existing code. `recordConversion` is idempotent on `(refereeId, triggeringAction)`.
 - **Consistency:** Attribution and conversion must be written in the same transaction or via a saga; partial writes that leave a conversion without a referral record are invalid.
 - **Observability:** The full referral funnel (attributed → converted → validated → rewarded) must be traceable as linked spans on a single root trace.
+```
+gensense_referrals_operation_total          counter { function, result: success|failure }
+gensense_referrals_operation_duration_ms    histogram { function, p50, p95, p99 }
+gensense_referrals_errors_total             counter { function, error_code }
+gensense_referrals_attributed_total         counter { program_id }
+gensense_referrals_converted_total          counter { program_id }
+gensense_referrals_validated_total          counter { program_id }
+gensense_referrals_rewarded_total           counter { reward_type }
+gensense_referrals_invalidated_total        counter { reason }
+gensense_referrals_fraud_detected_total     counter
+```
 - **Dependencies:** `users` (referrer/referee identity), `billing` or `loyalty` or `payments` (reward fulfillment), `fraud_detection` (self-referral and gaming detection), `notifications` (reward delivery).
 - **Errors:** `PROGRAM_NOT_FOUND`, `CODE_NOT_FOUND`, `CODE_EXPIRED`, `CODE_EXHAUSTED`, `REFERRAL_NOT_FOUND`, `REFEREE_ALREADY_ATTRIBUTED`, `SELF_REFERRAL_DETECTED`, `REWARD_CAP_REACHED`.
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 - **Providers (adapter examples):** Custom implementation, ReferralHero, Friendbuy, Rewardful (affiliate), Impact.com.

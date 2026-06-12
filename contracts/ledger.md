@@ -91,6 +91,60 @@ Ledger retention:
     on_expiry:         archive only if allowed by policy
 ```
 
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE ledgers (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        TEXT NOT NULL,
+  currency    TEXT NOT NULL CHECK (char_length(currency) = 3),
+  status      TEXT NOT NULL DEFAULT 'active'
+                CHECK (status IN ('active', 'suspended')),
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE ledger_accounts (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ledger_id   UUID NOT NULL REFERENCES ledgers(id) ON DELETE CASCADE,
+  type        TEXT NOT NULL CHECK (type IN ('asset', 'liability', 'equity', 'revenue', 'expense')),
+  name        TEXT,
+  currency    TEXT NOT NULL CHECK (char_length(currency) = 3),
+  status      TEXT NOT NULL DEFAULT 'active'
+                CHECK (status IN ('active', 'closed', 'frozen')),
+  balance     BIGINT NOT NULL DEFAULT 0,
+  version     INT NOT NULL DEFAULT 0,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_ledger_accounts_ledger ON ledger_accounts(ledger_id);
+
+CREATE TABLE ledger_transactions (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ledger_id   UUID NOT NULL REFERENCES ledgers(id),
+  reference   TEXT NOT NULL,
+  metadata    JSONB DEFAULT '{}',
+  posted_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX idx_ledger_tx_reference ON ledger_transactions(ledger_id, reference);
+CREATE INDEX idx_ledger_tx_posted ON ledger_transactions(posted_at DESC);
+
+CREATE TABLE ledger_postings (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  transaction_id  UUID NOT NULL REFERENCES ledger_transactions(id) ON DELETE CASCADE,
+  account_id      UUID NOT NULL REFERENCES ledger_accounts(id),
+  direction       TEXT NOT NULL CHECK (direction IN ('debit', 'credit')),
+  amount          BIGINT NOT NULL CHECK (amount > 0),
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_ledger_postings_tx ON ledger_postings(transaction_id);
+CREATE INDEX idx_ledger_postings_account ON ledger_postings(account_id, created_at DESC);
+```
+
 ### Storage Model
 * **Model:** Immutable double-entry ledger store.
 * **Details:** Postings are append-only; corrections must be represented by compensating transactions.
@@ -104,6 +158,19 @@ gensense_ledger_transactions_total          counter { result: success|failure }
 gensense_ledger_account_balance_snapshot    gauge { account_id }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** (none -- owns its own financial ledger data layer)

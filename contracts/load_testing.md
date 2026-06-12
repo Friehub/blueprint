@@ -65,7 +65,19 @@ ComparisonRun { run_id, scenario, score, metrics: MetricSummary }
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Error Taxonomy
-* Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
+### Module-Specific Errors
+```
+runScenario:
+    scenario_not_found:       Scenario ID does not exist | verify scenario_id
+    scenario_locked:          Scenario is currently running | wait for completion before re-running
+    sla_threshold_breached:   Running scenario would violate SLA thresholds | adjust thresholds or resources
+
+  cancelRun:
+    run_not_running:          Run is not in progress | verify run status before cancel
+
+  validateSla:
+    no_thresholds_defined:    No SLA thresholds configured for scenario | define thresholds or skip validation
+```
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
@@ -93,10 +105,26 @@ Max scenario duration:
 * **Telemetry Metrics:**
 ```
 gensense_load_testing_runs_total               { scenario, result }
-  gensense_load_testing_requests_total           { run_id, status }
-  gensense_load_testing_latency                  histogram { run_id, stage }
+gensense_load_testing_requests_total           { run_id, status }
+gensense_load_testing_latency                  histogram { run_id, stage }
+gensense_load_testing_sla_violations_total     { scenario, metric }
+gensense_load_testing_active_runs              gauge
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Scenario timeout exceeded | Cancel run gracefully, mark as failed |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new stage type: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** (none)

@@ -5,7 +5,7 @@
 ---
 
 ### `push_notifications`
-Device push notification delivery via FCM, APNs, and web push protocols.
+Device push notification delivery via FCM, APNs, and web push protocols. This is a sub-module of `notifications` — it handles push-specific device registration and delivery. The `notifications` module orchestrates channel selection and dispatch routing.
 
 **Functions**
 ```
@@ -91,7 +91,21 @@ Device token validation:
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `push_notifications.<function>`.
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Partial success in batch | Return partial_success with succeeded[] and failed[] |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 ### Module Dependencies
-* **Depends On:** (none)
+* **Belongs To:** notifications (orchestrator — routes push delivery through this module)
+* **Depends On:** users
 * **Emits To:** events
-* **Recommends:** notifications (for unified notification channel), audit_log
+* **Recommends:** audit_log

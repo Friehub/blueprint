@@ -100,6 +100,69 @@ Failover cooldown:
     on_expiry:      mark rebalancing as stalled; require operator intervention
 ```
 
+### Storage Model
+* **Model:** Durable topology configuration store with shard, replication, and failover metadata.
+* **Details:** Topology changes are control-plane operations and must be recorded durably before being applied.
+
+### Database Schema
+
+#### PostgreSQL
+```sql
+CREATE TABLE topology_shards (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  table_name        TEXT NOT NULL,
+  strategy          TEXT NOT NULL CHECK (strategy IN ('key_range', 'hash', 'directory')),
+  shard_key         TEXT NOT NULL,
+  range_start       TEXT,
+  range_end         TEXT,
+  status            TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'draining', 'inactive')),
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE topology_replica_nodes (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  shard_id          UUID NOT NULL REFERENCES topology_shards(id) ON DELETE CASCADE,
+  role              TEXT NOT NULL CHECK (role IN ('primary', 'replica', 'arbiter')),
+  endpoint          TEXT NOT NULL,
+  region            TEXT NOT NULL,
+  lag_ms            INT DEFAULT 0,
+  status            TEXT NOT NULL DEFAULT 'active'
+);
+
+CREATE TABLE topology_replication_config (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  table_name        TEXT NOT NULL,
+  model             TEXT NOT NULL CHECK (model IN ('leader_follower', 'multi_leader', 'leaderless')),
+  sync_mode         TEXT NOT NULL,
+  config            JSONB NOT NULL DEFAULT '{}',
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE topology_failover_events (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  config_id         UUID,
+  from_primary      TEXT,
+  to_primary        TEXT,
+  reason            TEXT NOT NULL,
+  success           BOOLEAN NOT NULL,
+  duration_ms       INT,
+  triggered_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+### Failure Modes & Breaking Change Policy
+
+| Failure Mode | Detection | Mitigation |
+|---|---|---|
+| Rebalance stalls past timeout | Stalled flag set at 4h | Operator intervention required; emit `topology.rebalance.stalled` |
+| Failover with no healthy candidate | `no_candidate` error | Alert operator; maintain quorum of replica nodes |
+| Split-brain in multi-region topology | Inconsistent primary assignments | Use consensus-based leader election; reject concurrent primaries |
+| Replication lag exceeds threshold | `ReplicationReport.status` degraded | Scale read replicas; throttle write-heavy workloads |
+
+**Breaking Changes:** Changing the sharding strategy on an existing table requires a full data redistribution. A deprecation window of 2 release cycles must be observed. Shard key changes are always breaking.
+
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `database_topology.<function>`.
 * **Telemetry Metrics:**
@@ -107,6 +170,8 @@ Failover cooldown:
 gensense_database_topology_shards_total              { status }
   gensense_database_topology_replication_lag_ms       gauge { table, node }
   gensense_database_topology_failovers_total           { reason }
+  gensense_database_topology_rebalance_duration_ms     histogram
+  gensense_database_topology_split_brain_total
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 

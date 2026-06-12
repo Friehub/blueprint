@@ -102,6 +102,20 @@ gensense_ip_blocklist_entries_total             { type, severity }
 ```
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
+### Failure Modes
+| Scenario | Behavior |
+|---|---|
+| Database unreachable | Return provider_error, do not retry indefinitely |
+| Provider rate limited | Respect Retry-After header, apply exponential backoff |
+| Cache stale before propagation window | Serve stale blocklist for up to 60 seconds; trigger immediate refresh |
+| Feed import partial failure | Return ImportResult with errors[] and entries_added count |
+
+### Breaking Change Policy
+- Adding a new optional parameter: non-breaking
+- Removing a parameter: breaking — requires major version bump and migration guide
+- Changing a type from nullable to required: breaking
+- Adding a new severity level: non-breaking if consumers use exhaustive enum handling; breaking otherwise
+
 ### Module Dependencies
 * **Depends On:** ip_intelligence, rate_limiting
 * **Emits To:** events
