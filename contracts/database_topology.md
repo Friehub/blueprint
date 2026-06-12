@@ -1,0 +1,116 @@
+# Module Contract: `database_topology`
+
+**Version:** 0.1.0
+
+---
+
+### `database_topology`
+Database sharding, replication, and cross-region topology configuration.
+
+**Functions**
+```
+configureSharding(table, strategy, key) → ShardingConfig
+getShard(key) → Shard
+listShards() → Shard[]
+addShard(shard_config) → Shard
+removeShard(shard_id) → void
+configureReplication(table, model, options?) → ReplicationConfig
+getReplicationLag() → ReplicationReport
+configureFailover(mode, options?) → FailoverConfig
+triggerFailover() → FailoverResult
+```
+
+**Types**
+```
+ShardingConfig { table, strategy: key_range|hash|directory, key, shards: Shard[] }
+Shard { id, range?, nodes: ReplicaNode[], status: active|draining|inactive }
+ReplicaNode { id, role: primary|replica|arbiter, endpoint, region, lag_ms? }
+ReplicationConfig { table, model: leader_follower|multi_leader|leaderless, sync_mode, nodes: ReplicaNode[] }
+ReplicationReport { tables: ReplicationLag[], max_lag_ms, status: healthy|degraded|lagging }
+ReplicationLag { table, node, lag_ms, status }
+FailoverConfig { mode: automated|manual, conditions: FailoverCondition[], cooldown_ms }
+FailoverResult { success, new_primary, duration_ms, data_loss_risk }
+FailoverCondition { metric, threshold, duration_ms }
+TopologyStrategy = read_replicas | sharding | multi_region
+```
+
+**Invariants**
+- `configureSharding` with strategy `hash` must distribute data uniformly across shards -- a new shard must trigger rebalancing of existing data
+- `getShard` must be deterministic for the same key -- the same key must always return the same shard, regardless of cluster state
+- A replication model of `leader_follower` must have exactly one primary; `multi_leader` must have at least two; `leaderless` must have at least three
+- `triggerFailover` must be rejected if the configured `cooldown_ms` has not elapsed since the last failover
+
+**Dependencies:** service_mesh, distributed_lock
+
+**Providers:** PostgreSQL (streaming replication), MongoDB (replica sets), Cassandra (leaderless), Vitess, CockroachDB
+
+---
+
+---
+
+## System-Level Integrations & Constraints
+
+### Consistency Model
+* **Model:** `causal`
+* **Details:** Topology configuration must converge; consistency depends on the selected replication model
+
+### Runtime Delivery Model
+* **Delivery Guarantee:** `at_least_once` for topology lifecycle events.
+* **Details:** Duplicate shard or replication configuration must be idempotent (update existing).
+
+### Worker Scaling
+* **Policy:** Topology management is a control-plane operation, not data-plane.
+
+### Multi-Region Behavior
+* **Mode:** This module IS the multi-region topology engine. It must support cross-region replication, failover, and read affinity.
+* **Details:** A cross-region topology must declare which region is the source of truth.
+
+### Idempotency Requirements
+* **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
+
+### Error Taxonomy
+### Module-Specific Errors
+```
+configureSharding:
+    rebalance_in_progress:   Cluster is currently rebalancing | wait for completion
+
+  triggerFailover:
+    cooldown_active:         Failover cooldown period has not elapsed | wait and retry
+    no_candidate:            No healthy candidate node available for failover | check cluster health
+```
+
+### Event Emission
+All events are emitted using at-least-once delivery with UUID v4 envelope.
+```
+configureSharding → topology.sharding.configured { table, strategy, shard_count }
+  addShard          → topology.shard.added          { shard_id, range }
+  removeShard       → topology.shard.removed        { shard_id }
+  triggerFailover   → topology.failover.started     { from, to, reason }
+                   → topology.failover.completed    { duration_ms }
+```
+
+### Temporal Constraints
+```
+Failover cooldown:
+    default:        60 seconds
+    on_expiry:      failover may be triggered again
+
+  Rebalancing timeout:
+    default:        4 hours
+    on_expiry:      mark rebalancing as stalled; require operator intervention
+```
+
+### Observability
+* **Tracing Spans:** Every function call creates a span. Span names follow the pattern `database_topology.<function>`.
+* **Telemetry Metrics:**
+```
+gensense_database_topology_shards_total              { status }
+  gensense_database_topology_replication_lag_ms       gauge { table, node }
+  gensense_database_topology_failovers_total           { reason }
+```
+* **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
+
+### Module Dependencies
+* **Depends On:** service_mesh, distributed_lock
+* **Emits To:** events
+* **Recommends:** health (for node health in failover decisions), notifications, telemetry
