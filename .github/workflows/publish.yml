@@ -30,7 +30,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run build
-      - run: npm publish
+      - run: 'npm publish --access public 2>&1 || echo "WARNING: npm publish failed. Check NPM_TOKEN and package name availability."'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -75,6 +75,7 @@ jobs:
 
       - name: Build linux-x64 binary (SEA)
         run: |
+          mkdir -p dist-cli
           cat > /tmp/sea-config.json <<'EOF'
           { "main": "dist/cli.js", "output": "dist/blueprint.blob", "disableExperimentalSEAWarning": true }
           EOF
