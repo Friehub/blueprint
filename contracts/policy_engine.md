@@ -1,6 +1,6 @@
 # Module Contract: `policy_engine`
 
-**Version:** 0.2.0
+**Version:** 0.2.1
 
 ---
 

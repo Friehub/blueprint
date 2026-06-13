@@ -1,6 +1,6 @@
 # Module Contract: `developer_portal`
 
-**Version:** 0.2.0
+**Version:** 0.2.1
 
 ---
 

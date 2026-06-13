@@ -1,6 +1,6 @@
 # Module Contract: `compliance_reporting`
 
-**Version:** 0.2.0
+**Version:** 0.2.1
 
 ---
 

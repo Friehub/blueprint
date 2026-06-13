@@ -1,6 +1,6 @@
 # Module Contract: `right_to_erasure`
 
-**Version:** 0.2.0
+**Version:** 0.2.1
 
 ---
 

@@ -1,6 +1,6 @@
 # Module: cache_invalidation
 
-**Version:** 0.2.0
+**Version:** 0.2.1
 **Part:** III -- Data and State
 
 ## Purpose

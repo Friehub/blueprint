@@ -1,6 +1,6 @@
 # Module Contract: `websocket_management`
 
-**Version:** 0.2.0
+**Version:** 0.2.1
 
 ---
 
