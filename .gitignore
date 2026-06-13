@@ -9,7 +9,5 @@ generated/
 my-saas/
 node_modules/
 scenario/
-site/dist/
-site/node_modules/
-site/public/*.json
+
 *.tgz

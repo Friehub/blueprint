@@ -1,6 +1,6 @@
 {
   "name": "@friehub/blueprint",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "A domain contract catalogue for backend development. 176 module contracts, 94 adapters, 5 languages, AI-ready via 14 MCP tools.",
   "keywords": [
     "contract",
