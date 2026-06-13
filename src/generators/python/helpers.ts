@@ -1,4 +1,4 @@
-import type { ContractFunction, ContractType } from "../../core/catalog.js";
+import type { ContractFunction, ContractType, ModuleContract } from "../../core/catalog.js";
 import { pascalCase, snakeCase, mapType, inferType } from "../types.js";
 
 export function generateTypeDefinition(type: ContractType): string {
@@ -123,3 +123,4 @@ export function generateIndex(moduleNames: string[]): string {
   }
   return lines.join("\n");
 }
+

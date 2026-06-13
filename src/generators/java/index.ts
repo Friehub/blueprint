@@ -74,6 +74,7 @@ export class JavaGenerator implements LanguageGenerator {
         const mod = context.catalog.modules.find((m) => m.name === adapter.module);
         if (!mod) { errors.push(`Module ${adapter.module} not found for adapter ${adapter.name}`); continue; }
         files.push({ path: this.nsPath(`adapters/${pascalCase(adapter.name)}Adapter.java`), content: this.generateAdapterClass(adapter, mod) });
+        files.push({ path: this.nsPath(`autoconfigure/${pascalCase(this.resolveModName(mod.name))}AutoConfiguration.java`), content: this.generateAutoConfiguration(adapter, mod) });
       } catch (error) {
         errors.push(`Failed to generate adapter ${adapter.name}: ${error instanceof Error ? error.message : error}`);
       }
@@ -137,6 +138,13 @@ export class JavaGenerator implements LanguageGenerator {
     lines.push("import java.util.Optional;");
     lines.push("import java.util.concurrent.CompletableFuture;");
     lines.push("");
+
+    for (const type of mod.types) {
+      const defn = generateTypeDefinition(type, this.context?.javaRecords);
+      lines.push(defn);
+      lines.push("");
+    }
+
     lines.push(`public interface ${interfaceName} {`);
 
     for (const fn of mod.functions) {
@@ -174,25 +182,58 @@ export class JavaGenerator implements LanguageGenerator {
     const interfaceName = `${ns}${pascalCase(this.resolveModName(mod.name))}Contract`;
     const adapterPascal = pascalCase(adapter.name);
     const className = `${ns}${this.resolveClsName(adapter.name, adapter.name)}`;
-    const lines: string[] = [
+    const implementedFns = mod.functions.filter((fn) => adapter.implements.includes(fn.name));
+    const baseImports = [
       `// ${className}.java`,
       `// Do not edit directly. Generated code.`,
       "",
+      "import io.micrometer.core.instrument.Counter;",
+      "import io.micrometer.core.instrument.MeterRegistry;",
+      "import io.micrometer.core.instrument.Timer;",
       "import java.util.Optional;",
       "import java.util.concurrent.CompletableFuture;",
-      "",
+    ];
+    if (this.context?.useVirtualThreads) {
+      baseImports.push("import java.util.concurrent.Executors;");
+    }
+    baseImports.push("");
+    const lines: string[] = [
+      ...baseImports,
       `public class ${className} implements ${interfaceName} {`,
     ];
 
     for (const f of adapter.config.required) {
       lines.push(`    private final ${mapType(f.type, "java")} ${camelCase(this.resolveCfgName(f.name))};`);
     }
+    lines.push("    private final MeterRegistry registry;");
+
+    for (const fn of implementedFns) {
+      const aliasedFn = { ...fn, name: this.resolveFnName(fn.name) };
+      const counterName = `${mod.name}.${aliasedFn.name}.total`;
+      const timerName = `${mod.name}.${aliasedFn.name}.duration`;
+      lines.push(`    private final Counter ${camelCase(aliasedFn.name)}Counter;`);
+      lines.push(`    private final Timer ${camelCase(aliasedFn.name)}Timer;`);
+    }
     lines.push("");
 
     const configArgs = adapter.config.required.map((f) => `${mapType(f.type, "java")} ${camelCase(this.resolveCfgName(f.name))}`).join(", ");
-    lines.push(`    public ${className}(${configArgs}) {`);
-    for (const f of adapter.config.required) {
-      lines.push(`        this.${camelCase(this.resolveCfgName(f.name))} = ${camelCase(this.resolveCfgName(f.name))};`);
+    const allArgs = configArgs ? `${configArgs}, MeterRegistry registry` : "MeterRegistry registry";
+    const assignConfig = adapter.config.required.map((f) => `        this.${camelCase(this.resolveCfgName(f.name))} = ${camelCase(this.resolveCfgName(f.name))};`).join("\n");
+    lines.push(`    public ${className}(${allArgs}) {`);
+    if (assignConfig) {
+      lines.push(assignConfig);
+    }
+    lines.push("        this.registry = registry;");
+    for (const fn of implementedFns) {
+      const aliasedFn = { ...fn, name: this.resolveFnName(fn.name) };
+      const counterName = `${mod.name}.${aliasedFn.name}.total`;
+      const timerName = `${mod.name}.${aliasedFn.name}.duration`;
+      lines.push(`        this.${camelCase(aliasedFn.name)}Counter = Counter.builder("${counterName}")`);
+      lines.push(`            .tag("provider", "${adapter.name}")`);
+      lines.push(`            .register(registry);`);
+      lines.push(`        this.${camelCase(aliasedFn.name)}Timer = Timer.builder("${timerName}")`);
+      lines.push(`            .tag("provider", "${adapter.name}")`);
+      lines.push(`            .register(registry);`);
     }
     lines.push("    }");
     lines.push("");
@@ -215,13 +256,58 @@ export class JavaGenerator implements LanguageGenerator {
   private generateAdapterMethod(fn: ContractFunction): string {
     const ret = mapType(fn.returns, "java");
     const params = generateParamsList(fn);
-    return `    @Override\n    public CompletableFuture<${ret}> ${camelCase(fn.name)}(${params}) {\n        // TODO: Implement ${fn.name}\n        return CompletableFuture.failedFuture(new UnsupportedOperationException("${fn.name}"));\n    }\n`;
+    const counterName = camelCase(fn.name);
+
+    if (this.context?.useVirtualThreads) {
+      return `    @Override\n    public CompletableFuture<${ret}> ${camelCase(fn.name)}(${params}) {\n        var timerSample = Timer.start(this.registry);\n        return CompletableFuture.supplyAsync(() -> {\n            try {\n                // TODO: Implement ${fn.name}\n                this.${counterName}Counter.increment();\n                ${ret} result = null;\n                timerSample.stop(this.${counterName}Timer);\n                return result;\n            } catch (Exception e) {\n                timerSample.stop(this.${counterName}Timer);\n                throw new RuntimeException(e);\n            }\n        }, Executors.newVirtualThreadPerTaskExecutor());\n    }\n`;
+    }
+    return `    @Override\n    public CompletableFuture<${ret}> ${camelCase(fn.name)}(${params}) {\n        var timerSample = Timer.start(this.registry);\n        try {\n            // TODO: Implement ${fn.name}\n            this.${counterName}Counter.increment();\n            ${ret} result = null;\n            timerSample.stop(this.${counterName}Timer);\n            return CompletableFuture.completedFuture(result);\n        } catch (Exception e) {\n            timerSample.stop(this.${counterName}Timer);\n            return CompletableFuture.failedFuture(e);\n        }\n    }\n`;
   }
 
   private generateUnimplementedMethod(fn: ContractFunction, message: string): string {
     const ret = mapType(fn.returns, "java");
     const params = generateParamsList(fn);
     return `    @Override\n    public CompletableFuture<${ret}> ${camelCase(fn.name)}(${params}) {\n        return CompletableFuture.failedFuture(new UnsupportedOperationException("${message}"));\n    }\n`;
+  }
+
+  private generateAutoConfiguration(adapter: AdapterDefinition, mod: ModuleContract): string {
+    const ns = this.context?.namespace ? `${pascalCase(this.context.namespace)}_` : "";
+    const interfaceName = `${ns}${pascalCase(this.resolveModName(mod.name))}Contract`;
+    const className = `${ns}${this.resolveClsName(adapter.name, adapter.name)}`;
+    const cfgName = `${pascalCase(this.resolveModName(mod.name))}Properties`;
+    const autoConfigName = `${pascalCase(this.resolveModName(mod.name))}AutoConfiguration`;
+
+    const lines: string[] = [
+      `// ${autoConfigName}.java`,
+      `// Do not edit directly. Generated code.`,
+      "",
+      "import org.springframework.boot.autoconfigure.AutoConfiguration;",
+      "import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;",
+      "import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;",
+      "import org.springframework.boot.context.properties.EnableConfigurationProperties;",
+      "import org.springframework.context.annotation.Bean;",
+      `import io.micrometer.core.instrument.MeterRegistry;`,
+      "",
+      `@AutoConfiguration`,
+      `@ConditionalOnClass(${interfaceName}.class)`,
+      `@EnableConfigurationProperties(${cfgName}.class)`,
+      `public class ${autoConfigName} {`,
+      "",
+      `    @Bean`,
+      `    @ConditionalOnMissingBean`,
+      `    public ${interfaceName} ${camelCase(this.resolveModName(mod.name))}Contract(${cfgName} props, MeterRegistry registry) {`,
+      `        return new ${className}(`,
+    ];
+
+    const configArgs = adapter.config.required.map((f) =>
+      `            props.get${pascalCase(this.resolveCfgName(f.name))}()`
+    ).join(",\n");
+    lines.push(configArgs);
+    lines.push(`            , registry`);
+    lines.push(`        );`);
+    lines.push(`    }`);
+    lines.push(`}`);
+    return lines.join("\n");
   }
 
   private generateConformanceTest(adapter: AdapterDefinition, mod: ModuleContract): string {

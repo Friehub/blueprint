@@ -1,6 +1,6 @@
 # Module Contract: `zero_trust_network_policy`
 
-**Version:** 0.1.0
+**Version:** 0.2.0
 
 ---
 

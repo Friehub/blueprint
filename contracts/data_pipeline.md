@@ -1,6 +1,6 @@
 # Module Contract: `data_pipeline`
 
-**Version:** 0.1.0
+**Version:** 0.2.0
 
 ---
 

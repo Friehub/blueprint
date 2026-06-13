@@ -1,6 +1,6 @@
 # Module Contract: `billing_metered`
 
-**Version:** 0.1.0
+**Version:** 1.0.0
 
 ---
 

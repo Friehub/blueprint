@@ -1,7 +1,7 @@
-import type { ContractFunction, ContractType } from "../../core/catalog.js";
-import { pascalCase, camelCase, mapType, inferType } from "../types.js";
+import type { ContractFunction, ContractType, ModuleContract } from "../../core/catalog.js";
+import { pascalCase, camelCase, snakeCase, mapType, inferType } from "../types.js";
 
-export function generateTypeDefinition(type: ContractType): string {
+export function generateTypeDefinition(type: ContractType, useRecords?: boolean): string {
   const name = pascalCase(type.name);
   const raw = type.raw;
 
@@ -21,6 +21,13 @@ export function generateTypeDefinition(type: ContractType): string {
       const simple = raw.match(/^\w+\s*\{\s*(.+)\s*\}$/);
       if (simple) {
         const fieldNames = simple[1]!.split(",").map((f) => f.trim().replace(/\?$/, ""));
+        if (useRecords) {
+          const fieldsStr = fieldNames.map((f) => {
+            const javaType = inferType(f, "java");
+            return `    ${camelCase(f)} ${javaType}`;
+          }).join(",\n");
+          return `public record ${name}(\n${fieldsStr}\n) {}`;
+        }
         const fieldsStr = fieldNames.map((f) => {
           const javaType = inferType(f, "java");
           return `    private ${javaType} ${camelCase(f)};`;
@@ -28,6 +35,13 @@ export function generateTypeDefinition(type: ContractType): string {
         return `public class ${name} {\n${fieldsStr}\n}`;
       }
       return `// ${name}: ${raw}`;
+    }
+    if (useRecords) {
+      const fieldsStr = fields.map((f) => {
+        const t = f.type ? mapType(f.type, "java") : inferType(f.name, "java");
+        return `    ${f.optional ? `Optional<${t}>` : t} ${camelCase(f.name)}`;
+      }).join(",\n");
+      return `public record ${name}(\n${fieldsStr}\n) {}`;
     }
     const fieldsStr = fields.map((f) => {
       const t = f.type ? mapType(f.type, "java") : inferType(f.name, "java");
@@ -100,3 +114,5 @@ public class PaginatedResult<T> {
 export function generatePackageDeclaration(moduleName: string): string {
   return `package blueprint.${moduleName};`;
 }
+
+

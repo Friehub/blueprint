@@ -82,6 +82,7 @@ export class PythonGenerator implements LanguageGenerator {
         errors.push(`Failed to generate adapter ${adapter.name}: ${error instanceof Error ? error.message : error}`);
       }
     }
+
     return { files, errors };
   }
 

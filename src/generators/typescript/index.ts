@@ -4,7 +4,7 @@ import { adapterSupportsLanguage } from "../../core/adapters/types.js";
 import type { Language, GeneratorContext, GeneratorResult, GeneratedFile, LanguageGenerator } from "../types.js";
 import { pascalCase, camelCase, mapType } from "../types.js";
 import { resolveAlias, resolveModuleAlias, resolveClassAlias, resolveConfigAlias, obfuscateName } from "../aliases.js";
-import { generateTypeDefinition, generateFunctionSignature, generateParamsList, generateIndex, getSdkHint, generateSharedTypes } from "./helpers.js";
+import { generateTypeDefinition, generateFunctionSignature, generateParamsList, generateIndex, generateIndexCjs, getSdkHint, generateSharedTypes, generateZodSchema, generateEventTypes, generateTranslateMethod } from "./helpers.js";
 
 const SDK_IMPORTS: Record<string, string> = {
   stripe: `import Stripe from 'stripe';`,
@@ -69,11 +69,16 @@ export class TypeScriptGenerator implements LanguageGenerator {
         const aliasedName = this.resolveModName(mod.name);
         files.push({ path: this.nsPath(`interfaces/${aliasedName}.ts`), content: this.generateModuleInterface(mod) });
         files.push({ path: this.nsPath(`graphql/${aliasedName}.graphql`), content: this.generateGraphQLTypes(mod) });
+        files.push({ path: this.nsPath(`interfaces/${aliasedName}.zod.ts`), content: this.generateZodTypes(mod) });
+        files.push({ path: this.nsPath(`interfaces/${aliasedName}.events.ts`), content: generateEventTypes(mod) });
       } catch (error) {
         errors.push(`Failed to generate interface for ${mod.name}: ${error instanceof Error ? error.message : error}`);
       }
     }
-    files.push({ path: this.nsPath("interfaces/index.ts"), content: generateIndex(modules.map((m) => this.resolveModName(m.name))) });
+    const names = modules.map((m) => this.resolveModName(m.name));
+    files.push({ path: this.nsPath("interfaces/index.ts"), content: generateIndex(names) });
+    files.push({ path: this.nsPath("interfaces/index.cjs"), content: generateIndexCjs(names) });
+    files.push({ path: this.nsPath("interfaces/package.json"), content: this.generatePackageJson(names) });
     return { files, errors };
   }
 
@@ -166,6 +171,37 @@ export class TypeScriptGenerator implements LanguageGenerator {
       lines.push(generateFunctionSignature(aliasedFn));
     }
     lines.push("}");
+    return lines.join("\n");
+  }
+
+  private generatePackageJson(_moduleNames: string[]): string {
+    const pkg: Record<string, unknown> = {
+      name: "@blueprint/interfaces",
+      version: "0.0.0",
+      type: "module",
+      main: "./index.cjs",
+      module: "./index.js",
+      types: "./index.ts",
+      exports: {
+        ".": { types: "./index.ts", import: "./index.js", require: "./index.cjs" },
+        "./*": { types: "./*.ts", import: "./*.js", require: "./*.cjs" },
+      },
+    };
+    return JSON.stringify(pkg, null, 2);
+  }
+
+  private generateZodTypes(mod: ModuleContract): string {
+    const lines: string[] = [
+      `// ${pascalCase(mod.name)} Zod Schemas`,
+      `// Do not edit directly. Generated code.`,
+      "",
+      `import { z } from 'zod';`,
+      "",
+    ];
+    for (const type of mod.types) {
+      lines.push(generateZodSchema(type));
+      lines.push("");
+    }
     return lines.join("\n");
   }
 
@@ -294,14 +330,26 @@ export class TypeScriptGenerator implements LanguageGenerator {
       "",
       getSdkImport(adapter.name),
       `import type { ${aliasedInterface} } from '../interfaces/${this.resolveModName(mod.name)}';`,
+      `import { trace, SpanStatusCode } from '@opentelemetry/api';`,
+      `import { ContractError } from '../interfaces/shared.js';`,
       "",
     ];
 
     const configFields = adapter.config.required.map((f) => `  ${this.resolveCfgName(f.name)}: ${mapType(f.type, "typescript")};`).join("\n");
     lines.push(`export class ${className} implements ${aliasedInterface} {`);
-    lines.push(`  constructor(private config: {`);
-    lines.push(configFields);
-    lines.push(`  }) {}`);
+    lines.push(`  private tracer = trace.getTracer('${adapter.name}');`);
+    lines.push("");
+
+    if (configFields) {
+      lines.push(`  constructor(private config: {`);
+      lines.push(configFields);
+      lines.push(`  }) {}`);
+    } else {
+      lines.push(`  constructor(private config: Record<string, never> = {}) {}`);
+    }
+    lines.push("");
+
+    lines.push(generateTranslateMethod(adapter.name, mod));
     lines.push("");
 
     for (const fn of mod.functions) {
@@ -322,19 +370,33 @@ export class TypeScriptGenerator implements LanguageGenerator {
 
   private generateAdapterMethod(fn: ContractFunction, adapterName: string): string {
     const lines: string[] = [];
-    lines.push(`  async ${camelCase(fn.name)}(${generateParamsList(fn)}): Promise<${mapType(fn.returns, "typescript")}> {`);
+    const returnType = mapType(fn.returns, "typescript");
+    lines.push(`  async ${camelCase(fn.name)}(${generateParamsList(fn)}): Promise<${returnType}> {`);
+    lines.push(`    const span = this.tracer.startSpan('${adapterName}.${fn.name}');`);
+    lines.push(`    span.setAttribute('function.name', '${fn.name}');`);
+    lines.push(`    span.setAttribute('adapter.name', '${adapterName}');`);
+    lines.push(`    try {`);
     const hint = getSdkHint(adapterName, fn.name);
     if (hint) {
       const hintLines = hint.split("\n");
       for (const hintLine of hintLines) {
-        lines.push(`    ${hintLine}`);
+        const trimmed = hintLine.trim();
+        if (trimmed) lines.push(`      ${hintLine}`);
       }
     } else {
-      lines.push(`    // TODO: Implement ${fn.name}`);
+      lines.push(`      // TODO: Implement ${fn.name}`);
       if (fn.returns !== "void") {
-        lines.push(`    throw new Error('Not implemented: ${fn.name}');`);
+        lines.push(`      throw new Error('Not implemented: ${fn.name}');`);
       }
     }
+    lines.push(`      span.setStatus({ code: SpanStatusCode.OK });`);
+    lines.push(`    } catch (error) {`);
+    lines.push(`      span.recordException(error instanceof Error ? error : new Error(String(error)));`);
+    lines.push(`      span.setStatus({ code: SpanStatusCode.ERROR, message: (error instanceof Error ? error.message : String(error)) });`);
+    lines.push(`      this.translateError(error, '${fn.name}');`);
+    lines.push(`    } finally {`);
+    lines.push(`      span.end();`);
+    lines.push(`    }`);
     lines.push(`  }`);
     return lines.join("\n");
   }

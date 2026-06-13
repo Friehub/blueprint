@@ -22,6 +22,8 @@ export type GenerateOptions = {
   namespace?: string;
   aliases?: AliasMap;
   obfuscate?: string;
+  javaRecords?: boolean;
+  useVirtualThreads?: boolean;
 };
 
 export type EngineResult = {
@@ -65,6 +67,8 @@ export async function generate(
   if (options.namespace) context.namespace = options.namespace;
   if (options.aliases) context.aliases = options.aliases;
   if (options.obfuscate) context.obfuscate = options.obfuscate;
+  if (options.javaRecords) context.javaRecords = options.javaRecords;
+  if (options.useVirtualThreads) context.useVirtualThreads = options.useVirtualThreads;
 
   let result: GeneratorResult;
 
