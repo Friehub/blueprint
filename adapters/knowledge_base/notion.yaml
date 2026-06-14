@@ -1,0 +1,60 @@
+name: notion
+module: knowledge_base
+version: 1.0.0
+description: Notion API knowledge base adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createCategory
+  - getCategory
+  - listCategories
+  - createArticle
+  - updateArticle
+  - createRevision
+  - submitForReview
+  - publishArticle
+  - deprecateArticle
+  - archiveArticle
+  - getArticle
+  - getArticleBySlug
+  - listArticles
+  - recordView
+  - submitFeedback
+  - getArticleStats
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Notion integration API key
+      secret: true
+    - name: database_id
+      type: string
+      description: Notion database ID
+      secret: false
+  optional:
+    - name: page_size
+      type: integer
+      default: 100
+      description: Page size for paginated queries
+    - name: notion_version
+      type: string
+      default: 2022-06-28
+      description: Notion API version
+
+dependencies:
+  - module: search
+    purpose: Index articles for search
+    required: true
+  - module: users
+    purpose: Resolve author identities
+    required: true
+  - module: audit_log
+    purpose: Log article lifecycle events
+    required: false
+
+metadata:
+  provider_url: https://www.notion.so
+  docs_url: https://developers.notion.com

@@ -1,0 +1,32 @@
+name: postgresql
+module: sessions
+version: 1.0.0
+description: PostgreSQL session store adapter for durable session management
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createSession
+  - getSession
+  - revokeSession
+
+does_not_implement:
+  - extendSession
+  - getSessions
+  - listActiveSessions
+  - revokeAllSessions
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: PostgreSQL connection string
+      secret: true
+  optional:
+    - name: pool_size
+      type: integer
+      default: 10
+      description: Database connection pool size
+
+metadata:
+  provider_url: https://www.postgresql.org
+  docs_url: https://www.postgresql.org/docs

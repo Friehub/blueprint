@@ -1,0 +1,36 @@
+name: chaosmesh
+module: chaos_engineering
+version: 1.0.0
+description: Chaos Mesh experiment management adapter
+languages: [typescript, go]
+
+implements:
+  - defineExperiment
+  - getExperiment
+  - listExperiments
+  - runExperiment
+  - stopExperiment
+  - injectFailure
+  - validateSteadyState
+  - rollbackExperiment
+
+does_not_implement:
+  - scheduleExperiment
+
+config:
+  required:
+    - name: api_url
+      type: string
+      description: Chaos Mesh dashboard API URL
+    - name: namespace
+      type: string
+      description: Kubernetes namespace for experiments
+  optional:
+    - name: tls_cert
+      type: string
+      description: TLS certificate for API access
+      secret: true
+
+metadata:
+  provider_url: https://chaos-mesh.org
+  docs_url: https://chaos-mesh.org/docs

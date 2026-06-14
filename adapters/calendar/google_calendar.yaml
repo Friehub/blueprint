@@ -1,0 +1,67 @@
+name: google_calendar
+module: calendar
+version: 1.0.0
+description: Google Calendar API adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createEvent
+  - publishEvent
+  - getEvent
+  - listEvents
+  - updateEvent
+  - rescheduleEvent
+  - cancelEvent
+  - addAttendee
+  - removeAttendee
+  - respondToInvitation
+  - getAvailability
+  - createRecurringEvent
+  - getOccurrences
+  - updateOccurrence
+  - cancelOccurrence
+
+does_not_implement: []
+
+config:
+  required:
+    - name: client_id
+      type: string
+      description: Google OAuth client ID
+      secret: false
+    - name: client_secret
+      type: string
+      description: Google OAuth client secret
+      secret: true
+    - name: refresh_token
+      type: string
+      description: Google OAuth refresh token
+      secret: true
+  optional:
+    - name: calendar_id
+      type: string
+      default: primary
+      description: Google Calendar ID
+    - name: timezone
+      type: string
+      default: UTC
+      description: Default timezone
+    - name: max_results
+      type: integer
+      default: 250
+      description: Max events per page
+
+dependencies:
+  - module: users
+    purpose: Resolve attendee identities
+    required: true
+  - module: notifications
+    purpose: Dispatch invitations
+    required: false
+  - module: audit_log
+    purpose: Log calendar events
+    required: false
+
+metadata:
+  provider_url: https://calendar.google.com
+  docs_url: https://developers.google.com/calendar

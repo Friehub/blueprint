@@ -1,0 +1,59 @@
+name: gitbook
+module: knowledge_base
+version: 1.0.0
+description: GitBook knowledge base adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createCategory
+  - getCategory
+  - listCategories
+  - createArticle
+  - updateArticle
+  - createRevision
+  - submitForReview
+  - publishArticle
+  - deprecateArticle
+  - archiveArticle
+  - getArticle
+  - getArticleBySlug
+  - listArticles
+  - recordView
+  - submitFeedback
+  - getArticleStats
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: GitBook API key
+      secret: true
+    - name: space_id
+      type: string
+      description: GitBook space ID
+      secret: false
+  optional:
+    - name: organization_id
+      type: string
+      description: GitBook organization ID
+    - name: limit
+      type: integer
+      default: 100
+      description: Page limit for list endpoints
+
+dependencies:
+  - module: search
+    purpose: Index articles for search
+    required: true
+  - module: users
+    purpose: Resolve author identities
+    required: true
+  - module: audit_log
+    purpose: Log article lifecycle events
+    required: false
+
+metadata:
+  provider_url: https://www.gitbook.com
+  docs_url: https://developer.gitbook.com

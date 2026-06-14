@@ -1,0 +1,38 @@
+name: socketio
+module: websocket_management
+version: 1.0.0
+description: Socket.IO WebSocket management adapter
+languages: [typescript, python, go, java]
+
+implements:
+  - createRoom
+  - joinRoom
+  - leaveRoom
+  - getRoomMembers
+  - broadcastToRoom
+  - sendToUser
+  - sendToConnection
+  - getUserConnections
+  - disconnectUser
+  - getRoomStats
+
+does_not_implement: []
+
+config:
+  required:
+    - name: server_url
+      type: string
+      description: Socket.IO server URL
+  optional:
+    - name: path
+      type: string
+      default: /socket.io
+      description: Socket.IO path
+    - name: max_rooms_per_user
+      type: number
+      default: 100
+      description: Maximum rooms a user can join
+
+metadata:
+  provider_url: https://socket.io
+  docs_url: https://socket.io/docs

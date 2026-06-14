@@ -1,0 +1,45 @@
+name: infobip
+module: sms
+version: 1.0.0
+description: InfoBip SMS delivery adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - send
+  - sendBulk
+  - getDeliveryStatus
+  - getBalance
+  - lookupNumber
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: InfoBip API key
+      secret: true
+    - name: base_url
+      type: string
+      description: InfoBip base URL
+      secret: false
+  optional:
+    - name: from
+      type: string
+      description: Default sender ID
+    - name: notify_url
+      type: string
+      description: Delivery notification callback URL
+    - name: notify_content_type
+      type: string
+      default: json
+      description: Notification content type
+
+dependencies:
+  - module: audit_log
+    purpose: Log SMS delivery events
+    required: false
+
+metadata:
+  provider_url: https://www.infobip.com
+  docs_url: https://www.infobip.com/docs/api

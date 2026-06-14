@@ -1,0 +1,52 @@
+name: wave
+module: invoicing
+version: 1.0.0
+description: Wave invoicing adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createInvoice
+  - issueInvoice
+  - sendInvoice
+  - getInvoice
+  - listInvoices
+  - recordInvoicePayment
+  - voidInvoice
+  - createCreditNote
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Wave API key
+      secret: true
+    - name: business_id
+      type: string
+      description: Wave business ID
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      default: production
+      description: Wave environment
+    - name: api_url
+      type: string
+      default: https://gql.waveapps.com
+      description: Wave GraphQL API URL
+
+dependencies:
+  - module: payments
+    purpose: Process invoice payments
+    required: true
+  - module: notifications
+    purpose: Send invoice emails
+    required: false
+  - module: audit_log
+    purpose: Log invoice events
+    required: false
+
+metadata:
+  provider_url: https://www.waveapps.com
+  docs_url: https://developer.waveapps.com

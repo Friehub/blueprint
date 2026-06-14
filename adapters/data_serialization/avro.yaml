@@ -1,0 +1,34 @@
+name: avro
+module: data_serialization
+version: 1.0.0
+description: Apache Avro schema registry adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - registerSchema
+  - getSchema
+  - evolveSchema
+  - validateCompatibility
+  - migrateDocument
+
+does_not_implement:
+  - detectFieldNumberConflict
+
+config:
+  required:
+    - name: registry_url
+      type: string
+      description: Schema registry URL
+    - name: api_key
+      type: string
+      description: Registry API token
+      secret: true
+  optional:
+    - name: compatibility_mode
+      type: string
+      default: backward
+      description: Default schema evolution mode
+
+metadata:
+  provider_url: https://avro.apache.org
+  docs_url: https://avro.apache.org/docs

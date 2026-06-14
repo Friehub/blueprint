@@ -1,0 +1,51 @@
+name: rabbitmq
+module: queues
+version: 1.0.0
+description: RabbitMQ queue adapter
+
+implements:
+  - enqueue
+  - enqueueBulk
+  - scheduleJob
+  - cancelJob
+  - getJob
+  - getJobStatus
+  - retryJob
+  - getQueueStats
+  - purgeQueue
+
+does_not_implement: []
+
+config:
+  required:
+    - name: url
+      type: string
+      description: RabbitMQ connection URL
+      secret: false
+  optional:
+    - name: host
+      type: string
+      default: "localhost"
+      description: RabbitMQ host
+    - name: port
+      type: integer
+      default: 5672
+      description: RabbitMQ port
+    - name: username
+      type: string
+      default: "guest"
+      description: RabbitMQ username
+    - name: password
+      type: string
+      description: RabbitMQ password
+      secret: true
+    - name: vhost
+      type: string
+      default: "/"
+      description: RabbitMQ virtual host
+
+dependencies: []
+
+metadata:
+  provider_url: https://www.rabbitmq.com
+  docs_url: https://www.rabbitmq.com/documentation.html

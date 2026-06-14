@@ -1,0 +1,46 @@
+name: posthog
+module: feature_auditing
+version: 1.0.0
+description: PostHog feature flag audit trail adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - getFeatureAuditTrail
+  - getFeatureAuditEntry
+  - listFeatureAuditEntries
+  - exportFeatureAudit
+  - compareFeatureVersions
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: PostHog API key
+      secret: true
+    - name: project_id
+      type: string
+      description: PostHog project ID
+      secret: false
+  optional:
+    - name: host
+      type: string
+      default: https://app.posthog.com
+      description: PostHog host URL
+    - name: personal_api_key
+      type: string
+      description: PostHog personal API key for exports
+      secret: true
+
+dependencies:
+  - module: feature_flags
+    purpose: Access feature flag definitions
+    required: true
+  - module: audit_log
+    purpose: Log audit events
+    required: false
+
+metadata:
+  provider_url: https://posthog.com
+  docs_url: https://posthog.com/docs/feature-flags

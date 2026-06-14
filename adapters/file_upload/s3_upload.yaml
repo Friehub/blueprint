@@ -1,0 +1,47 @@
+name: s3_upload
+module: file_upload
+version: 1.0.0
+description: AWS S3 presigned URL upload adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - initiateUpload
+  - uploadChunk
+  - completeUpload
+  - cancelUpload
+  - getUploadSession
+  - getSignedUrl
+  - deleteFile
+
+does_not_implement:
+  - requestVirusScan
+  - invalidateCdn
+
+config:
+  required:
+    - name: bucket
+      type: string
+      description: S3 bucket name
+    - name: region
+      type: string
+      description: AWS region
+    - name: access_key_id
+      type: string
+      description: AWS access key ID
+      secret: true
+    - name: secret_access_key
+      type: string
+      description: AWS secret access key
+      secret: true
+  optional:
+    - name: cdn_domain
+      type: string
+      description: CDN domain for public URLs
+    - name: max_upload_size_mb
+      type: number
+      default: 100
+      description: Maximum upload size in MB
+
+metadata:
+  provider_url: https://aws.amazon.com/s3
+  docs_url: https://docs.aws.amazon.com/AmazonS3/latest/userguide

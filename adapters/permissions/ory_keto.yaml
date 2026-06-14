@@ -1,0 +1,51 @@
+name: ory_keto
+module: permissions
+version: 1.0.0
+description: Ory Keto permission server adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - can
+  - canAll
+  - canAny
+  - batchCheckPermission
+  - grantPermission
+  - revokePermission
+  - denyPermission
+  - revokeDeny
+  - getPermissions
+
+does_not_implement:
+  - createRole
+  - assignRole
+
+config:
+  required:
+    - name: keto_url
+      type: string
+      description: Ory Keto server URL
+      secret: false
+  optional:
+    - name: api_key
+      type: string
+      description: Ory Keto API key
+      secret: true
+    - name: namespace
+      type: string
+      default: default
+      description: Permission namespace
+    - name: read_replica_url
+      type: string
+      description: Read replica URL for scale
+
+dependencies:
+  - module: users
+    purpose: Resolve user identities
+    required: true
+  - module: audit_log
+    purpose: Log permission changes
+    required: false
+
+metadata:
+  provider_url: https://www.ory.sh/keto
+  docs_url: https://www.ory.sh/docs/keto

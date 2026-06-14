@@ -1,0 +1,34 @@
+name: plausible
+module: web_analytics
+version: 1.0.0
+description: Plausible web analytics adapter
+
+implements:
+  - trackPageView
+  - trackSessionStart
+  - trackSessionEnd
+  - trackConversion
+  - getPageMetrics
+  - getAttributionReport
+  - getSessionReplay
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Plausible API key
+      secret: true
+    - name: site_id
+      type: string
+      description: Plausible site ID
+
+dependencies:
+  - module: audit_log
+    purpose: Log analytics events
+    required: false
+
+metadata:
+  provider_url: https://plausible.io
+  docs_url: https://plausible.io/docs

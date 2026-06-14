@@ -1,0 +1,34 @@
+name: posthog
+module: web_analytics
+version: 1.0.0
+description: PostHog web analytics adapter
+
+implements:
+  - trackPageView
+  - trackSessionStart
+  - trackSessionEnd
+  - trackConversion
+  - getPageMetrics
+  - getAttributionReport
+  - getSessionReplay
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: PostHog API key
+      secret: true
+    - name: host
+      type: string
+      description: PostHog host URL
+
+dependencies:
+  - module: audit_log
+    purpose: Log analytics events
+    required: false
+
+metadata:
+  provider_url: https://posthog.com
+  docs_url: https://posthog.com/docs

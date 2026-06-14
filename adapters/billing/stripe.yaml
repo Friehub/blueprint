@@ -1,0 +1,50 @@
+name: stripe
+module: billing
+version: 1.0.0
+description: Stripe billing subscription and plan management adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createSubscription
+  - getSubscription
+  - upgradeSubscription
+  - downgradeSubscription
+  - cancelSubscription
+  - reactivateSubscription
+  - getInvoices
+  - getInvoice
+  - getPlans
+  - getPlan
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Stripe secret API key
+      secret: true
+    - name: webhook_secret
+      type: string
+      description: Stripe webhook signing secret
+      secret: true
+  optional:
+    - name: api_version
+      type: string
+      default: "2023-10-16"
+      description: Stripe API version
+
+dependencies:
+  - module: payments
+    purpose: Process subscription payments
+    required: true
+  - module: notifications
+    purpose: Send subscription lifecycle emails
+    required: false
+  - module: audit_log
+    purpose: Log subscription events
+    required: false
+
+metadata:
+  provider_url: https://stripe.com
+  docs_url: https://stripe.com/docs/billing

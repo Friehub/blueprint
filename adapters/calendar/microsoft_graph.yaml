@@ -1,0 +1,66 @@
+name: microsoft_graph
+module: calendar
+version: 1.0.0
+description: Microsoft Graph Calendar API adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createEvent
+  - publishEvent
+  - getEvent
+  - listEvents
+  - updateEvent
+  - rescheduleEvent
+  - cancelEvent
+  - addAttendee
+  - removeAttendee
+  - respondToInvitation
+  - getAvailability
+  - createRecurringEvent
+  - getOccurrences
+  - updateOccurrence
+  - cancelOccurrence
+
+does_not_implement: []
+
+config:
+  required:
+    - name: tenant_id
+      type: string
+      description: Azure AD tenant ID
+      secret: false
+    - name: client_id
+      type: string
+      description: Azure AD application ID
+      secret: false
+    - name: client_secret
+      type: string
+      description: Azure AD application secret
+      secret: true
+  optional:
+    - name: user_id
+      type: string
+      description: Calendar owner user ID
+    - name: timezone
+      type: string
+      default: UTC
+      description: Default timezone
+    - name: api_version
+      type: string
+      default: v1.0
+      description: Graph API version
+
+dependencies:
+  - module: users
+    purpose: Resolve attendee identities
+    required: true
+  - module: notifications
+    purpose: Dispatch invitations
+    required: false
+  - module: audit_log
+    purpose: Log calendar events
+    required: false
+
+metadata:
+  provider_url: https://www.microsoft.com/en-us/microsoft-365/calendar
+  docs_url: https://learn.microsoft.com/en-us/graph/api/resources/calendar

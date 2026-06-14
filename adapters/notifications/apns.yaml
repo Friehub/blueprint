@@ -1,0 +1,60 @@
+name: apns
+module: notifications
+version: 1.0.0
+description: Apple Push Notification Service channel adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - sendPush
+  - sendBulkPush
+  - getNotifications
+  - markRead
+  - markAllRead
+  - getUnreadCount
+  - updatePreferences
+  - getPreferences
+
+does_not_implement:
+  - sendEmail
+  - sendSMS
+  - sendInApp
+
+config:
+  required:
+    - name: key_id
+      type: string
+      description: APNs key ID
+      secret: false
+    - name: team_id
+      type: string
+      description: Apple team ID
+      secret: false
+    - name: signing_key
+      type: string
+      description: APNs signing key (p8 file content)
+      secret: true
+    - name: bundle_id
+      type: string
+      description: App bundle identifier
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      default: production
+      description: APNs environment (development or production)
+    - name: priority
+      type: integer
+      default: 10
+      description: APNs priority (5 = low power, 10 = immediate)
+
+dependencies:
+  - module: users
+    purpose: Get user preferences
+    required: true
+  - module: audit_log
+    purpose: Log notification events
+    required: false
+
+metadata:
+  provider_url: https://developer.apple.com/notifications
+  docs_url: https://developer.apple.com/documentation/usernotifications

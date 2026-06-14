@@ -1,0 +1,48 @@
+name: braze
+module: push_notifications
+version: 1.0.0
+description: Braze push notification adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - registerDevice
+  - unregisterDevice
+  - getUserDevices
+  - sendPush
+  - sendBulkPush
+  - sendTopicPush
+  - getPushStatus
+  - updateDeviceToken
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Braze API key
+      secret: true
+    - name: app_group_id
+      type: string
+      description: Braze app group identifier
+      secret: false
+    - name: rest_endpoint
+      type: string
+      description: Braze REST endpoint URL
+      secret: false
+  optional:
+    - name: sdk_endpoint
+      type: string
+      description: Braze SDK endpoint
+
+dependencies:
+  - module: users
+    purpose: Resolve device registrations
+    required: true
+  - module: audit_log
+    purpose: Log push events
+    required: false
+
+metadata:
+  provider_url: https://www.braze.com
+  docs_url: https://www.braze.com/docs

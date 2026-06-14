@@ -1,0 +1,58 @@
+name: maxio
+module: billing
+version: 1.0.0
+description: Maxio (formerly Chargify) billing subscription and plan management adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createSubscription
+  - getSubscription
+  - upgradeSubscription
+  - downgradeSubscription
+  - cancelSubscription
+  - reactivateSubscription
+  - getInvoices
+  - getInvoice
+  - getPlans
+  - getPlan
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Maxio API key
+      secret: true
+    - name: site
+      type: string
+      description: Maxio site subdomain
+      secret: false
+  optional:
+    - name: api_password
+      type: string
+      description: Maxio API password
+      secret: true
+    - name: environment
+      type: string
+      default: production
+      description: Maxio environment (production or test)
+    - name: webhook_secret
+      type: string
+      description: Maxio webhook secret
+      secret: true
+
+dependencies:
+  - module: payments
+    purpose: Process subscription payments
+    required: true
+  - module: notifications
+    purpose: Send subscription lifecycle emails
+    required: false
+  - module: audit_log
+    purpose: Log subscription events
+    required: false
+
+metadata:
+  provider_url: https://www.maxio.com
+  docs_url: https://developers.maxio.com

@@ -1,0 +1,50 @@
+name: asana
+module: tasks
+version: 1.0.0
+description: Asana task management adapter
+
+implements:
+  - createTask
+  - getTask
+  - listTasks
+  - updateTask
+  - assignTask
+  - changeTaskStatus
+  - addTaskDependency
+  - removeTaskDependency
+  - completeTask
+  - archiveTask
+
+does_not_implement: []
+
+config:
+  required:
+    - name: access_token
+      type: string
+      description: Asana personal access token
+      secret: true
+  optional:
+    - name: workspace_id
+      type: string
+      description: Default workspace ID
+    - name: project_gid
+      type: string
+      description: Default project GID
+
+dependencies:
+  - module: projects
+    purpose: Get project data
+    required: true
+  - module: users
+    purpose: Get user data for assignment
+    required: true
+  - module: notifications
+    purpose: Send task notifications
+    required: false
+  - module: audit_log
+    purpose: Log task events
+    required: false
+
+metadata:
+  provider_url: https://asana.com
+  docs_url: https://developers.asana.com

@@ -1,0 +1,53 @@
+name: temporal
+module: jobs
+version: 1.0.0
+description: Temporal jobs adapter
+
+implements:
+  - registerJob
+  - scheduleJob
+  - triggerJob
+  - disableJob
+  - enableJob
+  - getJob
+  - listJobs
+  - getExecution
+  - listExecutions
+  - cancelExecution
+
+does_not_implement: []
+
+config:
+  required:
+    - name: temporal_url
+      type: string
+      description: Temporal server URL
+      secret: false
+    - name: namespace
+      type: string
+      description: Temporal namespace
+      secret: false
+  optional:
+    - name: task_queue
+      type: string
+      description: Default task queue name
+    - name: tls_cert
+      type: string
+      description: TLS certificate for Temporal connection
+      secret: true
+    - name: tls_key
+      type: string
+      description: TLS key for Temporal connection
+      secret: true
+
+dependencies:
+  - module: queues
+    purpose: Underlying job dispatch mechanism
+    required: true
+  - module: audit_log
+    purpose: Log job execution events
+    required: false
+
+metadata:
+  provider_url: https://temporal.io
+  docs_url: https://docs.temporal.io

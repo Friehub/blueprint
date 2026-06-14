@@ -1,0 +1,50 @@
+name: custom_postgres
+module: feature_auditing
+version: 1.0.0
+description: Custom PostgreSQL feature audit trail adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - getFeatureAuditTrail
+  - getFeatureAuditEntry
+  - listFeatureAuditEntries
+  - exportFeatureAudit
+  - compareFeatureVersions
+
+does_not_implement: []
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: PostgreSQL connection string
+      secret: true
+    - name: schema
+      type: string
+      description: Database schema name
+      secret: false
+  optional:
+    - name: max_connections
+      type: integer
+      default: 10
+      description: Max database connections
+    - name: audit_table
+      type: string
+      default: feature_audit_entries
+      description: Audit entries table name
+    - name: export_table
+      type: string
+      default: feature_audit_exports
+      description: Exports table name
+
+dependencies:
+  - module: feature_flags
+    purpose: Access feature flag definitions
+    required: true
+  - module: audit_log
+    purpose: Log audit events
+    required: false
+
+metadata:
+  provider_url: https://www.postgresql.org
+  docs_url: https://www.postgresql.org/docs

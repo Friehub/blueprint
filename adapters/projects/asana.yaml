@@ -1,0 +1,49 @@
+name: asana
+module: projects
+version: 1.0.0
+description: Asana project management adapter
+
+implements:
+  - createProject
+  - getProject
+  - listProjects
+  - updateProject
+  - archiveProject
+  - unarchiveProject
+  - addProjectMember
+  - removeProjectMember
+  - changeProjectOwner
+
+does_not_implement: []
+
+config:
+  required:
+    - name: access_token
+      type: string
+      description: Asana personal access token
+      secret: true
+  optional:
+    - name: workspace_id
+      type: string
+      description: Default workspace ID
+    - name: project_gid
+      type: string
+      description: Default project GID
+
+dependencies:
+  - module: workspaces
+    purpose: Get workspace data
+    required: true
+  - module: users
+    purpose: Get user data for membership
+    required: true
+  - module: notifications
+    purpose: Send project notifications
+    required: false
+  - module: audit_log
+    purpose: Log project events
+    required: false
+
+metadata:
+  provider_url: https://asana.com
+  docs_url: https://developers.asana.com

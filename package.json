@@ -1,0 +1,117 @@
+{
+  "name": "@friehub/blueprint",
+  "version": "0.3.0",
+  "description": "A domain contract catalogue for backend development. 176 module contracts, 94 adapters, 5 languages, AI-ready via 14 MCP tools.",
+  "keywords": [
+    "contract",
+    "domain",
+    "backend",
+    "code-generation",
+    "adapter",
+    "blueprint",
+    "ai",
+    "mcp"
+  ],
+  "license": "MIT",
+  "author": "Friehub",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Friehub/blueprint.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Friehub/blueprint/issues"
+  },
+  "homepage": "https://github.com/Friehub/blueprint#readme",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./cli": "./dist/cli.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "blueprint": "./dist/cli.js"
+  },
+  "files": [
+    "dist/catalog.min.json",
+    "dist/cli.js",
+    "dist/core/load-catalog.js",
+    "dist/core/catalog.js",
+    "dist/core/discovery.js",
+    "dist/core/scanner.js",
+    "dist/core/sections.js",
+    "dist/core/section-body.js",
+    "dist/core/envelope.js",
+    "dist/core/parse-document.js",
+    "dist/core/collectors.js",
+    "dist/core/resolve.js",
+    "dist/core/graph.js",
+    "dist/core/search.js",
+    "dist/core/verify.js",
+    "dist/core/implement.js",
+    "dist/core/index.js",
+    "dist/core/adapters/index.js",
+    "dist/core/adapters/types.js",
+    "dist/core/adapters/load.js",
+    "dist/core/adapters/resolve.js",
+    "dist/core/adapters/select.js",
+    "dist/core/adapters/validate.js",
+    "dist/generators/aliases.js",
+    "dist/generators/index.js",
+    "dist/generators/types.js",
+    "dist/generators/engine.js",
+    "dist/generators/render.js",
+    "dist/generators/typescript/index.js",
+    "dist/generators/typescript/helpers.js",
+    "dist/generators/python/index.js",
+    "dist/generators/python/helpers.js",
+    "dist/generators/go/index.js",
+    "dist/generators/go/helpers.js",
+    "dist/generators/rust/index.js",
+    "dist/generators/rust/helpers.js",
+    "dist/generators/java/index.js",
+    "dist/generators/java/helpers.js",
+    "dist/generators/database/index.js",
+    "dist/generators/database/types.js",
+    "dist/generators/database/postgres.js",
+    "dist/generators/database/mongodb.js",
+    "dist/generators/prototype/index.js",
+    "dist/mcp/server.js",
+    "dist/cli/commands.js",
+    "dist/cli/help.js",
+    "dist/cli/render.js",
+    "dist/utils/args.js",
+    "schemas/",
+    "completions/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "blueprint": {
+    "catalogHash": "d948c61dec1ee202d492a81583036011f9e42d56c72ef3ec354e2ca0a533dd72"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/build-catalog.cjs && node scripts/strip-catalog.cjs && node scripts/extract-entities.cjs && node scripts/hash-catalog.cjs",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit --strict",
+    "pretest": "npm run build",
+    "test": "node --test \"dist/**/*.test.js\"",
+    "test:mcp": "node --test 'dist/mcp/*.test.js'",
+    "precommit": "bash scripts/pre-commit.sh",
+    "check:publish": "bash scripts/check-publish.sh",
+    "test:integration": "npm run build && bash scripts/integration-test.sh",
+    "prerelease": "npm run build && bash scripts/pre-commit.sh",
+    "link": "npm run build && npm link",
+    "docs": "npm run build && cp dist/catalog.json site/public/catalog.json && cp dist/entities.json site/public/entities.json && cd site && npm ci && npx vite build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@types/handlebars": "^4.0.40",
+    "handlebars": "^4.7.9",
+    "yaml": "^2.9.0"
+  }
+}

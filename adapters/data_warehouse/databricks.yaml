@@ -1,0 +1,60 @@
+name: databricks
+module: data_warehouse
+version: 1.0.0
+description: Databricks data warehouse adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createTable
+  - getTable
+  - listTables
+  - createView
+  - runQuery
+  - getQueryHistory
+  - addPartition
+  - getStorageUsage
+  - setQueryBudget
+
+does_not_implement: []
+
+config:
+  required:
+    - name: server_hostname
+      type: string
+      description: Databricks workspace URL
+      secret: false
+    - name: access_token
+      type: string
+      description: Databricks personal access token
+      secret: true
+  optional:
+    - name: catalog
+      type: string
+      default: main
+      description: Unity Catalog name
+    - name: schema
+      type: string
+      default: default
+      description: Default schema
+    - name: warehouse_id
+      type: string
+      description: SQL warehouse ID
+    - name: http_path
+      type: string
+      description: Cluster HTTP path
+    - name: port
+      type: integer
+      default: 443
+      description: Server port
+
+dependencies:
+  - module: reporting
+    purpose: Enable reporting queries
+    required: false
+  - module: audit_log
+    purpose: Log query execution
+    required: false
+
+metadata:
+  provider_url: https://www.databricks.com
+  docs_url: https://docs.databricks.com

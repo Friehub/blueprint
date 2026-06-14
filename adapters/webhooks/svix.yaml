@@ -1,0 +1,41 @@
+name: svix
+module: webhooks
+version: 1.0.0
+description: Svix webhook delivery adapter
+
+implements:
+  - registerEndpoint
+  - updateEndpoint
+  - removeEndpoint
+  - listEndpoints
+  - dispatchEvent
+  - retryDelivery
+  - getDeliveries
+  - getDelivery
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Svix API key
+      secret: true
+    - name: application_id
+      type: string
+      description: Svix application ID
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      default: "production"
+      description: Svix environment
+
+dependencies:
+  - module: audit_log
+    purpose: Log webhook delivery events
+    required: false
+
+metadata:
+  provider_url: https://svix.com
+  docs_url: https://docs.svix.com

@@ -1,0 +1,34 @@
+name: apisix
+module: api_versioning
+version: 1.0.0
+description: Apache APISIX API gateway version management adapter
+languages: [typescript, python, go, java]
+
+implements:
+  - registerApi
+  - getApi
+  - getCurrentVersion
+  - deprecateVersion
+  - listVersions
+  - setVersioningStrategy
+  - extendSunset
+
+does_not_implement: []
+
+config:
+  required:
+    - name: admin_url
+      type: string
+      description: APISIX Admin API URL
+    - name: api_key
+      type: string
+      description: APISIX Admin API key
+      secret: true
+  optional:
+    - name: base_url
+      type: string
+      description: APISIX base URL for routes
+
+metadata:
+  provider_url: https://apisix.apache.org
+  docs_url: https://apisix.apache.org/docs

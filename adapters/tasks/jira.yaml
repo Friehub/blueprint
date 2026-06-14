@@ -1,0 +1,59 @@
+name: jira
+module: tasks
+version: 1.0.0
+description: Jira task management adapter
+
+implements:
+  - createTask
+  - getTask
+  - listTasks
+  - updateTask
+  - assignTask
+  - changeTaskStatus
+  - addTaskDependency
+  - removeTaskDependency
+  - completeTask
+  - archiveTask
+
+does_not_implement: []
+
+config:
+  required:
+    - name: base_url
+      type: string
+      description: Jira instance URL
+      secret: false
+    - name: email
+      type: string
+      description: Jira admin email
+      secret: false
+    - name: api_token
+      type: string
+      description: Jira API token
+      secret: true
+  optional:
+    - name: project_key
+      type: string
+      description: Default project key
+    - name: cloud
+      type: boolean
+      default: true
+      description: Whether using Jira Cloud
+
+dependencies:
+  - module: projects
+    purpose: Get project data
+    required: true
+  - module: users
+    purpose: Get user data for assignment
+    required: true
+  - module: notifications
+    purpose: Send task notifications
+    required: false
+  - module: audit_log
+    purpose: Log task events
+    required: false
+
+metadata:
+  provider_url: https://www.atlassian.com/software/jira
+  docs_url: https://developer.atlassian.com/cloud/jira/platform

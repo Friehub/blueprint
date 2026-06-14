@@ -1,0 +1,54 @@
+name: bullmq
+module: jobs
+version: 1.0.0
+description: BullMQ jobs adapter
+
+implements:
+  - registerJob
+  - scheduleJob
+  - triggerJob
+  - disableJob
+  - enableJob
+  - getJob
+  - listJobs
+  - getExecution
+  - listExecutions
+  - cancelExecution
+
+does_not_implement: []
+
+config:
+  required:
+    - name: redis_url
+      type: string
+      description: Redis connection URL for BullMQ
+      secret: false
+  optional:
+    - name: redis_host
+      type: string
+      default: "localhost"
+      description: Redis host
+    - name: redis_port
+      type: integer
+      default: 6379
+      description: Redis port
+    - name: redis_password
+      type: string
+      description: Redis password
+      secret: true
+    - name: redis_db
+      type: integer
+      default: 0
+      description: Redis database number
+
+dependencies:
+  - module: queues
+    purpose: Underlying job dispatch mechanism
+    required: true
+  - module: audit_log
+    purpose: Log job execution events
+    required: false
+
+metadata:
+  provider_url: https://docs.bullmq.io
+  docs_url: https://docs.bullmq.io

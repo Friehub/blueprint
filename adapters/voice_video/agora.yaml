@@ -1,0 +1,59 @@
+name: agora
+module: voice_video
+version: 1.0.0
+description: Agora real-time voice and video adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createRoom
+  - getRoom
+  - listRooms
+  - joinRoom
+  - leaveRoom
+  - getParticipants
+  - startRecording
+  - stopRecording
+  - startTranscription
+  - stopTranscription
+  - getRoomMetrics
+
+does_not_implement: []
+
+config:
+  required:
+    - name: app_id
+      type: string
+      description: Agora app ID
+      secret: false
+    - name: app_certificate
+      type: string
+      description: Agora app certificate
+      secret: true
+  optional:
+    - name: token_expiration
+      type: integer
+      default: 3600
+      description: Token expiration in seconds
+    - name: recording_region
+      type: string
+      default: us
+      description: Recording region
+    - name: cloud_recording_enabled
+      type: boolean
+      default: true
+      description: Enable cloud recording
+
+dependencies:
+  - module: users
+    purpose: Resolve participant identities
+    required: true
+  - module: storage
+    purpose: Store recordings and transcripts
+    required: false
+  - module: audit_log
+    purpose: Log room events
+    required: false
+
+metadata:
+  provider_url: https://www.agora.io
+  docs_url: https://docs.agora.io

@@ -1,0 +1,35 @@
+name: relay
+module: webhooks
+version: 1.0.0
+description: Relay webhook delivery adapter
+
+implements:
+  - registerEndpoint
+  - updateEndpoint
+  - removeEndpoint
+  - listEndpoints
+  - dispatchEvent
+  - retryDelivery
+  - getDeliveries
+  - getDelivery
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Relay API key
+      secret: true
+    - name: endpoint
+      type: string
+      description: Relay endpoint URL
+
+dependencies:
+  - module: audit_log
+    purpose: Log webhook events
+    required: false
+
+metadata:
+  provider_url: https://relay.app
+  docs_url: https://relay.app/docs

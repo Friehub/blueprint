@@ -1,0 +1,60 @@
+name: aws_kinesis
+module: stream_processing
+version: 1.0.0
+description: AWS Kinesis stream processing adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - defineStream
+  - getStream
+  - listStreams
+  - startStream
+  - stopStream
+  - applyTransformation
+  - addSink
+  - getStreamMetrics
+  - getLag
+
+does_not_implement: []
+
+config:
+  required:
+    - name: access_key_id
+      type: string
+      description: AWS access key ID
+      secret: false
+    - name: secret_access_key
+      type: string
+      description: AWS secret access key
+      secret: true
+    - name: region
+      type: string
+      description: AWS region
+      secret: false
+  optional:
+    - name: stream_name
+      type: string
+      description: Default Kinesis stream name
+    - name: shard_count
+      type: integer
+      default: 1
+      description: Default shard count
+    - name: retention_hours
+      type: integer
+      default: 24
+      description: Data retention in hours
+    - name: endpoint
+      type: string
+      description: Custom Kinesis endpoint URL
+
+dependencies:
+  - module: event_bus
+    purpose: Source and sink streaming events
+    required: true
+  - module: audit_log
+    purpose: Log stream lifecycle events
+    required: false
+
+metadata:
+  provider_url: https://aws.amazon.com/kinesis
+  docs_url: https://docs.aws.amazon.com/kinesis

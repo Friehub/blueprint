@@ -1,0 +1,63 @@
+name: twilio_video
+module: voice_video
+version: 1.0.0
+description: Twilio Video real-time rooms adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createRoom
+  - getRoom
+  - listRooms
+  - joinRoom
+  - leaveRoom
+  - getParticipants
+  - startRecording
+  - stopRecording
+  - startTranscription
+  - stopTranscription
+  - getRoomMetrics
+
+does_not_implement: []
+
+config:
+  required:
+    - name: account_sid
+      type: string
+      description: Twilio account SID
+      secret: false
+    - name: auth_token
+      type: string
+      description: Twilio auth token
+      secret: true
+    - name: api_key
+      type: string
+      description: Twilio API key
+      secret: false
+    - name: api_secret
+      type: string
+      description: Twilio API secret
+      secret: true
+  optional:
+    - name: region
+      type: string
+      default: us1
+      description: Twilio region
+    - name: recording_enabled
+      type: boolean
+      default: false
+      description: Enable room recording by default
+
+dependencies:
+  - module: users
+    purpose: Resolve participant identities
+    required: true
+  - module: storage
+    purpose: Store recordings and transcripts
+    required: false
+  - module: audit_log
+    purpose: Log room events
+    required: false
+
+metadata:
+  provider_url: https://www.twilio.com/video
+  docs_url: https://www.twilio.com/docs/video

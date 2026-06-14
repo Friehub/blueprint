@@ -1,0 +1,55 @@
+name: casbin
+module: permissions
+version: 1.0.0
+description: Casbin access control adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - can
+  - canAll
+  - canAny
+  - batchCheckPermission
+  - grantPermission
+  - revokePermission
+  - denyPermission
+  - revokeDeny
+  - getPermissions
+  - createRole
+  - assignRole
+
+does_not_implement: []
+
+config:
+  required:
+    - name: model_path
+      type: string
+      description: Path to Casbin model.conf
+      secret: false
+  optional:
+    - name: adapter_type
+      type: string
+      default: postgres
+      description: Policy storage adapter (postgres, mysql, file)
+    - name: connection_string
+      type: string
+      description: Database connection string for policy storage
+      secret: true
+    - name: policy_path
+      type: string
+      description: Path to policy CSV file (file adapter)
+    - name: auto_save
+      type: boolean
+      default: true
+      description: Auto-save policy changes
+
+dependencies:
+  - module: users
+    purpose: Resolve user identities
+    required: true
+  - module: audit_log
+    purpose: Log permission changes
+    required: false
+
+metadata:
+  provider_url: https://casbin.org
+  docs_url: https://casbin.org/docs

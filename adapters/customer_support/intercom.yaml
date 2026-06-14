@@ -1,0 +1,44 @@
+name: intercom
+module: customer_support
+version: 1.0.0
+description: Intercom customer support adapter
+
+implements:
+  - createTicket
+  - assignTicket
+  - addTicketMessage
+  - transitionTicketStatus
+  - checkSLA
+
+does_not_implement: []
+
+config:
+  required:
+    - name: app_id
+      type: string
+      description: Intercom app ID
+      secret: false
+    - name: api_key
+      type: string
+      description: Intercom API key
+      secret: true
+  optional:
+    - name: access_token
+      type: string
+      description: Intercom access token
+      secret: true
+
+dependencies:
+  - module: users
+    purpose: Get user data for tickets
+    required: true
+  - module: notifications
+    purpose: Send ticket notifications
+    required: false
+  - module: audit_log
+    purpose: Log support events
+    required: false
+
+metadata:
+  provider_url: https://www.intercom.com
+  docs_url: https://developers.intercom.com

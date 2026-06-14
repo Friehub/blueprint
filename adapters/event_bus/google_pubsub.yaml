@@ -1,0 +1,51 @@
+name: google_pubsub
+module: event_bus
+version: 1.0.0
+description: Google Cloud Pub/Sub event bus adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - publish
+  - publishBulk
+  - subscribe
+  - unsubscribe
+  - getSubscriptions
+  - replay
+  - getDeadLetters
+  - retryDeadLetter
+
+does_not_implement: []
+
+config:
+  required:
+    - name: project_id
+      type: string
+      description: Google Cloud project ID
+      secret: false
+  optional:
+    - name: service_account_key
+      type: string
+      description: Service account key JSON
+      secret: true
+    - name: topic_prefix
+      type: string
+      default: blueprint
+      description: Topic name prefix
+    - name: subscription_prefix
+      type: string
+      default: blueprint-sub
+      description: Subscription name prefix
+    - name: ack_deadline_seconds
+      type: integer
+      default: 60
+      description: Acknowledgement deadline (seconds)
+    - name: retention_duration
+      type: string
+      default: 604800s
+      description: Message retention duration (7 days default)
+
+dependencies: []
+
+metadata:
+  provider_url: https://cloud.google.com/pubsub
+  docs_url: https://cloud.google.com/pubsub/docs

@@ -1,0 +1,41 @@
+name: supabase_auth
+module: users
+version: 1.0.0
+description: Supabase Auth adapter for user management
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - getUser
+  - getUserByEmail
+  - createUser
+
+does_not_implement:
+  - updateUser
+  - deleteUser
+  - searchUsers
+  - getUsersByRole
+  - assignRole
+  - revokeRole
+  - getUserRoles
+  - banUser
+  - unbanUser
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Supabase service role API key
+      secret: true
+    - name: project_ref
+      type: string
+      description: Supabase project reference ID
+      secret: false
+  optional:
+    - name: base_url
+      type: string
+      description: Custom Supabase auth URL
+      default: "https://{project_ref}.supabase.co/auth/v1"
+
+metadata:
+  provider_url: https://supabase.com
+  docs_url: https://supabase.com/docs/guides/auth

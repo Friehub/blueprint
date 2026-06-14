@@ -1,0 +1,35 @@
+name: locust
+module: load_testing
+version: 1.0.0
+description: Locust load testing adapter
+languages: [python]
+
+implements:
+  - defineScenario
+  - getScenario
+  - runScenario
+  - getRun
+  - cancelRun
+  - setSlaThresholds
+  - validateSla
+
+does_not_implement:
+  - compareRuns
+
+config:
+  required:
+    - name: master_host
+      type: string
+      description: Locust master host
+    - name: master_port
+      type: number
+      default: 5557
+      description: Locust master port
+  optional:
+    - name: csv_prefix
+      type: string
+      description: Prefix for CSV metrics export
+
+metadata:
+  provider_url: https://locust.io
+  docs_url: https://docs.locust.io

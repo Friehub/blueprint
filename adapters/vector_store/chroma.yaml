@@ -1,0 +1,36 @@
+name: chroma
+module: vector_store
+version: 1.0.0
+description: Chroma vector database adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - upsertCollection
+  - deleteCollection
+  - upsertVectors
+  - deleteVectors
+  - search
+  - getVector
+  - getCollectionStats
+  - listCollections
+
+does_not_implement: []
+
+config:
+  required:
+    - name: host
+      type: string
+      description: Chroma server host
+      secret: false
+    - name: port
+      type: integer
+      default: 8000
+      description: Chroma server port
+  optional:
+    - name: tenant
+      type: string
+      description: Chroma tenant name
+
+metadata:
+  provider_url: https://www.trychroma.com
+  docs_url: https://docs.trychroma.com

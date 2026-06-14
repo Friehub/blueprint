@@ -1,0 +1,51 @@
+name: shipengine
+module: fulfillment
+version: 1.0.0
+description: ShipEngine fulfillment adapter
+
+implements:
+  - createFulfillment
+  - getFulfillment
+  - listFulfillments
+  - assignWarehouse
+  - markPacked
+  - markShipped
+  - markDelivered
+  - cancelFulfillment
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: ShipEngine API key
+      secret: true
+  optional:
+    - name: carrier_id
+      type: string
+      description: Default carrier ID
+    - name: warehouse_id
+      type: string
+      description: Default warehouse ID
+
+dependencies:
+  - module: orders
+    purpose: Get order data for fulfillment
+    required: true
+  - module: inventory
+    purpose: Check inventory availability
+    required: true
+  - module: shipping
+    purpose: Create and track shipments
+    required: true
+  - module: notifications
+    purpose: Send fulfillment updates
+    required: false
+  - module: audit_log
+    purpose: Log fulfillment events
+    required: false
+
+metadata:
+  provider_url: https://www.shipengine.com
+  docs_url: https://www.shipengine.com/docs

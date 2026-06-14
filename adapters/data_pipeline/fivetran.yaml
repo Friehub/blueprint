@@ -1,0 +1,51 @@
+name: fivetran
+module: data_pipeline
+version: 1.0.0
+description: Fivetran data integration pipeline adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - definePipeline
+  - getPipeline
+  - listPipelines
+  - runPipeline
+  - getRun
+  - getRunHistory
+  - retryStage
+  - pausePipeline
+  - resumePipeline
+  - deletePipeline
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Fivetran API key
+      secret: true
+    - name: api_secret
+      type: string
+      description: Fivetran API secret
+      secret: true
+  optional:
+    - name: server_url
+      type: string
+      default: https://api.fivetran.com
+      description: Fivetran API URL
+    - name: limit
+      type: integer
+      default: 100
+      description: Page limit
+
+dependencies:
+  - module: data_warehouse
+    purpose: Load data into warehouse
+    required: true
+  - module: audit_log
+    purpose: Log pipeline events
+    required: false
+
+metadata:
+  provider_url: https://www.fivetran.com
+  docs_url: https://fivetran.com/docs

@@ -1,0 +1,54 @@
+name: wise_business
+module: payouts
+version: 1.0.0
+description: Wise Business payout adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createPayout
+  - getPayout
+  - listPayouts
+  - cancelPayout
+  - retryPayout
+  - schedulePayout
+  - getPayoutSchedule
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Wise API key
+      secret: true
+    - name: profile_id
+      type: string
+      description: Wise business profile ID
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      default: production
+      description: Wise environment (production or sandbox)
+    - name: api_url
+      type: string
+      default: https://api.wise.com
+      description: Wise API URL
+
+dependencies:
+  - module: payments
+    purpose: Access payment data for payouts
+    required: true
+  - module: ledger
+    purpose: Track payout ledger entries
+    required: true
+  - module: notifications
+    purpose: Send payout notifications
+    required: false
+  - module: audit_log
+    purpose: Log payout events
+    required: false
+
+metadata:
+  provider_url: https://wise.com
+  docs_url: https://docs.wise.com

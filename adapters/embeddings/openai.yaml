@@ -1,0 +1,53 @@
+name: openai
+module: embeddings
+version: 1.0.0
+description: OpenAI embeddings API adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - embed
+  - upsertVector
+  - upsertVectorBatch
+  - querySimilar
+  - queryByText
+  - hybridQuery
+
+does_not_implement:
+  - createIndex
+  - getIndex
+  - listIndexes
+  - deleteIndex
+  - getVector
+  - deleteVector
+  - deleteVectorsByFilter
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: OpenAI API key
+      secret: true
+  optional:
+    - name: model
+      type: string
+      default: text-embedding-3-small
+      description: Embedding model name
+    - name: organization
+      type: string
+      description: OpenAI organization ID
+    - name: dimensions
+      type: integer
+      default: 1536
+      description: Output vector dimensions
+
+dependencies:
+  - module: vector_store
+    purpose: Store and index embedding vectors
+    required: true
+  - module: audit_log
+    purpose: Log embedding operations
+    required: false
+
+metadata:
+  provider_url: https://openai.com
+  docs_url: https://platform.openai.com/docs/guides/embeddings

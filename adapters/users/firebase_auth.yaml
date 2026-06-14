@@ -1,0 +1,36 @@
+name: firebase_auth
+module: users
+version: 1.0.0
+description: Firebase Authentication adapter for user management
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - getUser
+  - getUserByEmail
+  - createUser
+
+does_not_implement:
+  - updateUser
+  - deleteUser
+  - searchUsers
+  - getUsersByRole
+  - assignRole
+  - revokeRole
+  - getUserRoles
+  - banUser
+  - unbanUser
+
+config:
+  required:
+    - name: service_account_key
+      type: string
+      description: Firebase service account JSON key
+      secret: true
+  optional:
+    - name: project_id
+      type: string
+      description: Firebase project ID
+
+metadata:
+  provider_url: https://firebase.google.com
+  docs_url: https://firebase.google.com/docs/auth

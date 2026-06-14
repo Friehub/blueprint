@@ -1,0 +1,37 @@
+name: ipinfo
+module: ip_intelligence
+version: 1.0.0
+description: IPinfo IP intelligence adapter
+
+implements:
+  - lookup
+  - isVpn
+  - isTor
+  - isDatacenter
+  - getGeolocation
+  - getThreatScore
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_token
+      type: string
+      description: IPinfo API token
+      secret: true
+  optional:
+    - name: country
+      type: string
+      description: Default country filter
+    - name: fields
+      type: string
+      description: Fields to include in response
+
+dependencies:
+  - module: audit_log
+    purpose: Log IP intelligence events
+    required: false
+
+metadata:
+  provider_url: https://ipinfo.io
+  docs_url: https://ipinfo.io/developers

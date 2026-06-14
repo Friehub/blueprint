@@ -1,0 +1,30 @@
+name: custom_postgres
+module: ledger
+version: 1.0.0
+description: Custom PostgreSQL-backed double-entry ledger adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createLedger
+  - createAccount
+  - postTransaction
+  - getAccountBalance
+  - getLedgerTransactions
+
+does_not_implement: []
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: PostgreSQL connection string
+      secret: true
+  optional:
+    - name: pool_size
+      type: integer
+      default: 10
+      description: Database connection pool size
+
+metadata:
+  provider_url: https://www.postgresql.org
+  docs_url: https://www.postgresql.org/docs

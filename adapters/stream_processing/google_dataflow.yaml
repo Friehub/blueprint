@@ -1,0 +1,64 @@
+name: google_dataflow
+module: stream_processing
+version: 1.0.0
+description: Google Dataflow stream processing adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - defineStream
+  - getStream
+  - listStreams
+  - startStream
+  - stopStream
+  - applyTransformation
+  - addSink
+  - getStreamMetrics
+  - getLag
+
+does_not_implement: []
+
+config:
+  required:
+    - name: project_id
+      type: string
+      description: Google Cloud project ID
+      secret: false
+    - name: region
+      type: string
+      description: Compute region
+      secret: false
+  optional:
+    - name: service_account_key
+      type: string
+      description: Service account key JSON
+      secret: true
+    - name: staging_location
+      type: string
+      description: GCS staging location
+    - name: temp_location
+      type: string
+      description: GCS temp location
+    - name: max_workers
+      type: integer
+      default: 10
+      description: Max worker count
+    - name: machine_type
+      type: string
+      default: n1-standard-2
+      description: Worker machine type
+    - name: streaming_engine
+      type: string
+      default: streaming
+      description: Processing mode (streaming or batch)
+
+dependencies:
+  - module: event_bus
+    purpose: Source and sink streaming events
+    required: true
+  - module: audit_log
+    purpose: Log stream lifecycle events
+    required: false
+
+metadata:
+  provider_url: https://cloud.google.com/dataflow
+  docs_url: https://cloud.google.com/dataflow/docs

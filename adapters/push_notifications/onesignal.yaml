@@ -1,0 +1,44 @@
+name: onesignal
+module: push_notifications
+version: 1.0.0
+description: OneSignal push notification adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - registerDevice
+  - unregisterDevice
+  - getUserDevices
+  - sendPush
+  - sendBulkPush
+  - sendTopicPush
+  - getPushStatus
+  - updateDeviceToken
+
+does_not_implement: []
+
+config:
+  required:
+    - name: app_id
+      type: string
+      description: OneSignal app ID
+      secret: false
+    - name: api_key
+      type: string
+      description: OneSignal REST API key
+      secret: true
+  optional:
+    - name: channel_for_external_user_ids
+      type: string
+      description: Channel for external user IDs
+
+dependencies:
+  - module: users
+    purpose: Resolve device registrations
+    required: true
+  - module: audit_log
+    purpose: Log push events
+    required: false
+
+metadata:
+  provider_url: https://onesignal.com
+  docs_url: https://documentation.onesignal.com

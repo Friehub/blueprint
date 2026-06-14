@@ -1,0 +1,49 @@
+name: paypal
+module: payouts
+version: 1.0.0
+description: PayPal Payouts adapter
+
+implements:
+  - createPayout
+  - getPayout
+  - listPayouts
+  - cancelPayout
+  - retryPayout
+  - schedulePayout
+  - getPayoutSchedule
+
+does_not_implement: []
+
+config:
+  required:
+    - name: client_id
+      type: string
+      description: PayPal client ID
+      secret: false
+    - name: client_secret
+      type: string
+      description: PayPal client secret
+      secret: true
+  optional:
+    - name: environment
+      type: string
+      default: "production"
+      description: PayPal environment (sandbox or production)
+
+dependencies:
+  - module: payments
+    purpose: Access payment data for payouts
+    required: true
+  - module: ledger
+    purpose: Track payout ledger entries
+    required: true
+  - module: notifications
+    purpose: Send payout notifications
+    required: false
+  - module: audit_log
+    purpose: Log payout events
+    required: false
+
+metadata:
+  provider_url: https://www.paypal.com
+  docs_url: https://developer.paypal.com/docs/payouts

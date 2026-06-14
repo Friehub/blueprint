@@ -1,0 +1,37 @@
+name: stripe
+module: subscriptions
+version: 1.0.0
+description: Stripe subscriptions adapter for access management
+
+implements:
+  - getEntitlements
+  - hasAccess
+  - grantEntitlement
+  - revokeEntitlement
+  - getAccessHistory
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Stripe secret API key
+      secret: true
+  optional:
+    - name: api_version
+      type: string
+      default: "2023-10-16"
+      description: Stripe API version
+
+dependencies:
+  - module: billing
+    purpose: Check subscription status
+    required: true
+  - module: audit_log
+    purpose: Log access events
+    required: false
+
+metadata:
+  provider_url: https://stripe.com
+  docs_url: https://stripe.com/docs/billing/subscriptions

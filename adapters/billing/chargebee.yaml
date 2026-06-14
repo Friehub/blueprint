@@ -1,0 +1,54 @@
+name: chargebee
+module: billing
+version: 1.0.0
+description: Chargebee billing subscription and plan management adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createSubscription
+  - getSubscription
+  - upgradeSubscription
+  - downgradeSubscription
+  - cancelSubscription
+  - reactivateSubscription
+  - getInvoices
+  - getInvoice
+  - getPlans
+  - getPlan
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Chargebee API key
+      secret: true
+    - name: site
+      type: string
+      description: Chargebee site name
+      secret: false
+  optional:
+    - name: api_version
+      type: string
+      default: v2
+      description: Chargebee API version
+    - name: webhook_secret
+      type: string
+      description: Chargebee webhook secret
+      secret: true
+
+dependencies:
+  - module: payments
+    purpose: Process subscription payments
+    required: true
+  - module: notifications
+    purpose: Send subscription lifecycle emails
+    required: false
+  - module: audit_log
+    purpose: Log subscription events
+    required: false
+
+metadata:
+  provider_url: https://www.chargebee.com
+  docs_url: https://www.chargebee.com/docs/apis

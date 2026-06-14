@@ -1,0 +1,52 @@
+name: postmark
+module: emails
+version: 1.0.0
+description: Postmark transactional email adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - sendTransactional
+  - sendBulk
+  - createTemplate
+  - updateTemplate
+  - getTemplate
+  - listTemplates
+  - getDeliveryStatus
+  - getDeliveryEvents
+
+does_not_implement: []
+
+config:
+  required:
+    - name: server_token
+      type: string
+      description: Postmark server API token
+      secret: true
+    - name: from_email
+      type: string
+      description: Default sender email address
+      secret: false
+  optional:
+    - name: from_name
+      type: string
+      description: Default sender name
+    - name: reply_to
+      type: string
+      description: Default reply-to email address
+    - name: track_opens
+      type: boolean
+      default: true
+      description: Enable open tracking
+    - name: track_links
+      type: string
+      default: htmlonly
+      description: Link tracking (none, htmlonly, htmlandtext)
+
+dependencies:
+  - module: audit_log
+    purpose: Log email delivery events
+    required: false
+
+metadata:
+  provider_url: https://postmarkapp.com
+  docs_url: https://postmarkapp.com/developer/api

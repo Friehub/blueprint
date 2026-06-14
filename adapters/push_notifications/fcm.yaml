@@ -1,0 +1,36 @@
+name: fcm
+module: push_notifications
+version: 1.0.0
+description: Firebase Cloud Messaging push notification adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - registerDevice
+  - unregisterDevice
+  - getUserDevices
+  - sendPush
+  - sendBulkPush
+  - sendTopicPush
+  - getPushStatus
+  - updateDeviceToken
+
+does_not_implement: []
+
+config:
+  required:
+    - name: server_key
+      type: string
+      description: FCM server key
+      secret: true
+    - name: project_id
+      type: string
+      description: Firebase project ID
+  optional:
+    - name: default_priority
+      type: string
+      default: normal
+      description: Default push priority (normal or high)
+
+metadata:
+  provider_url: https://firebase.google.com/docs/cloud-messaging
+  docs_url: https://firebase.google.com/docs/cloud-messaging/send-message

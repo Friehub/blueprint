@@ -1,0 +1,47 @@
+name: adyen
+module: payments
+version: 1.0.0
+description: Adyen payment processing adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - initiatePayment
+  - verifyPayment
+  - getPaymentByOrder
+  - initiateRefund
+  - getRefundByOrder
+  - getRefund
+
+does_not_implement:
+  - getWallet
+  - creditWallet
+  - debitWallet
+  - getWalletTransactions
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Adyen API key
+      secret: true
+    - name: merchant_account
+      type: string
+      description: Adyen merchant account ID
+      secret: false
+  optional:
+    - name: environment
+      type: string
+      default: "live"
+      description: Adyen environment (test or live)
+
+dependencies:
+  - module: notifications
+    purpose: Send payment confirmation emails
+    required: false
+  - module: audit_log
+    purpose: Log payment events
+    required: false
+
+metadata:
+  provider_url: https://adyen.com
+  docs_url: https://docs.adyen.com

@@ -1,0 +1,42 @@
+name: launchdarkly
+module: feature_flags
+version: 1.0.0
+description: LaunchDarkly feature flag management with segment targeting
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - isEnabled
+  - getVariant
+  - setFlag
+  - archiveFlag
+  - listFlags
+  - getFlag
+  - rolloutToPercent
+  - evaluateAll
+  - createSegment
+  - updateSegment
+  - deleteSegment
+  - listSegments
+  - evaluateSegment
+
+does_not_implement: []
+
+config:
+  required:
+    - name: sdk_key
+      type: string
+      description: LaunchDarkly SDK key
+      secret: true
+  optional:
+    - name: base_url
+      type: string
+      default: https://app.launchdarkly.com
+      description: LaunchDarkly API base URL
+    - name: stream_uri
+      type: string
+      default: https://stream.launchdarkly.com
+      description: LaunchDarkly stream URI
+
+metadata:
+  provider_url: https://launchdarkly.com
+  docs_url: https://docs.launchdarkly.com

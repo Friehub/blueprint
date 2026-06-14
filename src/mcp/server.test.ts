@@ -1,0 +1,151 @@
+import { strict as assert } from "node:assert";
+import { describe, it, before, after } from "node:test";
+import { spawn, ChildProcess } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { join } from "node:path";
+
+const ROOT = fileURLToPath(new URL("../../", import.meta.url));
+const SERVER_PATH = join(ROOT, "dist", "mcp", "server.js");
+
+let server: ChildProcess;
+
+function sendRequest(request: Record<string, unknown>): Promise<string> {
+  const id = (request.id as number) ?? 1;
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    const timeout = setTimeout(() => {
+      reject(new Error("Timeout waiting for response for id " + id));
+    }, 15000);
+
+    const onData = (chunk: Buffer) => {
+      chunks.push(chunk);
+      const text = Buffer.concat(chunks).toString("utf8");
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed.id === id) {
+          clearTimeout(timeout);
+          server.stdout!.removeListener("data", onData);
+          resolve(text);
+        }
+      } catch {
+        // JSON not complete yet
+      }
+    };
+
+    server.stdout!.on("data", onData);
+    server.stderr!.on("data", () => {});
+    server.stdin!.write(JSON.stringify(request) + "\n");
+  });
+}
+
+describe("MCP server", () => {
+  before(() => {
+    server = spawn("node", [SERVER_PATH], {
+      env: { ...process.env, BLUEPRINT_ROOT: ROOT },
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+  });
+
+  after(() => {
+    if (server && !server.killed) server.kill();
+  });
+
+  it("responds to tools/list", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} });
+    const json = JSON.parse(response);
+    assert.ok(json.result, "should have result");
+    assert.ok(json.result.tools, "should have tools array");
+    assert.ok(json.result.tools.length >= 12, "should have at least 12 tools");
+  });
+
+  it("responds to list_modules", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 2, method: "tools/call", params: { name: "list_modules", arguments: {} } });
+    const json = JSON.parse(response);
+    const content = JSON.parse(json.result.content[0].text);
+    assert.ok(content.total >= 100, "should have at least 100 modules");
+    assert.ok(content.modules.length >= 100);
+  });
+
+  it("responds to get_module for payments", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "get_module", arguments: { name: "payments" } } });
+    const json = JSON.parse(response);
+    const content = JSON.parse(json.result.content[0].text);
+    assert.equal(content.name, "payments");
+    assert.ok(content.functions.length >= 10);
+  });
+
+  it("returns error for unknown module", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 4, method: "tools/call", params: { name: "get_module", arguments: { name: "nonexistent" } } });
+    const json = JSON.parse(response);
+    const text = json.result.content[0].text;
+    assert.ok(text.includes("not found") || text.includes("Not found"));
+  });
+
+  it("responds to search_modules", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 5, method: "tools/call", params: { name: "search_modules", arguments: { query: "payment" } } });
+    const json = JSON.parse(response);
+    const content = JSON.parse(json.result.content[0].text);
+    assert.ok(content.total > 0);
+    assert.ok(content.results.some((r: any) => r.name === "payments"));
+  });
+
+  it("responds to resolve_deps", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 6, method: "tools/call", params: { name: "resolve_deps", arguments: { modules: ["billing"] } } });
+    const json = JSON.parse(response);
+    const content = JSON.parse(json.result.content[0].text);
+    assert.ok(content.modules.length > 0);
+    assert.ok(content.modules.some((m: any) => m.name === "billing"));
+    assert.ok(content.modules.some((m: any) => m.name === "payments"));
+  });
+
+  it("responds to list_adapters", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 7, method: "tools/call", params: { name: "list_adapters", arguments: { module: "payments" } } });
+    const json = JSON.parse(response);
+    const content = JSON.parse(json.result.content[0].text);
+    assert.ok(content.payments, "should have payments adapters");
+    assert.ok(content.payments.includes("stripe"));
+  });
+
+  it("responds to get_adapter", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 8, method: "tools/call", params: { name: "get_adapter", arguments: { module: "payments", provider: "stripe" } } });
+    const json = JSON.parse(response);
+    const content = JSON.parse(json.result.content[0].text);
+    assert.equal(content.name, "stripe");
+    assert.equal(content.module, "payments");
+    assert.ok(content.config.required.length > 0);
+  });
+
+  it("responds to get_database_schema", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 9, method: "tools/call", params: { name: "get_database_schema", arguments: { module: "payments" } } });
+    const json = JSON.parse(response);
+    const text = json.result.content[0].text;
+    assert.ok(text.length > 0);
+  });
+
+  it("responds to get_saga", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 10, method: "tools/call", params: { name: "get_saga", arguments: { name: "checkout" } } });
+    const json = JSON.parse(response);
+    assert.ok(json.result.content[0].text.length > 0);
+  });
+
+  it("responds to get_distributed_patterns", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 11, method: "tools/call", params: { name: "get_distributed_patterns", arguments: { module: "payments" } } });
+    const json = JSON.parse(response);
+    assert.ok(json.result.content[0].text.length > 0);
+  });
+
+  it("responds to validate_implementation", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 12, method: "tools/call", params: { name: "validate_implementation", arguments: { module: "payments", code_summary: "Process payment using Stripe API with idempotency key and balance check" } } });
+    const json = JSON.parse(response);
+    const content = JSON.parse(json.result.content[0].text);
+    assert.ok(content.status, "should have status field");
+  });
+
+  it("responds to suggest_modules", { timeout: 15000 }, async () => {
+    const response = await sendRequest({ jsonrpc: "2.0", id: 13, method: "tools/call", params: { name: "suggest_modules", arguments: { description: "checkout flow with fraud detection" } } });
+    const json = JSON.parse(response);
+    const content = JSON.parse(json.result.content[0].text);
+    assert.ok(content.suggested_modules, "should have suggested_modules");
+    assert.ok(content.recommended_order, "should have recommended_order");
+  });
+});

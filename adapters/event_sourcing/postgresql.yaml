@@ -1,0 +1,38 @@
+name: postgresql
+module: event_sourcing
+version: 1.0.0
+description: PostgreSQL event store adapter with append-only streams and projections
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - appendEvent
+  - appendEvents
+  - readStream
+  - readStreamFrom
+  - buildProjection
+  - rebuildProjection
+  - createSnapshot
+  - getSnapshot
+  - subscribeToStream
+
+does_not_implement: []
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: PostgreSQL connection string
+      secret: true
+  optional:
+    - name: pool_size
+      type: integer
+      default: 10
+      description: Database connection pool size
+    - name: schema
+      type: string
+      default: "event_sourcing"
+      description: Database schema for event store tables
+
+metadata:
+  provider_url: https://www.postgresql.org
+  docs_url: https://www.postgresql.org/docs

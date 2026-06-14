@@ -1,0 +1,46 @@
+name: paystack
+module: payments
+version: 1.0.0
+description: Paystack payment processing adapter
+languages: [typescript, python, go]
+
+implements:
+  - initiatePayment
+  - verifyPayment
+  - getPaymentByOrder
+  - initiateRefund
+  - getRefundByOrder
+  - getRefund
+
+does_not_implement:
+  - getWallet
+  - creditWallet
+  - debitWallet
+  - getWalletTransactions
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Paystack secret API key
+      secret: true
+    - name: webhook_secret
+      type: string
+      description: Paystack webhook signing secret
+      secret: true
+  optional:
+    - name: merchant_email
+      type: string
+      description: Merchant email for Paystack
+
+dependencies:
+  - module: notifications
+    purpose: Send payment confirmation emails
+    required: false
+  - module: audit_log
+    purpose: Log payment events
+    required: false
+
+metadata:
+  provider_url: https://paystack.com
+  docs_url: https://paystack.com/docs

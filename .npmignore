@@ -1,0 +1,14 @@
+src/
+scripts/
+scenario/
+generated/
+my-saas/
+old_idea/
+node_modules/
+*.test.ts
+*.md
+!README.md
+!CHANGELOG.md
+.DS_Store
+.env
+blueprint.json

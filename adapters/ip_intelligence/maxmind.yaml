@@ -1,0 +1,39 @@
+name: maxmind
+module: ip_intelligence
+version: 1.0.0
+description: MaxMind IP intelligence adapter
+
+implements:
+  - lookup
+  - isVpn
+  - isTor
+  - isDatacenter
+  - getGeolocation
+  - getThreatScore
+
+does_not_implement: []
+
+config:
+  required:
+    - name: account_id
+      type: string
+      description: MaxMind account ID
+      secret: false
+    - name: license_key
+      type: string
+      description: MaxMind license key
+      secret: true
+  optional:
+    - name: edition_id
+      type: string
+      default: "GeoIP2-City"
+      description: MaxMind database edition ID
+
+dependencies:
+  - module: audit_log
+    purpose: Log IP intelligence events
+    required: false
+
+metadata:
+  provider_url: https://www.maxmind.com
+  docs_url: https://dev.maxmind.com

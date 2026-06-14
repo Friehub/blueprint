@@ -1,0 +1,52 @@
+name: persona
+module: kyc
+version: 1.0.0
+description: Persona KYC identity verification adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - submitVerification
+  - getVerification
+  - getUserVerification
+  - getVerificationStatus
+  - updateVerification
+  - rejectVerification
+  - approveVerification
+  - listPendingVerifications
+  - expireVerification
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Persona API key
+      secret: true
+  optional:
+    - name: environment
+      type: string
+      default: production
+      description: Persona environment (sandbox or production)
+    - name: template_id
+      type: string
+      description: Persona inquiry template ID
+    - name: webhook_secret
+      type: string
+      description: Persona webhook signing secret
+      secret: true
+
+dependencies:
+  - module: users
+    purpose: Resolve user identities
+    required: true
+  - module: storage
+    purpose: Store verification documents
+    required: false
+  - module: audit_log
+    purpose: Log KYC events
+    required: false
+
+metadata:
+  provider_url: https://withpersona.com
+  docs_url: https://docs.withpersona.com

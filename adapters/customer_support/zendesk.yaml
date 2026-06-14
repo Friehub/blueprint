@@ -1,0 +1,51 @@
+name: zendesk
+module: customer_support
+version: 1.0.0
+description: Zendesk customer support adapter
+
+implements:
+  - createTicket
+  - assignTicket
+  - addTicketMessage
+  - transitionTicketStatus
+  - checkSLA
+
+does_not_implement: []
+
+config:
+  required:
+    - name: subdomain
+      type: string
+      description: Zendesk subdomain
+      secret: false
+    - name: api_token
+      type: string
+      description: Zendesk API token
+      secret: true
+    - name: email
+      type: string
+      description: Zendesk admin email
+      secret: false
+  optional:
+    - name: oauth_token
+      type: string
+      description: Zendesk OAuth token
+      secret: true
+    - name: marketplace_listing_id
+      type: string
+      description: Zendesk marketplace listing ID
+
+dependencies:
+  - module: users
+    purpose: Get user data for tickets
+    required: true
+  - module: notifications
+    purpose: Send ticket notifications
+    required: false
+  - module: audit_log
+    purpose: Log support events
+    required: false
+
+metadata:
+  provider_url: https://www.zendesk.com
+  docs_url: https://developer.zendesk.com

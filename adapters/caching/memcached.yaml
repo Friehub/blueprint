@@ -1,0 +1,28 @@
+name: memcached
+module: caching
+version: 1.0.0
+description: Memcached caching adapter
+
+implements:
+  - get
+  - set
+  - del
+  - getOrSet
+  - mget
+  - mset
+  - increment
+  - decrement
+
+does_not_implement:
+  - invalidateByTag
+  - invalidateByPrefix
+
+config:
+  required:
+    - name: servers
+      type: string
+      description: Memcached servers (e.g., "localhost:11211")
+
+metadata:
+  provider_url: https://memcached.org
+  docs_url: https://memcached.org/docs

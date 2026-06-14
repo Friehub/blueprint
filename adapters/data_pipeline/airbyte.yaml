@@ -1,0 +1,54 @@
+name: airbyte
+module: data_pipeline
+version: 1.0.0
+description: Airbyte data integration and ELT pipeline adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - definePipeline
+  - getPipeline
+  - listPipelines
+  - runPipeline
+  - getRun
+  - getRunHistory
+  - retryStage
+  - pausePipeline
+  - resumePipeline
+  - deletePipeline
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Airbyte API key
+      secret: true
+    - name: host
+      type: string
+      description: Airbyte instance URL
+      secret: false
+  optional:
+    - name: workspace_id
+      type: string
+      description: Airbyte workspace ID
+    - name: max_sync_retries
+      type: integer
+      default: 3
+      description: Max sync retries
+    - name: log_level
+      type: string
+      default: INFO
+      description: Log level
+
+dependencies:
+  - module: data_warehouse
+    purpose: Load data into warehouse
+    required: true
+  - module: audit_log
+    purpose: Log pipeline events
+    required: false
+
+metadata:
+  provider_url: https://airbyte.com
+  docs_url: https://docs.airbyte.com

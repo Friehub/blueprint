@@ -1,0 +1,62 @@
+name: daily_co
+module: voice_video
+version: 1.0.0
+description: Daily.co real-time video and audio adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createRoom
+  - getRoom
+  - listRooms
+  - joinRoom
+  - leaveRoom
+  - getParticipants
+  - startRecording
+  - stopRecording
+  - startTranscription
+  - stopTranscription
+  - getRoomMetrics
+
+does_not_implement: []
+
+config:
+  required:
+    - name: api_key
+      type: string
+      description: Daily.co API key
+      secret: true
+  optional:
+    - name: domain
+      type: string
+      description: Daily.co domain
+    - name: enable_recording
+      type: boolean
+      default: false
+      description: Enable recording by default
+    - name: enable_transcription
+      type: boolean
+      default: false
+      description: Enable transcription by default
+    - name: max_duration
+      type: integer
+      default: 3600
+      description: Max room duration in seconds
+    - name: token_expiration
+      type: integer
+      default: 3600
+      description: Token expiration in seconds
+
+dependencies:
+  - module: users
+    purpose: Resolve participant identities
+    required: true
+  - module: storage
+    purpose: Store recordings and transcripts
+    required: false
+  - module: audit_log
+    purpose: Log room events
+    required: false
+
+metadata:
+  provider_url: https://www.daily.co
+  docs_url: https://docs.daily.co

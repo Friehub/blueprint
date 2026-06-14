@@ -1,0 +1,66 @@
+name: livekit
+module: voice_video
+version: 1.0.0
+description: LiveKit real-time video and audio adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createRoom
+  - getRoom
+  - listRooms
+  - joinRoom
+  - leaveRoom
+  - getParticipants
+  - startRecording
+  - stopRecording
+  - startTranscription
+  - stopTranscription
+  - getRoomMetrics
+
+does_not_implement: []
+
+config:
+  required:
+    - name: host
+      type: string
+      description: LiveKit server host
+      secret: false
+    - name: api_key
+      type: string
+      description: LiveKit API key
+      secret: false
+    - name: api_secret
+      type: string
+      description: LiveKit API secret
+      secret: true
+  optional:
+    - name: port
+      type: integer
+      default: 7880
+      description: LiveKit server port
+    - name: ws_url
+      type: string
+      description: WebSocket URL for clients
+    - name: token_expiration
+      type: integer
+      default: 3600
+      description: Token expiration in seconds
+    - name: egress_enabled
+      type: boolean
+      default: true
+      description: Enable egress recording
+
+dependencies:
+  - module: users
+    purpose: Resolve participant identities
+    required: true
+  - module: storage
+    purpose: Store recordings and transcripts
+    required: false
+  - module: audit_log
+    purpose: Log room events
+    required: false
+
+metadata:
+  provider_url: https://livekit.io
+  docs_url: https://docs.livekit.io

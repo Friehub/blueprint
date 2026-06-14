@@ -1,0 +1,50 @@
+name: paystack_transfers
+module: payouts
+version: 1.0.0
+description: Paystack Transfers payout adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createPayout
+  - getPayout
+  - listPayouts
+  - cancelPayout
+  - retryPayout
+  - schedulePayout
+  - getPayoutSchedule
+
+does_not_implement: []
+
+config:
+  required:
+    - name: secret_key
+      type: string
+      description: Paystack secret key
+      secret: true
+  optional:
+    - name: environment
+      type: string
+      default: production
+      description: Paystack environment (production or sandbox)
+    - name: api_url
+      type: string
+      default: https://api.paystack.co
+      description: Paystack API URL
+
+dependencies:
+  - module: payments
+    purpose: Access payment data for payouts
+    required: true
+  - module: ledger
+    purpose: Track payout ledger entries
+    required: true
+  - module: notifications
+    purpose: Send payout notifications
+    required: false
+  - module: audit_log
+    purpose: Log payout events
+    required: false
+
+metadata:
+  provider_url: https://paystack.com
+  docs_url: https://paystack.com/docs/transfers

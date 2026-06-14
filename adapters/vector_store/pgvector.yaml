@@ -1,0 +1,33 @@
+name: pgvector
+module: vector_store
+version: 1.0.0
+description: PostgreSQL pgvector extension for vector storage and similarity search
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - upsertCollection
+  - deleteCollection
+  - upsertVectors
+  - deleteVectors
+  - search
+  - getVector
+  - getCollectionStats
+  - listCollections
+
+does_not_implement: []
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: PostgreSQL connection string with pgvector extension
+      secret: true
+  optional:
+    - name: pool_size
+      type: integer
+      default: 10
+      description: Database connection pool size
+
+metadata:
+  provider_url: https://github.com/pgvector/pgvector
+  docs_url: https://github.com/pgvector/pgvector

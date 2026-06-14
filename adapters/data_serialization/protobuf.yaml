@@ -1,0 +1,34 @@
+name: protobuf
+module: data_serialization
+version: 1.0.0
+description: Protocol Buffers schema registry adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - registerSchema
+  - getSchema
+  - evolveSchema
+  - validateCompatibility
+  - detectFieldNumberConflict
+
+does_not_implement:
+  - migrateDocument
+
+config:
+  required:
+    - name: registry_url
+      type: string
+      description: Schema registry base URL
+    - name: api_key
+      type: string
+      description: Registry API token
+      secret: true
+  optional:
+    - name: compatibility_mode
+      type: string
+      default: backward
+      description: Default schema evolution mode
+
+metadata:
+  provider_url: https://protobuf.dev
+  docs_url: https://protobuf.dev/programming-guides

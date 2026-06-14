@@ -1,0 +1,45 @@
+name: plausible
+module: analytics
+version: 1.0.0
+description: Plausible analytics adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - trackEvent
+  - trackPageView
+  - getMetrics
+  - getFunnel
+  - getRetention
+
+does_not_implement:
+  - identifyUser
+  - getCohort
+
+config:
+  required:
+    - name: site_id
+      type: string
+      description: Plausible site ID
+      secret: false
+    - name: api_key
+      type: string
+      description: Plausible API key
+      secret: true
+  optional:
+    - name: server_url
+      type: string
+      default: https://plausible.io
+      description: Plausible server URL
+    - name: events_endpoint
+      type: string
+      default: /api/event
+      description: Events API endpoint
+
+dependencies:
+  - module: audit_log
+    purpose: Log analytics events
+    required: false
+
+metadata:
+  provider_url: https://plausible.io
+  docs_url: https://plausible.io/docs
