@@ -249,7 +249,19 @@ export async function handleGenerate(result: { value: Catalog | null }, config: 
   const outputDir = config.output ?? join(root, "generated");
   const adaptersDir = join(root, "adapters");
   const { adapters } = await loadAdapters(adaptersDir);
-  const genOpts: Record<string, unknown> = { language, type, module: config.module, provider: config.provider, outputDir };
+
+  // No adapter specified → interface-only generation
+  if (!config.provider) {
+    const modAdapters = adapters.filter((a: any) => a.module === config.module);
+    if (modAdapters.length === 0) {
+      console.log(`No adapters for '${config.module}'. Generating interface only.`);
+    } else {
+      console.log(`Available: ${modAdapters.map((a: any) => a.name).join(", ")}`);
+      console.log("Generating interface only. Use --adapter <name> for implementation.");
+    }
+  }
+
+  const genOpts: Record<string, unknown> = { language, type: config.provider ? type : "interfaces", module: config.module, provider: config.provider || "", outputDir };
   if (config.namespace) genOpts.namespace = config.namespace;
   if (config.aliases) {
     const { loadAliases } = await import("../generators/aliases.js");

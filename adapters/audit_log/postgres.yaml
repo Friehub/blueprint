@@ -1,0 +1,43 @@
+name: postgres
+module: audit_log
+version: 1.0.0
+description: Postgres audit log with hash chaining, cursor-based queries, and chain verification
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - recordEvent
+  - queryEvents
+  - getEventsByActor
+  - getEventsByResource
+  - exportAuditLog
+  - getEvent
+  - verifyChain
+
+does_not_implement: []
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: Postgres connection URL
+      secret: true
+  optional:
+    - name: schema
+      type: string
+      description: Database schema for audit tables
+      default: audit
+    - name: retention_days
+      type: integer
+      default: 365
+      description: Days before archiving audit events
+    - name: hash_algorithm
+      type: string
+      default: sha256
+      description: Hash algorithm for chain verification
+
+dependencies:
+  - database/migrations
+
+metadata:
+  provider_url: https://postgresql.org
+  docs_url: https://postgresql.org/docs

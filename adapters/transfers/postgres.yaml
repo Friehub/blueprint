@@ -1,0 +1,36 @@
+name: postgres
+module: transfers
+version: 1.0.0
+description: Postgres transfer ledger with saga coordination, idempotent settlement, and inbound matching
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - initiateTransfer
+  - getTransfer
+  - transitionTransferStatus
+  - registerCounterparty
+  - recordInboundTransfer
+  - getInboundTransfer
+  - listInboundTransfers
+  - confirmInboundTransfer
+
+does_not_implement: []
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: Postgres connection URL
+      secret: true
+  optional:
+    - name: schema
+      type: string
+      description: Database schema for transfer tables
+      default: transfers
+
+dependencies:
+  - database/migrations
+
+metadata:
+  provider_url: https://postgresql.org
+  docs_url: https://postgresql.org/docs

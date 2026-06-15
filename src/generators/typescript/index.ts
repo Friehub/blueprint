@@ -372,6 +372,17 @@ export class TypeScriptGenerator implements LanguageGenerator {
     const lines: string[] = [];
     const returnType = mapType(fn.returns, "typescript");
     lines.push(`  async ${camelCase(fn.name)}(${generateParamsList(fn)}): Promise<${returnType}> {`);
+
+    // Interface-only mode: no adapter, just stub with type-correct return
+    if (adapterName === "_interface") {
+      lines.push(`    // Implement ${fn.name} per contract`);
+      if (fn.returns !== "void") {
+        lines.push(`    throw new Error('Not implemented: ${fn.name}');`);
+      }
+      lines.push(`  }`);
+      return lines.join("\n");
+    }
+
     lines.push(`    const span = this.tracer.startSpan('${adapterName}.${fn.name}');`);
     lines.push(`    span.setAttribute('function.name', '${fn.name}');`);
     lines.push(`    span.setAttribute('adapter.name', '${adapterName}');`);

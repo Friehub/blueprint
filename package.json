@@ -88,7 +88,7 @@
     "LICENSE"
   ],
   "blueprint": {
-    "catalogHash": "d948c61dec1ee202d492a81583036011f9e42d56c72ef3ec354e2ca0a533dd72"
+    "catalogHash": "5f50897e1acbff55f52bbad9e86e5c48b10d31d0f0a0fb4d43814e8957060826"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && node scripts/build-catalog.cjs && node scripts/strip-catalog.cjs && node scripts/extract-entities.cjs && node scripts/hash-catalog.cjs",

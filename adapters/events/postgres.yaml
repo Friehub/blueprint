@@ -1,0 +1,38 @@
+name: postgres
+module: events
+version: 1.0.0
+description: Postgres event store with append-only invariant, outbox table, and cursor-based replay
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - publish
+  - subscribe
+  - unsubscribe
+  - publishBulk
+  - getTopics
+  - replay
+
+does_not_implement: []
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: Postgres connection URL
+      secret: true
+  optional:
+    - name: schema
+      type: string
+      description: Database schema for event tables
+      default: events
+    - name: max_replay_batch
+      type: integer
+      default: 1000
+      description: Max events per replay batch
+
+dependencies:
+  - database/migrations
+
+metadata:
+  provider_url: https://postgresql.org
+  docs_url: https://postgresql.org/docs
