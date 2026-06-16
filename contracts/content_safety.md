@@ -9,13 +9,13 @@ Content policy enforcement with classification, moderation logging, and appeal w
 
 **Functions**
 ```
-checkContent(content, options?) → SafetyVerdict
-classifyContent(content) → ContentClassification
-reportViolation(content_id, reason) → ViolationReport
-getViolation(violation_id) → ViolationReport
-getModerationHistory(content_id) → ModerationEntry[]
-appealViolation(violation_id, reason) → Appeal
-resolveAppeal(appeal_id, decision) → AppealResolution
+checkContent(content: string, options?: any) → SafetyVerdict
+classifyContent(content: string) → ContentClassification
+reportViolation(content_id: any, reason: any) → ViolationReport
+getViolation(violation_id: any) → ViolationReport
+getModerationHistory(content_id: any) → ModerationEntry[]
+appealViolation(violation_id: any, reason: any) → Appeal
+resolveAppeal(appeal_id: any, decision: any) → AppealResolution
 getSafetyStats() → SafetyStats
 ```
 

@@ -9,14 +9,14 @@ Image and video processing pipeline.
 
 **Functions**
 ```
-uploadMedia(file, options?) → MediaAsset
-processMedia(asset_id, transformations) → ProcessingJob
-getMediaAsset(asset_id) → MediaAsset
-getVariants(asset_id) → MediaVariant[]
-deleteMediaAsset(asset_id) → void
-generateThumbnail(asset_id, options?) → MediaVariant
-transcodeVideo(asset_id, format, options?) → ProcessingJob
-getProcessingJob(job_id) → ProcessingJob
+uploadMedia(file: string, options?: any) → MediaAsset
+processMedia(asset_id: any, transformations: any) → ProcessingJob
+getMediaAsset(asset_id: any) → MediaAsset
+getVariants(asset_id: any) → MediaVariant[]
+deleteMediaAsset(asset_id: any) → void
+generateThumbnail(asset_id: any, options?: any) → MediaVariant
+transcodeVideo(asset_id: any, format: string, options?: any) → ProcessingJob
+getProcessingJob(job_id: any) → ProcessingJob
 ```
 
 **Types**

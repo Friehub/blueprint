@@ -9,15 +9,15 @@ Credential lifecycle management with rotation schedules, expiry notifications, z
 
 **Functions**
 ```
-registerCredential(name, credential_type, config) → Credential
-getCredential(credential_id) → Credential
-listCredentials(credential_type?) → Credential[]
-rotateCredential(credential_id) → RotationResult
-scheduleRotation(credential_id, cron) → void
-getRotationHistory(credential_id) → RotationEvent[]
-getExpiringCredentials(window_days) → Credential[]
-notifyExpiry(credential_id) → void
-reportCompromise(credential_id, incident) → CompromiseReport
+registerCredential(name: string, credential_type: any, config: any) → Credential
+getCredential(credential_id: any) → Credential
+listCredentials(credential_type?: any) → Credential[]
+rotateCredential(credential_id: any) → RotationResult
+scheduleRotation(credential_id: any, cron: any) → void
+getRotationHistory(credential_id: any) → RotationEvent[]
+getExpiringCredentials(window_days: any) → Credential[]
+notifyExpiry(credential_id: any) → void
+reportCompromise(credential_id: any, incident: any) → CompromiseReport
 ```
 
 **Types**

@@ -9,10 +9,10 @@ Business-to-business purchase requisitions, approval chains, purchase order (PO)
 
 **Functions**
 ```
-createRequisition(requested_by, items, budget_code) → Requisition
-approveRequisition(requisition_id, approver_id) → Requisition
-generatePurchaseOrder(requisition_id, vendor_id) → PurchaseOrder
-recordVendorInvoice(po_id, invoice_details) → VendorInvoice
+createRequisition(requested_by: any, items: any[], budget_code: any) → Requisition
+approveRequisition(requisition_id: any, approver_id: any) → Requisition
+generatePurchaseOrder(requisition_id: any, vendor_id: any) → PurchaseOrder
+recordVendorInvoice(po_id: any, invoice_details: any) → VendorInvoice
 ```
 
 **Types**

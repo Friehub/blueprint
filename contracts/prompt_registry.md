@@ -9,15 +9,15 @@ Versioned prompt template storage with evaluation and A/B testing support.
 
 **Functions**
 ```
-registerPrompt(name, template, options?) → PromptVersion
-getPrompt(name, version?) → PromptVersion?
-listPrompts(tag?) → PromptSummary[]
-updatePrompt(name, template, change_reason) → PromptVersion
-activateVersion(prompt_id, version) → void
-evaluatePrompt(prompt_id, test_cases) → EvaluationResult
-createABTest(prompt_id, variant_a, variant_b, config) → ABTest
-getABTestResults(test_id) → ABTestResult
-archivePrompt(name) → void
+registerPrompt(name: string, template: any, options?: any) → PromptVersion
+getPrompt(name: string, version?: any) → PromptVersion?
+listPrompts(tag?: any) → PromptSummary[]
+updatePrompt(name: string, template: any, change_reason: any) → PromptVersion
+activateVersion(prompt_id: any, version: any) → void
+evaluatePrompt(prompt_id: any, test_cases: any) → EvaluationResult
+createABTest(prompt_id: any, variant_a: any, variant_b: any, config: any) → ABTest
+getABTestResults(test_id: any) → ABTestResult
+archivePrompt(name: string) → void
 ```
 
 **Types**

@@ -9,13 +9,13 @@ Event tracking and behavioral analytics.
 
 **Functions**
 ```
-trackEvent(event_name, user_id?, properties?, context?) → void
-identifyUser(user_id, traits) → void
-trackPageView(user_id?, url, properties?) → void
-getMetrics(metric, period, filters?) → MetricResult
-getFunnel(steps, period, filters?) → FunnelResult
-getCohort(definition, period) → CohortResult
-getRetention(cohort_start, periods) → RetentionResult
+trackEvent(event_name: any, user_id?: any, properties?: any, context?: any) → void
+identifyUser(user_id: any, traits: any) → void
+trackPageView(user_id?: any, url: string, properties?: any) → void
+getMetrics(metric: any, period: any, filters?: any) → MetricResult
+getFunnel(steps: any, period: any, filters?: any) → FunnelResult
+getCohort(definition: any, period: any) → CohortResult
+getRetention(cohort_start: any, periods: any) → RetentionResult
 ```
 
 **Types**

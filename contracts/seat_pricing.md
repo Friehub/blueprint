@@ -9,13 +9,13 @@ Per-seat pricing rules, volume discounts, overage rates, and billing adjustment 
 
 **Functions**
 ```
-createSeatPriceRule(account_id, rule) → SeatPriceRule
-getSeatPriceRule(account_id, seat_type?) → SeatPriceRule?
-listSeatPriceRules(account_id, options?) → PaginatedResult<SeatPriceRule>
-updateSeatPriceRule(rule_id, data) → SeatPriceRule
-archiveSeatPriceRule(rule_id) → SeatPriceRule
-quoteSeatCost(account_id, seat_count, seat_type?, effective_at?) → SeatPriceQuote
-applySeatAdjustment(account_id, adjustment) → SeatPriceAdjustment
+createSeatPriceRule(account_id: any, rule: any) → SeatPriceRule
+getSeatPriceRule(account_id: any, seat_type?: any) → SeatPriceRule?
+listSeatPriceRules(account_id: any, options?: any) → PaginatedResult<SeatPriceRule>
+updateSeatPriceRule(rule_id: any, data: any) → SeatPriceRule
+archiveSeatPriceRule(rule_id: any) → SeatPriceRule
+quoteSeatCost(account_id: any, seat_count: any, seat_type?: any, effective_at?: any) → SeatPriceQuote
+applySeatAdjustment(account_id: any, adjustment: any) → SeatPriceAdjustment
 ```
 
 **Types**

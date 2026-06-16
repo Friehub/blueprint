@@ -9,14 +9,14 @@ Commercial SLA definition, uptime tracking, breach calculation, and alerting.
 
 **Functions**
 ```
-defineSLA(name, config) → SLA
-getSLA(sla_id) → SLA
+defineSLA(name: string, config: any) → SLA
+getSLA(sla_id: any) → SLA
 listSLAs() → SLA[]
-getUptime(sla_id, period) → UptimeReport
-calculateBreach(sla_id, period) → BreachReport
-setMaintenanceWindow(sla_id, window) → void
-reportIncident(sla_id, incident) → void
-getSLADashboard(sla_id?) → DashboardView
+getUptime(sla_id: any, period: any) → UptimeReport
+calculateBreach(sla_id: any, period: any) → BreachReport
+setMaintenanceWindow(sla_id: any, window: any) → void
+reportIncident(sla_id: any, incident: any) → void
+getSLADashboard(sla_id?: any) → DashboardView
 ```
 
 **Types**

@@ -9,15 +9,15 @@ Event store append, projection, replay, and snapshot management.
 
 **Functions**
 ```
-appendEvent(stream_id, event) → EventRecord
-appendEvents(stream_id, events) → EventRecord[]
-readStream(stream_id, options?) → EventRecord[]
-readStreamFrom(stream_id, after_version, options?) → EventRecord[]
-buildProjection(projection_name, handler, options?) → Projection
-rebuildProjection(projection_id) → void
-createSnapshot(stream_id, version) → Snapshot
-getSnapshot(stream_id) → Snapshot?
-subscribeToStream(stream_id, handler) → Subscription
+appendEvent(stream_id: any, event: any) → EventRecord
+appendEvents(stream_id: any, events: any) → EventRecord[]
+readStream(stream_id: any, options?: any) → EventRecord[]
+readStreamFrom(stream_id: any, after_version: any, options?: any) → EventRecord[]
+buildProjection(projection_name: any, handler: Function, options?: any) → Projection
+rebuildProjection(projection_id: any) → void
+createSnapshot(stream_id: any, version: any) → Snapshot
+getSnapshot(stream_id: any) → Snapshot?
+subscribeToStream(stream_id: any, handler: Function) → Subscription
 ```
 
 **Types**

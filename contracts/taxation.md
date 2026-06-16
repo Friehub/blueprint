@@ -9,13 +9,13 @@ Tax calculation, jurisdiction lookup, tax profile management, and tax breakdown 
 
 **Functions**
 ```
-calculateTax(amount, currency, jurisdiction, context?) → TaxBreakdown
-getTaxRate(jurisdiction, tax_type?, effective_at?) → TaxRate?
-listTaxRates(input, options?) → PaginatedResult<TaxRate>
-setTaxProfile(entity_id, profile) → TaxProfile
-getTaxProfile(entity_id) → TaxProfile?
-validateTaxId(tax_id, jurisdiction) → TaxValidationResult
-previewTax(line_items, jurisdiction, context?) → TaxPreview
+calculateTax(amount: number, currency: any, jurisdiction: any, context?: any) → TaxBreakdown
+getTaxRate(jurisdiction: any, tax_type?: any, effective_at?: any) → TaxRate?
+listTaxRates(input: any, options?: any) → PaginatedResult<TaxRate>
+setTaxProfile(entity_id: any, profile: any) → TaxProfile
+getTaxProfile(entity_id: any) → TaxProfile?
+validateTaxId(tax_id: any, jurisdiction: any) → TaxValidationResult
+previewTax(line_items: any, jurisdiction: any, context?: any) → TaxPreview
 ```
 
 **Types**

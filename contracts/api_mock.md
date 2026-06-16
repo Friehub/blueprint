@@ -9,14 +9,14 @@ Mock API endpoint registration with configurable responses, request recording, a
 
 **Functions**
 ```
-registerMock(endpoint, method, response) → MockEndpoint
-getMock(endpoint_id) → MockEndpoint
-listMocks(tag?) → MockEndpoint[]
-updateMockResponse(endpoint_id, response) → void
-recordRequest(endpoint_id, request) → void
-getRecordedRequests(endpoint_id, options?) → PaginatedResult<RecordedRequest>
-replayRequests(endpoint_id) → void
-deleteMock(endpoint_id) → void
+registerMock(endpoint: any, method: any, response: any) → MockEndpoint
+getMock(endpoint_id: any) → MockEndpoint
+listMocks(tag?: any) → MockEndpoint[]
+updateMockResponse(endpoint_id: any, response: any) → void
+recordRequest(endpoint_id: any, request: any) → void
+getRecordedRequests(endpoint_id: any, options?: any) → PaginatedResult<RecordedRequest>
+replayRequests(endpoint_id: any) → void
+deleteMock(endpoint_id: any) → void
 ```
 
 **Types**

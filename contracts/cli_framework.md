@@ -9,13 +9,13 @@ Command-line interface framework with command registration, argument parsing, he
 
 **Functions**
 ```
-registerCommand(name, handler, config) → Command
+registerCommand(name: string, handler: Function, config: any) → Command
 listCommands() → Command[]
-runCommand(argv) → ExecResult
-getHelp(command_name?) → HelpText
-loadConfigFile(path) → ConfigData
-parseArguments(argv, schema) → ParsedArgs
-completeCommand(input) → Completion[]
+runCommand(argv: any) → ExecResult
+getHelp(command_name?: any) → HelpText
+loadConfigFile(path: string) → ConfigData
+parseArguments(argv: any, schema: any) → ParsedArgs
+completeCommand(input: any) → Completion[]
 ```
 
 **Types**

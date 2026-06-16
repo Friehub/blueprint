@@ -9,12 +9,12 @@ Internal capacity management with priority queuing and admission control.
 
 **Functions**
 ```
-admitRequest(request) → AdmissionDecision
-getCapacity(workload) → CapacityStatus
-setPriority(source, priority) → void
+admitRequest(request: any) → AdmissionDecision
+getCapacity(workload: any) → CapacityStatus
+setPriority(source: string, priority: any) → void
 getSheddingStatus() → SheddingStatus
-setSloBudget(workload, budget) → void
-getSloBudget(workload) → SloBudget
+setSloBudget(workload: any, budget: any) → void
+getSloBudget(workload: any) → SloBudget
 ```
 
 **Types**

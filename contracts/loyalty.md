@@ -9,14 +9,14 @@ Points, rewards, and loyalty tier management.
 
 **Functions**
 ```
-getBalance(user_id) → LoyaltyBalance
-earnPoints(user_id, amount, reason, reference) → LoyaltyTransaction
-redeemPoints(user_id, amount, reference) → LoyaltyTransaction
-getTransactions(user_id, options?) → PaginatedResult<LoyaltyTransaction>
-getTier(user_id) → LoyaltyTier
-calculateTierProgress(user_id) → TierProgress
-getRewards(tier?) → Reward[]
-redeemReward(user_id, reward_id) → RewardRedemption
+getBalance(user_id: any) → LoyaltyBalance
+earnPoints(user_id: any, amount: number, reason: any, reference: any) → LoyaltyTransaction
+redeemPoints(user_id: any, amount: number, reference: any) → LoyaltyTransaction
+getTransactions(user_id: any, options?: any) → PaginatedResult<LoyaltyTransaction>
+getTier(user_id: any) → LoyaltyTier
+calculateTierProgress(user_id: any) → TierProgress
+getRewards(tier?: any) → Reward[]
+redeemReward(user_id: any, reward_id: any) → RewardRedemption
 ```
 
 **Types**

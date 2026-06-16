@@ -9,13 +9,13 @@ Real-time resource change subscriptions with delta push, reconnect handling, and
 
 **Functions**
 ```
-subscribe(resource_type, filter, handler) → Subscription
-unsubscribe(subscription_id) → void
-getSubscriptions(user_id?) → Subscription[]
-pushUpdate(resource_type, resource_id, delta) → void
-broadcast(resource_type, delta, filter?) → void
-reconnect(subscription_id, last_event_id) → void
-getSubscriptionStatus(subscription_id) → SubscriptionStatus
+subscribe(resource_type: any, filter: any, handler: Function) → Subscription
+unsubscribe(subscription_id: any) → void
+getSubscriptions(user_id?: any) → Subscription[]
+pushUpdate(resource_type: any, resource_id: any, delta: any) → void
+broadcast(resource_type: any, delta: any, filter?: any) → void
+reconnect(subscription_id: any, last_event_id: any) → void
+getSubscriptionStatus(subscription_id: any) → SubscriptionStatus
 ```
 
 **Types**

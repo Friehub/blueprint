@@ -9,15 +9,15 @@ Product and seller review system.
 
 **Functions**
 ```
-createReview(reviewer_id, subject_type, subject_id, rating, content) → Review
-getReview(review_id) → Review
-getReviews(subject_type, subject_id, options?) → PaginatedResult<Review>
-getAggregateRating(subject_type, subject_id) → AggregateRating
-updateReview(review_id, data) → Review
-deleteReview(review_id) → void
-moderateReview(review_id, decision, reason?) → Review
-flagReview(review_id, reason) → void
-getUserReviews(user_id) → PaginatedResult<Review>
+createReview(reviewer_id: any, subject_type: any, subject_id: any, rating: any, content: string) → Review
+getReview(review_id: any) → Review
+getReviews(subject_type: any, subject_id: any, options?: any) → PaginatedResult<Review>
+getAggregateRating(subject_type: any, subject_id: any) → AggregateRating
+updateReview(review_id: any, data: any) → Review
+deleteReview(review_id: any) → void
+moderateReview(review_id: any, decision: any, reason?: any) → Review
+flagReview(review_id: any, reason: any) → void
+getUserReviews(user_id: any) → PaginatedResult<Review>
 ```
 
 **Types**

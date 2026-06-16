@@ -9,14 +9,14 @@ Load test scenario definition, execution, and SLA validation.
 
 **Functions**
 ```
-defineScenario(name, config) → LoadScenario
-getScenario(scenario_id) → LoadScenario
-runScenario(scenario_id) → LoadTestRun
-getRun(run_id) → LoadTestRun
-cancelRun(run_id) → void
-setSlaThresholds(scenario_id, thresholds) → void
-validateSla(run_id) → SlaResult
-compareRuns(run_ids) → ComparisonReport
+defineScenario(name: string, config: any) → LoadScenario
+getScenario(scenario_id: any) → LoadScenario
+runScenario(scenario_id: any) → LoadTestRun
+getRun(run_id: any) → LoadTestRun
+cancelRun(run_id: any) → void
+setSlaThresholds(scenario_id: any, thresholds: any) → void
+validateSla(run_id: any) → SlaResult
+compareRuns(run_ids: any) → ComparisonReport
 ```
 
 **Types**

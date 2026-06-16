@@ -9,15 +9,15 @@ Developer-facing portal with API key self-service, documentation hosting, usage 
 
 **Functions**
 ```
-getDashboard(user_id) → Dashboard
-getApiKeys(user_id) → ApiKey[]
-generateApiKey(user_id, name, scopes?) → ApiKey
-revokeApiKey(key_id) → void
-getDocumentation(module_name?) → DocPage[]
-searchDocumentation(query) → SearchResult[]
-getUsageDashboard(user_id, period) → UsageDashboard
-getChangelog(options?) → PaginatedResult<ChangelogEntry>
-publishChangelog(entry) → ChangelogEntry
+getDashboard(user_id: any) → Dashboard
+getApiKeys(user_id: any) → ApiKey[]
+generateApiKey(user_id: any, name: string, scopes?: any) → ApiKey
+revokeApiKey(key_id: any) → void
+getDocumentation(module_name?: any) → DocPage[]
+searchDocumentation(query: any) → SearchResult[]
+getUsageDashboard(user_id: any, period: any) → UsageDashboard
+getChangelog(options?: any) → PaginatedResult<ChangelogEntry>
+publishChangelog(entry: any) → ChangelogEntry
 ```
 
 **Types**

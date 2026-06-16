@@ -9,15 +9,15 @@ Data encryption and key management.
 
 **Functions**
 ```
-encrypt(data, key_id?) → EncryptedData
-decrypt(encrypted_data) → string
-generateKey(algorithm?) → Key
-rotateKey(key_id) → Key
+encrypt(data: any, key_id?: any) → EncryptedData
+decrypt(encrypted_data: any) → string
+generateKey(algorithm?: any) → Key
+rotateKey(key_id: any) → Key
 listKeys() → Key[]
-archiveKey(key_id) → void
-hashPassword(password) → string
-verifyPassword(password, hash) → boolean
-generateSecret(length?) → string
+archiveKey(key_id: any) → void
+hashPassword(password: any) → string
+verifyPassword(password: any, hash: any) → boolean
+generateSecret(length?: any) → string
 ```
 
 **Types**

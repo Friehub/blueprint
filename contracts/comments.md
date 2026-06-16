@@ -9,14 +9,14 @@ Threaded comment system on any entity.
 
 **Functions**
 ```
-createComment(author_id, subject_type, subject_id, content, parent_id?) → Comment
-getComment(comment_id) → Comment
-getComments(subject_type, subject_id, options?) → PaginatedResult<Comment>
-getReplies(comment_id, options?) → PaginatedResult<Comment>
-updateComment(comment_id, content) → Comment
-deleteComment(comment_id) → void
-moderateComment(comment_id, decision) → Comment
-getCommentCount(subject_type, subject_id) → number
+createComment(author_id: any, subject_type: any, subject_id: any, content: string, parent_id?: any) → Comment
+getComment(comment_id: any) → Comment
+getComments(subject_type: any, subject_id: any, options?: any) → PaginatedResult<Comment>
+getReplies(comment_id: any, options?: any) → PaginatedResult<Comment>
+updateComment(comment_id: any, content: string) → Comment
+deleteComment(comment_id: any) → void
+moderateComment(comment_id: any, decision: any) → Comment
+getCommentCount(subject_type: any, subject_id: any) → number
 ```
 
 **Types**

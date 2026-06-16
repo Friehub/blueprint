@@ -9,13 +9,13 @@ Universal request payload validation with size limits, type coercion, character 
 
 **Functions**
 ```
-validatePayload(payload, schema, options?) → ValidationResult
-validateField(value, rules) → FieldResult
-sanitizeForSql(input) → SanitizedInput
-sanitizeForShell(input) → SanitizedInput
-sanitizeForHtml(input) → SanitizedInput
-getMaxPayloadSize(endpoint) → number
-setMaxPayloadSize(endpoint, bytes) → void
+validatePayload(payload: any, schema: any, options?: any) → ValidationResult
+validateField(value: any, rules: any) → FieldResult
+sanitizeForSql(input: any) → SanitizedInput
+sanitizeForShell(input: any) → SanitizedInput
+sanitizeForHtml(input: any) → SanitizedInput
+getMaxPayloadSize(endpoint: any) → number
+setMaxPayloadSize(endpoint: any, bytes: any) → void
 ```
 
 **Types**

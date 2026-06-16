@@ -9,15 +9,15 @@ Booking and scheduling management.
 
 **Functions**
 ```
-getAvailability(provider_id, date_range) → Slot[]
-bookAppointment(patient_id, provider_id, slot_id, data) → Appointment
-getAppointment(appointment_id) → Appointment
-getAppointmentsByUser(user_id, options?) → PaginatedResult<Appointment>
-cancelAppointment(appointment_id, reason) → Appointment
-rescheduleAppointment(appointment_id, slot_id) → Appointment
-confirmAppointment(appointment_id) → Appointment
-getWaitlist(provider_id, service_id) → WaitlistEntry[]
-joinWaitlist(user_id, provider_id, service_id) → WaitlistEntry
+getAvailability(provider_id: any, date_range: any) → Slot[]
+bookAppointment(patient_id: any, provider_id: any, slot_id: any, data: any) → Appointment
+getAppointment(appointment_id: any) → Appointment
+getAppointmentsByUser(user_id: any, options?: any) → PaginatedResult<Appointment>
+cancelAppointment(appointment_id: any, reason: any) → Appointment
+rescheduleAppointment(appointment_id: any, slot_id: any) → Appointment
+confirmAppointment(appointment_id: any) → Appointment
+getWaitlist(provider_id: any, service_id: any) → WaitlistEntry[]
+joinWaitlist(user_id: any, provider_id: any, service_id: any) → WaitlistEntry
 ```
 
 **Types**

@@ -11,14 +11,14 @@ Key-value caching with TTL and tag-based invalidation.
 ```
 get<T>(key) → T?
 set<T>(key, value, options?) → void
-del(key) → void
+del(key: string) → void
 getOrSet<T>(key, factory, options?) → T
-invalidateByTag(tag) → void
-invalidateByPrefix(prefix) → void
+invalidateByTag(tag: any) → void
+invalidateByPrefix(prefix: any) → void
 mget<T>(keys) → Record<string, T?>
-mset(entries, options?) → void
-increment(key, by?) → number
-decrement(key, by?) → number
+mset(entries: any, options?: any) → void
+increment(key: string, by?: any) → number
+decrement(key: string, by?: any) → number
 ```
 
 **Types**

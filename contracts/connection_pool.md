@@ -9,17 +9,17 @@ Managed pool of reusable connections to databases, caches, and external services
 
 **Functions**
 ```
-acquire(pool_name) → Connection
-release(connection_id) → void
-getPoolStatus(pool_name) → PoolStatus
-resizePool(pool_name, min, max) → void
-drainPool(pool_name) → void
-getPoolMetrics(pool_name) → PoolMetrics
-validateConnection(connection_id) → HealthCheckResult
-registerConnectionLeak(connection_id, threshold_ms) → LeakMonitor
-setPoolResizePolicy(pool_name, policy) → void
-setConnectionHealthCheck(pool_name, config) → void
-evictConnection(connection_id) → void
+acquire(pool_name: any) → Connection
+release(connection_id: any) → void
+getPoolStatus(pool_name: any) → PoolStatus
+resizePool(pool_name: any, min: any, max: any) → void
+drainPool(pool_name: any) → void
+getPoolMetrics(pool_name: any) → PoolMetrics
+validateConnection(connection_id: any) → HealthCheckResult
+registerConnectionLeak(connection_id: any, threshold_ms: any) → LeakMonitor
+setPoolResizePolicy(pool_name: any, policy: any) → void
+setConnectionHealthCheck(pool_name: any, config: any) → void
+evictConnection(connection_id: any) → void
 ```
 
 **Types**

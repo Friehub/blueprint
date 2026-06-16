@@ -9,16 +9,16 @@ Task creation, assignment, lifecycle management, dependencies, and completion tr
 
 **Functions**
 ```
-createTask(project_id, data) → Task
-getTask(task_id) → Task
-listTasks(input, options?) → PaginatedResult<Task>
-updateTask(task_id, data) → Task
-assignTask(task_id, user_id) → Task
-changeTaskStatus(task_id, status) → Task
-addTaskDependency(task_id, depends_on_task_id) → void
-removeTaskDependency(task_id, depends_on_task_id) → void
-completeTask(task_id) → Task
-archiveTask(task_id) → Task
+createTask(project_id: any, data: any) → Task
+getTask(task_id: any) → Task
+listTasks(input: any, options?: any) → PaginatedResult<Task>
+updateTask(task_id: any, data: any) → Task
+assignTask(task_id: any, user_id: any) → Task
+changeTaskStatus(task_id: any, status: string) → Task
+addTaskDependency(task_id: any, depends_on_task_id: any) → void
+removeTaskDependency(task_id: any, depends_on_task_id: any) → void
+completeTask(task_id: any) → Task
+archiveTask(task_id: any) → Task
 ```
 
 **Types**

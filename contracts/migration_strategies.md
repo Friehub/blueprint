@@ -9,14 +9,14 @@ Zero-downtime schema migration patterns with expand/contract, dual-write, and ro
 
 **Functions**
 ```
-planMigration(name, strategy, steps) → MigrationPlan
-validateStrategy(migration_id) → StrategyReport
-executeExpandPhase(migration_id) → PhaseResult
-executeMigratePhase(migration_id) → PhaseResult
-executeContractPhase(migration_id) → PhaseResult
-executeDualWrite(migration_id, old_table, new_table) → DualWriteResult
-createBackfill(description, query, batch_size) → BackfillJob
-rollbackPhase(migration_id) → RollbackResult
+planMigration(name: string, strategy: any, steps: any) → MigrationPlan
+validateStrategy(migration_id: any) → StrategyReport
+executeExpandPhase(migration_id: any) → PhaseResult
+executeMigratePhase(migration_id: any) → PhaseResult
+executeContractPhase(migration_id: any) → PhaseResult
+executeDualWrite(migration_id: any, old_table: any, new_table: any) → DualWriteResult
+createBackfill(description: string, query: any, batch_size: any) → BackfillJob
+rollbackPhase(migration_id: any) → RollbackResult
 ```
 
 **Types**

@@ -9,18 +9,18 @@ Operational incident capture, severity classification, acknowledgement tracking,
 
 **Functions**
 ```
-createIncident(input) → Incident
-getIncident(incident_id) → Incident
-listIncidents(input, options?) → PaginatedResult<Incident>
-acknowledgeIncident(incident_id, user_id, note?) → Incident
-assignIncident(incident_id, assignee_id) → Incident
-updateIncidentSeverity(incident_id, severity) → Incident
-escalateIncident(incident_id, reason) → Incident
-addIncidentNote(incident_id, note) → IncidentNote
-resolveIncident(incident_id, resolution, note?) → Incident
-createRunbookLink(incident_id, url, title?) → RunbookLink
-createPostmortem(incident_id, report) → Postmortem
-getPostmortem(incident_id) → Postmortem?
+createIncident(input: any) → Incident
+getIncident(incident_id: any) → Incident
+listIncidents(input: any, options?: any) → PaginatedResult<Incident>
+acknowledgeIncident(incident_id: any, user_id: any, note?: any) → Incident
+assignIncident(incident_id: any, assignee_id: any) → Incident
+updateIncidentSeverity(incident_id: any, severity: any) → Incident
+escalateIncident(incident_id: any, reason: any) → Incident
+addIncidentNote(incident_id: any, note: any) → IncidentNote
+resolveIncident(incident_id: any, resolution: any, note?: any) → Incident
+createRunbookLink(incident_id: any, url: string, title?: string) → RunbookLink
+createPostmortem(incident_id: any, report: any) → Postmortem
+getPostmortem(incident_id: any) → Postmortem?
 getOnCallSchedule() → Schedule[]
 ```
 

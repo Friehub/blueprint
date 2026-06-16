@@ -9,11 +9,11 @@ Warehouse shelf bin locations, internal inventory movements, and picking/packing
 
 **Functions**
 ```
-registerBin(warehouse_id, zone, shelf, position) → WarehouseBin
-assignStockToBin(variant_id, bin_id, quantity) → void
-createPickList(order_id) → PickList
-confirmPick(pick_list_id, picker_id) → void
-moveStock(source_bin_id, dest_bin_id, quantity) → void
+registerBin(warehouse_id: any, zone: any, shelf: any, position: any) → WarehouseBin
+assignStockToBin(variant_id: any, bin_id: any, quantity: number) → void
+createPickList(order_id: any) → PickList
+confirmPick(pick_list_id: any, picker_id: any) → void
+moveStock(source_bin_id: any, dest_bin_id: any, quantity: number) → void
 ```
 
 **Types**

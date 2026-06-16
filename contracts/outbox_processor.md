@@ -9,13 +9,13 @@ Transactional outbox pattern — background processor that publishes unpublished
 
 **Functions**
 ```
-publishPending(batch_size?) → PublishResult
-getOutboxEntry(entry_id) → OutboxEntry
-listOutboxEntries(status, options?) → PaginatedResult<OutboxEntry>
-markPublished(entry_ids) → number
-reprocessFailed(entry_ids) → ReprocessResult
-getPublisherStats(period) → PublisherStats
-configurePublisher(config) → PublisherConfig
+publishPending(batch_size?: any) → PublishResult
+getOutboxEntry(entry_id: any) → OutboxEntry
+listOutboxEntries(status: string, options?: any) → PaginatedResult<OutboxEntry>
+markPublished(entry_ids: any) → number
+reprocessFailed(entry_ids: any) → ReprocessResult
+getPublisherStats(period: any) → PublisherStats
+configurePublisher(config: any) → PublisherConfig
 ```
 
 **Types**

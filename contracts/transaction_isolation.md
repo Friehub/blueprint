@@ -9,13 +9,13 @@ Transaction isolation level configuration, deadlock prevention, and distributed 
 
 **Functions**
 ```
-configureIsolation(module, level) → void
-getIsolationLevel(module) → IsolationLevel
-executeWithIsolation(operation, level) → OperationResult
-setLockTimeout(timeout_ms) → void
-setDeadlockPriority(priority) → void
+configureIsolation(module: any, level: any) → void
+getIsolationLevel(module: any) → IsolationLevel
+executeWithIsolation(operation: any, level: any) → OperationResult
+setLockTimeout(timeout_ms: any) → void
+setDeadlockPriority(priority: any) → void
 detectDeadlocks() → DeadlockReport
-distributedTransaction(steps, options?) → DistributedTxResult
+distributedTransaction(steps: any, options?: any) → DistributedTxResult
 ```
 
 **Types**

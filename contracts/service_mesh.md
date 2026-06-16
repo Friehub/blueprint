@@ -9,11 +9,11 @@ Service discovery, health-aware routing, and inter-service communication.
 
 **Functions**
 ```
-registerService(name, endpoints, metadata?) → Service
-deregisterService(service_id) → void
-discoverService(name) → Service?
-getEndpoints(service_name, health?) → Endpoint[]
-reportHealth(endpoint_id, status) → void
+registerService(name: string, endpoints: any, metadata?: any) → Service
+deregisterService(service_id: any) → void
+discoverService(name: string) → Service?
+getEndpoints(service_name: any, health?: any) → Endpoint[]
+reportHealth(endpoint_id: any, status: string) → void
 getServiceGraph() → ServiceGraph
 ```
 

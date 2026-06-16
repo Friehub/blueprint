@@ -9,14 +9,14 @@ Service-to-service authentication with identity registration, certificate/mTLS m
 
 **Functions**
 ```
-registerServiceIdentity(service_name, public_key, metadata?) → ServiceIdentity
-getServiceIdentity(service_name) → ServiceIdentity?
-verifyServiceIdentity(caller_identity, target_service) → IdentityVerification
-rotateIdentity(service_name) → RotationResult
+registerServiceIdentity(service_name: any, public_key: any, metadata?: any) → ServiceIdentity
+getServiceIdentity(service_name: any) → ServiceIdentity?
+verifyServiceIdentity(caller_identity: any, target_service: any) → IdentityVerification
+rotateIdentity(service_name: any) → RotationResult
 listTrustedServices() → TrustedService[]
-setTrustPolicy(source_service, target_service, policy) → void
-getTrustPolicy(source_service, target_service) → TrustPolicy?
-revokeIdentity(identity_id, reason) → void
+setTrustPolicy(source_service: any, target_service: any, policy: any) → void
+getTrustPolicy(source_service: any, target_service: any) → TrustPolicy?
+revokeIdentity(identity_id: any, reason: any) → void
 ```
 
 **Types**

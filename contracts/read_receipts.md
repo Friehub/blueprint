@@ -9,13 +9,13 @@ Message read state tracking with bulk mark, unread counts, and real-time broadca
 
 **Functions**
 ```
-markRead(message_id, user_id) → void
-markBulkRead(message_ids, user_id) → void
-markThreadRead(thread_id, user_id) → void
-getUnreadCount(user_id, thread_id?) → number
-getReadReceipts(message_id) → ReadReceipt[]
-subscribeReadReceipts(thread_id, handler) → ReadReceiptSubscription
-getLastReadMessage(thread_id, user_id) → string?
+markRead(message_id: any, user_id: any) → void
+markBulkRead(message_ids: any, user_id: any) → void
+markThreadRead(thread_id: any, user_id: any) → void
+getUnreadCount(user_id: any, thread_id?: any) → number
+getReadReceipts(message_id: any) → ReadReceipt[]
+subscribeReadReceipts(thread_id: any, handler: Function) → ReadReceiptSubscription
+getLastReadMessage(thread_id: any, user_id: any) → string?
 ```
 
 **Types**

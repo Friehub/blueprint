@@ -9,18 +9,18 @@ Multi-tenancy management for SaaS products.
 
 **Functions**
 ```
-createTenant(name, owner_id, plan_id?) → Tenant
-getTenant(tenant_id) → Tenant
-getTenantBySlug(slug) → Tenant?
-updateTenant(tenant_id, data) → Tenant
-suspendTenant(tenant_id, reason) → Tenant
-reactivateTenant(tenant_id) → Tenant
-deleteTenant(tenant_id) → void
-getTenantMembers(tenant_id) → TenantMember[]
-inviteMember(tenant_id, email, role) → TenantInvite
-removeMember(tenant_id, user_id) → void
-getTenantConfig(tenant_id) → TenantConfig
-updateTenantConfig(tenant_id, config) → TenantConfig
+createTenant(name: string, owner_id: any, plan_id?: any) → Tenant
+getTenant(tenant_id: any) → Tenant
+getTenantBySlug(slug: string) → Tenant?
+updateTenant(tenant_id: any, data: any) → Tenant
+suspendTenant(tenant_id: any, reason: any) → Tenant
+reactivateTenant(tenant_id: any) → Tenant
+deleteTenant(tenant_id: any) → void
+getTenantMembers(tenant_id: any) → TenantMember[]
+inviteMember(tenant_id: any, email: string, role: any) → TenantInvite
+removeMember(tenant_id: any, user_id: any) → void
+getTenantConfig(tenant_id: any) → TenantConfig
+updateTenantConfig(tenant_id: any, config: any) → TenantConfig
 ```
 
 **Types**

@@ -9,14 +9,14 @@ Outbound event delivery to external endpoints.
 
 **Functions**
 ```
-registerEndpoint(url, events, secret, metadata?) → WebhookEndpoint
-updateEndpoint(endpoint_id, data) → WebhookEndpoint
-removeEndpoint(endpoint_id) → void
-listEndpoints(owner_id) → WebhookEndpoint[]
-dispatchEvent(event_type, payload, owner_id) → void
-retryDelivery(delivery_id) → WebhookDelivery
-getDeliveries(endpoint_id, options?) → PaginatedResult<WebhookDelivery>
-getDelivery(delivery_id) → WebhookDelivery
+registerEndpoint(url: string, events: any, secret: any, metadata?: any) → WebhookEndpoint
+updateEndpoint(endpoint_id: any, data: any) → WebhookEndpoint
+removeEndpoint(endpoint_id: any) → void
+listEndpoints(owner_id: any) → WebhookEndpoint[]
+dispatchEvent(event_type: any, payload: any, owner_id: any) → void
+retryDelivery(delivery_id: any) → WebhookDelivery
+getDeliveries(endpoint_id: any, options?: any) → PaginatedResult<WebhookDelivery>
+getDelivery(delivery_id: any) → WebhookDelivery
 ```
 
 **Types**

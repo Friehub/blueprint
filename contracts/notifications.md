@@ -9,17 +9,17 @@ Multi-channel message delivery.
 
 **Functions**
 ```
-sendEmail(to, template_id, variables, options?) → DeliveryResult
-sendSMS(to, body, options?) → DeliveryResult
-sendPush(user_id, title, body, data?) → DeliveryResult
-sendBulkPush(user_ids[], notification, options?) → BulkPushResult
-sendInApp(user_id, notification) → Notification
-getNotifications(user_id, options?) → PaginatedResult<Notification>
-markRead(notification_id) → void
-markAllRead(user_id) → void
-getUnreadCount(user_id) → number
-updatePreferences(user_id, preferences) → NotificationPreferences
-getPreferences(user_id) → NotificationPreferences
+sendEmail(to: any, template_id: any, variables: any, options?: any) → DeliveryResult
+sendSMS(to: any, body: any, options?: any) → DeliveryResult
+sendPush(user_id: any, title: string, body: any, data?: any) → DeliveryResult
+sendBulkPush(user_ids[]: any, notification: any, options?: any) → BulkPushResult
+sendInApp(user_id: any, notification: any) → Notification
+getNotifications(user_id: any, options?: any) → PaginatedResult<Notification>
+markRead(notification_id: any) → void
+markAllRead(user_id: any) → void
+getUnreadCount(user_id: any) → number
+updatePreferences(user_id: any, preferences: any) → NotificationPreferences
+getPreferences(user_id: any) → NotificationPreferences
 ```
 
 **Types**

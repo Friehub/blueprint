@@ -9,12 +9,12 @@ Online/offline state tracking.
 
 **Functions**
 ```
-setOnline(user_id, channel?, metadata?) → void
-setOffline(user_id, channel?) → void
-getPresence(user_id) → PresenceState
-getPresenceMultiple(user_ids) → Record<string, PresenceState>
-subscribeToPresence(user_id, callback) → Unsubscribe
-setCustomStatus(user_id, status) → void
+setOnline(user_id: any, channel?: any, metadata?: any) → void
+setOffline(user_id: any, channel?: any) → void
+getPresence(user_id: any) → PresenceState
+getPresenceMultiple(user_ids: any) → Record<string, PresenceState>
+subscribeToPresence(user_id: any, callback: Function) → Unsubscribe
+setCustomStatus(user_id: any, status: string) → void
 ```
 
 **Types**

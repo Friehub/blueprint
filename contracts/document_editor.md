@@ -9,11 +9,11 @@ Collaborative workspace document creation, versioned revision history, and concu
 
 **Functions**
 ```
-createDocument(title, workspace_id) → Document
-saveRevision(document_id, content, author_id) → Revision
-getRevisionHistory(document_id, options?) → PaginatedResult<Revision>
-restoreRevision(revision_id) → Document
-acquireEditLock(document_id, user_id) → EditLock
+createDocument(title: string, workspace_id: any) → Document
+saveRevision(document_id: any, content: string, author_id: any) → Revision
+getRevisionHistory(document_id: any, options?: any) → PaginatedResult<Revision>
+restoreRevision(revision_id: any) → Document
+acquireEditLock(document_id: any, user_id: any) → EditLock
 ```
 
 **Types**

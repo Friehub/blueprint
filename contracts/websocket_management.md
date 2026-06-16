@@ -9,16 +9,16 @@ WebSocket connection lifecycle, room management, and message broadcasting.
 
 **Functions**
 ```
-createRoom(room_id, options?) → Room
-joinRoom(user_id, room_id) → Membership
-leaveRoom(user_id, room_id) → void
-getRoomMembers(room_id) → Membership[]
-broadcastToRoom(room_id, event, data) → BroadcastResult
-sendToUser(user_id, event, data) → void
-sendToConnection(connection_id, event, data) → void
-getUserConnections(user_id) → ConnectionInfo[]
-disconnectUser(user_id, reason?) → void
-getRoomStats(room_id) → RoomStats
+createRoom(room_id: any, options?: any) → Room
+joinRoom(user_id: any, room_id: any) → Membership
+leaveRoom(user_id: any, room_id: any) → void
+getRoomMembers(room_id: any) → Membership[]
+broadcastToRoom(room_id: any, event: any, data: any) → BroadcastResult
+sendToUser(user_id: any, event: any, data: any) → void
+sendToConnection(connection_id: any, event: any, data: any) → void
+getUserConnections(user_id: any) → ConnectionInfo[]
+disconnectUser(user_id: any, reason?: any) → void
+getRoomStats(room_id: any) → RoomStats
 ```
 
 **Types**

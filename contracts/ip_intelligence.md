@@ -9,12 +9,12 @@ IP-based geolocation, VPN detection, and threat assessment.
 
 **Functions**
 ```
-lookup(ip_address) → IpIntelligence
-isVpn(ip_address) → boolean
-isTor(ip_address) → boolean
-isDatacenter(ip_address) → boolean
-getGeolocation(ip_address) → Geolocation
-getThreatScore(ip_address) → ThreatScore
+lookup(ip_address: any) → IpIntelligence
+isVpn(ip_address: any) → boolean
+isTor(ip_address: any) → boolean
+isDatacenter(ip_address: any) → boolean
+getGeolocation(ip_address: any) → Geolocation
+getThreatScore(ip_address: any) → ThreatScore
 ```
 
 **Types**

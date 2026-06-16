@@ -9,14 +9,14 @@ Environment seeding with baseline data, snapshots, and restore capabilities.
 
 **Functions**
 ```
-createSeed(name, data, options?) → Seed
-listSeeds(environment?) → Seed[]
-applySeed(seed_id, environment) → SeedResult
-snapshot(environment, name?) → Snapshot
-listSnapshots(environment?) → Snapshot[]
-restoreSnapshot(snapshot_id) → RestoreResult
-resetToBaseline(environment) → ResetResult
-deleteSeed(seed_id) → void
+createSeed(name: string, data: any, options?: any) → Seed
+listSeeds(environment?: any) → Seed[]
+applySeed(seed_id: any, environment: any) → SeedResult
+snapshot(environment: any, name?: string) → Snapshot
+listSnapshots(environment?: any) → Snapshot[]
+restoreSnapshot(snapshot_id: any) → RestoreResult
+resetToBaseline(environment: any) → ResetResult
+deleteSeed(seed_id: any) → void
 ```
 
 **Types**

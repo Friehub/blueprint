@@ -9,13 +9,13 @@ IP address blocklist management with CIDR and ASN support, expiry, and threat in
 
 **Functions**
 ```
-blockIp(ip, reason, options?) → BlocklistEntry
-blockCidr(cidr, reason, options?) → BlocklistEntry
-blockAsn(asn, reason, options?) → BlocklistEntry
-unblock(entry_id) → void
-isBlocked(ip) → BlockStatus
-listEntries(status?, options?) → PaginatedResult<BlocklistEntry>
-importFeed(source, format) → ImportResult
+blockIp(ip: any, reason: any, options?: any) → BlocklistEntry
+blockCidr(cidr: any, reason: any, options?: any) → BlocklistEntry
+blockAsn(asn: any, reason: any, options?: any) → BlocklistEntry
+unblock(entry_id: any) → void
+isBlocked(ip: any) → BlockStatus
+listEntries(status?: string, options?: any) → PaginatedResult<BlocklistEntry>
+importFeed(source: string, format: string) → ImportResult
 getStats() → BlocklistStats
 ```
 

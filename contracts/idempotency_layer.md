@@ -9,13 +9,13 @@ Standalone reusable idempotency pattern — key generation, storage, lookup-befo
 
 **Functions**
 ```
-createIdempotencyKey(namespace, scope, seed?) → IdempotencyKey
-checkIdempotency(key) → IdempotencyResult
-registerAttempt(key, operation_type, args_hash) → AttemptRegistration
-completeAttempt(key, result) → IdempotencyResult
-failAttempt(key, error) → IdempotencyResult
-getStaleKeys(older_than_hours) → IdempotencyKey[]
-releaseStaleKeys(keys) → number
+createIdempotencyKey(namespace: any, scope: any, seed?: any) → IdempotencyKey
+checkIdempotency(key: string) → IdempotencyResult
+registerAttempt(key: string, operation_type: any, args_hash: any) → AttemptRegistration
+completeAttempt(key: string, result: any) → IdempotencyResult
+failAttempt(key: string, error: any) → IdempotencyResult
+getStaleKeys(older_than_hours: any) → IdempotencyKey[]
+releaseStaleKeys(keys: any) → number
 ```
 
 **Types**

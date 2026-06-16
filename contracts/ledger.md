@@ -9,11 +9,11 @@ Financial double-entry bookkeeping engine for immutable multi-currency transacti
 
 **Functions**
 ```
-createLedger(name, currency) → Ledger
-createAccount(ledger_id, type, name?) → LedgerAccount
-postTransaction(postings, reference, metadata?) → LedgerTransaction
-getAccountBalance(account_id, timestamp?) → LedgerBalance
-getLedgerTransactions(filters, options?) → PaginatedResult<LedgerTransaction>
+createLedger(name: string, currency: any) → Ledger
+createAccount(ledger_id: any, type: string, name?: string) → LedgerAccount
+postTransaction(postings: any, reference: any, metadata?: any) → LedgerTransaction
+getAccountBalance(account_id: any, timestamp?: string) → LedgerBalance
+getLedgerTransactions(filters: any, options?: any) → PaginatedResult<LedgerTransaction>
 ```
 
 **Types**

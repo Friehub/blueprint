@@ -15,12 +15,12 @@ Card network chargeback lifecycle, evidence management, and dispute response tra
 
 **Functions**
 ```
-createChargeback(payment_id, reason, metadata?) → Chargeback
-getChargeback(chargeback_id) → Chargeback
-listChargebacks(input, options?) → PaginatedResult<Chargeback>
-submitEvidence(chargeback_id, evidence) → Chargeback
-updateChargebackStatus(chargeback_id, status, metadata?) → Chargeback
-closeChargeback(chargeback_id) → Chargeback
+createChargeback(payment_id: any, reason: any, metadata?: any) → Chargeback
+getChargeback(chargeback_id: any) → Chargeback
+listChargebacks(input: any, options?: any) → PaginatedResult<Chargeback>
+submitEvidence(chargeback_id: any, evidence: any) → Chargeback
+updateChargebackStatus(chargeback_id: any, status: string, metadata?: any) → Chargeback
+closeChargeback(chargeback_id: any) → Chargeback
 ```
 
 **Types**

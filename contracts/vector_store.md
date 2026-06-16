@@ -9,13 +9,13 @@ Vector embedding storage and retrieval with similarity search and metadata filte
 
 **Functions**
 ```
-upsertCollection(name, config) → Collection
-deleteCollection(collection_id) → void
-upsertVectors(collection_id, vectors) → IndexResult
-deleteVectors(collection_id, ids) → void
-search(collection_id, query_vector, options?) → SearchResult[]
-getVector(collection_id, id) → VectorRecord?
-getCollectionStats(collection_id) → CollectionStats
+upsertCollection(name: string, config: any) → Collection
+deleteCollection(collection_id: any) → void
+upsertVectors(collection_id: any, vectors: any) → IndexResult
+deleteVectors(collection_id: any, ids: any) → void
+search(collection_id: any, query_vector: any, options?: any) → SearchResult[]
+getVector(collection_id: any, id: string) → VectorRecord?
+getCollectionStats(collection_id: any) → CollectionStats
 listCollections() → Collection[]
 ```
 

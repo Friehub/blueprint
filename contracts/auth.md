@@ -9,16 +9,16 @@ Authentication -- who you are.
 
 **Functions**
 ```
-signUp(email, password, metadata?) → Session
-signIn(email, password) → Session
-signInWithProvider(provider, token) → Session
-signOut(session_token) → void
-refreshToken(refresh_token) → Session
-verifyToken(token) → TokenClaims
-requestPasswordReset(email) → void
-confirmPasswordReset(token, new_password) → void
-verifyEmail(token) → void
-resendVerification(email) → void
+signUp(email: string, password: any, metadata?: any) → Session
+signIn(email: string, password: any) → Session
+signInWithProvider(provider: any, token: any) → Session
+signOut(session_token: any) → void
+refreshToken(refresh_token: any) → Session
+verifyToken(token: any) → TokenClaims
+requestPasswordReset(email: string) → void
+confirmPasswordReset(token: any, new_password: any) → void
+verifyEmail(token: any) → void
+resendVerification(email: string) → void
 ```
 
 **Types**

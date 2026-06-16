@@ -9,18 +9,18 @@ User identity and profile management.
 
 **Functions**
 ```
-getUser(user_id) → User
-getUserByEmail(email) → User?
-createUser(data) → User
-updateUser(user_id, data) → User
-deleteUser(user_id) → void
-searchUsers(query, options?) → PaginatedResult<User>
-getUsersByRole(role) → User[]
-assignRole(user_id, role) → void
-revokeRole(user_id, role) → void
-getUserRoles(user_id) → Role[]
-banUser(user_id, reason) → void
-unbanUser(user_id) → void
+getUser(user_id: any) → User
+getUserByEmail(email: string) → User?
+createUser(data: any) → User
+updateUser(user_id: any, data: any) → User
+deleteUser(user_id: any) → void
+searchUsers(query: any, options?: any) → PaginatedResult<User>
+getUsersByRole(role: any) → User[]
+assignRole(user_id: any, role: any) → void
+revokeRole(user_id: any, role: any) → void
+getUserRoles(user_id: any) → Role[]
+banUser(user_id: any, reason: any) → void
+unbanUser(user_id: any) → void
 ```
 
 **Types**

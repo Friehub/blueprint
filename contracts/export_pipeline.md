@@ -9,14 +9,14 @@ Scheduled bulk data export with format conversion and delivery to external desti
 
 **Functions**
 ```
-defineExport(name, config) → Export
-getExport(export_id) → Export
+defineExport(name: string, config: any) → Export
+getExport(export_id: any) → Export
 listExports() → Export[]
-runExport(export_id) → ExportRun
-getRunHistory(export_id, options?) → PaginatedResult<ExportRun>
-cancelExport(run_id) → void
+runExport(export_id: any) → ExportRun
+getRunHistory(export_id: any, options?: any) → PaginatedResult<ExportRun>
+cancelExport(run_id: any) → void
 getExportFormats() → Format[]
-validateDestination(destination) → ValidationResult
+validateDestination(destination: any) → ValidationResult
 ```
 
 **Types**

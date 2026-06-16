@@ -9,14 +9,14 @@ Cross-domain moderation cases, reviewer workflows, decisions, escalations, and m
 
 **Functions**
 ```
-createCase(subject_ref, reason, metadata?) → ModerationCase
-getCase(case_id) → ModerationCase
-listCases(input, options?) → PaginatedResult<ModerationCase>
-assignReviewer(case_id, reviewer_id) → ModerationCase
-recordDecision(case_id, decision, reason?) → ModerationCase
-escalateCase(case_id, level?) → ModerationCase
-closeCase(case_id) → ModerationCase
-exportCases(filters, format) → ModerationExport
+createCase(subject_ref: any, reason: any, metadata?: any) → ModerationCase
+getCase(case_id: any) → ModerationCase
+listCases(input: any, options?: any) → PaginatedResult<ModerationCase>
+assignReviewer(case_id: any, reviewer_id: any) → ModerationCase
+recordDecision(case_id: any, decision: any, reason?: any) → ModerationCase
+escalateCase(case_id: any, level?: any) → ModerationCase
+closeCase(case_id: any) → ModerationCase
+exportCases(filters: any, format: string) → ModerationExport
 ```
 
 **Types**

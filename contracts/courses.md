@@ -9,16 +9,16 @@ Curriculum structure, lesson publishing, and course content lifecycle.
 
 **Functions**
 ```
-createCourse(title, owner_id, description?, metadata?) → Course
-getCourse(course_id) → Course
-listCourses(input, options?) → PaginatedResult<Course>
-updateCourse(course_id, data) → Course
-publishCourse(course_id) → Course
-archiveCourse(course_id) → Course
-addLesson(course_id, lesson) → Lesson
-updateLesson(course_id, lesson_id, data) → Lesson
-reorderLessons(course_id, order) → Course
-listLessons(course_id, options?) → PaginatedResult<Lesson>
+createCourse(title: string, owner_id: any, description?: string, metadata?: any) → Course
+getCourse(course_id: any) → Course
+listCourses(input: any, options?: any) → PaginatedResult<Course>
+updateCourse(course_id: any, data: any) → Course
+publishCourse(course_id: any) → Course
+archiveCourse(course_id: any) → Course
+addLesson(course_id: any, lesson: any) → Lesson
+updateLesson(course_id: any, lesson_id: any, data: any) → Lesson
+reorderLessons(course_id: any, order: any) → Course
+listLessons(course_id: any, options?: any) → PaginatedResult<Lesson>
 ```
 
 **Types**

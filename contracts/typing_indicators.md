@@ -9,12 +9,12 @@ Real-time typing state broadcast with expiry and channel scoping.
 
 **Functions**
 ```
-startTyping(channel, user_id) → void
-stopTyping(channel, user_id) → void
-getTypingUsers(channel) → TypingUser[]
-subscribeTyping(channel, handler) → TypingSubscription
-unsubscribeTyping(subscription_id) → void
-setTypingTimeout(channel, duration_ms) → void
+startTyping(channel: any, user_id: any) → void
+stopTyping(channel: any, user_id: any) → void
+getTypingUsers(channel: any) → TypingUser[]
+subscribeTyping(channel: any, handler: Function) → TypingSubscription
+unsubscribeTyping(subscription_id: any) → void
+setTypingTimeout(channel: any, duration_ms: any) → void
 ```
 
 **Types**

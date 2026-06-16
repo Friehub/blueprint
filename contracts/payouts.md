@@ -9,13 +9,13 @@ Outbound disbursement of funds to vendors, creators, sellers, and bank accounts.
 
 **Functions**
 ```
-createPayout(source_account_id, recipient_id, amount, currency, destination) → Payout
-getPayout(payout_id) → Payout
-listPayouts(input, options?) → PaginatedResult<Payout>
-cancelPayout(payout_id, reason) → Payout
-retryPayout(payout_id) → Payout
-schedulePayout(source_account_id, destination, schedule) → PayoutSchedule
-getPayoutSchedule(schedule_id) → PayoutSchedule
+createPayout(source_account_id: any, recipient_id: any, amount: number, currency: any, destination: any) → Payout
+getPayout(payout_id: any) → Payout
+listPayouts(input: any, options?: any) → PaginatedResult<Payout>
+cancelPayout(payout_id: any, reason: any) → Payout
+retryPayout(payout_id: any) → Payout
+schedulePayout(source_account_id: any, destination: any, schedule: any) → PayoutSchedule
+getPayoutSchedule(schedule_id: any) → PayoutSchedule
 ```
 
 **Types**

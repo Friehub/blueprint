@@ -10,19 +10,19 @@ This module also owns gift cards as stored-value promotional instruments.
 
 **Functions**
 ```
-validateCoupon(code, cart_id, user_id?) → CouponValidation
-markCouponUsed(code, order_id, user_id) → void
+validateCoupon(code: any, cart_id: any, user_id?: any) → CouponValidation
+markCouponUsed(code: any, order_id: any, user_id: any) → void
 getActiveFlashSales() → FlashSale[]
-getFlashSaleForVariant(variant_id) → FlashSale?
-applyPromotionToCart(cart_id, promotion_id) → Cart
-getEligiblePromotions(cart_id, user_id?) → Promotion[]
-createPromotion(data) → Promotion
-archivePromotion(promotion_id) → void
-issueGiftCard(data) → GiftCard
-getGiftCard(code) → GiftCard
-listGiftCards(input, options?) → PaginatedResult<GiftCard>
-redeemGiftCard(code, order_id, amount) → GiftCardRedemption
-voidGiftCard(code, reason) → GiftCard
+getFlashSaleForVariant(variant_id: any) → FlashSale?
+applyPromotionToCart(cart_id: any, promotion_id: any) → Cart
+getEligiblePromotions(cart_id: any, user_id?: any) → Promotion[]
+createPromotion(data: any) → Promotion
+archivePromotion(promotion_id: any) → void
+issueGiftCard(data: any) → GiftCard
+getGiftCard(code: any) → GiftCard
+listGiftCards(input: any, options?: any) → PaginatedResult<GiftCard>
+redeemGiftCard(code: any, order_id: any, amount: number) → GiftCardRedemption
+voidGiftCard(code: any, reason: any) → GiftCard
 ```
 
 **Types**

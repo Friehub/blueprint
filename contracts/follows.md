@@ -9,13 +9,13 @@ Directed follow relationships between entities.
 
 **Functions**
 ```
-follow(follower_id, followee_id) → FollowRelation
-unfollow(follower_id, followee_id) → void
-isFollowing(follower_id, followee_id) → boolean
-getFollowers(user_id, options?) → PaginatedResult<User>
-getFollowing(user_id, options?) → PaginatedResult<User>
-getFollowCounts(user_id) → FollowCounts
-getMutualFollowers(user_id_a, user_id_b) → User[]
+follow(follower_id: any, followee_id: any) → FollowRelation
+unfollow(follower_id: any, followee_id: any) → void
+isFollowing(follower_id: any, followee_id: any) → boolean
+getFollowers(user_id: any, options?: any) → PaginatedResult<User>
+getFollowing(user_id: any, options?: any) → PaginatedResult<User>
+getFollowCounts(user_id: any) → FollowCounts
+getMutualFollowers(user_id_a: any, user_id_b: any) → User[]
 ```
 
 **Types**

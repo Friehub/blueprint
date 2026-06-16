@@ -9,13 +9,13 @@ Data sovereignty enforcement with region-aware routing and compliance verificati
 
 **Functions**
 ```
-declareResidency(data_domain, region) → ResidencyRule
-getResidencyRule(data_domain) → ResidencyRule?
-listResidencyRules(region?) → ResidencyRule[]
-routeRequest(request, data_domains) → RouteDecision
-verifyCompliance(data_domain) → ComplianceReport
-updateResidencyRule(rule_id, changes) → ResidencyRule
-removeResidencyRule(rule_id) → void
+declareResidency(data_domain: any, region: any) → ResidencyRule
+getResidencyRule(data_domain: any) → ResidencyRule?
+listResidencyRules(region?: any) → ResidencyRule[]
+routeRequest(request: any, data_domains: any) → RouteDecision
+verifyCompliance(data_domain: any) → ComplianceReport
+updateResidencyRule(rule_id: any, changes: any) → ResidencyRule
+removeResidencyRule(rule_id: any) → void
 ```
 
 **Types**

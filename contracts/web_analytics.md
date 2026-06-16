@@ -9,13 +9,13 @@ Website-centric traffic, session, attribution, and conversion tracking.
 
 **Functions**
 ```
-trackPageView(url, user_id?, context?) → void
-trackSessionStart(session_id, context?) → void
-trackSessionEnd(session_id, context?) → void
-trackConversion(event_name, user_id?, context?) → void
-getPageMetrics(input) → PageMetrics
-getAttributionReport(input) → AttributionReport
-getSessionReplay(session_id) → SessionReplay?
+trackPageView(url: string, user_id?: any, context?: any) → void
+trackSessionStart(session_id: any, context?: any) → void
+trackSessionEnd(session_id: any, context?: any) → void
+trackConversion(event_name: any, user_id?: any, context?: any) → void
+getPageMetrics(input: any) → PageMetrics
+getAttributionReport(input: any) → AttributionReport
+getSessionReplay(session_id: any) → SessionReplay?
 ```
 
 **Types**

@@ -9,15 +9,15 @@ Async job processing and task scheduling.
 
 **Functions**
 ```
-enqueue(queue_name, payload, options?) → Job
-enqueueBulk(queue_name, payloads) → Job[]
-scheduleJob(queue_name, payload, run_at) → Job
-cancelJob(job_id) → void
-getJob(job_id) → Job
-getJobStatus(job_id) → JobStatus
-retryJob(job_id) → Job
-getQueueStats(queue_name) → QueueStats
-purgeQueue(queue_name) → void
+enqueue(queue_name: any, payload: any, options?: any) → Job
+enqueueBulk(queue_name: any, payloads: any) → Job[]
+scheduleJob(queue_name: any, payload: any, run_at: any) → Job
+cancelJob(job_id: any) → void
+getJob(job_id: any) → Job
+getJobStatus(job_id: any) → JobStatus
+retryJob(job_id: any) → Job
+getQueueStats(queue_name: any) → QueueStats
+purgeQueue(queue_name: any) → void
 ```
 
 **Types**

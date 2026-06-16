@@ -9,11 +9,11 @@ Feature flag and rollout history, assignment decisions, and governance audit tra
 
 **Functions**
 ```
-getFeatureAuditTrail(flag_key, options?) → PaginatedResult<FeatureAuditEntry>
-getFeatureAuditEntry(entry_id) → FeatureAuditEntry
-listFeatureAuditEntries(input, options?) → PaginatedResult<FeatureAuditEntry>
-exportFeatureAudit(filters, format) → FeatureAuditExport
-compareFeatureVersions(flag_key, from_version, to_version) → FeatureDiff
+getFeatureAuditTrail(flag_key: any, options?: any) → PaginatedResult<FeatureAuditEntry>
+getFeatureAuditEntry(entry_id: any) → FeatureAuditEntry
+listFeatureAuditEntries(input: any, options?: any) → PaginatedResult<FeatureAuditEntry>
+exportFeatureAudit(filters: any, format: string) → FeatureAuditExport
+compareFeatureVersions(flag_key: any, from_version: any, to_version: any) → FeatureDiff
 ```
 
 **Types**

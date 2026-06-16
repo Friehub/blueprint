@@ -9,14 +9,14 @@ Order fulfillment orchestration across warehouse, packing, shipping, and deliver
 
 **Functions**
 ```
-createFulfillment(order_id, warehouse_id?) → Fulfillment
-getFulfillment(fulfillment_id) → Fulfillment
-listFulfillments(input, options?) → PaginatedResult<Fulfillment>
-assignWarehouse(fulfillment_id, warehouse_id) → Fulfillment
-markPacked(fulfillment_id, metadata?) → Fulfillment
-markShipped(fulfillment_id, tracking_number, carrier?) → Fulfillment
-markDelivered(fulfillment_id, delivered_at?) → Fulfillment
-cancelFulfillment(fulfillment_id, reason) → Fulfillment
+createFulfillment(order_id: any, warehouse_id?: any) → Fulfillment
+getFulfillment(fulfillment_id: any) → Fulfillment
+listFulfillments(input: any, options?: any) → PaginatedResult<Fulfillment>
+assignWarehouse(fulfillment_id: any, warehouse_id: any) → Fulfillment
+markPacked(fulfillment_id: any, metadata?: any) → Fulfillment
+markShipped(fulfillment_id: any, tracking_number: any, carrier?: any) → Fulfillment
+markDelivered(fulfillment_id: any, delivered_at?: any) → Fulfillment
+cancelFulfillment(fulfillment_id: any, reason: any) → Fulfillment
 ```
 
 **Types**

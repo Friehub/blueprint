@@ -9,13 +9,13 @@ Session lifecycle management separate from auth tokens.
 
 **Functions**
 ```
-createSession(user_id, device_info?) → Session
-getSession(session_id) → Session?
-getSessions(user_id) → Session[]
-listActiveSessions(user_id) → Session[]
-revokeSession(session_id) → void
-revokeAllSessions(user_id) → void
-extendSession(session_id) → Session
+createSession(user_id: any, device_info?: any) → Session
+getSession(session_id: any) → Session?
+getSessions(user_id: any) → Session[]
+listActiveSessions(user_id: any) → Session[]
+revokeSession(session_id: any) → void
+revokeAllSessions(user_id: any) → void
+extendSession(session_id: any) → Session
 ```
 
 **Types**

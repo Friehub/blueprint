@@ -9,10 +9,10 @@ HTTP security header enforcement with distinct policies for browser-facing and A
 
 **Functions**
 ```
-getHeaders(endpoint_type, options?) → HeaderPolicy
-validateResponse(response, policy) → ValidationResult
-getCorsPolicy(origin) → CorsPolicy
-setCorsPolicy(origin, policy) → void
+getHeaders(endpoint_type: any, options?: any) → HeaderPolicy
+validateResponse(response: any, policy: any) → ValidationResult
+getCorsPolicy(origin: any) → CorsPolicy
+setCorsPolicy(origin: any, policy: any) → void
 getHstsPolicy() -> HstsPolicy
 ```
 

@@ -9,14 +9,14 @@ Data quality expectation management with validation, tracking, and alerting.
 
 **Functions**
 ```
-defineExpectation(name, config) → Expectation
-getExpectation(expectation_id) → Expectation
-listExpectations(dataset?) → Expectation[]
-runValidation(expectation_id, dataset) → ValidationResult
-runAllValidations(dataset) → ValidationResult[]
-getValidationHistory(expectation_id, options?) → PaginatedResult<ValidationRun>
-getDatasetHealth(dataset) → DatasetHealth
-alertOnDegradation(expectation_id, threshold) → void
+defineExpectation(name: string, config: any) → Expectation
+getExpectation(expectation_id: any) → Expectation
+listExpectations(dataset?: any) → Expectation[]
+runValidation(expectation_id: any, dataset: any) → ValidationResult
+runAllValidations(dataset: any) → ValidationResult[]
+getValidationHistory(expectation_id: any, options?: any) → PaginatedResult<ValidationRun>
+getDatasetHealth(dataset: any) → DatasetHealth
+alertOnDegradation(expectation_id: any, threshold: any) → void
 ```
 
 **Types**

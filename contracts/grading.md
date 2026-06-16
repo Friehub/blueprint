@@ -10,14 +10,14 @@ This module also grades quizzes and exams that are modeled as assignments.
 
 **Functions**
 ```
-createRubric(course_id, data) → Rubric
-getRubric(rubric_id) → Rubric
-listRubrics(course_id, options?) → PaginatedResult<Rubric>
-gradeSubmission(submission_id, rubric_id, scores, feedback?) → Grade
-updateGrade(grade_id, data) → Grade
-publishGrade(grade_id) → Grade
-finalizeGrades(course_id) → Gradebook
-getGradebook(course_id) → Gradebook
+createRubric(course_id: any, data: any) → Rubric
+getRubric(rubric_id: any) → Rubric
+listRubrics(course_id: any, options?: any) → PaginatedResult<Rubric>
+gradeSubmission(submission_id: any, rubric_id: any, scores: any, feedback?: any) → Grade
+updateGrade(grade_id: any, data: any) → Grade
+publishGrade(grade_id: any) → Grade
+finalizeGrades(course_id: any) → Gradebook
+getGradebook(course_id: any) → Gradebook
 ```
 
 **Types**

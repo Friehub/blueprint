@@ -9,14 +9,14 @@ Return authorization, inspection, disposition, and refund coordination for comme
 
 **Functions**
 ```
-requestReturn(order_id, items, reason, metadata?) → ReturnAuthorization
-getReturn(return_id) → ReturnAuthorization
-listReturns(input, options?) → PaginatedResult<ReturnAuthorization>
-approveReturn(return_id) → ReturnAuthorization
-rejectReturn(return_id, reason) → ReturnAuthorization
-receiveReturn(return_id, received_items, metadata?) → ReturnAuthorization
-inspectReturn(return_id, disposition) → ReturnAuthorization
-closeReturn(return_id) → ReturnAuthorization
+requestReturn(order_id: any, items: any[], reason: any, metadata?: any) → ReturnAuthorization
+getReturn(return_id: any) → ReturnAuthorization
+listReturns(input: any, options?: any) → PaginatedResult<ReturnAuthorization>
+approveReturn(return_id: any) → ReturnAuthorization
+rejectReturn(return_id: any, reason: any) → ReturnAuthorization
+receiveReturn(return_id: any, received_items: any, metadata?: any) → ReturnAuthorization
+inspectReturn(return_id: any, disposition: any) → ReturnAuthorization
+closeReturn(return_id: any) → ReturnAuthorization
 ```
 
 **Types**

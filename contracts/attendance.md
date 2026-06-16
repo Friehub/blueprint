@@ -9,12 +9,12 @@ Attendance capture, presence marking, absence tracking, and attendance reporting
 
 **Functions**
 ```
-markAttendance(course_id, student_id, session_id, status, metadata?) → AttendanceRecord
-getAttendanceRecord(record_id) → AttendanceRecord
-listAttendance(course_id, options?) → PaginatedResult<AttendanceRecord>
-markSessionStart(session_id) → AttendanceSession
-markSessionEnd(session_id) → AttendanceSession
-getAttendanceSummary(course_id, period) → AttendanceSummary
+markAttendance(course_id: any, student_id: any, session_id: any, status: string, metadata?: any) → AttendanceRecord
+getAttendanceRecord(record_id: any) → AttendanceRecord
+listAttendance(course_id: any, options?: any) → PaginatedResult<AttendanceRecord>
+markSessionStart(session_id: any) → AttendanceSession
+markSessionEnd(session_id: any) → AttendanceSession
+getAttendanceSummary(course_id: any, period: any) → AttendanceSummary
 ```
 
 **Types**

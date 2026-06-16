@@ -9,12 +9,12 @@ Schema evolution rules, backward/forward compatibility, and wire format versioni
 
 **Functions**
 ```
-registerSchema(name, schema, format) → SchemaVersion
-getSchema(name, version?) → SchemaVersion?
-evolveSchema(name, changes, compatibility) → SchemaVersion
-validateCompatibility(old_schema, new_schema, mode) → CompatibilityReport
-detectFieldNumberConflict(proto_schema) → ConflictReport
-migrateDocument(doc, from_version, to_version) → MigratedDocument
+registerSchema(name: string, schema: any, format: string) → SchemaVersion
+getSchema(name: string, version?: any) → SchemaVersion?
+evolveSchema(name: string, changes: any, compatibility: any) → SchemaVersion
+validateCompatibility(old_schema: any, new_schema: any, mode: any) → CompatibilityReport
+detectFieldNumberConflict(proto_schema: any) → ConflictReport
+migrateDocument(doc: any, from_version: any, to_version: any) → MigratedDocument
 ```
 
 **Types**

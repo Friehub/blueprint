@@ -9,11 +9,11 @@ Programmatic SMS delivery.
 
 **Functions**
 ```
-send(to, body, sender_id?, options?) → DeliveryResult
-sendBulk(recipients, body) → BulkDeliveryResult
-getDeliveryStatus(message_id) → DeliveryStatus
+send(to: any, body: any, sender_id?: any, options?: any) → DeliveryResult
+sendBulk(recipients: any, body: any) → BulkDeliveryResult
+getDeliveryStatus(message_id: any) → DeliveryStatus
 getBalance() → SMSBalance
-lookupNumber(phone) → NumberLookup
+lookupNumber(phone: any) → NumberLookup
 ```
 
 **Types**

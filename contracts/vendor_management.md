@@ -9,16 +9,16 @@ Vendor lifecycle management with contract tracking, health monitoring, and offbo
 
 **Functions**
 ```
-registerVendor(name, details) → Vendor
-getVendor(vendor_id) → Vendor
-listVendors(status?) → Vendor[]
-updateVendor(vendor_id, changes) → Vendor
-recordContract(vendor_id, contract) → Contract
-getContracts(vendor_id) → Contract[]
-assessVendorHealth(vendor_id) → HealthAssessment
-flagVendorRisk(vendor_id, risk) → void
-initiateOffboarding(vendor_id, reason) → OffboardingPlan
-getVendorReport(vendor_id) → VendorReport
+registerVendor(name: string, details: any) → Vendor
+getVendor(vendor_id: any) → Vendor
+listVendors(status?: string) → Vendor[]
+updateVendor(vendor_id: any, changes: any) → Vendor
+recordContract(vendor_id: any, contract: any) → Contract
+getContracts(vendor_id: any) → Contract[]
+assessVendorHealth(vendor_id: any) → HealthAssessment
+flagVendorRisk(vendor_id: any, risk: any) → void
+initiateOffboarding(vendor_id: any, reason: any) → OffboardingPlan
+getVendorReport(vendor_id: any) → VendorReport
 ```
 
 **Types**

@@ -9,18 +9,18 @@ Risk scoring for transactions and user actions.
 
 **Functions**
 ```
-scoreTransaction(transaction, context) → RiskScore
-scoreSignUp(data, context) → RiskScore
-scoreLogin(user_id, context) → RiskScore
-reportFraud(transaction_id, reason) → FraudReport
-blockEntity(entity_type, entity_id, reason, options?) → void
-unblockEntity(entity_type, entity_id) → void
-isBlocked(entity_type, entity_id) → boolean
-getRiskHistory(entity_type, entity_id) → RiskScore[]
-submitFeedback(entity_type, entity_id, outcome, metadata) → FeedbackEvent
-getFeedbackHistory(entity_type, entity_id) → FeedbackEvent[]
-requestBlockReview(entity_type, entity_id, reason) → BlockReview
-resolveBlockReview(review_id, decision, reason) → void
+scoreTransaction(transaction: any, context: any) → RiskScore
+scoreSignUp(data: any, context: any) → RiskScore
+scoreLogin(user_id: any, context: any) → RiskScore
+reportFraud(transaction_id: any, reason: any) → FraudReport
+blockEntity(entity_type: any, entity_id: any, reason: any, options?: any) → void
+unblockEntity(entity_type: any, entity_id: any) → void
+isBlocked(entity_type: any, entity_id: any) → boolean
+getRiskHistory(entity_type: any, entity_id: any) → RiskScore[]
+submitFeedback(entity_type: any, entity_id: any, outcome: any, metadata: any) → FeedbackEvent
+getFeedbackHistory(entity_type: any, entity_id: any) → FeedbackEvent[]
+requestBlockReview(entity_type: any, entity_id: any, reason: any) → BlockReview
+resolveBlockReview(review_id: any, decision: any, reason: any) → void
 ```
 
 **Types**

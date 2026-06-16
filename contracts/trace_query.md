@@ -9,13 +9,13 @@ Distributed trace search, retrieval, filtering, and service dependency inspectio
 
 **Functions**
 ```
-queryTraces(input, options?) → PaginatedResult<Trace>
-getTrace(trace_id) → Trace
-getSpan(span_id) → Span
-listServices(options?) → ServiceTraceSummary[]
-searchTraces(query, options?) → PaginatedResult<Trace>
-getTraceStats(input) → TraceStats
-getErrorTraces(input, options?) → PaginatedResult<Trace>
+queryTraces(input: any, options?: any) → PaginatedResult<Trace>
+getTrace(trace_id: any) → Trace
+getSpan(span_id: any) → Span
+listServices(options?: any) → ServiceTraceSummary[]
+searchTraces(query: any, options?: any) → PaginatedResult<Trace>
+getTraceStats(input: any) → TraceStats
+getErrorTraces(input: any, options?: any) → PaginatedResult<Trace>
 ```
 
 **Types**

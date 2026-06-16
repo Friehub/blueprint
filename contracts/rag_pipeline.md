@@ -9,14 +9,14 @@ Full retrieval-augmented generation pipeline: chunking, embedding, storage, retr
 
 **Functions**
 ```
-ingestDocument(source, content, options?) → DocumentRecord
-chunkDocument(document_id, strategy) → Chunk[]
-embedChunk(chunk_id) → EmbeddingResult
-indexDocument(document_id) → IndexResult
-search(query, options?) → PaginatedResult<SearchResult>
-rerank(query, results, top_n) → RankedResult[]
-getDocument(document_id) → DocumentRecord?
-deleteDocument(document_id) → void
+ingestDocument(source: string, content: string, options?: any) → DocumentRecord
+chunkDocument(document_id: any, strategy: any) → Chunk[]
+embedChunk(chunk_id: any) → EmbeddingResult
+indexDocument(document_id: any) → IndexResult
+search(query: any, options?: any) → PaginatedResult<SearchResult>
+rerank(query: any, results: any, top_n: any) → RankedResult[]
+getDocument(document_id: any) → DocumentRecord?
+deleteDocument(document_id: any) → void
 getIndexStats() → IndexStats
 ```
 

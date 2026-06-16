@@ -9,15 +9,15 @@ Project planning, ownership, membership, and lifecycle tracking for work organiz
 
 **Functions**
 ```
-createProject(workspace_id, owner_id, name, description?, metadata?) → Project
-getProject(project_id) → Project?
-listProjects(workspace_id, options?) → PaginatedResult<Project>
-updateProject(project_id, data) → Project
-archiveProject(project_id) → Project
-unarchiveProject(project_id) → Project
-addProjectMember(project_id, user_id, role?) → ProjectMember
-removeProjectMember(project_id, user_id) → void
-changeProjectOwner(project_id, user_id) → Project
+createProject(workspace_id: any, owner_id: any, name: string, description?: string, metadata?: any) → Project
+getProject(project_id: any) → Project?
+listProjects(workspace_id: any, options?: any) → PaginatedResult<Project>
+updateProject(project_id: any, data: any) → Project
+archiveProject(project_id: any) → Project
+unarchiveProject(project_id: any) → Project
+addProjectMember(project_id: any, user_id: any, role?: any) → ProjectMember
+removeProjectMember(project_id: any, user_id: any) → void
+changeProjectOwner(project_id: any, user_id: any) → Project
 ```
 
 **Types**

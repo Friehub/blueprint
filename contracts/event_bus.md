@@ -9,14 +9,14 @@ Typed event publish-subscribe with filtering, replay, and dead-letter management
 
 **Functions**
 ```
-publish(topic, event) → EventId
-publishBulk(topic, events) → EventId[]
-subscribe(topic, handler, filter?) → Subscription
-unsubscribe(subscription_id) → void
-getSubscriptions(topic?) → Subscription[]
-replay(topic, from, to, target_subscription?) → ReplayResult
-getDeadLetters(topic, options?) → PaginatedResult<DeadLetter>
-retryDeadLetter(dead_letter_id) → void
+publish(topic: any, event: any) → EventId
+publishBulk(topic: any, events: any) → EventId[]
+subscribe(topic: any, handler: Function, filter?: any) → Subscription
+unsubscribe(subscription_id: any) → void
+getSubscriptions(topic?: any) → Subscription[]
+replay(topic: any, from: any, to: any, target_subscription?: any) → ReplayResult
+getDeadLetters(topic: any, options?: any) → PaginatedResult<DeadLetter>
+retryDeadLetter(dead_letter_id: any) → void
 ```
 
 **Types**

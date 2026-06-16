@@ -9,15 +9,15 @@ Structured emission of spans, metrics, and logs with sampling and correlation.
 
 **Functions**
 ```
-createSpan(name, options?) → Span
-endSpan(span_id, status) → void
-addSpanEvent(span_id, name, attributes?) → void
-recordMetric(name, value, attributes?, metric_type?) → void
-incrementCounter(name, value?, attributes?) → void
-recordHistogram(name, value, attributes?) → void
-setGauge(name, value, attributes?) → void
-setLogLevel(level) → void
-log(level, message, context?) → void
+createSpan(name: string, options?: any) → Span
+endSpan(span_id: any, status: string) → void
+addSpanEvent(span_id: any, name: string, attributes?: any) → void
+recordMetric(name: string, value: any, attributes?: any, metric_type?: any) → void
+incrementCounter(name: string, value?: any, attributes?: any) → void
+recordHistogram(name: string, value: any, attributes?: any) → void
+setGauge(name: string, value: any, attributes?: any) → void
+setLogLevel(level: any) → void
+log(level: any, message: any, context?: any) → void
 ```
 
 **Types**

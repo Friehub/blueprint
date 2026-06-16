@@ -9,14 +9,14 @@ Outgoing webhook delivery pipeline — queue, retry, dead-letter, and delivery r
 
 **Functions**
 ```
-registerWebhookEndpoint(url, events, config?) → WebhookEndpoint
-sendWebhook(endpoint_id, event_type, payload) → DeliveryAttempt
-getDeliveryStatus(delivery_id) → DeliveryAttempt
-listDeliveries(endpoint_id, options?) → PaginatedResult<DeliveryAttempt>
-retryDelivery(delivery_id) → DeliveryAttempt
-getDeadLetterQueue(options?) → PaginatedResult<DeadLetterEntry>
-replayDeadLetter(entry_id) → DeliveryAttempt
-getDeliveryStats(endpoint_id, period) → DeliveryStats
+registerWebhookEndpoint(url: string, events: any, config?: any) → WebhookEndpoint
+sendWebhook(endpoint_id: any, event_type: any, payload: any) → DeliveryAttempt
+getDeliveryStatus(delivery_id: any) → DeliveryAttempt
+listDeliveries(endpoint_id: any, options?: any) → PaginatedResult<DeliveryAttempt>
+retryDelivery(delivery_id: any) → DeliveryAttempt
+getDeadLetterQueue(options?: any) → PaginatedResult<DeadLetterEntry>
+replayDeadLetter(entry_id: any) → DeliveryAttempt
+getDeliveryStats(endpoint_id: any, period: any) → DeliveryStats
 ```
 
 **Types**

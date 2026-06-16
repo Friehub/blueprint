@@ -9,15 +9,15 @@ Internationalisation and content translation.
 
 **Functions**
 ```
-getTranslation(key, locale, variables?) → string
-getTranslations(keys, locale) → Record<string, string>
-setTranslation(key, locale, value) → void
+getTranslation(key: string, locale: string, variables?: any) → string
+getTranslations(keys: any, locale: string) → Record<string, string>
+setTranslation(key: string, locale: string, value: any) → void
 listLocales() → Locale[]
-getLocale(locale_code) → Locale
-detectLocale(accept_language) → string
-formatCurrency(amount, currency, locale) → string
-formatDate(date, format, locale) → string
-formatNumber(number, locale, options?) → string
+getLocale(locale_code: any) → Locale
+detectLocale(accept_language: any) → string
+formatCurrency(amount: number, currency: any, locale: string) → string
+formatDate(date: string, format: string, locale: string) → string
+formatNumber(number: any, locale: string, options?: any) → string
 ```
 
 **Types**

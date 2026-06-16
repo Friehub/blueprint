@@ -9,14 +9,14 @@ API changelog with breaking change tracking, migration guides, semver enforcemen
 
 **Functions**
 ```
-recordEntry(version, changes) → ChangelogEntry
-getEntry(entry_id) → ChangelogEntry
-listEntries(options?) → PaginatedResult<ChangelogEntry>
-getBreakingChanges(version_range) → BreakingChange[]
-addMigrationGuide(entry_id, guide) → void
-notifySubscribers(entry_id) → NotificationResult
-subscribe(user_id, modules?) → Subscription
-unsubscribe(subscription_id) → void
+recordEntry(version: any, changes: any) → ChangelogEntry
+getEntry(entry_id: any) → ChangelogEntry
+listEntries(options?: any) → PaginatedResult<ChangelogEntry>
+getBreakingChanges(version_range: any) → BreakingChange[]
+addMigrationGuide(entry_id: any, guide: any) → void
+notifySubscribers(entry_id: any) → NotificationResult
+subscribe(user_id: any, modules?: any) → Subscription
+unsubscribe(subscription_id: any) → void
 ```
 
 **Types**

@@ -9,14 +9,14 @@ Charitable giving and campaign management.
 
 **Functions**
 ```
-createCampaign(data) → Campaign
-getCampaign(campaign_id) → Campaign
-listCampaigns(filters?) → PaginatedResult<Campaign>
-donate(campaign_id, donor_id, amount, currency, method) → Donation
-getDonation(donation_id) → Donation
-getDonationsByCampaign(campaign_id, options?) → PaginatedResult<Donation>
-getCampaignStats(campaign_id) → CampaignStats
-issueCertificate(donation_id) → Certificate
+createCampaign(data: any) → Campaign
+getCampaign(campaign_id: any) → Campaign
+listCampaigns(filters?: any) → PaginatedResult<Campaign>
+donate(campaign_id: any, donor_id: any, amount: number, currency: any, method: any) → Donation
+getDonation(donation_id: any) → Donation
+getDonationsByCampaign(campaign_id: any, options?: any) → PaginatedResult<Donation>
+getCampaignStats(campaign_id: any) → CampaignStats
+issueCertificate(donation_id: any) → Certificate
 ```
 
 **Types**

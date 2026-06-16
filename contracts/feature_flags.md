@@ -9,19 +9,19 @@ Runtime feature control and progressive rollout.
 
 **Functions**
 ```
-isEnabled(flag_key, user_id?, context?) → boolean
-getVariant(flag_key, user_id?, context?) → Variant
-setFlag(flag_key, enabled, rules?) → Flag
-archiveFlag(flag_key) → void
+isEnabled(flag_key: any, user_id?: any, context?: any) → boolean
+getVariant(flag_key: any, user_id?: any, context?: any) → Variant
+setFlag(flag_key: any, enabled: boolean, rules?: any) → Flag
+archiveFlag(flag_key: any) → void
 listFlags() → Flag[]
-getFlag(flag_key) → Flag
-rolloutToPercent(flag_key, percentage) → Flag
-evaluateAll(user_id, context?) → Record<string, boolean>
-createSegment(name, matchers) → Segment
-updateSegment(segment_id, matchers) → Segment
-deleteSegment(segment_id) → void
+getFlag(flag_key: any) → Flag
+rolloutToPercent(flag_key: any, percentage: any) → Flag
+evaluateAll(user_id: any, context?: any) → Record<string, boolean>
+createSegment(name: string, matchers: any) → Segment
+updateSegment(segment_id: any, matchers: any) → Segment
+deleteSegment(segment_id: any) → void
 listSegments() → Segment[]
-evaluateSegment(segment_id, user_id, context?) → boolean
+evaluateSegment(segment_id: any, user_id: any, context?: any) → boolean
 ```
 
 **Types**

@@ -9,15 +9,15 @@ Homework, coursework, submissions, and assignment lifecycle for education platfo
 
 **Functions**
 ```
-createAssignment(course_id, data) → Assignment
-getAssignment(assignment_id) → Assignment
-listAssignments(course_id, options?) → PaginatedResult<Assignment>
-updateAssignment(assignment_id, data) → Assignment
-publishAssignment(assignment_id) → Assignment
-closeAssignment(assignment_id) → Assignment
-submitAssignment(assignment_id, student_id, submission) → Submission
-getSubmission(submission_id) → Submission
-listSubmissions(input, options?) → PaginatedResult<Submission>
+createAssignment(course_id: any, data: any) → Assignment
+getAssignment(assignment_id: any) → Assignment
+listAssignments(course_id: any, options?: any) → PaginatedResult<Assignment>
+updateAssignment(assignment_id: any, data: any) → Assignment
+publishAssignment(assignment_id: any) → Assignment
+closeAssignment(assignment_id: any) → Assignment
+submitAssignment(assignment_id: any, student_id: any, submission: any) → Submission
+getSubmission(submission_id: any) → Submission
+listSubmissions(input: any, options?: any) → PaginatedResult<Submission>
 ```
 
 **Types**

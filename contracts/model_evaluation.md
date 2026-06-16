@@ -9,15 +9,15 @@ Systematic evaluation of model quality with datasets, metrics, and regression de
 
 **Functions**
 ```
-createEvaluation(name, config) → Evaluation
-getEvaluation(eval_id) → Evaluation
-listEvaluations(model?) → EvaluationSummary[]
-runEvaluation(eval_id) → EvalRun
-getRunResults(run_id) → EvalRunResults
-getMetricHistory(eval_id, metric) → MetricPoint[]
-registerMetric(name, calculator) → void
-setBaseline(eval_id, run_id) → void
-detectRegression(eval_id, metric) → RegressionReport?
+createEvaluation(name: string, config: any) → Evaluation
+getEvaluation(eval_id: any) → Evaluation
+listEvaluations(model?: any) → EvaluationSummary[]
+runEvaluation(eval_id: any) → EvalRun
+getRunResults(run_id: any) → EvalRunResults
+getMetricHistory(eval_id: any, metric: any) → MetricPoint[]
+registerMetric(name: string, calculator: any) → void
+setBaseline(eval_id: any, run_id: any) → void
+detectRegression(eval_id: any, metric: any) → RegressionReport?
 ```
 
 **Types**

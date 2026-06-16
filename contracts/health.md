@@ -9,15 +9,15 @@ Application health checks, liveness/readiness probes, and dependency status aggr
 
 **Functions**
 ```
-check(service?) → HealthReport
+check(service?: any) → HealthReport
 checkAll() → HealthReport
-registerCheck(name, check_fn, options?) → void
+registerCheck(name: string, check_fn: any, options?: any) → void
 livenessProbe() → ProbeResult
-readinessProbe(expected_deps?) → ProbeResult
+readinessProbe(expected_deps?: any) → ProbeResult
 startupProbe() → ProbeResult
 getStatus() → SystemStatus
-getHistory(service, options?) → HealthEvent[]
-setDependencyThreshold(dependency, threshold) → void
+getHistory(service: any, options?: any) → HealthEvent[]
+setDependencyThreshold(dependency: any, threshold: any) → void
 ```
 
 **Types**

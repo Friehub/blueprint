@@ -9,13 +9,13 @@ Immutable record of system events for compliance and debugging.
 
 **Functions**
 ```
-recordEvent(event) → AuditEvent
-queryEvents(filters, options?) → PaginatedResult<AuditEvent>
-getEventsByActor(actor_id, options?) → PaginatedResult<AuditEvent>
-getEventsByResource(resource_type, resource_id) → AuditEvent[]
-exportAuditLog(filters, format) → ExportJob
-getEvent(event_id) → AuditEvent
-verifyChain(from, to) → ChainVerificationReport
+recordEvent(event: any) → AuditEvent
+queryEvents(filters: any, options?: any) → PaginatedResult<AuditEvent>
+getEventsByActor(actor_id: any, options?: any) → PaginatedResult<AuditEvent>
+getEventsByResource(resource_type: any, resource_id: any) → AuditEvent[]
+exportAuditLog(filters: any, format: string) → ExportJob
+getEvent(event_id: any) → AuditEvent
+verifyChain(from: any, to: any) → ChainVerificationReport
 ```
 
 **Types**

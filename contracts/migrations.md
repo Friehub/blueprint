@@ -9,13 +9,13 @@ Schema migration management with versioning, rollback, and drift detection.
 
 **Functions**
 ```
-createMigration(name, options?) → MigrationPlan
-applyPending(options?) → MigrationResult
-rollback(steps?, options?) → MigrationResult
+createMigration(name: string, options?: any) → MigrationPlan
+applyPending(options?: any) → MigrationResult
+rollback(steps?: any, options?: any) → MigrationResult
 getStatus() → MigrationStatus
-getHistory(options?) → PaginatedResult<MigrationRecord>
+getHistory(options?: any) → PaginatedResult<MigrationRecord>
 validateDrift() → DriftReport
-baseline(version) → void
+baseline(version: any) → void
 lockMigrations() → void
 unlockMigrations() → void
 ```

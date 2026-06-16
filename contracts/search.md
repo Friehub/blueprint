@@ -9,16 +9,16 @@ Full-text and faceted search across documents.
 
 **Functions**
 ```
-indexDocument(index, id, document) → void
-indexBulk(index, documents) → BulkIndexResult
-removeDocument(index, id) → void
-search(index, query, options?) → SearchResult
-multiSearch(queries) → SearchResult[][]
-suggest(index, partial, field, options?) → Suggestion[]
-reindex(index) → ReindexJob
-getIndexStats(index) → IndexStats
-createIndex(name, config) → Index
-deleteIndex(name) → void
+indexDocument(index: any, id: string, document: any) → void
+indexBulk(index: any, documents: any) → BulkIndexResult
+removeDocument(index: any, id: string) → void
+search(index: any, query: any, options?: any) → SearchResult
+multiSearch(queries: any) → SearchResult[][]
+suggest(index: any, partial: any, field: any, options?: any) → Suggestion[]
+reindex(index: any) → ReindexJob
+getIndexStats(index: any) → IndexStats
+createIndex(name: string, config: any) → Index
+deleteIndex(name: string) → void
 ```
 
 **Types**

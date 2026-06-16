@@ -9,13 +9,13 @@ Track and enforce resource consumption quotas.
 
 **Functions**
 ```
-recordUsage(user_id, metric, quantity, timestamp?) → UsageRecord
-getUsageSummary(user_id, metric, period) → UsageSummary
-checkQuota(user_id, metric) → QuotaCheck
-getOverage(user_id, metric, period) → Overage?
-setQuota(user_id, metric, limit) → void
-resetUsage(user_id, metric) → void
-getUsageHistory(user_id, metric, options?) → PaginatedResult<UsageRecord>
+recordUsage(user_id: any, metric: any, quantity: number, timestamp?: string) → UsageRecord
+getUsageSummary(user_id: any, metric: any, period: any) → UsageSummary
+checkQuota(user_id: any, metric: any) → QuotaCheck
+getOverage(user_id: any, metric: any, period: any) → Overage?
+setQuota(user_id: any, metric: any, limit: number) → void
+resetUsage(user_id: any, metric: any) → void
+getUsageHistory(user_id: any, metric: any, options?: any) → PaginatedResult<UsageRecord>
 ```
 
 **Types**

@@ -9,13 +9,13 @@ Unified routing to LLM providers with context management, streaming, token accou
 
 **Functions**
 ```
-chat(messages, options?) → ChatResponse
-chatStream(messages, options?) → AsyncIterator<ChatChunk>
+chat(messages: any, options?: any) → ChatResponse
+chatStream(messages: any, options?: any) → AsyncIterator<ChatChunk>
 getModels() → Model[]
-getModelInfo(model) → ModelInfo
-countTokens(text) → TokenCount
-estimateCost(model, input_tokens, output_tokens) → CostEstimate
-abortRequest(request_id) → void
+getModelInfo(model: any) → ModelInfo
+countTokens(text: any) → TokenCount
+estimateCost(model: any, input_tokens: any, output_tokens: any) → CostEstimate
+abortRequest(request_id: any) → void
 ```
 
 **Types**

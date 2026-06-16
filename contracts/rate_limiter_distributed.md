@@ -9,12 +9,12 @@ Distributed rate limiting using shared Redis counter or token bucket — correct
 
 **Functions**
 ```
-checkRateLimit(namespace, identifier, limit, window_seconds) → RateLimitResult
-consumeToken(namespace, identifier, tokens?) → RateLimitResult
-getCurrentUsage(namespace, identifier) → UsageInfo
-resetWindow(namespace, identifier) → void
-getRateLimitConfig(namespace) → RateLimitConfig
-updateRateLimitConfig(namespace, config) → RateLimitConfig
+checkRateLimit(namespace: any, identifier: any, limit: number, window_seconds: any) → RateLimitResult
+consumeToken(namespace: any, identifier: any, tokens?: any) → RateLimitResult
+getCurrentUsage(namespace: any, identifier: any) → UsageInfo
+resetWindow(namespace: any, identifier: any) → void
+getRateLimitConfig(namespace: any) → RateLimitConfig
+updateRateLimitConfig(namespace: any, config: any) → RateLimitConfig
 ```
 
 **Types**

@@ -9,15 +9,15 @@ Security event capture, suspicious activity detection, alerting, and security ca
 
 **Functions**
 ```
-recordSecurityEvent(event, context?) → SecurityEvent
-getSecurityEvent(event_id) → SecurityEvent
-listSecurityEvents(input, options?) → PaginatedResult<SecurityEvent>
-createSecurityAlertRule(rule) → SecurityAlertRule
-getSecurityAlertRule(rule_id) → SecurityAlertRule
-listSecurityAlertRules(options?) → SecurityAlertRule[]
-createSecurityCase(subject_ref, reason) → SecurityCase
-getSecurityCase(case_id) → SecurityCase
-resolveSecurityCase(case_id, resolution) → SecurityCase
+recordSecurityEvent(event: any, context?: any) → SecurityEvent
+getSecurityEvent(event_id: any) → SecurityEvent
+listSecurityEvents(input: any, options?: any) → PaginatedResult<SecurityEvent>
+createSecurityAlertRule(rule: any) → SecurityAlertRule
+getSecurityAlertRule(rule_id: any) → SecurityAlertRule
+listSecurityAlertRules(options?: any) → SecurityAlertRule[]
+createSecurityCase(subject_ref: any, reason: any) → SecurityCase
+getSecurityCase(case_id: any) → SecurityCase
+resolveSecurityCase(case_id: any, resolution: any) → SecurityCase
 ```
 
 **Types**

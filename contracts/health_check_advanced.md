@@ -12,10 +12,10 @@ Production health checks — readiness, liveness, startup probes with dependency
 getLiveness() → HealthStatus
 getReadiness() → HealthStatus
 getStartupStatus() → HealthStatus
-checkDependency(dependency_name) → DependencyHealth
+checkDependency(dependency_name: any) → DependencyHealth
 getFullHealth() → FullHealthReport
-registerHealthCheck(name, check_fn) → void
-getHealthHistory(minutes) → HealthHistory
+registerHealthCheck(name: string, check_fn: any) → void
+getHealthHistory(minutes: any) → HealthHistory
 ```
 
 **Types**

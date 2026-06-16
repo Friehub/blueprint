@@ -9,19 +9,19 @@ Extensible plugin architecture with registration, interface validation, lifecycl
 
 **Functions**
 ```
-registerPlugin(name, plugin_class, manifest) → Plugin
-getPlugin(plugin_id) → Plugin
-listPlugins(status?) → Plugin[]
-loadPlugin(plugin_id) → void
-unloadPlugin(plugin_id) → void
-enablePlugin(plugin_id) → void
-disablePlugin(plugin_id) → void
-validateInterface(plugin_id) → ValidationReport
-verifyPluginSignature(plugin_id) → SignatureVerification
+registerPlugin(name: string, plugin_class: any, manifest: any) → Plugin
+getPlugin(plugin_id: any) → Plugin
+listPlugins(status?: string) → Plugin[]
+loadPlugin(plugin_id: any) → void
+unloadPlugin(plugin_id: any) → void
+enablePlugin(plugin_id: any) → void
+disablePlugin(plugin_id: any) → void
+validateInterface(plugin_id: any) → ValidationReport
+verifyPluginSignature(plugin_id: any) → SignatureVerification
 listHooks() → HookPoint[]
-triggerHook(hook_name, context) → HookResult
-registerPublisher(publisher_id, public_key) → void
-removePublisher(publisher_id) → void
+triggerHook(hook_name: any, context: any) → HookResult
+registerPublisher(publisher_id: any, public_key: any) → void
+removePublisher(publisher_id: any) → void
 ```
 
 **Types**

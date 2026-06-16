@@ -9,13 +9,13 @@ Server-Sent Events stream management with reconnection, event tracking, and back
 
 **Functions**
 ```
-createStream(url, options?) → EventStream
-subscribe(channel, handler) → StreamSubscription
-unsubscribe(subscription_id) → void
-sendEvent(channel, event) → void
-sendEvents(channel, events) → void
-closeStream(stream_id) → void
-getLastEventId(channel) → string?
+createStream(url: string, options?: any) → EventStream
+subscribe(channel: any, handler: Function) → StreamSubscription
+unsubscribe(subscription_id: any) → void
+sendEvent(channel: any, event: any) → void
+sendEvents(channel: any, events: any) → void
+closeStream(stream_id: any) → void
+getLastEventId(channel: any) → string?
 ```
 
 **Types**

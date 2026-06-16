@@ -9,14 +9,14 @@ Device push notification delivery via FCM, APNs, and web push protocols. This is
 
 **Functions**
 ```
-registerDevice(user_id, device_token, platform, metadata?) → DeviceRegistration
-unregisterDevice(device_id) → void
-getUserDevices(user_id) → DeviceRegistration[]
-sendPush(user_id, notification, options?) → PushResult
-sendBulkPush(user_ids[], notification, options?) → BulkPushResult
-sendTopicPush(topic, notification, options?) → BulkPushResult
-getPushStatus(message_id) → PushDeliveryStatus
-updateDeviceToken(device_id, new_token) → void
+registerDevice(user_id: any, device_token: any, platform: any, metadata?: any) → DeviceRegistration
+unregisterDevice(device_id: any) → void
+getUserDevices(user_id: any) → DeviceRegistration[]
+sendPush(user_id: any, notification: any, options?: any) → PushResult
+sendBulkPush(user_ids[]: any, notification: any, options?: any) → BulkPushResult
+sendTopicPush(topic: any, notification: any, options?: any) → BulkPushResult
+getPushStatus(message_id: any) → PushDeliveryStatus
+updateDeviceToken(device_id: any, new_token: any) → void
 ```
 
 **Types**

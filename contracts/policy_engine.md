@@ -9,14 +9,14 @@ Policy-as-code evaluation with rule-based authorization and explainable decision
 
 **Functions**
 ```
-evaluate(policy_name, context) → PolicyDecision
-evaluateBatch(policies, context) → PolicyDecision[]
-registerPolicy(name, rules, options?) → Policy
-updatePolicy(policy_id, rules, change_reason) → Policy
-getPolicy(policy_id) → Policy
+evaluate(policy_name: any, context: any) → PolicyDecision
+evaluateBatch(policies: any, context: any) → PolicyDecision[]
+registerPolicy(name: string, rules: any, options?: any) → Policy
+updatePolicy(policy_id: any, rules: any, change_reason: any) → Policy
+getPolicy(policy_id: any) → Policy
 listPolicies() → Policy[]
-deletePolicy(policy_id) → void
-testPolicy(policy_id, test_context) → TestResult
+deletePolicy(policy_id: any) → void
+testPolicy(policy_id: any, test_context: any) → TestResult
 ```
 
 **Types**

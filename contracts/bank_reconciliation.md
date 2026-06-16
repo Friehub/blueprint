@@ -9,12 +9,12 @@ Matching bank statements, balances, and external account activity to internal fi
 
 **Functions**
 ```
-createBankReconciliationRun(input) → BankReconciliationRun
-getBankReconciliationRun(run_id) → BankReconciliationRun
-listBankReconciliationRuns(input, options?) → PaginatedResult<BankReconciliationRun>
-getStatementMatches(run_id, options?) → PaginatedResult<StatementMatch>
-resolveStatementMatch(match_id, resolution) → StatementMatch
-closeBankReconciliationRun(run_id) → BankReconciliationRun
+createBankReconciliationRun(input: any) → BankReconciliationRun
+getBankReconciliationRun(run_id: any) → BankReconciliationRun
+listBankReconciliationRuns(input: any, options?: any) → PaginatedResult<BankReconciliationRun>
+getStatementMatches(run_id: any, options?: any) → PaginatedResult<StatementMatch>
+resolveStatementMatch(match_id: any, resolution: any) → StatementMatch
+closeBankReconciliationRun(run_id: any) → BankReconciliationRun
 ```
 
 **Types**

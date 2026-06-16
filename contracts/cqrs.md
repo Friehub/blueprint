@@ -9,13 +9,13 @@ Command Query Responsibility Segregation with separate read/write models and pro
 
 **Functions**
 ```
-executeCommand(command, context) → CommandResult
-executeQuery(query, context) → QueryResult
-defineCommandHandler(command_type, handler) → void
-defineQueryHandler(query_type, handler) → void
-synchronizeModel(projection_id) → SyncResult
-defineReadModel(model_name, projection, options?) → ReadModel
-getReadModel(model_name, filter?) → Record<string, any>[]
+executeCommand(command: any, context: any) → CommandResult
+executeQuery(query: any, context: any) → QueryResult
+defineCommandHandler(command_type: any, handler: Function) → void
+defineQueryHandler(query_type: any, handler: Function) → void
+synchronizeModel(projection_id: any) → SyncResult
+defineReadModel(model_name: any, projection: any, options?: any) → ReadModel
+getReadModel(model_name: any, filter?: any) → Record<string, any>[]
 ```
 
 **Types**

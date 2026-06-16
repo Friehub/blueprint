@@ -9,12 +9,12 @@ Programmatic access credentials.
 
 **Functions**
 ```
-createApiKey(user_id, name, scopes, expires_at?) → ApiKey
-getApiKey(key_id) → ApiKey
-listApiKeys(user_id) → ApiKey[]
-revokeApiKey(key_id) → void
-validateApiKey(raw_key) → ApiKeyValidation
-rotateApiKey(key_id) → ApiKey
+createApiKey(user_id: any, name: string, scopes: any, expires_at?: any) → ApiKey
+getApiKey(key_id: any) → ApiKey
+listApiKeys(user_id: any) → ApiKey[]
+revokeApiKey(key_id: any) → void
+validateApiKey(raw_key: any) → ApiKeyValidation
+rotateApiKey(key_id: any) → ApiKey
 ```
 
 **Types**

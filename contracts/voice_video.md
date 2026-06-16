@@ -9,17 +9,17 @@ WebRTC room management with participant coordination, recording, and transcripti
 
 **Functions**
 ```
-createRoom(name, config) → Room
-getRoom(room_id) → Room
-listRooms(status?) → Room[]
-joinRoom(room_id, user_id) → ParticipantToken
-leaveRoom(room_id, user_id) → void
-getParticipants(room_id) → Participant[]
-startRecording(room_id) → RecordingSession
-stopRecording(recording_id) → RecordingResult
-startTranscription(room_id, language) → TranscriptionSession
-stopTranscription(session_id) → TranscriptionResult
-getRoomMetrics(room_id) → RoomMetrics
+createRoom(name: string, config: any) → Room
+getRoom(room_id: any) → Room
+listRooms(status?: string) → Room[]
+joinRoom(room_id: any, user_id: any) → ParticipantToken
+leaveRoom(room_id: any, user_id: any) → void
+getParticipants(room_id: any) → Participant[]
+startRecording(room_id: any) → RecordingSession
+stopRecording(recording_id: any) → RecordingResult
+startTranscription(room_id: any, language: any) → TranscriptionSession
+stopTranscription(session_id: any) → TranscriptionResult
+getRoomMetrics(room_id: any) → RoomMetrics
 ```
 
 **Types**

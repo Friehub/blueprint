@@ -9,16 +9,16 @@ Subscription and plan management.
 
 **Functions**
 ```
-createSubscription(user_id, plan_id, payment_method) → Subscription
-getSubscription(user_id) → Subscription?
-upgradeSubscription(user_id, plan_id) → Subscription
-downgradeSubscription(user_id, plan_id, at_period_end?) → Subscription
-cancelSubscription(user_id, at_period_end?) → Subscription
-reactivateSubscription(user_id) → Subscription
-getInvoices(user_id, options?) → PaginatedResult<Invoice>
-getInvoice(invoice_id) → Invoice
+createSubscription(user_id: any, plan_id: any, payment_method: any) → Subscription
+getSubscription(user_id: any) → Subscription?
+upgradeSubscription(user_id: any, plan_id: any) → Subscription
+downgradeSubscription(user_id: any, plan_id: any, at_period_end?: any) → Subscription
+cancelSubscription(user_id: any, at_period_end?: any) → Subscription
+reactivateSubscription(user_id: any) → Subscription
+getInvoices(user_id: any, options?: any) → PaginatedResult<Invoice>
+getInvoice(invoice_id: any) → Invoice
 getPlans() → Plan[]
-getPlan(plan_id) → Plan
+getPlan(plan_id: any) → Plan
 ```
 
 **Types**

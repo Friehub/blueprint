@@ -9,16 +9,16 @@ ETL/ELT orchestration with run management, retry, and stage-level error handling
 
 **Functions**
 ```
-definePipeline(name, stages, config?) → Pipeline
-getPipeline(pipeline_id) → Pipeline
+definePipeline(name: string, stages: any, config?: any) → Pipeline
+getPipeline(pipeline_id: any) → Pipeline
 listPipelines() → Pipeline[]
-runPipeline(pipeline_id) → PipelineRun
-getRun(run_id) → PipelineRun
-getRunHistory(pipeline_id, options?) → PaginatedResult<PipelineRun>
-retryStage(run_id, stage) → void
-pausePipeline(pipeline_id) → void
-resumePipeline(pipeline_id) → void
-deletePipeline(pipeline_id) → void
+runPipeline(pipeline_id: any) → PipelineRun
+getRun(run_id: any) → PipelineRun
+getRunHistory(pipeline_id: any, options?: any) → PaginatedResult<PipelineRun>
+retryStage(run_id: any, stage: any) → void
+pausePipeline(pipeline_id: any) → void
+resumePipeline(pipeline_id: any) → void
+deletePipeline(pipeline_id: any) → void
 ```
 
 **Types**

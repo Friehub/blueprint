@@ -9,18 +9,18 @@ Application error capture, issue grouping, deduplication, triage, and alert rout
 
 **Functions**
 ```
-recordError(error, context?) → ErrorEvent
-getErrorEvent(event_id) → ErrorEvent
-listErrorEvents(input, options?) → PaginatedResult<ErrorEvent>
-getIssue(issue_id) → ErrorIssue
-listIssues(input, options?) → PaginatedResult<ErrorIssue>
-updateIssue(issue_id, data) → ErrorIssue
-assignIssue(issue_id, assignee_id) → ErrorIssue
-muteIssue(issue_id, reason?) → ErrorIssue
-unmuteIssue(issue_id) → ErrorIssue
-createAlertRule(rule) → AlertRule
-getAlertRule(rule_id) → AlertRule
-listAlertRules(options?) → AlertRule[]
+recordError(error: any, context?: any) → ErrorEvent
+getErrorEvent(event_id: any) → ErrorEvent
+listErrorEvents(input: any, options?: any) → PaginatedResult<ErrorEvent>
+getIssue(issue_id: any) → ErrorIssue
+listIssues(input: any, options?: any) → PaginatedResult<ErrorIssue>
+updateIssue(issue_id: any, data: any) → ErrorIssue
+assignIssue(issue_id: any, assignee_id: any) → ErrorIssue
+muteIssue(issue_id: any, reason?: any) → ErrorIssue
+unmuteIssue(issue_id: any) → ErrorIssue
+createAlertRule(rule: any) → AlertRule
+getAlertRule(rule_id: any) → AlertRule
+listAlertRules(options?: any) → AlertRule[]
 ```
 
 **Types**

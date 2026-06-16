@@ -9,17 +9,17 @@ Order lifecycle management.
 
 **Functions**
 ```
-createOrder(cart_id, user_id, shipping_address, payment_method) → Order
-getOrder(order_id) → Order
-getOrdersByUser(user_id, options?) → PaginatedResult<Order>
-getSellerOrders(seller_id, options?) → PaginatedResult<Order>
-getPackagesByOrder(order_id) → OrderPackage[]
-getOrderLinesByPackage(package_id) → OrderLine[]
-transitionOrderStatus(order_id, status, metadata?) → Order
-transitionPackageStatus(package_id, status, metadata?) → OrderPackage
-cancelOrder(order_id, reason) → Order
-requestReturn(order_id, lines, reason) → ReturnRequest
-approveReturn(return_id) → ReturnRequest
+createOrder(cart_id: any, user_id: any, shipping_address: any, payment_method: any) → Order
+getOrder(order_id: any) → Order
+getOrdersByUser(user_id: any, options?: any) → PaginatedResult<Order>
+getSellerOrders(seller_id: any, options?: any) → PaginatedResult<Order>
+getPackagesByOrder(order_id: any) → OrderPackage[]
+getOrderLinesByPackage(package_id: any) → OrderLine[]
+transitionOrderStatus(order_id: any, status: string, metadata?: any) → Order
+transitionPackageStatus(package_id: any, status: string, metadata?: any) → OrderPackage
+cancelOrder(order_id: any, reason: any) → Order
+requestReturn(order_id: any, lines: any, reason: any) → ReturnRequest
+approveReturn(return_id: any) → ReturnRequest
 ```
 
 **Types**

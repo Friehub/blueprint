@@ -9,15 +9,15 @@ Failure injection experimentation with steady-state validation, blast radius con
 
 **Functions**
 ```
-defineExperiment(name, hypothesis, config) → Experiment
-getExperiment(experiment_id) → Experiment
-listExperiments(status?) → Experiment[]
-runExperiment(experiment_id) → ExperimentRun
-stopExperiment(run_id) → void
-injectFailure(run_id, failure) → InjectionResult
-validateSteadyState(run_id) → SteadyStateResult
-rollbackExperiment(run_id) → RollbackResult
-scheduleExperiment(experiment_id, cron) → void
+defineExperiment(name: string, hypothesis: any, config: any) → Experiment
+getExperiment(experiment_id: any) → Experiment
+listExperiments(status?: string) → Experiment[]
+runExperiment(experiment_id: any) → ExperimentRun
+stopExperiment(run_id: any) → void
+injectFailure(run_id: any, failure: any) → InjectionResult
+validateSteadyState(run_id: any) → SteadyStateResult
+rollbackExperiment(run_id: any) → RollbackResult
+scheduleExperiment(experiment_id: any, cron: any) → void
 ```
 
 **Types**

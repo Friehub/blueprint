@@ -9,15 +9,15 @@ Concurrent document editing with CRDT-based conflict resolution and cursor aware
 
 **Functions**
 ```
-openDocument(doc_id, user_id) → DocumentSession
-getDocument(doc_id) → Document
-closeDocument(doc_id, user_id) → void
-applyOperation(doc_id, operation) → OperationAck
-getOperations(doc_id, since_version) → Operation[]
-getCursors(doc_id) → CursorPosition[]
-updateCursor(doc_id, user_id, position) → void
-getDocumentHistory(doc_id) → HistoryEntry[]
-resolveConflict(doc_id, operation_a, operation_b) → ResolvedOperation
+openDocument(doc_id: any, user_id: any) → DocumentSession
+getDocument(doc_id: any) → Document
+closeDocument(doc_id: any, user_id: any) → void
+applyOperation(doc_id: any, operation: any) → OperationAck
+getOperations(doc_id: any, since_version: any) → Operation[]
+getCursors(doc_id: any) → CursorPosition[]
+updateCursor(doc_id: any, user_id: any, position: any) → void
+getDocumentHistory(doc_id: any) → HistoryEntry[]
+resolveConflict(doc_id: any, operation_a: any, operation_b: any) → ResolvedOperation
 ```
 
 **Types**

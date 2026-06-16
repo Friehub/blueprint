@@ -9,13 +9,13 @@ Account lifecycle provisioning, workspace setup, and feature activation for SaaS
 
 **Functions**
 ```
-createProvisioningJob(account_id, template_id, requested_by, metadata?) → ProvisioningJob
-getProvisioningJob(job_id) → ProvisioningJob
-listProvisioningJobs(input, options?) → PaginatedResult<ProvisioningJob>
-retryProvisioning(job_id) → ProvisioningJob
-cancelProvisioning(job_id) → ProvisioningJob
-applyTemplate(account_id, template_id) → ProvisioningJob
-markStepComplete(job_id, step_id) → ProvisioningJob
+createProvisioningJob(account_id: any, template_id: any, requested_by: any, metadata?: any) → ProvisioningJob
+getProvisioningJob(job_id: any) → ProvisioningJob
+listProvisioningJobs(input: any, options?: any) → PaginatedResult<ProvisioningJob>
+retryProvisioning(job_id: any) → ProvisioningJob
+cancelProvisioning(job_id: any) → ProvisioningJob
+applyTemplate(account_id: any, template_id: any) → ProvisioningJob
+markStepComplete(job_id: any, step_id: any) → ProvisioningJob
 ```
 
 **Types**

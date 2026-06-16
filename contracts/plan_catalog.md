@@ -9,13 +9,13 @@ Product plan definitions, feature entitlements, and pricing structure for SaaS o
 
 **Functions**
 ```
-createPlan(data) → Plan
-getPlan(plan_id) → Plan
-listPlans(options?) → PaginatedResult<Plan>
-updatePlan(plan_id, data) → Plan
-archivePlan(plan_id) → Plan
-getPlanFeatures(plan_id) → Feature[]
-comparePlans(plan_ids) → PlanComparison
+createPlan(data: any) → Plan
+getPlan(plan_id: any) → Plan
+listPlans(options?: any) → PaginatedResult<Plan>
+updatePlan(plan_id: any, data: any) → Plan
+archivePlan(plan_id: any) → Plan
+getPlanFeatures(plan_id: any) → Feature[]
+comparePlans(plan_ids: any) → PlanComparison
 ```
 
 **Types**

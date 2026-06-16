@@ -9,11 +9,11 @@ Request throttling and quota enforcement.
 
 **Functions**
 ```
-checkLimit(key, limit, window) → RateLimitResult
-consumeToken(key, limit, window, cost?) → RateLimitResult
-resetLimit(key) → void
-getLimitStatus(key) → LimitStatus
-setCustomLimit(key, limit, window) → void
+checkLimit(key: string, limit: number, window: any) → RateLimitResult
+consumeToken(key: string, limit: number, window: any, cost?: any) → RateLimitResult
+resetLimit(key: string) → void
+getLimitStatus(key: string) → LimitStatus
+setCustomLimit(key: string, limit: number, window: any) → void
 ```
 
 **Types**

@@ -9,14 +9,14 @@ Treasury cash accounts, balances, account movements, and internal treasury contr
 
 **Functions**
 ```
-createTreasuryAccount(name, currency, metadata?) → TreasuryAccount
-getTreasuryAccount(account_id) → TreasuryAccount
-listTreasuryAccounts(input, options?) → PaginatedResult<TreasuryAccount>
-postTreasuryMovement(account_id, movement) → TreasuryMovement
-getTreasuryMovements(account_id, options?) → PaginatedResult<TreasuryMovement>
-freezeTreasuryAccount(account_id, reason) → TreasuryAccount
-unfreezeTreasuryAccount(account_id) → TreasuryAccount
-setTreasuryLimit(account_id, limits) → TreasuryLimit
+createTreasuryAccount(name: string, currency: any, metadata?: any) → TreasuryAccount
+getTreasuryAccount(account_id: any) → TreasuryAccount
+listTreasuryAccounts(input: any, options?: any) → PaginatedResult<TreasuryAccount>
+postTreasuryMovement(account_id: any, movement: any) → TreasuryMovement
+getTreasuryMovements(account_id: any, options?: any) → PaginatedResult<TreasuryMovement>
+freezeTreasuryAccount(account_id: any, reason: any) → TreasuryAccount
+unfreezeTreasuryAccount(account_id: any) → TreasuryAccount
+setTreasuryLimit(account_id: any, limits: any) → TreasuryLimit
 ```
 
 **Types**

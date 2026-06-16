@@ -9,15 +9,15 @@ Isolated test environment provisioning with seeding, expiry, and reset.
 
 **Functions**
 ```
-provisionSandbox(user_id, template, options?) → Sandbox
-getSandbox(sandbox_id) → Sandbox
-listSandboxes(user_id?) → Sandbox[]
-resetSandbox(sandbox_id) → void
-seedSandbox(sandbox_id, seed_data) → void
-extendSandbox(sandbox_id, duration) → void
-expireSandbox(sandbox_id) → void
-getSandboxUsage(sandbox_id) → UsageReport
-validateSandboxCredentials(sandbox_id) → CredentialValidationResult
+provisionSandbox(user_id: any, template: any, options?: any) → Sandbox
+getSandbox(sandbox_id: any) → Sandbox
+listSandboxes(user_id?: any) → Sandbox[]
+resetSandbox(sandbox_id: any) → void
+seedSandbox(sandbox_id: any, seed_data: any) → void
+extendSandbox(sandbox_id: any, duration: any) → void
+expireSandbox(sandbox_id: any) → void
+getSandboxUsage(sandbox_id: any) → UsageReport
+validateSandboxCredentials(sandbox_id: any) → CredentialValidationResult
 ```
 
 **Types**

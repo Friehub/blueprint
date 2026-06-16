@@ -9,15 +9,15 @@ Stock tracking with reservation lifecycle.
 
 **Functions**
 ```
-getStockLevel(variant_id, location_id?) → StockLevel
-getStockLevels(variant_ids) → StockLevel[]
-reserveStock(variant_id, quantity, order_id) → StockReservation
-releaseStock(reservation_token) → void
-confirmStock(reservation_token) → void
-updateStockOnHand(variant_id, quantity, location_id?) → void
-adjustStock(variant_id, delta, reason) → StockAdjustment
-getStockHistory(variant_id) → StockAdjustment[]
-getLowStockAlerts(threshold?) → StockLevel[]
+getStockLevel(variant_id: any, location_id?: any) → StockLevel
+getStockLevels(variant_ids: any) → StockLevel[]
+reserveStock(variant_id: any, quantity: number, order_id: any) → StockReservation
+releaseStock(reservation_token: any) → void
+confirmStock(reservation_token: any) → void
+updateStockOnHand(variant_id: any, quantity: number, location_id?: any) → void
+adjustStock(variant_id: any, delta: any, reason: any) → StockAdjustment
+getStockHistory(variant_id: any) → StockAdjustment[]
+getLowStockAlerts(threshold?: any) → StockLevel[]
 ```
 
 **Types**

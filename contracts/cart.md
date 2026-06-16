@@ -9,16 +9,16 @@ Session-based shopping cart.
 
 **Functions**
 ```
-getCart(cart_id) → Cart
-createCart(user_id?) → Cart
-addToCart(cart_id, variant_id, quantity) → CartItem
-updateCartItem(cart_id, item_id, quantity) → CartItem
-removeCartItem(cart_id, item_id) → void
-clearCart(cart_id) → void
-applyCoupon(cart_id, code) → Cart
-removeCoupon(cart_id) → Cart
-getCartTotal(cart_id, context?) → CartTotal
-mergeCart(anonymous_cart_id, user_cart_id) → Cart
+getCart(cart_id: any) → Cart
+createCart(user_id?: any) → Cart
+addToCart(cart_id: any, variant_id: any, quantity: number) → CartItem
+updateCartItem(cart_id: any, item_id: any, quantity: number) → CartItem
+removeCartItem(cart_id: any, item_id: any) → void
+clearCart(cart_id: any) → void
+applyCoupon(cart_id: any, code: any) → Cart
+removeCoupon(cart_id: any) → Cart
+getCartTotal(cart_id: any, context?: any) → CartTotal
+mergeCart(anonymous_cart_id: any, user_cart_id: any) → Cart
 ```
 
 **Types**

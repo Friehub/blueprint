@@ -9,11 +9,11 @@ Schema validation, type coercion, and environment override resolution for config
 
 **Functions**
 ```
-registerSchema(name, schema) → void
-getSchema(name) → ConfigSchema?
-validateConfig(name, values) → ValidationResult
-coerceType(value, target_type) → CoercionResult
-resolveConfig(name, env_overrides?) → ResolvedConfig
+registerSchema(name: string, schema: any) → void
+getSchema(name: string) → ConfigSchema?
+validateConfig(name: string, values: any) → ValidationResult
+coerceType(value: any, target_type: any) → CoercionResult
+resolveConfig(name: string, env_overrides?: any) → ResolvedConfig
 listSchemas() → SchemaRef[]
 ```
 

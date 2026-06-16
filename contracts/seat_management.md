@@ -9,13 +9,13 @@ Licensing seat allocation, assignment, transfer, and release for SaaS accounts.
 
 **Functions**
 ```
-assignSeat(account_id, user_id, seat_type?) → SeatAssignment
-releaseSeat(account_id, user_id) → void
-transferSeat(account_id, from_user_id, to_user_id) → SeatAssignment
-listSeats(account_id, options?) → PaginatedResult<SeatAssignment>
-getSeatUsage(account_id) → SeatUsage
-setSeatLimit(account_id, seat_type, limit) → SeatPolicy
-getSeatPolicy(account_id) → SeatPolicy
+assignSeat(account_id: any, user_id: any, seat_type?: any) → SeatAssignment
+releaseSeat(account_id: any, user_id: any) → void
+transferSeat(account_id: any, from_user_id: any, to_user_id: any) → SeatAssignment
+listSeats(account_id: any, options?: any) → PaginatedResult<SeatAssignment>
+getSeatUsage(account_id: any) → SeatUsage
+setSeatLimit(account_id: any, seat_type: any, limit: number) → SeatPolicy
+getSeatPolicy(account_id: any) → SeatPolicy
 ```
 
 **Types**

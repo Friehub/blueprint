@@ -9,13 +9,13 @@ Client SDK generation from API specifications with registry publishing and versi
 
 **Functions**
 ```
-generateSDK(spec, language, options?) → SDKPackage
-getSDK(sdk_id) → SDKPackage
-listSDKs(language?) → SDKPackage[]
-publishSDK(sdk_id, registry) → PublishResult
-versionSDK(sdk_id, version) → SDKPackage
-getSDKUsage(sdk_id) → UsageStats
-deprecateSDK(sdk_id, reason) → void
+generateSDK(spec: any, language: any, options?: any) → SDKPackage
+getSDK(sdk_id: any) → SDKPackage
+listSDKs(language?: any) → SDKPackage[]
+publishSDK(sdk_id: any, registry: any) → PublishResult
+versionSDK(sdk_id: any, version: any) → SDKPackage
+getSDKUsage(sdk_id: any) → UsageStats
+deprecateSDK(sdk_id: any, reason: any) → void
 ```
 
 **Types**

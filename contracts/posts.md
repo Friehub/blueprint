@@ -9,15 +9,15 @@ User-generated content publishing.
 
 **Functions**
 ```
-createPost(author_id, content, options?) → Post
-getPost(post_id) → Post
-updatePost(post_id, content) → Post
-deletePost(post_id) → void
-getFeed(user_id, options?) → PaginatedResult<FeedItem>
-getPostsByUser(user_id, options?) → PaginatedResult<Post>
-pinPost(post_id) → void
-unpinPost(post_id) → void
-moderatePost(post_id, decision, reason?) → Post
+createPost(author_id: any, content: string, options?: any) → Post
+getPost(post_id: any) → Post
+updatePost(post_id: any, content: string) → Post
+deletePost(post_id: any) → void
+getFeed(user_id: any, options?: any) → PaginatedResult<FeedItem>
+getPostsByUser(user_id: any, options?: any) → PaginatedResult<Post>
+pinPost(post_id: any) → void
+unpinPost(post_id: any) → void
+moderatePost(post_id: any, decision: any, reason?: any) → Post
 ```
 
 **Types**

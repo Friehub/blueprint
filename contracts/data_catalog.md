@@ -9,15 +9,15 @@ Dataset registration with schema description, lineage tracking, and governance t
 
 **Functions**
 ```
-registerDataset(name, metadata) → Dataset
-getDataset(dataset_id) → Dataset
-listDatasets(tag?, domain?) → Dataset[]
-updateDataset(dataset_id, changes) → Dataset
-addLineage(dataset_id, upstream, downstream) → void
-getLineage(dataset_id) → LineageGraph
-tagDataset(dataset_id, tags) → void
-searchDatasets(query) → DatasetSearchResult[]
-archiveDataset(dataset_id, reason) → void
+registerDataset(name: string, metadata: any) → Dataset
+getDataset(dataset_id: any) → Dataset
+listDatasets(tag?: any, domain?: any) → Dataset[]
+updateDataset(dataset_id: any, changes: any) → Dataset
+addLineage(dataset_id: any, upstream: any, downstream: any) → void
+getLineage(dataset_id: any) → LineageGraph
+tagDataset(dataset_id: any, tags: string[]) → void
+searchDatasets(query: any) → DatasetSearchResult[]
+archiveDataset(dataset_id: any, reason: any) → void
 ```
 
 **Types**

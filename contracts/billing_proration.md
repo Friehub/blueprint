@@ -9,13 +9,13 @@ Mid-cycle plan change credit and charge calculation. Computes prorated amounts w
 
 **Functions**
 ```
-calculateProration(user_id, from_plan_id, to_plan_id, effective_at) → ProrationResult
-applyProration(proration_id) → ProrationCredit
-getProration(proration_id) → ProrationCredit
-listProrations(user_id, options?) → PaginatedResult<ProrationCredit>
-voidProration(proration_id, reason) → void
-getProrationPolicy(plan_id) → ProrationPolicy
-setProrationPolicy(plan_id, policy) → void
+calculateProration(user_id: any, from_plan_id: any, to_plan_id: any, effective_at: any) → ProrationResult
+applyProration(proration_id: any) → ProrationCredit
+getProration(proration_id: any) → ProrationCredit
+listProrations(user_id: any, options?: any) → PaginatedResult<ProrationCredit>
+voidProration(proration_id: any, reason: any) → void
+getProrationPolicy(plan_id: any) → ProrationPolicy
+setProrationPolicy(plan_id: any, policy: any) → void
 ```
 
 **Types**

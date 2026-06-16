@@ -9,14 +9,14 @@ Database sharding, replication, and cross-region topology configuration.
 
 **Functions**
 ```
-configureSharding(table, strategy, key) → ShardingConfig
-getShard(key) → Shard
+configureSharding(table: any, strategy: any, key: string) → ShardingConfig
+getShard(key: string) → Shard
 listShards() → Shard[]
-addShard(shard_config) → Shard
-removeShard(shard_id) → void
-configureReplication(table, model, options?) → ReplicationConfig
+addShard(shard_config: any) → Shard
+removeShard(shard_id: any) → void
+configureReplication(table: any, model: any, options?: any) → ReplicationConfig
 getReplicationLag() → ReplicationReport
-configureFailover(mode, options?) → FailoverConfig
+configureFailover(mode: any, options?: any) → FailoverConfig
 triggerFailover() → FailoverResult
 ```
 

@@ -9,11 +9,11 @@ Emoji/like reactions on any entity.
 
 **Functions**
 ```
-addReaction(user_id, subject_type, subject_id, type) → Reaction
-removeReaction(user_id, subject_type, subject_id, type) → void
-getReactions(subject_type, subject_id) → ReactionSummary
-getUserReaction(user_id, subject_type, subject_id) → Reaction?
-getTopReacted(subject_type, options?) → ReactionLeaderboard
+addReaction(user_id: any, subject_type: any, subject_id: any, type: string) → Reaction
+removeReaction(user_id: any, subject_type: any, subject_id: any, type: string) → void
+getReactions(subject_type: any, subject_id: any) → ReactionSummary
+getUserReaction(user_id: any, subject_type: any, subject_id: any) → Reaction?
+getTopReacted(subject_type: any, options?: any) → ReactionLeaderboard
 ```
 
 **Types**

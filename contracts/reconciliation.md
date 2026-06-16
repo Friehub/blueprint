@@ -9,13 +9,13 @@ Matching and discrepancy resolution across financial, operational, and ledger-ba
 
 **Functions**
 ```
-createReconciliationRun(input) → ReconciliationRun
-getReconciliationRun(run_id) → ReconciliationRun
-listReconciliationRuns(input) → PaginatedResult<ReconciliationRun>
-getDiscrepancies(run_id, options?) → PaginatedResult<Discrepancy>
-resolveDiscrepancy(discrepancy_id, resolution) → Discrepancy
-retryRun(run_id) → ReconciliationRun
-closeRun(run_id) → ReconciliationRun
+createReconciliationRun(input: any) → ReconciliationRun
+getReconciliationRun(run_id: any) → ReconciliationRun
+listReconciliationRuns(input: any) → PaginatedResult<ReconciliationRun>
+getDiscrepancies(run_id: any, options?: any) → PaginatedResult<Discrepancy>
+resolveDiscrepancy(discrepancy_id: any, resolution: any) → Discrepancy
+retryRun(run_id: any) → ReconciliationRun
+closeRun(run_id: any) → ReconciliationRun
 ```
 
 **Types**

@@ -9,14 +9,14 @@ Customer invoice generation, issue, delivery, payment application, and credit no
 
 **Functions**
 ```
-createInvoice(customer_id, line_items, currency, due_at?, metadata?) → Invoice
-issueInvoice(invoice_id) → Invoice
-sendInvoice(invoice_id, channel?) → DeliveryResult
-getInvoice(invoice_id) → Invoice
-listInvoices(input, options?) → PaginatedResult<Invoice>
-recordInvoicePayment(invoice_id, payment_reference, amount, paid_at?) → Invoice
-voidInvoice(invoice_id, reason) → Invoice
-createCreditNote(invoice_id, adjustments, reason) → CreditNote
+createInvoice(customer_id: any, line_items: any, currency: any, due_at?: any, metadata?: any) → Invoice
+issueInvoice(invoice_id: any) → Invoice
+sendInvoice(invoice_id: any, channel?: any) → DeliveryResult
+getInvoice(invoice_id: any) → Invoice
+listInvoices(input: any, options?: any) → PaginatedResult<Invoice>
+recordInvoicePayment(invoice_id: any, payment_reference: any, amount: number, paid_at?: any) → Invoice
+voidInvoice(invoice_id: any, reason: any) → Invoice
+createCreditNote(invoice_id: any, adjustments: any, reason: any) → CreditNote
 ```
 
 **Types**

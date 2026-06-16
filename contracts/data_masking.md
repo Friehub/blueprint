@@ -9,15 +9,15 @@ PII obfuscation with anonymization, tokenization, and context-aware redaction.
 
 **Functions**
 ```
-maskField(value, strategy) → MaskedValue
-maskDocument(document, rules) → MaskedDocument
-tokenize(value, context) → Token
-detokenize(token, context) → OriginalValue
-anonymize(value, strategy) → AnonymizedValue
-registerMaskingRule(name, config) → MaskingRule
-listMaskingRules(data_type?) → MaskingRule[]
-redactLog(log_entry, rules) → RedactedEntry
-scanForPii(document_or_schema) → PiiClassification[]
+maskField(value: any, strategy: any) → MaskedValue
+maskDocument(document: any, rules: any) → MaskedDocument
+tokenize(value: any, context: any) → Token
+detokenize(token: any, context: any) → OriginalValue
+anonymize(value: any, strategy: any) → AnonymizedValue
+registerMaskingRule(name: string, config: any) → MaskingRule
+listMaskingRules(data_type?: any) → MaskingRule[]
+redactLog(log_entry: any, rules: any) → RedactedEntry
+scanForPii(document_or_schema: any) → PiiClassification[]
 ```
 
 **Types**

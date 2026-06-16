@@ -9,12 +9,12 @@ Cross-instance mutual exclusion with fencing tokens and lease management.
 
 **Functions**
 ```
-acquire(lock_name, ttl) → Lock
-tryAcquire(lock_name, ttl) → Lock?
-release(lock_token) → void
-extend(lock_token, ttl) → void
-getLockStatus(lock_name) → LockStatus?
-forceRelease(lock_name) → void
+acquire(lock_name: any, ttl: any) → Lock
+tryAcquire(lock_name: any, ttl: any) → Lock?
+release(lock_token: any) → void
+extend(lock_token: any, ttl: any) → void
+getLockStatus(lock_name: any) → LockStatus?
+forceRelease(lock_name: any) → void
 ```
 
 **Types**

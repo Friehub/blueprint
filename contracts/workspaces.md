@@ -9,10 +9,10 @@ Multi-member workspace structures, collaborative resource partitioning, and orga
 
 **Functions**
 ```
-createWorkspace(name, owner_id) → Workspace
-addWorkspaceMember(workspace_id, user_id, role) → WorkspaceMember
-removeWorkspaceMember(workspace_id, user_id) → void
-getWorkspaceResources(workspace_id) → WorkspaceResources
+createWorkspace(name: string, owner_id: any) → Workspace
+addWorkspaceMember(workspace_id: any, user_id: any, role: any) → WorkspaceMember
+removeWorkspaceMember(workspace_id: any, user_id: any) → void
+getWorkspaceResources(workspace_id: any) → WorkspaceResources
 ```
 
 **Types**

@@ -9,14 +9,14 @@ File attachment lifecycle, linking, preview metadata, and retention management a
 
 **Functions**
 ```
-createAttachment(owner_id, file_ref, metadata?) → Attachment
-getAttachment(attachment_id) → Attachment
-listAttachments(input, options?) → PaginatedResult<Attachment>
-linkAttachment(attachment_id, entity_ref) → AttachmentLink
-unlinkAttachment(attachment_id, entity_ref) → void
-deleteAttachment(attachment_id) → void
-createPreview(attachment_id, options?) → AttachmentPreview
-getPreview(attachment_id) → AttachmentPreview?
+createAttachment(owner_id: any, file_ref: any, metadata?: any) → Attachment
+getAttachment(attachment_id: any) → Attachment
+listAttachments(input: any, options?: any) → PaginatedResult<Attachment>
+linkAttachment(attachment_id: any, entity_ref: any) → AttachmentLink
+unlinkAttachment(attachment_id: any, entity_ref: any) → void
+deleteAttachment(attachment_id: any) → void
+createPreview(attachment_id: any, options?: any) → AttachmentPreview
+getPreview(attachment_id: any) → AttachmentPreview?
 ```
 
 **Types**

@@ -9,14 +9,14 @@ Usage-based billing for metered resources (API calls, storage, compute, seats). 
 
 **Functions**
 ```
-recordUsage(usage) → UsageRecord
-getUsage(user_id, metric, period) → AggregatedUsage
-getBillableUsage(user_id, period) → BillableUsage[]
-createMeteredPlan(name, metrics, pricing) → MeteredPlan
-updateMeteredPlan(plan_id, changes) → MeteredPlan
+recordUsage(usage: any) → UsageRecord
+getUsage(user_id: any, metric: any, period: any) → AggregatedUsage
+getBillableUsage(user_id: any, period: any) → BillableUsage[]
+createMeteredPlan(name: string, metrics: any, pricing: any) → MeteredPlan
+updateMeteredPlan(plan_id: any, changes: any) → MeteredPlan
 listMeteredPlans() → MeteredPlan[]
-getUsageAlerts(user_id) → UsageAlert[]
-setUsageAlert(user_id, metric, threshold) → UsageAlert
+getUsageAlerts(user_id: any) → UsageAlert[]
+setUsageAlert(user_id: any, metric: any, threshold: any) → UsageAlert
 ```
 
 **Types**

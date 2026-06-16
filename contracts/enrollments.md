@@ -9,15 +9,15 @@ Student enrollment lifecycle, progress tracking, and completion records.
 
 **Functions**
 ```
-enrollStudent(course_id, student_id, cohort_id?) → Enrollment
-getEnrollment(enrollment_id) → Enrollment
-getEnrollmentByCourseAndStudent(course_id, student_id) → Enrollment?
-listEnrollments(input, options?) → PaginatedResult<Enrollment>
-updateProgress(enrollment_id, progress) → Enrollment
-completeLesson(enrollment_id, lesson_id) → Enrollment
-completeCourse(enrollment_id) → Enrollment
-withdrawEnrollment(enrollment_id, reason?) → Enrollment
-issueCertificate(enrollment_id) → Certificate
+enrollStudent(course_id: any, student_id: any, cohort_id?: any) → Enrollment
+getEnrollment(enrollment_id: any) → Enrollment
+getEnrollmentByCourseAndStudent(course_id: any, student_id: any) → Enrollment?
+listEnrollments(input: any, options?: any) → PaginatedResult<Enrollment>
+updateProgress(enrollment_id: any, progress: any) → Enrollment
+completeLesson(enrollment_id: any, lesson_id: any) → Enrollment
+completeCourse(enrollment_id: any) → Enrollment
+withdrawEnrollment(enrollment_id: any, reason?: any) → Enrollment
+issueCertificate(enrollment_id: any) → Certificate
 ```
 
 **Types**

@@ -9,11 +9,11 @@ Access entitlement and content gating separate from billing.
 
 **Functions**
 ```
-getEntitlements(user_id) → Entitlement[]
-hasAccess(user_id, resource_id) → boolean
-grantEntitlement(user_id, entitlement_type, expires_at?) → Entitlement
-revokeEntitlement(user_id, entitlement_type) → void
-getAccessHistory(user_id, resource_id) → AccessEvent[]
+getEntitlements(user_id: any) → Entitlement[]
+hasAccess(user_id: any, resource_id: any) → boolean
+grantEntitlement(user_id: any, entitlement_type: any, expires_at?: any) → Entitlement
+revokeEntitlement(user_id: any, entitlement_type: any) → void
+getAccessHistory(user_id: any, resource_id: any) → AccessEvent[]
 ```
 
 **Types**

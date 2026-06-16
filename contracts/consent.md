@@ -9,14 +9,14 @@ Privacy consent and GDPR compliance.
 
 **Functions**
 ```
-recordConsent(user_id, purposes, version) → ConsentRecord
-getConsent(user_id) → ConsentRecord?
-withdrawConsent(user_id, purposes?) → void
-hasConsented(user_id, purpose) → boolean
-getConsentHistory(user_id) → ConsentRecord[]
-exportUserData(user_id) → DataExportJob
-deleteUserData(user_id) → DataDeletionJob
-getJob(job_id) → ExportOrDeletionJob
+recordConsent(user_id: any, purposes: any, version: any) → ConsentRecord
+getConsent(user_id: any) → ConsentRecord?
+withdrawConsent(user_id: any, purposes?: any) → void
+hasConsented(user_id: any, purpose: any) → boolean
+getConsentHistory(user_id: any) → ConsentRecord[]
+exportUserData(user_id: any) → DataExportJob
+deleteUserData(user_id: any) → DataDeletionJob
+getJob(job_id: any) → ExportOrDeletionJob
 ```
 
 **Types**

@@ -9,15 +9,15 @@ Policy-driven data lifecycle management with automated purge and compliance logg
 
 **Functions**
 ```
-definePolicy(name, config) → RetentionPolicy
-getPolicy(policy_id) → RetentionPolicy
-listPolicies(scope?) → RetentionPolicy[]
-updatePolicy(policy_id, changes) → RetentionPolicy
-deletePolicy(policy_id) → void
-runPurge(policy_id?) → PurgeResult
-previewPurge(policy_id) → PurgePreview
-getPurgeHistory(policy_id, options?) → PaginatedResult<PurgeRecord>
-exportBeforePurge(policy_id, destination) → ExportResult
+definePolicy(name: string, config: any) → RetentionPolicy
+getPolicy(policy_id: any) → RetentionPolicy
+listPolicies(scope?: any) → RetentionPolicy[]
+updatePolicy(policy_id: any, changes: any) → RetentionPolicy
+deletePolicy(policy_id: any) → void
+runPurge(policy_id?: any) → PurgeResult
+previewPurge(policy_id: any) → PurgePreview
+getPurgeHistory(policy_id: any, options?: any) → PaginatedResult<PurgeRecord>
+exportBeforePurge(policy_id: any, destination: any) → ExportResult
 ```
 
 **Types**

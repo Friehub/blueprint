@@ -9,13 +9,13 @@ GraphQL schema definition, resolver contracts, and subscription management with 
 
 **Functions**
 ```
-defineSchema(type_defs) → GraphQLSchema
-defineResolver(type_name, field_name, resolver) → ResolverDefinition
-createDataLoader(batch_fn, options?) → DataLoader
-executeQuery(query, variables?, context?) → ExecutionResult
-executeMutation(query, variables?, context?) → ExecutionResult
-createSubscription(subscription_def, handler) → Subscription
-publishSubscription(topic, payload) → void
+defineSchema(type_defs: any) → GraphQLSchema
+defineResolver(type_name: any, field_name: any, resolver: any) → ResolverDefinition
+createDataLoader(batch_fn: any, options?: any) → DataLoader
+executeQuery(query: any, variables?: any, context?: any) → ExecutionResult
+executeMutation(query: any, variables?: any, context?: any) → ExecutionResult
+createSubscription(subscription_def: any, handler: Function) → Subscription
+publishSubscription(topic: any, payload: any) → void
 ```
 
 **Types**

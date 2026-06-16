@@ -9,15 +9,15 @@ Know Your Customer identity verification.
 
 **Functions**
 ```
-submitVerification(user_id, documents, data) → VerificationRequest
-getVerification(request_id) → VerificationRequest
-getUserVerification(user_id) → VerificationRequest?
-getVerificationStatus(user_id) → VerificationStatus
-updateVerification(request_id, data) → VerificationRequest
-rejectVerification(request_id, reason) → VerificationRequest
-approveVerification(request_id) → VerificationRequest
-listPendingVerifications(options?) → PaginatedResult<VerificationRequest>
-expireVerification(request_id) → VerificationRequest
+submitVerification(user_id: any, documents: any, data: any) → VerificationRequest
+getVerification(request_id: any) → VerificationRequest
+getUserVerification(user_id: any) → VerificationRequest?
+getVerificationStatus(user_id: any) → VerificationStatus
+updateVerification(request_id: any, data: any) → VerificationRequest
+rejectVerification(request_id: any, reason: any) → VerificationRequest
+approveVerification(request_id: any) → VerificationRequest
+listPendingVerifications(options?: any) → PaginatedResult<VerificationRequest>
+expireVerification(request_id: any) → VerificationRequest
 ```
 
 **Types**

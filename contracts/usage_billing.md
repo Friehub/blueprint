@@ -9,13 +9,13 @@ Usage aggregation, billable metric conversion, and metered charge creation for S
 
 **Functions**
 ```
-recordUsage(account_id, metric, value, occurred_at?, metadata?) → UsageRecord
-getUsage(account_id, metric, options?) → PaginatedResult<UsageRecord>
-aggregateUsage(account_id, period, metric?) → UsageSummary
-createUsageCharge(account_id, period, metadata?) → UsageCharge
-finalizeUsageCharge(charge_id) → UsageCharge
-adjustUsageCharge(charge_id, adjustment) → UsageCharge
-closeUsagePeriod(account_id, period) → UsagePeriod
+recordUsage(account_id: any, metric: any, value: any, occurred_at?: any, metadata?: any) → UsageRecord
+getUsage(account_id: any, metric: any, options?: any) → PaginatedResult<UsageRecord>
+aggregateUsage(account_id: any, period: any, metric?: any) → UsageSummary
+createUsageCharge(account_id: any, period: any, metadata?: any) → UsageCharge
+finalizeUsageCharge(charge_id: any) → UsageCharge
+adjustUsageCharge(charge_id: any, adjustment: any) → UsageCharge
+closeUsagePeriod(account_id: any, period: any) → UsagePeriod
 ```
 
 **Types**

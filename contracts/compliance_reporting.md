@@ -9,14 +9,14 @@ Automated compliance report generation with evidence mapping and export.
 
 **Functions**
 ```
-defineReport(template_name, framework) → ReportTemplate
-generateReport(template_id, period) → ComplianceReport
-getReport(report_id) → ComplianceReport
-listReports(framework?) → ComplianceReport[]
-mapControl(control_id, evidence_source) → ControlMapping
-getEvidence(control_id, period) → EvidenceBundle
-exportReport(report_id, format) → ExportResult
-scheduleReport(template_id, cadence) → ScheduledReport
+defineReport(template_name: any, framework: any) → ReportTemplate
+generateReport(template_id: any, period: any) → ComplianceReport
+getReport(report_id: any) → ComplianceReport
+listReports(framework?: any) → ComplianceReport[]
+mapControl(control_id: any, evidence_source: any) → ControlMapping
+getEvidence(control_id: any, period: any) → EvidenceBundle
+exportReport(report_id: any, format: string) → ExportResult
+scheduleReport(template_id: any, cadence: any) → ScheduledReport
 ```
 
 **Types**

@@ -9,14 +9,14 @@ Shipment creation and tracking.
 
 **Functions**
 ```
-getRates(origin, destination, parcels) → ShippingRate[]
-createShipment(order_id, rate_id, parcels) → Shipment
-getShipment(shipment_id) → Shipment
-trackShipment(tracking_number, carrier?) → TrackingResult
-cancelShipment(shipment_id) → void
-createLabel(shipment_id) → ShippingLabel
-getLabel(shipment_id) → ShippingLabel
-validateAddress(address) → AddressValidation
+getRates(origin: any, destination: any, parcels: any) → ShippingRate[]
+createShipment(order_id: any, rate_id: any, parcels: any) → Shipment
+getShipment(shipment_id: any) → Shipment
+trackShipment(tracking_number: any, carrier?: any) → TrackingResult
+cancelShipment(shipment_id: any) → void
+createLabel(shipment_id: any) → ShippingLabel
+getLabel(shipment_id: any) → ShippingLabel
+validateAddress(address: any) → AddressValidation
 ```
 
 **Types**

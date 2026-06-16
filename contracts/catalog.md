@@ -10,27 +10,27 @@ This module also owns product pricing rules and bundles.
 
 **Functions**
 ```
-getProduct(product_id) → Product
-getProducts(ids) → Product[]
-searchProducts(query, options?) → PaginatedResult<Product>
-createProduct(data) → Product
-updateProduct(product_id, data) → Product
-archiveProduct(product_id) → void
-getVariant(variant_id) → Variant
-getVariantsByProduct(product_id) → Variant[]
-createVariant(product_id, data) → Variant
-updateVariant(variant_id, data) → Variant
-getPricing(variant_id, context?) → Price
-createPricingRule(product_id, rule) → PricingRule
-getPricingRule(rule_id) → PricingRule
-listPricingRules(product_id, options?) → PaginatedResult<PricingRule>
-updatePricingRule(rule_id, data) → PricingRule
-archivePricingRule(rule_id) → PricingRule
-createBundle(data) → Bundle
-getBundle(bundle_id) → Bundle
-listBundles(input, options?) → PaginatedResult<Bundle>
-updateBundle(bundle_id, data) → Bundle
-archiveBundle(bundle_id) → Bundle
+getProduct(product_id: any) → Product
+getProducts(ids: any) → Product[]
+searchProducts(query: any, options?: any) → PaginatedResult<Product>
+createProduct(data: any) → Product
+updateProduct(product_id: any, data: any) → Product
+archiveProduct(product_id: any) → void
+getVariant(variant_id: any) → Variant
+getVariantsByProduct(product_id: any) → Variant[]
+createVariant(product_id: any, data: any) → Variant
+updateVariant(variant_id: any, data: any) → Variant
+getPricing(variant_id: any, context?: any) → Price
+createPricingRule(product_id: any, rule: any) → PricingRule
+getPricingRule(rule_id: any) → PricingRule
+listPricingRules(product_id: any, options?: any) → PaginatedResult<PricingRule>
+updatePricingRule(rule_id: any, data: any) → PricingRule
+archivePricingRule(rule_id: any) → PricingRule
+createBundle(data: any) → Bundle
+getBundle(bundle_id: any) → Bundle
+listBundles(input: any, options?: any) → PaginatedResult<Bundle>
+updateBundle(bundle_id: any, data: any) → Bundle
+archiveBundle(bundle_id: any) → Bundle
 ```
 
 **Types**

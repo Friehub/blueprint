@@ -9,16 +9,16 @@ Database change streaming with operation filtering, schema evolution, and replay
 
 **Functions**
 ```
-configureCDC(table, config) → CDCStream
-getCDCStream(stream_id) → CDCStream
+configureCDC(table: any, config: any) → CDCStream
+getCDCStream(stream_id: any) → CDCStream
 listCDCStreams() → CDCStream[]
-startStream(stream_id) → void
-stopStream(stream_id) → void
-getChanges(stream_id, options?) → ChangeEvent[]
-filterOperations(stream_id, operations) → void
-getStreamLag(stream_id) → LagInfo
-replayChanges(stream_id, from_lsn) → ReplayResult
-handleSchemaChange(stream_id, schema_change) → void
+startStream(stream_id: any) → void
+stopStream(stream_id: any) → void
+getChanges(stream_id: any, options?: any) → ChangeEvent[]
+filterOperations(stream_id: any, operations: any) → void
+getStreamLag(stream_id: any) → LagInfo
+replayChanges(stream_id: any, from_lsn: any) → ReplayResult
+handleSchemaChange(stream_id: any, schema_change: any) → void
 ```
 
 **Types**

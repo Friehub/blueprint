@@ -9,15 +9,15 @@ Time-based job scheduling with cron expressions and execution history.
 
 **Functions**
 ```
-createSchedule(name, cron_expression, action, options?) → Schedule
-getSchedule(schedule_id) → Schedule
-listSchedules(options?) → PaginatedResult<Schedule>
-pauseSchedule(schedule_id) → void
-resumeSchedule(schedule_id) → void
-triggerManually(schedule_id) → Execution
-updateSchedule(schedule_id, changes) → Schedule
-deleteSchedule(schedule_id) → void
-getExecutionHistory(schedule_id, options?) → PaginatedResult<Execution>
+createSchedule(name: string, cron_expression: any, action: any, options?: any) → Schedule
+getSchedule(schedule_id: any) → Schedule
+listSchedules(options?: any) → PaginatedResult<Schedule>
+pauseSchedule(schedule_id: any) → void
+resumeSchedule(schedule_id: any) → void
+triggerManually(schedule_id: any) → Execution
+updateSchedule(schedule_id: any, changes: any) → Schedule
+deleteSchedule(schedule_id: any) → void
+getExecutionHistory(schedule_id: any, options?: any) → PaginatedResult<Execution>
 ```
 
 **Types**

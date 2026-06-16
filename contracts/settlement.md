@@ -9,14 +9,14 @@ Clearing, batching, and final settlement of financial transactions between proce
 
 **Functions**
 ```
-createSettlementBatch(source, period) → SettlementBatch
-getSettlementBatch(batch_id) → SettlementBatch
-listSettlementBatches(input, options?) → PaginatedResult<SettlementBatch>
-addSettlementItem(batch_id, item) → SettlementItem
-closeSettlementBatch(batch_id) → SettlementBatch
-confirmSettlement(batch_id, reference, settled_at?) → SettlementBatch
-failSettlement(batch_id, reason) → SettlementBatch
-reconcileBatch(batch_id) → SettlementBatch
+createSettlementBatch(source: string, period: any) → SettlementBatch
+getSettlementBatch(batch_id: any) → SettlementBatch
+listSettlementBatches(input: any, options?: any) → PaginatedResult<SettlementBatch>
+addSettlementItem(batch_id: any, item: any) → SettlementItem
+closeSettlementBatch(batch_id: any) → SettlementBatch
+confirmSettlement(batch_id: any, reference: any, settled_at?: any) → SettlementBatch
+failSettlement(batch_id: any, reason: any) → SettlementBatch
+reconcileBatch(batch_id: any) → SettlementBatch
 ```
 
 **Types**

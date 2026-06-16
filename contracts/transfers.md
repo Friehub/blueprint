@@ -10,14 +10,14 @@ This module also owns inbound bank transfer intake and matching.
 
 **Functions**
 ```
-initiateTransfer(source_account_id, dest_account_id, amount, routing_details) → Transfer
-getTransfer(transfer_id) → Transfer
-transitionTransferStatus(transfer_id, status, error_details?) → Transfer
-registerCounterparty(details) → Counterparty
-recordInboundTransfer(dest_account_id, amount, routing_details, external_reference, metadata?) → InboundTransfer
-getInboundTransfer(inbound_transfer_id) → InboundTransfer
-listInboundTransfers(input, options?) → PaginatedResult<InboundTransfer>
-confirmInboundTransfer(inbound_transfer_id) → InboundTransfer
+initiateTransfer(source_account_id: any, dest_account_id: any, amount: number, routing_details: any) → Transfer
+getTransfer(transfer_id: any) → Transfer
+transitionTransferStatus(transfer_id: any, status: string, error_details?: any) → Transfer
+registerCounterparty(details: any) → Counterparty
+recordInboundTransfer(dest_account_id: any, amount: number, routing_details: any, external_reference: any, metadata?: any) → InboundTransfer
+getInboundTransfer(inbound_transfer_id: any) → InboundTransfer
+listInboundTransfers(input: any, options?: any) → PaginatedResult<InboundTransfer>
+confirmInboundTransfer(inbound_transfer_id: any) → InboundTransfer
 ```
 
 **Types**

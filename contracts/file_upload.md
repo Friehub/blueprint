@@ -9,15 +9,15 @@ File upload pipeline with chunked uploads, virus scanning, CDN invalidation, and
 
 **Functions**
 ```
-initiateUpload(file_info, options?) → UploadSession
-uploadChunk(session_id, chunk_index, data) → ChunkResult
-completeUpload(session_id) → FileAsset
-cancelUpload(session_id) → void
-getUploadSession(session_id) → UploadSession
-getSignedUrl(file_id, operation, expires_in) → SignedUrl
-requestVirusScan(file_id) → ScanResult
-invalidateCdn(file_id, paths?) → void
-deleteFile(file_id, options?) → void
+initiateUpload(file_info: any, options?: any) → UploadSession
+uploadChunk(session_id: any, chunk_index: any, data: any) → ChunkResult
+completeUpload(session_id: any) → FileAsset
+cancelUpload(session_id: any) → void
+getUploadSession(session_id: any) → UploadSession
+getSignedUrl(file_id: any, operation: any, expires_in: any) → SignedUrl
+requestVirusScan(file_id: any) → ScanResult
+invalidateCdn(file_id: any, paths?: any) → void
+deleteFile(file_id: any, options?: any) → void
 ```
 
 **Types**

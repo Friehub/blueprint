@@ -9,15 +9,15 @@ Real-time stream transformation with window aggregation and output sinks.
 
 **Functions**
 ```
-defineStream(name, source, config) → Stream
-getStream(stream_id) → Stream
+defineStream(name: string, source: string, config: any) → Stream
+getStream(stream_id: any) → Stream
 listStreams() → Stream[]
-startStream(stream_id) → void
-stopStream(stream_id) → void
-applyTransformation(stream_id, transform) → void
-addSink(stream_id, sink_config) → void
-getStreamMetrics(stream_id) → StreamMetrics
-getLag(stream_id) → LagReport
+startStream(stream_id: any) → void
+stopStream(stream_id: any) → void
+applyTransformation(stream_id: any, transform: any) → void
+addSink(stream_id: any, sink_config: any) → void
+getStreamMetrics(stream_id: any) → StreamMetrics
+getLag(stream_id: any) → LagReport
 ```
 
 **Types**

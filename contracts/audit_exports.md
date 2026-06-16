@@ -9,11 +9,11 @@ Scheduled and on-demand export of audit and compliance records.
 
 **Functions**
 ```
-createExportJob(filters, format, requested_by) → ExportJob
-getExportJob(job_id) → ExportJob
-listExportJobs(input, options?) → PaginatedResult<ExportJob>
-cancelExportJob(job_id) → ExportJob
-downloadExport(job_id) → SignedUrl
+createExportJob(filters: any, format: string, requested_by: any) → ExportJob
+getExportJob(job_id: any) → ExportJob
+listExportJobs(input: any, options?: any) → PaginatedResult<ExportJob>
+cancelExportJob(job_id: any) → ExportJob
+downloadExport(job_id: any) → SignedUrl
 ```
 
 **Types**

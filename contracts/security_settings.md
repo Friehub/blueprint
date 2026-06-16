@@ -9,14 +9,14 @@ Account security preferences such as two-factor authentication, trusted devices,
 
 **Functions**
 ```
-getSecuritySettings(user_id) → SecuritySettings
-enableTwoFactor(user_id, method, options?) → SecuritySettings
-disableTwoFactor(user_id, verification) → SecuritySettings
-generateRecoveryCodes(user_id) → RecoveryCodes
-revokeRecoveryCode(user_id, code) → void
-listTrustedDevices(user_id, options?) → PaginatedResult<TrustedDevice>
-revokeTrustedDevice(user_id, device_id) → void
-setLoginAlerts(user_id, enabled) → SecuritySettings
+getSecuritySettings(user_id: any) → SecuritySettings
+enableTwoFactor(user_id: any, method: any, options?: any) → SecuritySettings
+disableTwoFactor(user_id: any, verification: any) → SecuritySettings
+generateRecoveryCodes(user_id: any) → RecoveryCodes
+revokeRecoveryCode(user_id: any, code: any) → void
+listTrustedDevices(user_id: any, options?: any) → PaginatedResult<TrustedDevice>
+revokeTrustedDevice(user_id: any, device_id: any) → void
+setLoginAlerts(user_id: any, enabled: boolean) → SecuritySettings
 ```
 
 **Types**

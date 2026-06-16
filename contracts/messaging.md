@@ -9,17 +9,17 @@ Threaded conversation between users or entities.
 
 **Functions**
 ```
-createThread(participants, metadata?) → Thread
-getThread(thread_id) → Thread
-getThreads(user_id, options?) → PaginatedResult<Thread>
-sendMessage(thread_id, sender_id, content, reply_to_id?, attachments?, client_id?) → Message
-getMessages(thread_id, options?) → PaginatedResult<Message>
-editMessage(message_id, content) → Message
-deleteMessage(message_id) → void
-markRead(thread_id, user_id) → void
-getUnreadCount(user_id) → number
-addParticipant(thread_id, user_id) → void
-removeParticipant(thread_id, user_id) → void
+createThread(participants: any, metadata?: any) → Thread
+getThread(thread_id: any) → Thread
+getThreads(user_id: any, options?: any) → PaginatedResult<Thread>
+sendMessage(thread_id: any, sender_id: any, content: string, reply_to_id?: any, attachments?: any, client_id?: any) → Message
+getMessages(thread_id: any, options?: any) → PaginatedResult<Message>
+editMessage(message_id: any, content: string) → Message
+deleteMessage(message_id: any) → void
+markRead(thread_id: any, user_id: any) → void
+getUnreadCount(user_id: any) → number
+addParticipant(thread_id: any, user_id: any) → void
+removeParticipant(thread_id: any, user_id: any) → void
 ```
 
 **Types**

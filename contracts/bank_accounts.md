@@ -9,13 +9,13 @@ External bank account linking, verification, masking, and payout destination man
 
 **Functions**
 ```
-linkBankAccount(owner_id, account_details) → BankAccount
-getBankAccount(bank_account_id) → BankAccount
-listBankAccounts(owner_id, options?) → PaginatedResult<BankAccount>
-verifyBankAccount(bank_account_id, verification_data) → BankAccount
-setDefaultBankAccount(owner_id, bank_account_id) → BankAccount
-disableBankAccount(bank_account_id, reason) → BankAccount
-getVerificationStatus(bank_account_id) → VerificationStatus
+linkBankAccount(owner_id: any, account_details: any) → BankAccount
+getBankAccount(bank_account_id: any) → BankAccount
+listBankAccounts(owner_id: any, options?: any) → PaginatedResult<BankAccount>
+verifyBankAccount(bank_account_id: any, verification_data: any) → BankAccount
+setDefaultBankAccount(owner_id: any, bank_account_id: any) → BankAccount
+disableBankAccount(bank_account_id: any, reason: any) → BankAccount
+getVerificationStatus(bank_account_id: any) → VerificationStatus
 ```
 
 **Types**

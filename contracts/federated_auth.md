@@ -9,15 +9,15 @@ Federated identity management with OAuth 2.0, OpenID Connect, and SAML provider 
 
 **Functions**
 ```
-connectIdentity(user_id, provider, code) → ConnectedIdentity
-disconnectIdentity(user_id, provider) → void
-getConnectedIdentities(user_id) → ConnectedIdentity[]
-getIdentity(provider, provider_account_id) → UserMapping?
-getProviderConfig(provider) → ProviderConfig
+connectIdentity(user_id: any, provider: any, code: any) → ConnectedIdentity
+disconnectIdentity(user_id: any, provider: any) → void
+getConnectedIdentities(user_id: any) → ConnectedIdentity[]
+getIdentity(provider: any, provider_account_id: any) → UserMapping?
+getProviderConfig(provider: any) → ProviderConfig
 listConfiguredProviders() → ProviderConfig[]
-handleSamlAssertion(provider, saml_response) → Session
-initiateOAuth(provider, redirect_uri) → AuthorizationUrl
-refreshProviderToken(user_id, provider) → void
+handleSamlAssertion(provider: any, saml_response: any) → Session
+initiateOAuth(provider: any, redirect_uri: any) → AuthorizationUrl
+refreshProviderToken(user_id: any, provider: any) → void
 ```
 
 **Types**

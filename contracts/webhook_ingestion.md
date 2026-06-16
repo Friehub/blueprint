@@ -9,13 +9,13 @@ Incoming webhook ingestion — signature verification, deduplication, ordering, 
 
 **Functions**
 ```
-ingestWebhook(provider, raw_body, headers) → IngestedEvent
-verifySignature(provider, raw_body, signature, secret) → VerificationResult
-deduplicateEvent(provider_event_id, provider) → DedupResult
-getIngestedEvent(event_id) → IngestedEvent
-listIngestedEvents(provider, options?) → PaginatedResult<IngestedEvent>
-reprocessEvent(event_id) → IngestedEvent
-getProviderConfig(provider) → ProviderConfig
+ingestWebhook(provider: any, raw_body: any, headers: any) → IngestedEvent
+verifySignature(provider: any, raw_body: any, signature: any, secret: any) → VerificationResult
+deduplicateEvent(provider_event_id: any, provider: any) → DedupResult
+getIngestedEvent(event_id: any) → IngestedEvent
+listIngestedEvents(provider: any, options?: any) → PaginatedResult<IngestedEvent>
+reprocessEvent(event_id: any) → IngestedEvent
+getProviderConfig(provider: any) → ProviderConfig
 ```
 
 **Types**

@@ -9,13 +9,13 @@ One-to-many message broadcast with channel filtering, delivery confirmation, and
 
 **Functions**
 ```
-createBroadcast(channel, content, options?) → BroadcastMessage
-sendBroadcast(broadcast_id) → SendResult
-scheduleBroadcast(broadcast_id, send_at) → void
-getBroadcast(broadcast_id) → BroadcastMessage
-listBroadcasts(channel?, status?) → BroadcastMessage[]
-getDeliveryStatus(broadcast_id) → DeliveryReport
-cancelBroadcast(broadcast_id) → void
+createBroadcast(channel: any, content: string, options?: any) → BroadcastMessage
+sendBroadcast(broadcast_id: any) → SendResult
+scheduleBroadcast(broadcast_id: any, send_at: any) → void
+getBroadcast(broadcast_id: any) → BroadcastMessage
+listBroadcasts(channel?: any, status?: string) → BroadcastMessage[]
+getDeliveryStatus(broadcast_id: any) → DeliveryReport
+cancelBroadcast(broadcast_id: any) → void
 ```
 
 **Types**

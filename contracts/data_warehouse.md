@@ -9,15 +9,15 @@ Analytics table and view management with query execution, partitioning, and cost
 
 **Functions**
 ```
-createTable(name, schema, options?) → Table
-getTable(table_name) → Table
-listTables(schema?) → Table[]
-createView(name, query, options?) → View
-runQuery(sql, options?) → QueryResult
-getQueryHistory(options?) → PaginatedResult<QueryRecord>
-addPartition(table_name, partition_def) → void
+createTable(name: string, schema: any, options?: any) → Table
+getTable(table_name: any) → Table
+listTables(schema?: any) → Table[]
+createView(name: string, query: any, options?: any) → View
+runQuery(sql: any, options?: any) → QueryResult
+getQueryHistory(options?: any) → PaginatedResult<QueryRecord>
+addPartition(table_name: any, partition_def: any) → void
 getStorageUsage() → StorageReport
-setQueryBudget(project, budget) → void
+setQueryBudget(project: any, budget: any) → void
 ```
 
 **Types**

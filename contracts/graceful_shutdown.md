@@ -9,11 +9,11 @@ Ordered service shutdown with in-flight request draining and resource lifecycle 
 
 **Functions**
 ```
-registerShutdownHook(name, handler, phase) → ShutdownHook
-deregisterShutdownHook(hook_id) → void
-initiateShutdown(reason) → ShutdownSequence
+registerShutdownHook(name: string, handler: Function, phase: any) → ShutdownHook
+deregisterShutdownHook(hook_id: any) → void
+initiateShutdown(reason: any) → ShutdownSequence
 getShutdownStatus() → ShutdownStatus
-setShutdownTimeout(timeout_ms) → void
+setShutdownTimeout(timeout_ms: any) → void
 getInFlightRequests() → number
 ```
 

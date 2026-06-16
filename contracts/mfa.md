@@ -9,22 +9,22 @@ Multi-factor authentication methods: TOTP, SMS/email OTP, hardware security keys
 
 **Functions**
 ```
-setupTotp(user_id) → TotpSetup
-verifyTotp(user_id, code) → boolean
-setupSmsOtp(phone) → void
-sendSmsOtp(phone) → void
-verifySmsOtp(phone, code) → boolean
-setupEmailOtp(email) → void
-sendEmailOtp(email) → void
-verifyEmailOtp(email, code) → boolean
-setupFido2(user_id, challenge) → Fido2Registration
-verifyFido2(user_id, credential_id, assertion) → boolean
-generateBackupCodes(user_id) → BackupCode[]
-verifyBackupCode(user_id, code) → boolean
-getMFAStatus(user_id) → MFAStatus
-disableMFA(user_id, method) → void
-disableAllMFA(user_id) → void
-listMFAMethods(user_id) → MFAMethod[]
+setupTotp(user_id: any) → TotpSetup
+verifyTotp(user_id: any, code: any) → boolean
+setupSmsOtp(phone: any) → void
+sendSmsOtp(phone: any) → void
+verifySmsOtp(phone: any, code: any) → boolean
+setupEmailOtp(email: string) → void
+sendEmailOtp(email: string) → void
+verifyEmailOtp(email: string, code: any) → boolean
+setupFido2(user_id: any, challenge: any) → Fido2Registration
+verifyFido2(user_id: any, credential_id: any, assertion: any) → boolean
+generateBackupCodes(user_id: any) → BackupCode[]
+verifyBackupCode(user_id: any, code: any) → boolean
+getMFAStatus(user_id: any) → MFAStatus
+disableMFA(user_id: any, method: any) → void
+disableAllMFA(user_id: any) → void
+listMFAMethods(user_id: any) → MFAMethod[]
 ```
 
 **Types**

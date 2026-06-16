@@ -9,14 +9,14 @@ Transactional email with template management.
 
 **Functions**
 ```
-sendTransactional(to, template_id, variables, options?) → DeliveryResult
-sendBulk(recipients, template_id, variables) → BulkDeliveryResult
-createTemplate(name, subject, html, text?) → EmailTemplate
-updateTemplate(template_id, data) → EmailTemplate
-getTemplate(template_id) → EmailTemplate
+sendTransactional(to: any, template_id: any, variables: any, options?: any) → DeliveryResult
+sendBulk(recipients: any, template_id: any, variables: any) → BulkDeliveryResult
+createTemplate(name: string, subject: any, html: any, text?: any) → EmailTemplate
+updateTemplate(template_id: any, data: any) → EmailTemplate
+getTemplate(template_id: any) → EmailTemplate
 listTemplates() → EmailTemplate[]
-getDeliveryStatus(message_id) → DeliveryStatus
-getDeliveryEvents(message_id) → DeliveryEvent[]
+getDeliveryStatus(message_id: any) → DeliveryStatus
+getDeliveryEvents(message_id: any) → DeliveryEvent[]
 ```
 
 **Types**

@@ -9,13 +9,13 @@ Failure isolation for external service calls with automated recovery.
 
 **Functions**
 ```
-getState(breaker_name) → BreakerState
-trip(breaker_name, reason) → void
-recordSuccess(breaker_name) → void
-recordFailure(breaker_name) → void
-reset(breaker_name) → void
-getMetrics(breaker_name) → BreakerMetrics
-registerBreaker(name, config) → void
+getState(breaker_name: any) → BreakerState
+trip(breaker_name: any, reason: any) → void
+recordSuccess(breaker_name: any) → void
+recordFailure(breaker_name: any) → void
+reset(breaker_name: any) → void
+getMetrics(breaker_name: any) → BreakerMetrics
+registerBreaker(name: string, config: any) → void
 ```
 
 **Types**

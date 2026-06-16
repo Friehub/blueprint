@@ -9,15 +9,15 @@ File and object storage.
 
 **Functions**
 ```
-uploadFile(bucket, key, content, options?) → FileObject
-downloadFile(bucket, key) → FileStream
-deleteFile(bucket, key) → void
-getSignedUrl(bucket, key, expires_in) → SignedUrl
-getSignedUploadUrl(bucket, key, options?) → SignedUrl
-listFiles(bucket, prefix?, options?) → PaginatedResult<FileObject>
-moveFile(source_bucket, source_key, dest_bucket, dest_key) → FileObject
-copyFile(source_bucket, source_key, dest_bucket, dest_key) → FileObject
-getMetadata(bucket, key) → FileMetadata
+uploadFile(bucket: any, key: string, content: string, options?: any) → FileObject
+downloadFile(bucket: any, key: string) → FileStream
+deleteFile(bucket: any, key: string) → void
+getSignedUrl(bucket: any, key: string, expires_in: any) → SignedUrl
+getSignedUploadUrl(bucket: any, key: string, options?: any) → SignedUrl
+listFiles(bucket: any, prefix?: any, options?: any) → PaginatedResult<FileObject>
+moveFile(source_bucket: any, source_key: any, dest_bucket: any, dest_key: any) → FileObject
+copyFile(source_bucket: any, source_key: any, dest_bucket: any, dest_key: any) → FileObject
+getMetadata(bucket: any, key: string) → FileMetadata
 ```
 
 **Types**
