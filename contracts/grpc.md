@@ -12,10 +12,10 @@ gRPC service definition, streaming RPCs, and interceptor middleware with deadlin
 defineService(name: string, methods: any) → ServiceDefinition
 defineMethod(name: string, request_type: any, response_type: any, rpc_type: any) → MethodDefinition
 createServer(services: any, options?: any) → GrpcServer
-createClient(service_def: any, address: any, options?: any) → GrpcClient
+createClient(service_def: any, address: string, options?: any) → GrpcClient
 startServer(server: any, port: any) → void
 addInterceptor(interceptor: any, phase: any) → void
-setDeadline(timeout: any) → void
+setDeadline(timeout: number) → void
 healthCheck() → ServingStatus
 ```
 

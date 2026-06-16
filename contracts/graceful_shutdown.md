@@ -11,7 +11,7 @@ Ordered service shutdown with in-flight request draining and resource lifecycle 
 ```
 registerShutdownHook(name: string, handler: Function, phase: any) → ShutdownHook
 deregisterShutdownHook(hook_id: any) → void
-initiateShutdown(reason: any) → ShutdownSequence
+initiateShutdown(reason: string) → ShutdownSequence
 getShutdownStatus() → ShutdownStatus
 setShutdownTimeout(timeout_ms: any) → void
 getInFlightRequests() → number

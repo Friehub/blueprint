@@ -10,7 +10,7 @@ Failure isolation for external service calls with automated recovery.
 **Functions**
 ```
 getState(breaker_name: any) → BreakerState
-trip(breaker_name: any, reason: any) → void
+trip(breaker_name: any, reason: string) → void
 recordSuccess(breaker_name: any) → void
 recordFailure(breaker_name: any) → void
 reset(breaker_name: any) → void

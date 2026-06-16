@@ -13,7 +13,7 @@ send(to: any, body: any, sender_id?: any, options?: any) → DeliveryResult
 sendBulk(recipients: any, body: any) → BulkDeliveryResult
 getDeliveryStatus(message_id: any) → DeliveryStatus
 getBalance() → SMSBalance
-lookupNumber(phone: any) → NumberLookup
+lookupNumber(phone: string) → NumberLookup
 ```
 
 **Types**

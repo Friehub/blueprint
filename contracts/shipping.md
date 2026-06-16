@@ -16,7 +16,7 @@ trackShipment(tracking_number: any, carrier?: any) → TrackingResult
 cancelShipment(shipment_id: any) → void
 createLabel(shipment_id: any) → ShippingLabel
 getLabel(shipment_id: any) → ShippingLabel
-validateAddress(address: any) → AddressValidation
+validateAddress(address: string) → AddressValidation
 ```
 
 **Types**

@@ -9,11 +9,11 @@ PII obfuscation with anonymization, tokenization, and context-aware redaction.
 
 **Functions**
 ```
-maskField(value: any, strategy: any) → MaskedValue
+maskField(value: any, strategy: string) → MaskedValue
 maskDocument(document: any, rules: any) → MaskedDocument
 tokenize(value: any, context: any) → Token
-detokenize(token: any, context: any) → OriginalValue
-anonymize(value: any, strategy: any) → AnonymizedValue
+detokenize(token: string, context: any) → OriginalValue
+anonymize(value: any, strategy: string) → AnonymizedValue
 registerMaskingRule(name: string, config: any) → MaskingRule
 listMaskingRules(data_type?: any) → MaskingRule[]
 redactLog(log_entry: any, rules: any) → RedactedEntry

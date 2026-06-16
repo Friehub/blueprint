@@ -15,7 +15,7 @@ createDataLoader(batch_fn: any, options?: any) → DataLoader
 executeQuery(query: any, variables?: any, context?: any) → ExecutionResult
 executeMutation(query: any, variables?: any, context?: any) → ExecutionResult
 createSubscription(subscription_def: any, handler: Function) → Subscription
-publishSubscription(topic: any, payload: any) → void
+publishSubscription(topic: string, payload: any) → void
 ```
 
 **Types**

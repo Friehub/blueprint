@@ -9,13 +9,13 @@ Periodic access reviews, approval workflows, and stale access revocation.
 
 **Functions**
 ```
-createReview(name: string, scope: any, reviewers: any) → AccessReview
+createReview(name: string, scope: string, reviewers: any) → AccessReview
 getReview(review_id: any) → AccessReview
 listReviews(status?: string, scope?: any) → AccessReview[]
-submitDecision(review_id: any, grant_id: any, decision: any, reason: any) → ReviewDecision
+submitDecision(review_id: any, grant_id: any, decision: any, reason: string) → ReviewDecision
 completeReview(review_id: any) → ReviewResult
 revokeStaleAccess(review_id: any) → RevocationResult
-scheduleRecurringReview(name: string, scope: any, config: any) → RecurringReview
+scheduleRecurringReview(name: string, scope: string, config: any) → RecurringReview
 getReviewHistory(user_id: any) → ReviewHistoryEntry[]
 ```
 

@@ -15,7 +15,7 @@ rollback(steps?: any, options?: any) → MigrationResult
 getStatus() → MigrationStatus
 getHistory(options?: any) → PaginatedResult<MigrationRecord>
 validateDrift() → DriftReport
-baseline(version: any) → void
+baseline(version: number) → void
 lockMigrations() → void
 unlockMigrations() → void
 ```

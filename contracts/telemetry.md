@@ -17,7 +17,7 @@ incrementCounter(name: string, value?: any, attributes?: any) → void
 recordHistogram(name: string, value: any, attributes?: any) → void
 setGauge(name: string, value: any, attributes?: any) → void
 setLogLevel(level: any) → void
-log(level: any, message: any, context?: any) → void
+log(level: any, message: string, context?: any) → void
 ```
 
 **Types**

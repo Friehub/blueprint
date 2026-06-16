@@ -9,7 +9,7 @@ Financial double-entry bookkeeping engine for immutable multi-currency transacti
 
 **Functions**
 ```
-createLedger(name: string, currency: any) → Ledger
+createLedger(name: string, currency: string) → Ledger
 createAccount(ledger_id: any, type: string, name?: string) → LedgerAccount
 postTransaction(postings: any, reference: any, metadata?: any) → LedgerTransaction
 getAccountBalance(account_id: any, timestamp?: string) → LedgerBalance

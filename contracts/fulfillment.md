@@ -16,7 +16,7 @@ assignWarehouse(fulfillment_id: any, warehouse_id: any) → Fulfillment
 markPacked(fulfillment_id: any, metadata?: any) → Fulfillment
 markShipped(fulfillment_id: any, tracking_number: any, carrier?: any) → Fulfillment
 markDelivered(fulfillment_id: any, delivered_at?: any) → Fulfillment
-cancelFulfillment(fulfillment_id: any, reason: any) → Fulfillment
+cancelFulfillment(fulfillment_id: any, reason: string) → Fulfillment
 ```
 
 **Types**

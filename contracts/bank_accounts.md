@@ -14,7 +14,7 @@ getBankAccount(bank_account_id: any) → BankAccount
 listBankAccounts(owner_id: any, options?: any) → PaginatedResult<BankAccount>
 verifyBankAccount(bank_account_id: any, verification_data: any) → BankAccount
 setDefaultBankAccount(owner_id: any, bank_account_id: any) → BankAccount
-disableBankAccount(bank_account_id: any, reason: any) → BankAccount
+disableBankAccount(bank_account_id: any, reason: string) → BankAccount
 getVerificationStatus(bank_account_id: any) → VerificationStatus
 ```
 

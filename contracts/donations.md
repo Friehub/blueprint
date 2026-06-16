@@ -12,7 +12,7 @@ Charitable giving and campaign management.
 createCampaign(data: any) → Campaign
 getCampaign(campaign_id: any) → Campaign
 listCampaigns(filters?: any) → PaginatedResult<Campaign>
-donate(campaign_id: any, donor_id: any, amount: number, currency: any, method: any) → Donation
+donate(campaign_id: any, donor_id: any, amount: number, currency: string, method: any) → Donation
 getDonation(donation_id: any) → Donation
 getDonationsByCampaign(campaign_id: any, options?: any) → PaginatedResult<Donation>
 getCampaignStats(campaign_id: any) → CampaignStats

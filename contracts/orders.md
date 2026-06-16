@@ -17,8 +17,8 @@ getPackagesByOrder(order_id: any) → OrderPackage[]
 getOrderLinesByPackage(package_id: any) → OrderLine[]
 transitionOrderStatus(order_id: any, status: string, metadata?: any) → Order
 transitionPackageStatus(package_id: any, status: string, metadata?: any) → OrderPackage
-cancelOrder(order_id: any, reason: any) → Order
-requestReturn(order_id: any, lines: any, reason: any) → ReturnRequest
+cancelOrder(order_id: any, reason: string) → Order
+requestReturn(order_id: any, lines: any, reason: string) → ReturnRequest
 approveReturn(return_id: any) → ReturnRequest
 ```
 

@@ -13,7 +13,7 @@ getSecuritySettings(user_id: any) → SecuritySettings
 enableTwoFactor(user_id: any, method: any, options?: any) → SecuritySettings
 disableTwoFactor(user_id: any, verification: any) → SecuritySettings
 generateRecoveryCodes(user_id: any) → RecoveryCodes
-revokeRecoveryCode(user_id: any, code: any) → void
+revokeRecoveryCode(user_id: any, code: string) → void
 listTrustedDevices(user_id: any, options?: any) → PaginatedResult<TrustedDevice>
 revokeTrustedDevice(user_id: any, device_id: any) → void
 setLoginAlerts(user_id: any, enabled: boolean) → SecuritySettings

@@ -11,7 +11,7 @@ Internal capacity management with priority queuing and admission control.
 ```
 admitRequest(request: any) → AdmissionDecision
 getCapacity(workload: any) → CapacityStatus
-setPriority(source: string, priority: any) → void
+setPriority(source: string, priority: number) → void
 getSheddingStatus() → SheddingStatus
 setSloBudget(workload: any, budget: any) → void
 getSloBudget(workload: any) → SloBudget

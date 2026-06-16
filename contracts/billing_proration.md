@@ -13,7 +13,7 @@ calculateProration(user_id: any, from_plan_id: any, to_plan_id: any, effective_a
 applyProration(proration_id: any) → ProrationCredit
 getProration(proration_id: any) → ProrationCredit
 listProrations(user_id: any, options?: any) → PaginatedResult<ProrationCredit>
-voidProration(proration_id: any, reason: any) → void
+voidProration(proration_id: any, reason: string) → void
 getProrationPolicy(plan_id: any) → ProrationPolicy
 setProrationPolicy(plan_id: any, policy: any) → void
 ```

@@ -9,7 +9,7 @@ Federated identity management with OAuth 2.0, OpenID Connect, and SAML provider 
 
 **Functions**
 ```
-connectIdentity(user_id: any, provider: any, code: any) → ConnectedIdentity
+connectIdentity(user_id: any, provider: any, code: string) → ConnectedIdentity
 disconnectIdentity(user_id: any, provider: any) → void
 getConnectedIdentities(user_id: any) → ConnectedIdentity[]
 getIdentity(provider: any, provider_account_id: any) → UserMapping?

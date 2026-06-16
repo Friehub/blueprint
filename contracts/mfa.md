@@ -10,17 +10,17 @@ Multi-factor authentication methods: TOTP, SMS/email OTP, hardware security keys
 **Functions**
 ```
 setupTotp(user_id: any) → TotpSetup
-verifyTotp(user_id: any, code: any) → boolean
-setupSmsOtp(phone: any) → void
-sendSmsOtp(phone: any) → void
-verifySmsOtp(phone: any, code: any) → boolean
+verifyTotp(user_id: any, code: string) → boolean
+setupSmsOtp(phone: string) → void
+sendSmsOtp(phone: string) → void
+verifySmsOtp(phone: string, code: string) → boolean
 setupEmailOtp(email: string) → void
 sendEmailOtp(email: string) → void
-verifyEmailOtp(email: string, code: any) → boolean
+verifyEmailOtp(email: string, code: string) → boolean
 setupFido2(user_id: any, challenge: any) → Fido2Registration
 verifyFido2(user_id: any, credential_id: any, assertion: any) → boolean
 generateBackupCodes(user_id: any) → BackupCode[]
-verifyBackupCode(user_id: any, code: any) → boolean
+verifyBackupCode(user_id: any, code: string) → boolean
 getMFAStatus(user_id: any) → MFAStatus
 disableMFA(user_id: any, method: any) → void
 disableAllMFA(user_id: any) → void

@@ -13,7 +13,7 @@ getAvailability(provider_id: any, date_range: any) → Slot[]
 bookAppointment(patient_id: any, provider_id: any, slot_id: any, data: any) → Appointment
 getAppointment(appointment_id: any) → Appointment
 getAppointmentsByUser(user_id: any, options?: any) → PaginatedResult<Appointment>
-cancelAppointment(appointment_id: any, reason: any) → Appointment
+cancelAppointment(appointment_id: any, reason: string) → Appointment
 rescheduleAppointment(appointment_id: any, slot_id: any) → Appointment
 confirmAppointment(appointment_id: any) → Appointment
 getWaitlist(provider_id: any, service_id: any) → WaitlistEntry[]

@@ -13,11 +13,11 @@ createTenant(name: string, owner_id: any, plan_id?: any) → Tenant
 getTenant(tenant_id: any) → Tenant
 getTenantBySlug(slug: string) → Tenant?
 updateTenant(tenant_id: any, data: any) → Tenant
-suspendTenant(tenant_id: any, reason: any) → Tenant
+suspendTenant(tenant_id: any, reason: string) → Tenant
 reactivateTenant(tenant_id: any) → Tenant
 deleteTenant(tenant_id: any) → void
 getTenantMembers(tenant_id: any) → TenantMember[]
-inviteMember(tenant_id: any, email: string, role: any) → TenantInvite
+inviteMember(tenant_id: any, email: string, role: string) → TenantInvite
 removeMember(tenant_id: any, user_id: any) → void
 getTenantConfig(tenant_id: any) → TenantConfig
 updateTenantConfig(tenant_id: any, config: any) → TenantConfig

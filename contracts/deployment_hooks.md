@@ -12,7 +12,7 @@ Pre-deploy health verification, post-deploy smoke testing, rollback trigger, and
 registerHook(name: string, hook_type: any, action: any) → Hook
 runPreDeployChecks(deployment_id: any) → PreDeployResult
 runPostDeploySmoke(deployment_id: any) → SmokeResult
-triggerRollback(deployment_id: any, reason: any) → RollbackResult
+triggerRollback(deployment_id: any, reason: string) → RollbackResult
 getDeploymentStatus(deployment_id: any) → DeploymentStatus
 getHookHistory(deployment_id?: any) → PaginatedResult<HookExecution>
 ```

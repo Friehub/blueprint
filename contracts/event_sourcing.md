@@ -15,7 +15,7 @@ readStream(stream_id: any, options?: any) → EventRecord[]
 readStreamFrom(stream_id: any, after_version: any, options?: any) → EventRecord[]
 buildProjection(projection_name: any, handler: Function, options?: any) → Projection
 rebuildProjection(projection_id: any) → void
-createSnapshot(stream_id: any, version: any) → Snapshot
+createSnapshot(stream_id: any, version: number) → Snapshot
 getSnapshot(stream_id: any) → Snapshot?
 subscribeToStream(stream_id: any, handler: Function) → Subscription
 ```

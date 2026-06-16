@@ -9,14 +9,14 @@ Fine-grained access control with RBAC and ABAC support.
 
 **Functions**
 ```
-can(user_id: any, action: any, resource: any, context?: any) → boolean
-canAll(user_id: any, actions: any, resource: any, context?: any) → boolean
-canAny(user_id: any, actions: any, resource: any, context?: any) → boolean
+can(user_id: any, action: any, resource: string, context?: any) → boolean
+canAll(user_id: any, actions: any, resource: string, context?: any) → boolean
+canAny(user_id: any, actions: any, resource: string, context?: any) → boolean
 batchCheckPermission(user_id: any, checks[]: any, context?: any) → boolean[]
-grantPermission(user_id: any, action: any, resource: any) → void
-revokePermission(user_id: any, action: any, resource: any) → void
-denyPermission(user_id: any, action: any, resource: any, reason?: any) → void
-revokeDeny(user_id: any, action: any, resource: any) → void
+grantPermission(user_id: any, action: any, resource: string) → void
+revokePermission(user_id: any, action: any, resource: string) → void
+denyPermission(user_id: any, action: any, resource: string, reason?: any) → void
+revokeDeny(user_id: any, action: any, resource: string) → void
 getPermissions(user_id: any) → Permission[]
 createRole(name: string, permissions: any) → Role
 assignRole(user_id: any, role_id: any) → void

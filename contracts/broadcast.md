@@ -9,7 +9,7 @@ One-to-many message broadcast with channel filtering, delivery confirmation, and
 
 **Functions**
 ```
-createBroadcast(channel: any, content: string, options?: any) → BroadcastMessage
+createBroadcast(channel: string, content: string, options?: any) → BroadcastMessage
 sendBroadcast(broadcast_id: any) → SendResult
 scheduleBroadcast(broadcast_id: any, send_at: any) → void
 getBroadcast(broadcast_id: any) → BroadcastMessage

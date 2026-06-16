@@ -9,11 +9,11 @@ Return authorization, inspection, disposition, and refund coordination for comme
 
 **Functions**
 ```
-requestReturn(order_id: any, items: any[], reason: any, metadata?: any) → ReturnAuthorization
+requestReturn(order_id: any, items: any[], reason: string, metadata?: any) → ReturnAuthorization
 getReturn(return_id: any) → ReturnAuthorization
 listReturns(input: any, options?: any) → PaginatedResult<ReturnAuthorization>
 approveReturn(return_id: any) → ReturnAuthorization
-rejectReturn(return_id: any, reason: any) → ReturnAuthorization
+rejectReturn(return_id: any, reason: string) → ReturnAuthorization
 receiveReturn(return_id: any, received_items: any, metadata?: any) → ReturnAuthorization
 inspectReturn(return_id: any, disposition: any) → ReturnAuthorization
 closeReturn(return_id: any) → ReturnAuthorization

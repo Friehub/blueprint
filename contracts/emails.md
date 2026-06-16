@@ -11,7 +11,7 @@ Transactional email with template management.
 ```
 sendTransactional(to: any, template_id: any, variables: any, options?: any) → DeliveryResult
 sendBulk(recipients: any, template_id: any, variables: any) → BulkDeliveryResult
-createTemplate(name: string, subject: any, html: any, text?: any) → EmailTemplate
+createTemplate(name: string, subject: string, html: string, text?: any) → EmailTemplate
 updateTemplate(template_id: any, data: any) → EmailTemplate
 getTemplate(template_id: any) → EmailTemplate
 listTemplates() → EmailTemplate[]

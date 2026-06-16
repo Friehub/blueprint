@@ -14,8 +14,8 @@ validateField(value: any, rules: any) → FieldResult
 sanitizeForSql(input: any) → SanitizedInput
 sanitizeForShell(input: any) → SanitizedInput
 sanitizeForHtml(input: any) → SanitizedInput
-getMaxPayloadSize(endpoint: any) → number
-setMaxPayloadSize(endpoint: any, bytes: any) → void
+getMaxPayloadSize(endpoint: string) → number
+setMaxPayloadSize(endpoint: string, bytes: any) → void
 ```
 
 **Types**

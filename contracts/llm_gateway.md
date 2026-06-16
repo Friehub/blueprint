@@ -13,7 +13,7 @@ chat(messages: any, options?: any) → ChatResponse
 chatStream(messages: any, options?: any) → AsyncIterator<ChatChunk>
 getModels() → Model[]
 getModelInfo(model: any) → ModelInfo
-countTokens(text: any) → TokenCount
+countTokens(text: string) → TokenCount
 estimateCost(model: any, input_tokens: any, output_tokens: any) → CostEstimate
 abortRequest(request_id: any) → void
 ```

@@ -12,15 +12,15 @@ Risk scoring for transactions and user actions.
 scoreTransaction(transaction: any, context: any) → RiskScore
 scoreSignUp(data: any, context: any) → RiskScore
 scoreLogin(user_id: any, context: any) → RiskScore
-reportFraud(transaction_id: any, reason: any) → FraudReport
-blockEntity(entity_type: any, entity_id: any, reason: any, options?: any) → void
+reportFraud(transaction_id: any, reason: string) → FraudReport
+blockEntity(entity_type: any, entity_id: any, reason: string, options?: any) → void
 unblockEntity(entity_type: any, entity_id: any) → void
 isBlocked(entity_type: any, entity_id: any) → boolean
 getRiskHistory(entity_type: any, entity_id: any) → RiskScore[]
 submitFeedback(entity_type: any, entity_id: any, outcome: any, metadata: any) → FeedbackEvent
 getFeedbackHistory(entity_type: any, entity_id: any) → FeedbackEvent[]
-requestBlockReview(entity_type: any, entity_id: any, reason: any) → BlockReview
-resolveBlockReview(review_id: any, decision: any, reason: any) → void
+requestBlockReview(entity_type: any, entity_id: any, reason: string) → BlockReview
+resolveBlockReview(review_id: any, decision: any, reason: string) → void
 ```
 
 **Types**

@@ -9,7 +9,7 @@ Outbound event delivery to external endpoints.
 
 **Functions**
 ```
-registerEndpoint(url: string, events: any, secret: any, metadata?: any) → WebhookEndpoint
+registerEndpoint(url: string, events: any, secret: string, metadata?: any) → WebhookEndpoint
 updateEndpoint(endpoint_id: any, data: any) → WebhookEndpoint
 removeEndpoint(endpoint_id: any) → void
 listEndpoints(owner_id: any) → WebhookEndpoint[]

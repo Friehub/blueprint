@@ -14,7 +14,7 @@ indexBulk(index: any, documents: any) → BulkIndexResult
 removeDocument(index: any, id: string) → void
 search(index: any, query: any, options?: any) → SearchResult
 multiSearch(queries: any) → SearchResult[][]
-suggest(index: any, partial: any, field: any, options?: any) → Suggestion[]
+suggest(index: any, partial: any, field: string, options?: any) → Suggestion[]
 reindex(index: any) → ReindexJob
 getIndexStats(index: any) → IndexStats
 createIndex(name: string, config: any) → Index

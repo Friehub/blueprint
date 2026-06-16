@@ -10,7 +10,7 @@ Incoming webhook ingestion — signature verification, deduplication, ordering, 
 **Functions**
 ```
 ingestWebhook(provider: any, raw_body: any, headers: any) → IngestedEvent
-verifySignature(provider: any, raw_body: any, signature: any, secret: any) → VerificationResult
+verifySignature(provider: any, raw_body: any, signature: string, secret: string) → VerificationResult
 deduplicateEvent(provider_event_id: any, provider: any) → DedupResult
 getIngestedEvent(event_id: any) → IngestedEvent
 listIngestedEvents(provider: any, options?: any) → PaginatedResult<IngestedEvent>

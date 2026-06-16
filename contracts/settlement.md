@@ -15,7 +15,7 @@ listSettlementBatches(input: any, options?: any) → PaginatedResult<SettlementB
 addSettlementItem(batch_id: any, item: any) → SettlementItem
 closeSettlementBatch(batch_id: any) → SettlementBatch
 confirmSettlement(batch_id: any, reference: any, settled_at?: any) → SettlementBatch
-failSettlement(batch_id: any, reason: any) → SettlementBatch
+failSettlement(batch_id: any, reason: string) → SettlementBatch
 reconcileBatch(batch_id: any) → SettlementBatch
 ```
 

@@ -17,7 +17,7 @@ readinessProbe(expected_deps?: any) → ProbeResult
 startupProbe() → ProbeResult
 getStatus() → SystemStatus
 getHistory(service: any, options?: any) → HealthEvent[]
-setDependencyThreshold(dependency: any, threshold: any) → void
+setDependencyThreshold(dependency: any, threshold: number) → void
 ```
 
 **Types**

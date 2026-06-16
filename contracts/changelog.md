@@ -9,7 +9,7 @@ API changelog with breaking change tracking, migration guides, semver enforcemen
 
 **Functions**
 ```
-recordEntry(version: any, changes: any) → ChangelogEntry
+recordEntry(version: number, changes: any) → ChangelogEntry
 getEntry(entry_id: any) → ChangelogEntry
 listEntries(options?: any) → PaginatedResult<ChangelogEntry>
 getBreakingChanges(version_range: any) → BreakingChange[]

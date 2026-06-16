@@ -15,7 +15,7 @@ reserveStock(variant_id: any, quantity: number, order_id: any) → StockReservat
 releaseStock(reservation_token: any) → void
 confirmStock(reservation_token: any) → void
 updateStockOnHand(variant_id: any, quantity: number, location_id?: any) → void
-adjustStock(variant_id: any, delta: any, reason: any) → StockAdjustment
+adjustStock(variant_id: any, delta: any, reason: string) → StockAdjustment
 getStockHistory(variant_id: any) → StockAdjustment[]
 getLowStockAlerts(threshold?: any) → StockLevel[]
 ```

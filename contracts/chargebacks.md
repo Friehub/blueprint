@@ -15,7 +15,7 @@ Card network chargeback lifecycle, evidence management, and dispute response tra
 
 **Functions**
 ```
-createChargeback(payment_id: any, reason: any, metadata?: any) → Chargeback
+createChargeback(payment_id: any, reason: string, metadata?: any) → Chargeback
 getChargeback(chargeback_id: any) → Chargeback
 listChargebacks(input: any, options?: any) → PaginatedResult<Chargeback>
 submitEvidence(chargeback_id: any, evidence: any) → Chargeback

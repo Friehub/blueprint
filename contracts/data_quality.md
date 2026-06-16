@@ -16,7 +16,7 @@ runValidation(expectation_id: any, dataset: any) → ValidationResult
 runAllValidations(dataset: any) → ValidationResult[]
 getValidationHistory(expectation_id: any, options?: any) → PaginatedResult<ValidationRun>
 getDatasetHealth(dataset: any) → DatasetHealth
-alertOnDegradation(expectation_id: any, threshold: any) → void
+alertOnDegradation(expectation_id: any, threshold: number) → void
 ```
 
 **Types**

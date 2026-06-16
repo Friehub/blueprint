@@ -13,7 +13,7 @@ configureIsolation(module: any, level: any) → void
 getIsolationLevel(module: any) → IsolationLevel
 executeWithIsolation(operation: any, level: any) → OperationResult
 setLockTimeout(timeout_ms: any) → void
-setDeadlockPriority(priority: any) → void
+setDeadlockPriority(priority: number) → void
 detectDeadlocks() → DeadlockReport
 distributedTransaction(steps: any, options?: any) → DistributedTxResult
 ```

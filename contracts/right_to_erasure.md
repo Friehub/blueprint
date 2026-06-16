@@ -9,14 +9,14 @@ Cross-service user data deletion with certification and notification (GDPR Artic
 
 **Functions**
 ```
-requestErasure(user_id: any, reason: any, requested_by: any) → ErasureRequest
+requestErasure(user_id: any, reason: string, requested_by: any) → ErasureRequest
 getErasureRequest(request_id: any) → ErasureRequest
 listErasureRequests(status?: string) → ErasureRequest[]
 identifyDataSources(user_id: any) → DataSourceMap
 executeErasure(request_id: any) → ErasureResult
 certifyDeletion(request_id: any) → Certification
 notifyDataRecipients(request_id: any) → NotificationResult
-cancelRequest(request_id: any, reason: any) → void
+cancelRequest(request_id: any, reason: string) → void
 ```
 
 **Types**

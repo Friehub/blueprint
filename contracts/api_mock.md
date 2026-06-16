@@ -9,7 +9,7 @@ Mock API endpoint registration with configurable responses, request recording, a
 
 **Functions**
 ```
-registerMock(endpoint: any, method: any, response: any) → MockEndpoint
+registerMock(endpoint: string, method: any, response: any) → MockEndpoint
 getMock(endpoint_id: any) → MockEndpoint
 listMocks(tag?: any) → MockEndpoint[]
 updateMockResponse(endpoint_id: any, response: any) → void

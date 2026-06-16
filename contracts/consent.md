@@ -9,7 +9,7 @@ Privacy consent and GDPR compliance.
 
 **Functions**
 ```
-recordConsent(user_id: any, purposes: any, version: any) → ConsentRecord
+recordConsent(user_id: any, purposes: any, version: number) → ConsentRecord
 getConsent(user_id: any) → ConsentRecord?
 withdrawConsent(user_id: any, purposes?: any) → void
 hasConsented(user_id: any, purpose: any) → boolean

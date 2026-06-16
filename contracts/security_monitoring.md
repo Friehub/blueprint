@@ -15,7 +15,7 @@ listSecurityEvents(input: any, options?: any) → PaginatedResult<SecurityEvent>
 createSecurityAlertRule(rule: any) → SecurityAlertRule
 getSecurityAlertRule(rule_id: any) → SecurityAlertRule
 listSecurityAlertRules(options?: any) → SecurityAlertRule[]
-createSecurityCase(subject_ref: any, reason: any) → SecurityCase
+createSecurityCase(subject_ref: any, reason: string) → SecurityCase
 getSecurityCase(case_id: any) → SecurityCase
 resolveSecurityCase(case_id: any, resolution: any) → SecurityCase
 ```

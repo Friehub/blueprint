@@ -15,7 +15,7 @@ setTranslation(key: string, locale: string, value: any) → void
 listLocales() → Locale[]
 getLocale(locale_code: any) → Locale
 detectLocale(accept_language: any) → string
-formatCurrency(amount: number, currency: any, locale: string) → string
+formatCurrency(amount: number, currency: string, locale: string) → string
 formatDate(date: string, format: string, locale: string) → string
 formatNumber(number: any, locale: string, options?: any) → string
 ```

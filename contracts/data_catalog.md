@@ -17,7 +17,7 @@ addLineage(dataset_id: any, upstream: any, downstream: any) → void
 getLineage(dataset_id: any) → LineageGraph
 tagDataset(dataset_id: any, tags: string[]) → void
 searchDatasets(query: any) → DatasetSearchResult[]
-archiveDataset(dataset_id: any, reason: any) → void
+archiveDataset(dataset_id: any, reason: string) → void
 ```
 
 **Types**

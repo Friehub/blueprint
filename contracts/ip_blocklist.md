@@ -9,9 +9,9 @@ IP address blocklist management with CIDR and ASN support, expiry, and threat in
 
 **Functions**
 ```
-blockIp(ip: any, reason: any, options?: any) → BlocklistEntry
-blockCidr(cidr: any, reason: any, options?: any) → BlocklistEntry
-blockAsn(asn: any, reason: any, options?: any) → BlocklistEntry
+blockIp(ip: any, reason: string, options?: any) → BlocklistEntry
+blockCidr(cidr: any, reason: string, options?: any) → BlocklistEntry
+blockAsn(asn: any, reason: string, options?: any) → BlocklistEntry
 unblock(entry_id: any) → void
 isBlocked(ip: any) → BlockStatus
 listEntries(status?: string, options?: any) → PaginatedResult<BlocklistEntry>

@@ -13,7 +13,7 @@ registerPrompt(name: string, template: any, options?: any) → PromptVersion
 getPrompt(name: string, version?: any) → PromptVersion?
 listPrompts(tag?: any) → PromptSummary[]
 updatePrompt(name: string, template: any, change_reason: any) → PromptVersion
-activateVersion(prompt_id: any, version: any) → void
+activateVersion(prompt_id: any, version: number) → void
 evaluatePrompt(prompt_id: any, test_cases: any) → EvaluationResult
 createABTest(prompt_id: any, variant_a: any, variant_b: any, config: any) → ABTest
 getABTestResults(test_id: any) → ABTestResult

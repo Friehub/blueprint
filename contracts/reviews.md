@@ -9,14 +9,14 @@ Product and seller review system.
 
 **Functions**
 ```
-createReview(reviewer_id: any, subject_type: any, subject_id: any, rating: any, content: string) → Review
+createReview(reviewer_id: any, subject_type: any, subject_id: any, rating: number, content: string) → Review
 getReview(review_id: any) → Review
 getReviews(subject_type: any, subject_id: any, options?: any) → PaginatedResult<Review>
 getAggregateRating(subject_type: any, subject_id: any) → AggregateRating
 updateReview(review_id: any, data: any) → Review
 deleteReview(review_id: any) → void
 moderateReview(review_id: any, decision: any, reason?: any) → Review
-flagReview(review_id: any, reason: any) → void
+flagReview(review_id: any, reason: string) → void
 getUserReviews(user_id: any) → PaginatedResult<Review>
 ```
 

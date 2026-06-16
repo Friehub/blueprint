@@ -14,7 +14,7 @@ unregisterDevice(device_id: any) → void
 getUserDevices(user_id: any) → DeviceRegistration[]
 sendPush(user_id: any, notification: any, options?: any) → PushResult
 sendBulkPush(user_ids[]: any, notification: any, options?: any) → BulkPushResult
-sendTopicPush(topic: any, notification: any, options?: any) → BulkPushResult
+sendTopicPush(topic: string, notification: any, options?: any) → BulkPushResult
 getPushStatus(message_id: any) → PushDeliveryStatus
 updateDeviceToken(device_id: any, new_token: any) → void
 ```

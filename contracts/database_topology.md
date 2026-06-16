@@ -9,7 +9,7 @@ Database sharding, replication, and cross-region topology configuration.
 
 **Functions**
 ```
-configureSharding(table: any, strategy: any, key: string) → ShardingConfig
+configureSharding(table: any, strategy: string, key: string) → ShardingConfig
 getShard(key: string) → Shard
 listShards() → Shard[]
 addShard(shard_config: any) → Shard

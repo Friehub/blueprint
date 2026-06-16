@@ -15,11 +15,11 @@ createUser(data: any) → User
 updateUser(user_id: any, data: any) → User
 deleteUser(user_id: any) → void
 searchUsers(query: any, options?: any) → PaginatedResult<User>
-getUsersByRole(role: any) → User[]
-assignRole(user_id: any, role: any) → void
-revokeRole(user_id: any, role: any) → void
+getUsersByRole(role: string) → User[]
+assignRole(user_id: any, role: string) → void
+revokeRole(user_id: any, role: string) → void
 getUserRoles(user_id: any) → Role[]
-banUser(user_id: any, reason: any) → void
+banUser(user_id: any, reason: string) → void
 unbanUser(user_id: any) → void
 ```
 

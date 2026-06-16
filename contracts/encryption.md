@@ -15,8 +15,8 @@ generateKey(algorithm?: any) → Key
 rotateKey(key_id: any) → Key
 listKeys() → Key[]
 archiveKey(key_id: any) → void
-hashPassword(password: any) → string
-verifyPassword(password: any, hash: any) → boolean
+hashPassword(password: string) → string
+verifyPassword(password: string, hash: string) → boolean
 generateSecret(length?: any) → string
 ```
 

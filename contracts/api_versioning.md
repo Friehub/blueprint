@@ -9,13 +9,13 @@ API version management with versioning strategy selection, deprecation policies,
 
 **Functions**
 ```
-registerApi(name: string, version: any, strategy: any) → ApiVersion
+registerApi(name: string, version: number, strategy: string) → ApiVersion
 getApi(api_id: any) → ApiVersion
 getCurrentVersion(api_name: any) → string
 deprecateVersion(api_id: any, sunset_date: any, migration_guide: any) → DeprecationNotice
 listVersions(api_name: any) → ApiVersion[]
-setVersioningStrategy(api_name: any, strategy: any) → void
-extendSunset(api_id: any, new_date: any, reason: any) → void
+setVersioningStrategy(api_name: any, strategy: string) → void
+extendSunset(api_id: any, new_date: any, reason: string) → void
 ```
 
 **Types**

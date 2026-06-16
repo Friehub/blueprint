@@ -14,7 +14,7 @@ getSandbox(sandbox_id: any) → Sandbox
 listSandboxes(user_id?: any) → Sandbox[]
 resetSandbox(sandbox_id: any) → void
 seedSandbox(sandbox_id: any, seed_data: any) → void
-extendSandbox(sandbox_id: any, duration: any) → void
+extendSandbox(sandbox_id: any, duration: number) → void
 expireSandbox(sandbox_id: any) → void
 getSandboxUsage(sandbox_id: any) → UsageReport
 validateSandboxCredentials(sandbox_id: any) → CredentialValidationResult

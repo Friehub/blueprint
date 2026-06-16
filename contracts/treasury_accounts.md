@@ -9,12 +9,12 @@ Treasury cash accounts, balances, account movements, and internal treasury contr
 
 **Functions**
 ```
-createTreasuryAccount(name: string, currency: any, metadata?: any) → TreasuryAccount
+createTreasuryAccount(name: string, currency: string, metadata?: any) → TreasuryAccount
 getTreasuryAccount(account_id: any) → TreasuryAccount
 listTreasuryAccounts(input: any, options?: any) → PaginatedResult<TreasuryAccount>
 postTreasuryMovement(account_id: any, movement: any) → TreasuryMovement
 getTreasuryMovements(account_id: any, options?: any) → PaginatedResult<TreasuryMovement>
-freezeTreasuryAccount(account_id: any, reason: any) → TreasuryAccount
+freezeTreasuryAccount(account_id: any, reason: string) → TreasuryAccount
 unfreezeTreasuryAccount(account_id: any) → TreasuryAccount
 setTreasuryLimit(account_id: any, limits: any) → TreasuryLimit
 ```

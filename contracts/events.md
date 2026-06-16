@@ -9,12 +9,12 @@ Internal event bus for decoupled module communication.
 
 **Functions**
 ```
-publish(topic: any, event: any) → void
-subscribe(topic: any, handler: Function) → Subscription
+publish(topic: string, event: any) → void
+subscribe(topic: string, handler: Function) → Subscription
 unsubscribe(subscription_id: any) → void
-publishBulk(topic: any, events: any) → void
+publishBulk(topic: string, events: any) → void
 getTopics() → string[]
-replay(topic: any, from: any, to: any, handler: Function) → void
+replay(topic: string, from: any, to: any, handler: Function) → void
 ```
 
 **Types**

@@ -10,7 +10,7 @@ Points, rewards, and loyalty tier management.
 **Functions**
 ```
 getBalance(user_id: any) → LoyaltyBalance
-earnPoints(user_id: any, amount: number, reason: any, reference: any) → LoyaltyTransaction
+earnPoints(user_id: any, amount: number, reason: string, reference: any) → LoyaltyTransaction
 redeemPoints(user_id: any, amount: number, reference: any) → LoyaltyTransaction
 getTransactions(user_id: any, options?: any) → PaginatedResult<LoyaltyTransaction>
 getTier(user_id: any) → LoyaltyTier

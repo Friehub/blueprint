@@ -9,7 +9,7 @@ Standalone reusable idempotency pattern — key generation, storage, lookup-befo
 
 **Functions**
 ```
-createIdempotencyKey(namespace: any, scope: any, seed?: any) → IdempotencyKey
+createIdempotencyKey(namespace: any, scope: string, seed?: any) → IdempotencyKey
 checkIdempotency(key: string) → IdempotencyResult
 registerAttempt(key: string, operation_type: any, args_hash: any) → AttemptRegistration
 completeAttempt(key: string, result: any) → IdempotencyResult

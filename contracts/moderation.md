@@ -9,7 +9,7 @@ Cross-domain moderation cases, reviewer workflows, decisions, escalations, and m
 
 **Functions**
 ```
-createCase(subject_ref: any, reason: any, metadata?: any) → ModerationCase
+createCase(subject_ref: any, reason: string, metadata?: any) → ModerationCase
 getCase(case_id: any) → ModerationCase
 listCases(input: any, options?: any) → PaginatedResult<ModerationCase>
 assignReviewer(case_id: any, reviewer_id: any) → ModerationCase

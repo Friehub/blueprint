@@ -10,7 +10,7 @@ Full retrieval-augmented generation pipeline: chunking, embedding, storage, retr
 **Functions**
 ```
 ingestDocument(source: string, content: string, options?: any) → DocumentRecord
-chunkDocument(document_id: any, strategy: any) → Chunk[]
+chunkDocument(document_id: any, strategy: string) → Chunk[]
 embedChunk(chunk_id: any) → EmbeddingResult
 indexDocument(document_id: any) → IndexResult
 search(query: any, options?: any) → PaginatedResult<SearchResult>

@@ -11,10 +11,10 @@ Content policy enforcement with classification, moderation logging, and appeal w
 ```
 checkContent(content: string, options?: any) → SafetyVerdict
 classifyContent(content: string) → ContentClassification
-reportViolation(content_id: any, reason: any) → ViolationReport
+reportViolation(content_id: any, reason: string) → ViolationReport
 getViolation(violation_id: any) → ViolationReport
 getModerationHistory(content_id: any) → ModerationEntry[]
-appealViolation(violation_id: any, reason: any) → Appeal
+appealViolation(violation_id: any, reason: string) → Appeal
 resolveAppeal(appeal_id: any, decision: any) → AppealResolution
 getSafetyStats() → SafetyStats
 ```

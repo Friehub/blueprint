@@ -9,9 +9,9 @@ Customer support ticket lifecycle, help desk queue management, and service-level
 
 **Functions**
 ```
-createTicket(customer_id: any, subject: any, body: any, priority: any) → Ticket
+createTicket(customer_id: any, subject: string, body: any, priority: number) → Ticket
 assignTicket(ticket_id: any, agent_id: any) → Ticket
-addTicketMessage(ticket_id: any, sender_id: any, message: any) → TicketMessage
+addTicketMessage(ticket_id: any, sender_id: any, message: string) → TicketMessage
 transitionTicketStatus(ticket_id: any, status: string) → Ticket
 checkSLA(ticket_id: any) → SLAResult
 ```

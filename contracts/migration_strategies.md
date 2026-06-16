@@ -9,7 +9,7 @@ Zero-downtime schema migration patterns with expand/contract, dual-write, and ro
 
 **Functions**
 ```
-planMigration(name: string, strategy: any, steps: any) → MigrationPlan
+planMigration(name: string, strategy: string, steps: any) → MigrationPlan
 validateStrategy(migration_id: any) → StrategyReport
 executeExpandPhase(migration_id: any) → PhaseResult
 executeMigratePhase(migration_id: any) → PhaseResult

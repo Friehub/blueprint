@@ -14,7 +14,7 @@ getVerification(request_id: any) → VerificationRequest
 getUserVerification(user_id: any) → VerificationRequest?
 getVerificationStatus(user_id: any) → VerificationStatus
 updateVerification(request_id: any, data: any) → VerificationRequest
-rejectVerification(request_id: any, reason: any) → VerificationRequest
+rejectVerification(request_id: any, reason: string) → VerificationRequest
 approveVerification(request_id: any) → VerificationRequest
 listPendingVerifications(options?: any) → PaginatedResult<VerificationRequest>
 expireVerification(request_id: any) → VerificationRequest

@@ -9,12 +9,12 @@ Automated traffic detection with challenge issuance and human verification scori
 
 **Functions**
 ```
-issueChallenge(endpoint: any, request_context: any) → Challenge
+issueChallenge(endpoint: string, request_context: any) → Challenge
 verifyChallenge(challenge_id: any, response: any) → ChallengeResult
 scoreRequest(request_context: any) → BotScore
-configureChallenge(endpoint: any, config: any) → void
-getChallengeConfig(endpoint: any) → ChallengeConfig
-reportBypassAttempt(endpoint: any, request_context: any) → void
+configureChallenge(endpoint: string, config: any) → void
+getChallengeConfig(endpoint: string) → ChallengeConfig
+reportBypassAttempt(endpoint: string, request_context: any) → void
 ```
 
 **Types**

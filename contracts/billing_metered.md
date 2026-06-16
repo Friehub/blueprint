@@ -16,7 +16,7 @@ createMeteredPlan(name: string, metrics: any, pricing: any) → MeteredPlan
 updateMeteredPlan(plan_id: any, changes: any) → MeteredPlan
 listMeteredPlans() → MeteredPlan[]
 getUsageAlerts(user_id: any) → UsageAlert[]
-setUsageAlert(user_id: any, metric: any, threshold: any) → UsageAlert
+setUsageAlert(user_id: any, metric: any, threshold: number) → UsageAlert
 ```
 
 **Types**

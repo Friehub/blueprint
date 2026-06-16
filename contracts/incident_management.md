@@ -15,8 +15,8 @@ listIncidents(input: any, options?: any) → PaginatedResult<Incident>
 acknowledgeIncident(incident_id: any, user_id: any, note?: any) → Incident
 assignIncident(incident_id: any, assignee_id: any) → Incident
 updateIncidentSeverity(incident_id: any, severity: any) → Incident
-escalateIncident(incident_id: any, reason: any) → Incident
-addIncidentNote(incident_id: any, note: any) → IncidentNote
+escalateIncident(incident_id: any, reason: string) → Incident
+addIncidentNote(incident_id: any, note: string) → IncidentNote
 resolveIncident(incident_id: any, resolution: any, note?: any) → Incident
 createRunbookLink(incident_id: any, url: string, title?: string) → RunbookLink
 createPostmortem(incident_id: any, report: any) → Postmortem

@@ -17,7 +17,7 @@ recordContract(vendor_id: any, contract: any) → Contract
 getContracts(vendor_id: any) → Contract[]
 assessVendorHealth(vendor_id: any) → HealthAssessment
 flagVendorRisk(vendor_id: any, risk: any) → void
-initiateOffboarding(vendor_id: any, reason: any) → OffboardingPlan
+initiateOffboarding(vendor_id: any, reason: string) → OffboardingPlan
 getVendorReport(vendor_id: any) → VendorReport
 ```
 

@@ -16,7 +16,7 @@ rotateIdentity(service_name: any) → RotationResult
 listTrustedServices() → TrustedService[]
 setTrustPolicy(source_service: any, target_service: any, policy: any) → void
 getTrustPolicy(source_service: any, target_service: any) → TrustPolicy?
-revokeIdentity(identity_id: any, reason: any) → void
+revokeIdentity(identity_id: any, reason: string) → void
 ```
 
 **Types**

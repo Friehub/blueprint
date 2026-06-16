@@ -9,14 +9,14 @@ Payment processing and wallet management.
 
 **Functions**
 ```
-initiatePayment(order_id: any, amount: number, currency: any, method: any) → Payment
+initiatePayment(order_id: any, amount: number, currency: string, method: any) → Payment
 verifyPayment(payment_id: any) → Payment
 getPaymentByOrder(order_id: any) → Payment?
 getWallet(user_id: any) → Wallet
-creditWallet(user_id: any, amount: number, currency: any, reference: any) → WalletTransaction
-debitWallet(user_id: any, amount: number, currency: any, reference: any) → WalletTransaction
+creditWallet(user_id: any, amount: number, currency: string, reference: any) → WalletTransaction
+debitWallet(user_id: any, amount: number, currency: string, reference: any) → WalletTransaction
 getWalletTransactions(user_id: any, options?: any) → PaginatedResult<WalletTransaction>
-initiateRefund(payment_id: any, amount?: number, reason: any) → Refund
+initiateRefund(payment_id: any, amount?: number, reason: string) → Refund
 getRefundByOrder(order_id: any) → Refund?
 getRefund(refund_id: any) → Refund
 ```

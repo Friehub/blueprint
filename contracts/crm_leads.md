@@ -11,7 +11,7 @@ Sales lead ingestion pipelines, contact history, and deal stage tracking for bus
 ```
 createLead(contact_info: any, source: string, metadata?: any) → Lead
 updateLeadStatus(lead_id: any, status: string) → Lead
-createDeal(lead_id: any, value: any, currency: any, stage: any) → Deal
+createDeal(lead_id: any, value: any, currency: string, stage: any) → Deal
 updateDealStage(deal_id: any, stage: any) → Deal
 assignOwner(lead_id: any, owner_id: any) → Lead
 ```

@@ -9,7 +9,7 @@ Tax calculation, jurisdiction lookup, tax profile management, and tax breakdown 
 
 **Functions**
 ```
-calculateTax(amount: number, currency: any, jurisdiction: any, context?: any) → TaxBreakdown
+calculateTax(amount: number, currency: string, jurisdiction: any, context?: any) → TaxBreakdown
 getTaxRate(jurisdiction: any, tax_type?: any, effective_at?: any) → TaxRate?
 listTaxRates(input: any, options?: any) → PaginatedResult<TaxRate>
 setTaxProfile(entity_id: any, profile: any) → TaxProfile

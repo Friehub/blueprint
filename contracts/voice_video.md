@@ -17,7 +17,7 @@ leaveRoom(room_id: any, user_id: any) → void
 getParticipants(room_id: any) → Participant[]
 startRecording(room_id: any) → RecordingSession
 stopRecording(recording_id: any) → RecordingResult
-startTranscription(room_id: any, language: any) → TranscriptionSession
+startTranscription(room_id: any, language: string) → TranscriptionSession
 stopTranscription(session_id: any) → TranscriptionResult
 getRoomMetrics(room_id: any) → RoomMetrics
 ```
