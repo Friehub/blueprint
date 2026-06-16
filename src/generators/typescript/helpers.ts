@@ -156,9 +156,17 @@ export function generateEventTypes(mod: ModuleContract): string {
     "",
   ];
 
+  function getSectionContent(section: typeof mod.rawSections[0]): string {
+    let c = section.content || "";
+    for (const sub of section.subsections || []) {
+      if (/event\s*emission/i.test(sub.name)) c += "\n" + sub.content;
+    }
+    return c;
+  }
+
   const uniqueEventMap = new Map<string, string>();
   for (const section of mod.rawSections) {
-    const content = section.content || "";
+    const content = getSectionContent(section);
     if (section.name.toLowerCase().includes("events emitted") || content.includes("### Event Emission")) {
       const events = parseEventEmissionContent(content);
       for (const evt of events) {
@@ -219,7 +227,10 @@ export function generateEventTypes(mod: ModuleContract): string {
 export function parseErrorTaxonomyContent(mod: ModuleContract): Array<{ functionName: string; errorCode: string; description: string }> {
   const errors: Array<{ functionName: string; errorCode: string; description: string }> = [];
   for (const section of mod.rawSections) {
-    const content = section.content || "";
+    let content = section.content || "";
+    for (const sub of section.subsections || []) {
+      if (/error\s*taxonomy/i.test(sub.name)) content += "\n" + sub.content;
+    }
     if (!content.includes("### Error Taxonomy") && !section.name.toLowerCase().includes("error taxonomy")) continue;
 
     const fenceRegex = /```[\s\S]*?```/g;

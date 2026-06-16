@@ -23,7 +23,27 @@ export function scanDocument(file: string, text: string): ScannedDocument {
   let preambleStart = -1;
   let preambleEnd = -1;
   let currentSection: RawSection | null = null;
+  let currentSubsection: { name: string; content: string } | null = null;
   let seenFirstKnownSection = false;
+
+  function flushSubsection() {
+    if (currentSubsection && currentSection) {
+      currentSection.subsections = currentSection.subsections || [];
+      currentSubsection.content = currentSubsection.content.trimEnd();
+      currentSection.subsections.push(currentSubsection);
+      currentSubsection = null;
+    }
+  }
+
+  function flushSection(lineNumber: number) {
+    if (currentSection) {
+      flushSubsection();
+      currentSection.endLine = lineNumber - 1;
+      currentSection.content = currentSection.content.trimEnd();
+      sections.push(currentSection);
+      currentSection = null;
+    }
+  }
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index]!;
@@ -36,14 +56,8 @@ export function scanDocument(file: string, text: string): ScannedDocument {
 
     const sectionHeader = detectSectionHeader(trimmed, envelope.kind);
     if (sectionHeader) {
-      if (!seenFirstKnownSection) {
-        seenFirstKnownSection = true;
-      }
-
-      if (currentSection) {
-        currentSection.endLine = lineNumber - 1;
-        sections.push(currentSection);
-      }
+      flushSection(lineNumber);
+      if (!seenFirstKnownSection) seenFirstKnownSection = true;
 
       currentSection = {
         file,
@@ -57,6 +71,16 @@ export function scanDocument(file: string, text: string): ScannedDocument {
       continue;
     }
 
+    // H3 inside a module section → create subsection
+    if (!sectionHeader && currentSection && envelope.kind === "module") {
+      const h3Match = trimmed.match(H3_RE);
+      if (h3Match) {
+        flushSubsection();
+        currentSubsection = { name: h3Match[1]!.trim(), content: "" };
+        continue;
+      }
+    }
+
     if (!seenFirstKnownSection) {
       if (trimmed) {
         if (preambleStart === -1) preambleStart = lineNumber;
@@ -65,13 +89,16 @@ export function scanDocument(file: string, text: string): ScannedDocument {
       continue;
     }
 
-    if (currentSection) {
+    if (currentSubsection) {
+      currentSubsection.content += line + "\n";
+    } else if (currentSection) {
       currentSection.content += line + "\n";
-      currentSection.endLine = lineNumber;
     }
   }
 
   if (currentSection) {
+    flushSubsection();
+    currentSection.content = currentSection.content.trimEnd();
     sections.push(currentSection);
   }
 

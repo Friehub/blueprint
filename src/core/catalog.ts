@@ -20,6 +20,7 @@ export type RawSection = {
   content: string;
   startLine: number;
   endLine: number;
+  subsections?: { name: string; content: string }[];
 };
 
 export type AlgorithmInfo = {
