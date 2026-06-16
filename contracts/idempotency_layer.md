@@ -5,7 +5,7 @@
 ---
 
 ### `idempotency_layer`
-Standalone reusable idempotency pattern — key generation, storage, lookup-before-execute, and result caching.
+Standalone reusable idempotency pattern key generation, storage, lookup-before-execute, and result caching.
 
 **Functions**
 ```
@@ -27,12 +27,12 @@ StaleKeyPolicy { max_age_hours: 168, cleanup_interval_minutes: 60, on_expiry: re
 ```
 
 **Invariants**
-- `checkIdempotency` + `registerAttempt` + `completeAttempt` must be atomic — no window for duplicate execution
+- `checkIdempotency` + `registerAttempt` + `completeAttempt` must be atomic no window for duplicate execution
 - Duplicate keys must return the original result, not an error
-- Keys auto-expire after 7 days (604800 seconds) — configurable per namespace
+- Keys auto-expire after 7 days (604800 seconds) configurable per namespace
 - Concurrent requests with the same key must not both execute; one wins, the other waits or receives `in_progress`
 - The `in_progress` state must have a timeout (default 30s) to release locks on crashed handlers
-- Stale key cleanup must not affect active keys — soft delete only
+- Stale key cleanup must not affect active keys soft delete only
 
 **Providers:** Redis, Postgres (advisory locks), DynamoDB (conditional writes)
 

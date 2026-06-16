@@ -168,12 +168,12 @@ blueprint_ledger_account_balance_snapshot    gauge { account_id }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Depends On:** (none -- owns its own financial ledger data layer)
+* **Depends On:** (none owns its own financial ledger data layer)
 * **Emits To:** events
 * **Recommends:** audit_log, caching (for high-speed balance reads)
 * **Pagination Sort Key:** Uses cursor-based pagination sorting by `posted_at DESC` on `getLedgerTransactions`.

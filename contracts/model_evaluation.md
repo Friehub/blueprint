@@ -35,7 +35,7 @@ EvalConfig { model, dataset_id, metrics, split?, max_samples?, timeout? }
 ```
 
 **Invariants**
-- `runEvaluation` must produce a complete metric set or fail entirely -- partial results must not be reported
+- `runEvaluation` must produce a complete metric set or fail entirely partial results must not be reported
 - `detectRegression` must only produce a report when a baseline exists and the delta exceeds the threshold
 - A run that takes longer than the configured `timeout` must be marked as failed, not silently abandoned
 
@@ -127,10 +127,10 @@ blueprint_model_evaluation_active_runs          gauge
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new metric: non-breaking
-- Changing baseline comparison algorithm: breaking — existing regressions must be re-evaluated
+- Changing baseline comparison algorithm: breaking existing regressions must be re-evaluated
 
 ### Module Dependencies
 * **Depends On:** (none)

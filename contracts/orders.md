@@ -33,7 +33,7 @@ ReturnRequest { id, order_id, lines, reason, status }
 ```
 
 **Invariants**
-- Status transitions must follow the defined state machine -- invalid transitions must throw
+- Status transitions must follow the defined state machine invalid transitions must throw
 - A cancelled order must release all stock reservations
 
 ---
@@ -163,7 +163,7 @@ CREATE TABLE order_returns (
 * Step 5: Confirm order (status: confirmed) and inventory via inventory.confirmStock
 * Compensation on step 3 failure: cancel order (no payment yet)
 * Compensation on step 4 failure: release inventory, cancel order
-* Compensation on step 5 failure: payment was captured but order confirm failed -- retry idempotently
+* Compensation on step 5 failure: payment was captured but order confirm failed retry idempotently
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `orders.<function>`.
@@ -186,7 +186,7 @@ blueprint_orders_created_total               { currency }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new OrderStatus enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 - Adding a new PackageStatus enum value: non-breaking if consumers handle unknown statuses gracefully; breaking otherwise

@@ -29,10 +29,10 @@ ReviewSubjectType = product | seller | service
 ```
 
 **Invariants**
-- A user can submit at most one review per subject -- enforced via UNIQUE constraint on `(reviewer_id, subject_type, subject_id)`
-- A review's rating must be between 1 and 5 inclusive -- enforced via CHECK constraint on the `rating` column
+- A user can submit at most one review per subject enforced via UNIQUE constraint on `(reviewer_id, subject_type, subject_id)`
+- A review's rating must be between 1 and 5 inclusive enforced via CHECK constraint on the `rating` column
 - `moderateReview` must only transition from `pending` to `published` or `rejected`; it must not re-moderate an already-published review unless explicitly configured
-- `deleteReview` must cascade to the aggregate rating recalculation -- the average must reflect the remaining reviews
+- `deleteReview` must cascade to the aggregate rating recalculation the average must reflect the remaining reviews
 - Flagged reviews must preserve the original content for audit purposes; content must not be silently removed
 - `getAggregateRating` must return `{ average: 0, count: 0, distribution: {1:0,2:0,3:0,4:0,5:0} }` when no reviews exist for the subject
 

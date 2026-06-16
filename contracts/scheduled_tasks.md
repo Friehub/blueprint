@@ -28,7 +28,7 @@ ScheduleOptions { timezone?, max_concurrency?, retry_on_failure?, timeout? }
 ```
 
 **Invariants**
-- `pauseSchedule` must not cancel an in-flight execution -- it must prevent only future triggers
+- `pauseSchedule` must not cancel an in-flight execution it must prevent only future triggers
 - A schedule must not create overlapping executions unless `max_concurrency > 1` is explicitly configured
 - `triggerManually` must reset the next execution time based on the cron expression from the current time, not from the originally scheduled time
 

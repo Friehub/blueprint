@@ -31,7 +31,7 @@ StockAdjustment { id, variant_id, delta, reason, created_at }
 **Invariants**
 - `available = on_hand - reserved` at all times.
 - `updateStockOnHand` must use a database-level `CHECK (on_hand >= 0)` constraint to enforce non-negativity. Application-level check is insufficient under concurrent transactions. Use atomic UPDATE with conditional: `UPDATE inventory_stock SET on_hand = on_hand + $delta WHERE variant_id = $id AND on_hand + $delta >= 0 RETURNING on_hand`. If 0 rows returned: return `insufficient_stock` error.
-- `confirmStock` must be idempotent — confirming twice must not double-decrement.
+- `confirmStock` must be idempotent confirming twice must not double-decrement.
 - `reserveStock` must use the optimistic locking pattern: read version N, then `UPDATE inventory_stock SET reserved = reserved + $qty, version = N + 1 WHERE variant_id = $id AND version = N AND available >= $qty`. If 0 rows updated: retry entire operation (max 3). Prevents double-sell under concurrent checkout load.
 - Reservations must expire automatically if not confirmed. Expiry is configurable per deployment (default 15 minutes). On expiry, release stock atomically and emit `inventory.stock.released`.
 - `adjustStock` delta must not bring `on_hand` below zero unless `reason` is explicitly a correction (e.g. `inventory_count_correction`).
@@ -154,7 +154,7 @@ CREATE TABLE inventory_adjustments (
 **Scheduled expiry (reservation cleanup):**
 * Background worker queries inventory_reservations WHERE status = 'active' AND expires_at < now()
 * For each expired reservation: release stock, emit inventory.stock.released event
-* Idempotent -- double-expiry is a no-op
+* Idempotent double-expiry is a no-op
 
 ### Observability
 * **Tracing Spans:** Every function call creates a span. Span names follow the pattern `inventory.<function>`.
@@ -175,7 +175,7 @@ blueprint_inventory_reservations_active       gauge { variant_id? }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

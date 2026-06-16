@@ -5,7 +5,7 @@
 ---
 
 ### `push_notifications`
-Device push notification delivery via FCM, APNs, and web push protocols. This is a sub-module of `notifications` — it handles push-specific device registration and delivery. The `notifications` module orchestrates channel selection and dispatch routing.
+Device push notification delivery via FCM, APNs, and web push protocols. This is a sub-module of `notifications` it handles push-specific device registration and delivery. The `notifications` module orchestrates channel selection and dispatch routing.
 
 **Functions**
 ```
@@ -32,8 +32,8 @@ Platform = ios | android | web | huawei
 ```
 
 **Invariants**
-- `registerDevice` must validate the `device_token` by sending a silent push before storing it -- unvalidated tokens must not be accepted
-- `sendPush` must not throw when targeting a user with no registered devices -- it must return a zero-device result
+- `registerDevice` must validate the `device_token` by sending a silent push before storing it unvalidated tokens must not be accepted
+- `sendPush` must not throw when targeting a user with no registered devices it must return a zero-device result
 - A device that returns `invalid_token` more than 3 consecutive times must be automatically unregistered
 - `sendBulkPush` must batch devices by platform and respect each platform's payload size limits (4KB for FCM, 4KB for APNs)
 - Push notifications targeting a user in their quiet hours must be queued and delivered after the quiet hours window expires
@@ -100,12 +100,12 @@ Device token validation:
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Belongs To:** notifications (orchestrator — routes push delivery through this module)
+* **Belongs To:** notifications (orchestrator routes push delivery through this module)
 * **Depends On:** users
 * **Emits To:** events
 * **Recommends:** audit_log

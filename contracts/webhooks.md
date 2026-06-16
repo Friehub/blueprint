@@ -32,9 +32,9 @@ DeliveryStatus = pending | success | failed
 - Exponential backoff formula: `delay = min(2^attempt, max_backoff)` seconds, with jitter of ±25%. Default `max_backoff` is 32 seconds. Maximum retry window is 72 hours from first failure.
 - Payloads must be signed with the endpoint secret using HMAC-SHA256 of `body + "." + timestamp`
 - Payload size must not exceed the endpoint's configured `max_payload_size` (default 256 KiB). Larger payloads are rejected before dispatch with `PAYLOAD_TOO_LARGE`.
-- Endpoint registration must be rejected if no secret is provided -- a non-empty secret is mandatory
+- Endpoint registration must be rejected if no secret is provided a non-empty secret is mandatory
 - Every dispatched payload must include a canonical timestamp in the signature input
-- The receiver must reject any delivery where the timestamp in the signature is older than 5 minutes -- replay attacks with captured valid signatures are ineffective after this window
+- The receiver must reject any delivery where the timestamp in the signature is older than 5 minutes replay attacks with captured valid signatures are ineffective after this window
 - Any URL submitted for endpoint registration must be validated against a configured allowlist of permitted domains before the URL is used
 - Any URL that resolves to a private IP address range (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8) or a cloud metadata endpoint (169.254.169.254) must be rejected unconditionally
 - Redirect following must be disabled or constrained to the originally allowed domain
@@ -43,7 +43,7 @@ DeliveryStatus = pending | success | failed
 
 ---
 
-## Part III -- Data and State
+## Part III Data and State
 
 ---
 
@@ -119,11 +119,11 @@ Webhook delivery:
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Depends On:** (none -- wraps external provider)
+* **Depends On:** (none wraps external provider)
 * **Emits To:** events
 * **Recommends:** queues, audit_log

@@ -28,12 +28,12 @@ Transformation { width?, height?, format?, quality?, crop? }
 ```
 
 **Invariants**
-- Any URL submitted for `uploadMedia`, `processMedia`, or `transcodeVideo` must be validated against a configured allowlist of permitted domains before the URL is used — URLs not on the allowlist must be rejected with `DOMAIN_NOT_ALLOWED`.
-- Any URL that resolves to a private IP address range (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8) or a cloud metadata endpoint (169.254.169.254) must be rejected unconditionally — server-side DNS resolution must verify the resolved address is not private.
-- Redirect following must be disabled or constrained to the originally allowed domain — following a redirect to a non-allowed domain is a contract violation.
-- `uploadMedia` with an `idempotency_key` that matches an existing asset must return the existing `MediaAsset` rather than creating a duplicate — processing must be idempotent by asset identity.
-- `deleteMediaAsset` must remove all variants and the original from storage — orphaned variants without a parent asset are a contract violation.
-- `transcodeVideo` must validate the output format against the supported codec list before queuing — unsupported format must return `UNSUPPORTED_FORMAT`.
+- Any URL submitted for `uploadMedia`, `processMedia`, or `transcodeVideo` must be validated against a configured allowlist of permitted domains before the URL is used URLs not on the allowlist must be rejected with `DOMAIN_NOT_ALLOWED`.
+- Any URL that resolves to a private IP address range (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8) or a cloud metadata endpoint (169.254.169.254) must be rejected unconditionally server-side DNS resolution must verify the resolved address is not private.
+- Redirect following must be disabled or constrained to the originally allowed domain following a redirect to a non-allowed domain is a contract violation.
+- `uploadMedia` with an `idempotency_key` that matches an existing asset must return the existing `MediaAsset` rather than creating a duplicate processing must be idempotent by asset identity.
+- `deleteMediaAsset` must remove all variants and the original from storage orphaned variants without a parent asset are a contract violation.
+- `transcodeVideo` must validate the output format against the supported codec list before queuing unsupported format must return `UNSUPPORTED_FORMAT`.
 
 **Providers:** Cloudinary, AWS MediaConvert + S3, Uploadcare, imgix
 
@@ -176,11 +176,11 @@ blueprint_media_storage_usage_bytes        gauge
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new media type enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Depends On:** (none -- infrastructure primitive / wraps external provider)
+* **Depends On:** (none infrastructure primitive / wraps external provider)
 * **Emits To:** events
 * **Recommends:** storage, caching, queues (for async processing)

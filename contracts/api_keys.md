@@ -32,7 +32,7 @@ ApiKeyValidation { valid, user_id?, scopes?, reason? }
 
 ---
 
-## Part II -- Communication
+## Part II Communication
 
 ---
 
@@ -76,7 +76,7 @@ rotateApiKey     → api_keys.key.rotated        { key_id, user_id }
 ApiKey (with expires_at set):
     on_expiry:      transition to expired
                     validateApiKey returns { valid: false, reason: "expired" }
-    warning:        7 days before expiry -- emit api_key.expiring_soon to owner
+    warning:        7 days before expiry emit api_key.expiring_soon to owner
 ```
 
 ### Storage Model

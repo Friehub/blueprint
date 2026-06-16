@@ -30,10 +30,10 @@ ProtobufFieldRule = optional | required | repeated
 ```
 
 **Invariants**
-- `evolveSchema` with mode `backward` must not remove any field that existing consumers depend on -- adding new fields is permitted, removing or changing existing fields is not
-- `evolveSchema` with mode `forward` must not add any required field -- consumers written against the old schema must be able to read data written with the new schema
-- A protobuf field number must never be reused after a field is removed -- the removed field number must be marked as `reserved` in the schema definition
-- `validateCompatibility` with mode `full` must pass both backward AND forward checks -- a schema that passes both can safely evolve in either direction
+- `evolveSchema` with mode `backward` must not remove any field that existing consumers depend on adding new fields is permitted, removing or changing existing fields is not
+- `evolveSchema` with mode `forward` must not add any required field consumers written against the old schema must be able to read data written with the new schema
+- A protobuf field number must never be reused after a field is removed the removed field number must be marked as `reserved` in the schema definition
+- `validateCompatibility` with mode `full` must pass both backward AND forward checks a schema that passes both can safely evolve in either direction
 
 **Providers:** Protobuf, Apache Avro, MessagePack, JSON Schema, custom
 
@@ -93,7 +93,7 @@ registerSchema     -> serialization.schema.registered  { name, version, format }
 ```
 Schema version retention:
     duration:       indefinite (schemas are immutable once registered)
-    on_expiry:      N/A -- schemas are never deleted, only deprecated
+    on_expiry:      N/A schemas are never deleted, only deprecated
 
   Schema deprecation grace period:
     default:        90 days

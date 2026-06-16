@@ -34,7 +34,7 @@ PermissionCheck { action, resource }
 **Invariants**
 - `can` must be deterministic for the same inputs at the same instant
 - Role inheritance must be acyclic and transitive: if Role A inherits from B, and B inherits from C, then users of A inherit permissions from C
-- An explicit deny for the requesting identity always overrides any role-level grant -- deny wins over allow when both are present for the same identity, action, and resource combination
+- An explicit deny for the requesting identity always overrides any role-level grant deny wins over allow when both are present for the same identity, action, and resource combination
 - `denyPermission` must take effect immediately and must not require cache invalidation or propagation delay
 - ABAC `context` evaluation: if a `Permission` has `conditions`, the `context` parameter must be evaluated against those conditions at runtime. Conditions use attribute-based matching (e.g. `resource.owner_id == context.user_id`, `resource.region in context.allowed_regions`). If conditions are present and `context` is omitted, the permission is denied.
 - Permission actions support glob matching: `*` matches all actions within a resource, `resource:*` matches all actions on that resource. Globs must be expanded at evaluation time, not at storage time.
@@ -116,7 +116,7 @@ blueprint_permissions_evaluations_total     counter { result: allowed|denied }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

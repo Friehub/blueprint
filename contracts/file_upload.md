@@ -33,12 +33,12 @@ AccessPolicy { read_roles[], write_roles[], public_read: bool, cdn_auth: bool }
 ```
 
 **Invariants**
-- `initiateUpload` must validate `file_info` against max size and allowed MIME types before creating the session -- an invalid file must be rejected before any chunks are uploaded
-- `completeUpload` must verify that all expected chunks have been received and that the assembled file checksum matches -- a mismatched checksum must fail the upload
+- `initiateUpload` must validate `file_info` against max size and allowed MIME types before creating the session an invalid file must be rejected before any chunks are uploaded
+- `completeUpload` must verify that all expected chunks have been received and that the assembled file checksum matches a mismatched checksum must fail the upload
 - An upload session that has not received any chunks for more than the session timeout must be automatically cancelled and cleaned up
-- `requestVirusScan` must be called before the file URL is made publicly accessible -- serving an unscanned file is a security violation
+- `requestVirusScan` must be called before the file URL is made publicly accessible serving an unscanned file is a security violation
 - An infected file must be quarantined and must not be accessible via its public URL
-- `deleteFile` must invalidate the CDN cache for the file before removing it from storage -- serving a deleted file from cache is a data leak
+- `deleteFile` must invalidate the CDN cache for the file before removing it from storage serving a deleted file from cache is a data leak
 
 **Providers:** AWS S3 + presigned URLs, GCP Cloud Storage + signed URLs, Azure Blob Storage + SAS, Uploadcare, Transloadit
 

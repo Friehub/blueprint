@@ -5,7 +5,7 @@
 ---
 
 ### `health_check_advanced`
-Production health checks — readiness, liveness, startup probes with dependency verification.
+Production health checks readiness, liveness, startup probes with dependency verification.
 
 **Functions**
 ```
@@ -33,7 +33,7 @@ ProbeType = liveness | readiness | startup
 - Liveness probe must confirm the application is not deadlocked (goroutine/thread count, event loop lag)
 - Startup probe must delay readiness until initialisation is complete (migrations, cache warmup)
 - Individual dependency failures must not cause cascading probe failures
-- Probes must time out independently — a slow DB must not block cache health checks
+- Probes must time out independently a slow DB must not block cache health checks
 - Response format must follow Kubernetes spec: `{"status": "ok", "checks": [...]}`
 
 **Providers:** Express health route, Fastify health plugin, NestJS Terminus, K8s HTTP probes

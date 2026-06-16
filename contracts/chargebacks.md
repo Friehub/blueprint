@@ -5,7 +5,7 @@
 ---
 
 ### `chargebacks`
-Card network chargeback lifecycle, evidence management, and dispute response tracking. Chargebacks are a specific type of dispute — they are **provider-initiated** (triggered by the card network or issuing bank). For **user-initiated** disputes (e.g., customer requests merchant mediation before contacting their bank), see `disputes.md`.
+Card network chargeback lifecycle, evidence management, and dispute response tracking. Chargebacks are a specific type of dispute they are **provider-initiated** (triggered by the card network or issuing bank). For **user-initiated** disputes (e.g., customer requests merchant mediation before contacting their bank), see `disputes.md`.
 
 **Distinction from `disputes`:**
 - `chargebacks` are initiated externally by the card network or payment processor via webhook
@@ -55,7 +55,7 @@ ChargebackStatus = open | evidence_due | submitted | won | lost | reversed | clo
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

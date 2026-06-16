@@ -189,6 +189,6 @@ blueprint_event_bus_published_total              { topic }
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none -- infrastructure primitive)
+* **Depends On:** (none infrastructure primitive)
 * **Emits To:** events
 * **Recommends:** audit_log, telemetry, circuit_breaker

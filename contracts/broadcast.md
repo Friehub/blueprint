@@ -30,11 +30,11 @@ Segment { field, operator, value }
 
 **Invariants**
 - A broadcast must not send to recipients who have opted out of the broadcast channel
-- `cancelBroadcast` must stop delivery to recipients who have not yet received the message -- it must not recall delivered messages
+- `cancelBroadcast` must stop delivery to recipients who have not yet received the message it must not recall delivered messages
 - `scheduleBroadcast` with a send_at in the past must send immediately
 - A broadcast with no matching recipients (after opt-out filtering) must transition directly to `sent` with zero delivered count; it must not remain in `sending`
 - `getDeliveryStatus` must reflect the final delivery state for all recipients once the broadcast transitions to `sent`; partial delivery states are only valid while status is `sending` or `partially_delivered`
-- Recipient opt-out status must be checked at send time, not at broadcast creation time -- a recipient who opts out between creation and delivery must not receive the broadcast
+- Recipient opt-out status must be checked at send time, not at broadcast creation time a recipient who opts out between creation and delivery must not receive the broadcast
 
 **Providers:** OneSignal, Firebase, SendGrid (broadcast), Mailgun, custom
 

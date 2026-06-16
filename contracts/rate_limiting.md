@@ -24,11 +24,11 @@ LimitWindow = second | minute | hour | day
 ```
 
 **Invariants**
-- `checkLimit` must not consume a token -- it must be a read-only check. Repeated calls to `checkLimit` alone must never decrement the remaining count
-- Limits must be enforced atomically -- race conditions must not allow over-consumption. Implementations must use Lua scripts, stored procedures, or compare-and-swap operations; read-check-write patterns are a contract violation
-- `consumeToken` must never return `allowed: true` when the limit would be exceeded -- exactly N tokens may pass per window, never N+1
+- `checkLimit` must not consume a token it must be a read-only check. Repeated calls to `checkLimit` alone must never decrement the remaining count
+- Limits must be enforced atomically race conditions must not allow over-consumption. Implementations must use Lua scripts, stored procedures, or compare-and-swap operations; read-check-write patterns are a contract violation
+- `consumeToken` must never return `allowed: true` when the limit would be exceeded exactly N tokens may pass per window, never N+1
 - `resetLimit` must set the current count to zero and reset the window start time atomically
-- `setCustomLimit` must not allow a limit of zero or negative values -- the minimum enforceable limit is 1
+- `setCustomLimit` must not allow a limit of zero or negative values the minimum enforceable limit is 1
 - `getLimitStatus` must return the same `remaining` value that the next `consumeToken` call would observe, absent concurrent modifications
 
 **Providers:** Redis (sliding window, token bucket), Upstash, custom
@@ -64,7 +64,7 @@ LimitWindow = second | minute | hour | day
 
 ### Algorithm
 * **Recommended:** Sliding window counter for distributed rate limiting (Redis sorted sets + Lua). Token bucket for burst-tolerant per-client limits. Leaky bucket for smoothing request peaks into a steady throughput.
-* **Atomicity:** All limit checks and consumption must be atomic. Read-check-write patterns are not permitted -- use Lua scripts or equivalent server-side atomic operations.
+* **Atomicity:** All limit checks and consumption must be atomic. Read-check-write patterns are not permitted use Lua scripts or equivalent server-side atomic operations.
 * **Accuracy vs performance tradeoff:** Sliding window log provides exact counts but higher memory. Sliding window counter provides approximate counts with lower memory. Token bucket provides burst tolerance. The implementation must document which algorithm is used and the tradeoff.
 
 ### Storage Model

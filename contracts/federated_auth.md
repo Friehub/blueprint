@@ -31,12 +31,12 @@ TokenExchangeResult { access_token, refresh_token?, id_token?, expires_in }
 ```
 
 **Invariants**
-- `connectIdentity` must verify the provider-issued authorization code before creating the identity link -- accepting an unverified code is a security violation
-- A user must not be able to connect the same provider account to more than one internal user -- duplicate provider account links must be rejected
-- `disconnectIdentity` must not remove the last authentication method if the user has no password set -- at least one sign-in method must remain
-- `handleSamlAssertion` must validate the SAML response signature against the configured provider's certificate -- unsigned assertions must be rejected
+- `connectIdentity` must verify the provider-issued authorization code before creating the identity link accepting an unverified code is a security violation
+- A user must not be able to connect the same provider account to more than one internal user duplicate provider account links must be rejected
+- `disconnectIdentity` must not remove the last authentication method if the user has no password set at least one sign-in method must remain
+- `handleSamlAssertion` must validate the SAML response signature against the configured provider's certificate unsigned assertions must be rejected
 - `initiateOAuth` must generate a cryptographically random `state` parameter and store it for CSRF verification during the callback
-- When PKCE is supported by the provider, `initiateOAuth` must generate a `code_verifier` and use `S256` challenge method -- the verifier must not be logged or transmitted to the provider
+- When PKCE is supported by the provider, `initiateOAuth` must generate a `code_verifier` and use `S256` challenge method the verifier must not be logged or transmitted to the provider
 
 **Providers:** Auth0, Okta, Keycloak, Azure AD, custom
 

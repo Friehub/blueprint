@@ -31,10 +31,10 @@ NumberLookup { valid, carrier?, country_code, line_type: mobile | landline | voi
 ## System-Level Integrations & Constraints
 
 ### Invariants
-- `send` must reject payloads exceeding `max_size` with a `ValidationError` — truncation without caller consent is not permitted
-- `sendBulk` must process recipients independently — failure for one recipient must not block delivery to others
+- `send` must reject payloads exceeding `max_size` with a `ValidationError` truncation without caller consent is not permitted
+- `sendBulk` must process recipients independently failure for one recipient must not block delivery to others
 - `getDeliveryStatus` for a message that has exhausted all retry attempts must return a terminal failure status
-- A message sent with an `idempotency_key` must not be dispatched more than once — duplicate calls must return the existing DeliveryResult
+- A message sent with an `idempotency_key` must not be dispatched more than once duplicate calls must return the existing DeliveryResult
 
 ### Consistency Model
 * **Model:** `strong (default)`
@@ -58,7 +58,7 @@ NumberLookup { valid, carrier?, country_code, line_type: mobile | landline | voi
 
 ### Backpressure
 * If provider capacity is saturated, the module must return a predictable retry signal or defer sending.
-* `sendBulk` must not allow unbounded backlog growth — implement a configurable max queue depth per provider.
+* `sendBulk` must not allow unbounded backlog growth implement a configurable max queue depth per provider.
 
 ### Error Taxonomy
 ### Module-Specific Errors
@@ -155,11 +155,11 @@ blueprint_sms_balance_gauge                 gauge { currency }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Depends On:** (none -- wraps external provider)
+* **Depends On:** (none wraps external provider)
 * **Emits To:** events
 * **Recommends:** queues, audit_log

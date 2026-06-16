@@ -34,7 +34,7 @@ NotificationResult { entry_id, subscribers_notified, total_subscribers, failed_d
 - `listEntries` must return entries sorted by version descending (newest first)
 - `recordEntry` for a version that already exists must return `429 Conflict` unless the existing entry is within the 24-hour edit window and the caller is the original author
 - `subscribe` with no `modules` filter must subscribe the user to all module changelogs; subsequent changes to a new module automatically notify the subscriber
-- A `prerelease` entry must not be the latest entry when listing entries without a prerelease filter -- prerelease entries are excluded from the default list
+- A `prerelease` entry must not be the latest entry when listing entries without a prerelease filter prerelease entries are excluded from the default list
 
 **Providers:** custom, GitHub Releases, Keep a Changelog, changesets, standard-version
 

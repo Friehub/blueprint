@@ -1,11 +1,11 @@
 # Module: embeddings
 
 **Version:** 0.2.1
-**Part:** III -- Data and State
+**Part:** III Data and State
 
 ## Purpose
 
-Defines the interface for generating, storing, indexing, and querying vector embeddings. An embedding is a numerical vector representation of a piece of content (text, image, or structured data) produced by a machine learning model. Embeddings enable semantic similarity search, recommendation, clustering, and retrieval-augmented generation (RAG). This module owns the embedding lifecycle -- generation, upsert into the vector index, similarity query, and deletion -- independent of the embedding model or vector store used. It is a first-class infrastructure module for any system implementing AI-native features.
+Defines the interface for generating, storing, indexing, and querying vector embeddings. An embedding is a numerical vector representation of a piece of content (text, image, or structured data) produced by a machine learning model. Embeddings enable semantic similarity search, recommendation, clustering, and retrieval-augmented generation (RAG). This module owns the embedding lifecycle generation, upsert into the vector index, similarity query, and deletion independent of the embedding model or vector store used. It is a first-class infrastructure module for any system implementing AI-native features.
 
 ---
 
@@ -142,7 +142,7 @@ type SimilarityQueryInput = {
   indexId: EmbeddingIndexId;
   queryVector: number[];
   topK: number;
-  minScore?: number;               // Minimum similarity score (0.0 -- 1.0)
+  minScore?: number;               // Minimum similarity score (0.0 1.0)
   filter?: MetadataFilter[];
   includeVector?: boolean;         // Whether to return the raw vector in results
   includeMetadata?: boolean;
@@ -202,7 +202,7 @@ type ListIndexesInput = {
 
 - `index.created`
 - `index.deleted`
-- `vector.upserted` -- includes `indexId`, `vectorId` (no vector values)
+- `vector.upserted` includes `indexId`, `vectorId` (no vector values)
 - `vector.deleted`
 
 ---
@@ -247,7 +247,7 @@ CREATE TABLE embedding_indexes (
 CREATE TABLE embedding_vectors (
   vector_id         TEXT NOT NULL,
   index_id          UUID NOT NULL REFERENCES embedding_indexes(id) ON DELETE CASCADE,
-  embedding         vector(1536),        -- dimension set at index creation
+  embedding         vector(1536),        dimension set at index creation
   metadata          JSONB DEFAULT '{}',
   upserted_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (index_id, vector_id)

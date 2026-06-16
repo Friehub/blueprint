@@ -39,12 +39,12 @@ TenantStatus = active | suspended | deleted
 ## System-Level Integrations & Constraints
 
 ### Invariants
-- `createTenant` with the same `slug` must return `TENANT_SLUG_CONFLICT` — slugs must be unique across all tenants
+- `createTenant` with the same `slug` must return `TENANT_SLUG_CONFLICT` slugs must be unique across all tenants
 - `suspendTenant` on an already-suspended tenant must be a no-op
-- `deleteTenant` must fail if the tenant has active members or active subscriptions — cascade deletion requires explicit force flag
+- `deleteTenant` must fail if the tenant has active members or active subscriptions cascade deletion requires explicit force flag
 - A tenant with status `deleted` must not accept any state-mutating operations except `getTenant` (for audit trails)
-- `getTenantBySlug` must perform a case-insensitive slug lookup — slugs are normalised to lowercase on create
-- The last `owner` of a tenant cannot be removed via `removeMember` — transfer ownership first
+- `getTenantBySlug` must perform a case-insensitive slug lookup slugs are normalised to lowercase on create
+- The last `owner` of a tenant cannot be removed via `removeMember` transfer ownership first
 
 ### Consistency Model
 * **Model:** `strong`
@@ -178,7 +178,7 @@ blueprint_tenants_invites_sent_total       counter
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

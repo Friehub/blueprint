@@ -32,10 +32,10 @@ ProbeConfig { failure_threshold, success_threshold, period_seconds, timeout_seco
 ```
 
 **Invariants**
-- `livenessProbe` must return immediately -- it must not make network calls or dependency checks. It only verifies the process is running
+- `livenessProbe` must return immediately it must not make network calls or dependency checks. It only verifies the process is running
 - `readinessProbe` must check all declared dependencies before returning `ready: true`. If any dependency is unhealthy and its failure count exceeds the configured threshold, readiness must return `ready: false`
 - A dependency that has been unhealthy for longer than its configured threshold must cause the local service to report `degraded`, even if the dependency later recovers briefly
-- Startup probes are required for services that take longer than 5 seconds to initialise. The startup probe runs only once -- on success, it is replaced by liveness and readiness probes
+- Startup probes are required for services that take longer than 5 seconds to initialise. The startup probe runs only once on success, it is replaced by liveness and readiness probes
 
 **Providers:** Kubernetes, Consul, custom health endpoint
 
@@ -63,7 +63,7 @@ ProbeConfig { failure_threshold, success_threshold, period_seconds, timeout_seco
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Backpressure
-* Health checks must not queue -- if a dependency is saturated, the check must return the current state immediately rather than waiting.
+* Health checks must not queue if a dependency is saturated, the check must return the current state immediately rather than waiting.
 
 ### Error Taxonomy
 * Inherits universal domain errors (NotFound, Unauthorized, ValidationError, RateLimited, ProviderError, Timeout).
@@ -115,11 +115,11 @@ blueprint_health_system_status                  gauge { status }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Depends On:** (none -- infrastructure primitive / wraps external provider)
+* **Depends On:** (none infrastructure primitive / wraps external provider)
 * **Emits To:** events
 * **Recommends:** graceful_shutdown (for readiness-driven draining), telemetry, notifications

@@ -31,11 +31,11 @@ DeadlockPriority = normal | low | high
 ```
 
 **Invariants**
-- `executeWithIsolation` with level `serializable` must guarantee that concurrent transactions produce the same result as if they executed sequentially -- violations must be detected and reported
-- A deadlock victim must be selected based on `deadlock_priority` -- the lowest priority transaction must be rolled back. If priorities are equal, the transaction with the least work done must be selected
-- `distributedTransaction` must coordinate all steps via the configured coordinator -- the coordinator must maintain durable state to recover from crashes
+- `executeWithIsolation` with level `serializable` must guarantee that concurrent transactions produce the same result as if they executed sequentially violations must be detected and reported
+- A deadlock victim must be selected based on `deadlock_priority` the lowest priority transaction must be rolled back. If priorities are equal, the transaction with the least work done must be selected
+- `distributedTransaction` must coordinate all steps via the configured coordinator the coordinator must maintain durable state to recover from crashes
 - If a distributed transaction step fails, all prior steps must have their compensation executed before the transaction returns a failure
-- `setLockTimeout` must apply to all subsequent transactions in the current session -- changing lock timeout mid-transaction is a contract violation
+- `setLockTimeout` must apply to all subsequent transactions in the current session changing lock timeout mid-transaction is a contract violation
 
 **Dependencies:** distributed_lock
 
@@ -60,7 +60,7 @@ DeadlockPriority = normal | low | high
 
 ### Multi-Region Behavior
 * **Mode:** Isolation levels are per-database; distributed transactions across regions require a coordinator with consensus.
-* **Details:** Cross-region distributed transactions are strongly discouraged -- prefer saga patterns.
+* **Details:** Cross-region distributed transactions are strongly discouraged prefer saga patterns.
 
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
@@ -122,7 +122,7 @@ blueprint_transaction_isolation_deadlocks_total    { table }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

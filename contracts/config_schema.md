@@ -28,7 +28,7 @@ SchemaRef { name, version, field_count, required_count }
 ```
 
 **Invariants**
-- `validateConfig` must not mutate the config values -- it must be a read-only check
+- `validateConfig` must not mutate the config values it must be a read-only check
 - `resolveConfig` must apply overrides in order: defaults < file config < env vars < explicit overrides
 - A required field without a value and without a default must produce a hard validation error
 

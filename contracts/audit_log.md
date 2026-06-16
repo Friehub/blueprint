@@ -30,18 +30,18 @@ ChainBreak { index, event_id, expected_previous_hash, actual_previous_hash, reas
 
 **Invariants**
 - Audit events must never be deleted or modified after creation
-- `recordEvent` must be non-blocking -- it must not add latency to the calling operation
+- `recordEvent` must be non-blocking it must not add latency to the calling operation
 - Each new audit event must include a `chain_hash` computed from the event content concatenated with the `chain_hash` of the preceding event, forming an immutable hash chain
 - `verifyChain` must detect any break in the chain: a missing event, a modified event hash, or an inconsistency between the stored `previous_hash` and the actual hash of the preceding event. Any break must be surfaced immediately in the `ChainVerificationReport`
 - `recordEvent` must reject events with a `chain_hash` that does not match the computed hash of `(event_content + previous_hash)`, returning `CHAIN_HASH_MISMATCH`
 - `queryEvents` must return events in descending `created_at` order; results must be internally consistent within a single page
-- An audit event's `actor` and `resource` fields must be non-null -- every event must identify both who performed the action and what it was performed on
+- An audit event's `actor` and `resource` fields must be non-null every event must identify both who performed the action and what it was performed on
 
 **Providers:** custom append-only table, Axiom, Datadog, custom event stream
 
 ---
 
-## Part IV -- Commerce
+## Part IV Commerce
 
 ---
 
@@ -82,7 +82,7 @@ verifyChain       → audit_log.chain.verified         { from, to, chain_intact,
                  OR audit_log.chain.break_detected   { from, to, break_count }
 ```
 
-Note: `audit_log` events are meta-events about the audit system itself. The audit events recorded via `recordEvent` are not re-emitted as domain events -- they are stored in the append-only table and queried via `queryEvents`.
+Note: `audit_log` events are meta-events about the audit system itself. The audit events recorded via `recordEvent` are not re-emitted as domain events they are stored in the append-only table and queried via `queryEvents`.
 
 ### Temporal Constraints
 ```
@@ -110,7 +110,7 @@ blueprint_audit_log_ingestion_lag_ms             gauge
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none -- must be dependency-free to avoid circular dependencies)
+* **Depends On:** (none must be dependency-free to avoid circular dependencies)
 * **Emits To:** events
 * **Recommends:** (none)
 * **Pagination Sort Key:** Uses cursor-based pagination sorting by `created_at DESC` on `queryEvents`.

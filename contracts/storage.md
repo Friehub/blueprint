@@ -29,7 +29,7 @@ SignedUrl { url, expires_at, method: GET | PUT }
 
 **Invariants**
 - Signed upload URLs must enforce `content_type` and `max_size` constraints when provided
-- `deleteFile` must be idempotent -- deleting a non-existent key must not throw
+- `deleteFile` must be idempotent deleting a non-existent key must not throw
 - Any URL submitted for signed upload, copy, or move must be validated against a configured allowlist of permitted domains or CIDR ranges before the URL is used
 - Any URL that resolves to a private IP address range (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8) or a cloud metadata endpoint (169.254.169.254) must be rejected unconditionally
 - Redirect following must be disabled or constrained to the originally allowed domain
@@ -144,11 +144,11 @@ blueprint_storage_transfer_bytes             counter { bucket, operation: upload
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Depends On:** (none -- wraps external provider)
+* **Depends On:** (none wraps external provider)
 * **Emits To:** events
 * **Recommends:** audit_log

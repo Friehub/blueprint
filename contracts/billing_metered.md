@@ -31,7 +31,7 @@ UsageAlert { id, user_id, metric, threshold, type: percentage|absolute, triggere
 ```
 
 **Invariants**
-- `recordUsage` must be idempotent on `(user_id, metric, timestamp, idempotency_key)` — duplicate recording of the same usage at the same timestamp must not double-count
+- `recordUsage` must be idempotent on `(user_id, metric, timestamp, idempotency_key)` duplicate recording of the same usage at the same timestamp must not double-count
 - Usage timestamps must be in UTC; the module rejects non-UTC timestamps with `INVALID_TIMEZONE`
 - Aggregation windows are calendar-aligned per the plan's `billing_frequency` (daily, monthly, or billing-period); partial periods are prorated
 - Price tier thresholds are evaluated in ascending order; the first matching tier determines the price for the quantity bracket
@@ -184,6 +184,6 @@ blueprint_billing_metered_ingestion_lag_seconds    histogram { metric }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise

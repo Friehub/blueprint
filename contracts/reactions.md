@@ -24,9 +24,9 @@ ReactionType = like | love | laugh | angry | sad | fire | clap (configurable)
 ```
 
 **Invariants**
-- A user can have at most one reaction of each type per subject -- enforced via UNIQUE constraint on `(user_id, subject_type, subject_id, type)`
-- `addReaction` must be upsert -- calling it twice with the same parameters must not create a duplicate row; the second call must be a no-op
-- `removeReaction` on a reaction that does not exist must be a no-op -- it must not error
+- A user can have at most one reaction of each type per subject enforced via UNIQUE constraint on `(user_id, subject_type, subject_id, type)`
+- `addReaction` must be upsert calling it twice with the same parameters must not create a duplicate row; the second call must be a no-op
+- `removeReaction` on a reaction that does not exist must be a no-op it must not error
 - Reactions on a deleted subject must be removed or anonymised within the same transaction as the subject deletion (cascading delete or trigger)
 - `getReactions` must return a valid summary even when no reactions exist (`total: 0`, `by_type: {}`)
 
@@ -97,7 +97,7 @@ removeReaction    → reactions.reaction.removed        { user_id, subject_type,
 ```
 Reaction record retention:
     duration:       indefinite (subject to data retention policy)
-    on_expiry:      N/A -- reactions are deleted when the subject is deleted (cascade)
+    on_expiry:      N/A reactions are deleted when the subject is deleted (cascade)
 
   Aggregation cache:
     default:        60 seconds

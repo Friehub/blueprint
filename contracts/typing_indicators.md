@@ -25,7 +25,7 @@ TypingSubscription { id, channel, handler, status: active|paused }
 
 **Invariants**
 - A user who has not sent a `startTyping` heartbeat within the timeout must be automatically expired from the typing list
-- `stopTyping` must immediately remove the user from the typing indicator list -- it must not wait for expiry
+- `stopTyping` must immediately remove the user from the typing indicator list it must not wait for expiry
 - A user must not appear in the typing list for a channel they are not a participant of
 
 **Providers:** custom (WebSocket), Presence (Liveblocks, Ably, Pusher)
@@ -90,11 +90,11 @@ blueprint_typing_indicators_active_users_total    { channel }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** presence, messaging
-* **Emits To:** (none -- ephemeral state only)
+* **Emits To:** (none ephemeral state only)
 * **Recommends:** live_updates

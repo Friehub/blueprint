@@ -25,7 +25,7 @@ FollowCounts { followers, following }
 ```
 
 **Invariants**
-- `follow` must be idempotent -- following twice must not create a duplicate relation
+- `follow` must be idempotent following twice must not create a duplicate relation
 - Self-follows must be rejected
 
 ---
@@ -76,7 +76,7 @@ unfollow → follows.deleted    { follower_id, followee_id }
 ```
 Follow relationship:
     retention:         indefinite (until unfollow)
-    on_expiry:         N/A -- follow relationships persist until explicitly removed
+    on_expiry:         N/A follow relationships persist until explicitly removed
 
   Follower count cache TTL:
     default:           5 minutes

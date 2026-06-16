@@ -35,8 +35,8 @@ TopologyStrategy = read_replicas | sharding | multi_region
 ```
 
 **Invariants**
-- `configureSharding` with strategy `hash` must distribute data uniformly across shards -- a new shard must trigger rebalancing of existing data
-- `getShard` must be deterministic for the same key -- the same key must always return the same shard, regardless of cluster state
+- `configureSharding` with strategy `hash` must distribute data uniformly across shards a new shard must trigger rebalancing of existing data
+- `getShard` must be deterministic for the same key the same key must always return the same shard, regardless of cluster state
 - A replication model of `leader_follower` must have exactly one primary; `multi_leader` must have at least two; `leaderless` must have at least three
 - `triggerFailover` must be rejected if the configured `cooldown_ms` has not elapsed since the last failover
 

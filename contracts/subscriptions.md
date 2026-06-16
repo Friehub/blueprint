@@ -29,10 +29,10 @@ AccessEvent { user_id, resource_id, granted, reason, timestamp }
 ## System-Level Integrations & Constraints
 
 ### Invariants
-- `grantEntitlement` with the same `(user_id, entitlement_type)` must be idempotent — duplicate calls must return the existing entitlement and not extend expiry
+- `grantEntitlement` with the same `(user_id, entitlement_type)` must be idempotent duplicate calls must return the existing entitlement and not extend expiry
 - `hasAccess` must return `false` for an entitlement that has passed its `expires_at` even if the entitlement record still exists
-- `revokeEntitlement` must immediately void access — a subsequent `hasAccess` call must return `false`
-- An entitlement with `source: trial` must have a non-null `expires_at` — unlimited trials are not permitted
+- `revokeEntitlement` must immediately void access a subsequent `hasAccess` call must return `false`
+- An entitlement with `source: trial` must have a non-null `expires_at` unlimited trials are not permitted
 - `getEntitlements` must never return expired entitlements unless explicitly requested with an `include_expired` option
 
 ### Consistency Model
@@ -143,7 +143,7 @@ blueprint_subscriptions_expirations_total         counter { type }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

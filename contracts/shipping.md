@@ -38,11 +38,11 @@ AddressValidation { valid, normalized_address?, suggestions? }
 ## System-Level Integrations & Constraints
 
 ### Invariants
-- `createShipment` with the same `order_id` must be idempotent — duplicate calls must return the existing shipment and not create duplicates
+- `createShipment` with the same `order_id` must be idempotent duplicate calls must return the existing shipment and not create duplicates
 - `cancelShipment` on an already-cancelled shipment must be a no-op
 - `trackShipment` must return the most recent tracking event from the carrier; stale events older than `max_lag` must be surfaced as stale tracking status
-- A label URL returned by `createLabel` must be a signed, time-limited URL — the URL must expire after the configured label expiry duration
-- `validateAddress` must never surface full address data in logs or span attributes — only the validation result (valid, normalized address without unit numbers, suggestions) may be emitted
+- A label URL returned by `createLabel` must be a signed, time-limited URL the URL must expire after the configured label expiry duration
+- `validateAddress` must never surface full address data in logs or span attributes only the validation result (valid, normalized address without unit numbers, suggestions) may be emitted
 
 ### Consistency Model
 * **Model:** `strong (default)`
@@ -50,7 +50,7 @@ AddressValidation { valid, normalized_address?, suggestions? }
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_least_once` for shipment state updates and tracking events.
-* **Details:** Duplicate tracking callbacks must not duplicate shipments — upsert on tracking_number.
+* **Details:** Duplicate tracking callbacks must not duplicate shipments upsert on tracking_number.
 
 ### Worker Scaling
 * **Policy:** Rate lookup, label creation, and tracking ingestion must be independently scalable.
@@ -159,7 +159,7 @@ blueprint_shipping_labels_created_total      counter { format }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

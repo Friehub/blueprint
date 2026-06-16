@@ -31,7 +31,7 @@ CourseStatus = draft | published | archived | deprecated
 **Invariants**
 - Lesson order must be unique within a course; `addLesson` and `reorderLessons` must reject duplicate order values with `LESSON_ORDER_CONFLICT`
 - `publishCourse` on an already-published course must return the existing published state, not create a duplicate publication
-- `archiveCourse` must reject if the course has active enrollments -- those must be completed or transferred first
+- `archiveCourse` must reject if the course has active enrollments those must be completed or transferred first
 - Published courses must not accept structural edits (add/remove/reorder lessons) unless explicitly republished via `publishCourse`
 - Archived courses must not accept new lessons or updates via `addLesson` or `updateLesson`
 - A course with status `deprecated` must still be readable via `getCourse` but must not appear in `listCourses` by default
@@ -110,11 +110,11 @@ createCourse      → course.created              { course_id, title, owner_id }
 ```
 Course publish schedule:
     effective:      immediate on publishCourse call
-    on_expiry:      N/A -- publication is permanent until archived
+    on_expiry:      N/A publication is permanent until archived
 
   Lesson content retention:
     duration:       indefinite (until course is deleted)
-    on_expiry:      N/A -- content is preserved for enrolled students
+    on_expiry:      N/A content is preserved for enrolled students
 ```
 
 ### Storage Model

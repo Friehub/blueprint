@@ -36,7 +36,7 @@ Capability = chat | streaming | tools | vision | json_mode | function_calling
 **Invariants**
 - `chat` must return a complete response; partial or interrupted responses must surface an error
 - `chatStream` must emit a final chunk with `done: true` and accumulated usage when complete
-- The gateway must enforce `context_window` limits -- if total tokens exceed the model's limit, it must reject or truncate rather than silently fail
+- The gateway must enforce `context_window` limits if total tokens exceed the model's limit, it must reject or truncate rather than silently fail
 - All user-supplied inputs passed to `chat` or `chatStream` must be screened by `content_safety.checkContent` with the `prompt_injection` policy enabled before being used as part of a prompt. Requests containing prompt injection must be rejected.
 
 **Providers:** OpenAI, Anthropic, Google Vertex AI, AWS Bedrock, NVIDIA NIM, Ollama, together.ai, custom
@@ -127,10 +127,10 @@ blueprint_llm_gateway_requests_total           { model, provider, status }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new model capability: non-breaking if consumers use capability detection; breaking otherwise
-- Changing token counting algorithm: breaking — may affect cost estimates and usage tracking
+- Changing token counting algorithm: breaking may affect cost estimates and usage tracking
 
 ### Module Dependencies
 * **Depends On:** content_safety

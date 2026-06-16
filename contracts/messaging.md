@@ -30,7 +30,7 @@ MessageContent { type: text | image | file | system, body, attachments? }
 ```
 
 **Invariants**
-- Deleted messages must show a tombstone, not disappear -- the thread history must remain intact
+- Deleted messages must show a tombstone, not disappear the thread history must remain intact
 - A user cannot send a message to a thread they are not a participant of
 - Messages within a thread must have monotonically increasing sequence numbers. Sequence numbers are assigned at persist time and are immutable.
 - `client_id` prevents duplicate optimistic sends: if a message with the same `(thread_id, client_id)` exists, return the existing message instead of creating a duplicate
@@ -170,7 +170,7 @@ blueprint_messaging_unread_total          gauge { user_id? }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

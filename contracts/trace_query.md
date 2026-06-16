@@ -116,11 +116,11 @@ blueprint_trace_query_trace_retrieval_latency_ms   histogram
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** telemetry
-* **Emits To:** (none — read-only)
+* **Emits To:** (none read-only)
 * **Recommends:** error_tracking, security_monitoring, analytics, audit_log, search

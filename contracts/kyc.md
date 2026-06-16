@@ -28,12 +28,12 @@ DocumentType = passport | national_id | drivers_license | utility_bill | selfie
 ```
 
 **Invariants**
-- `submitVerification` must reject if an active `pending` or `approved` verification exists for the same `user_id` — return `DUPLICATE_VERIFICATION` with the existing `request_id`.
-- `approveVerification` must only transition from `pending` — calling it on an already `approved` or `expired` request returns `INVALID_TRANSITION`.
-- `rejectVerification` must include a non-empty `reason` string — rejections without a reason are a contract violation.
-- Verification expiry must be enforced by a scheduled job — `getVerificationStatus` must treat expired records as `expired` even if the DB row still says `approved`.
-- Document references in `documents` must point to valid entries in the `storage` module — orphan document references are a contract violation.
-- `listPendingVerifications` must only return records with status `pending` — records expiring within the next hour must be returned with an `expires_soon` flag.
+- `submitVerification` must reject if an active `pending` or `approved` verification exists for the same `user_id` return `DUPLICATE_VERIFICATION` with the existing `request_id`.
+- `approveVerification` must only transition from `pending` calling it on an already `approved` or `expired` request returns `INVALID_TRANSITION`.
+- `rejectVerification` must include a non-empty `reason` string rejections without a reason are a contract violation.
+- Verification expiry must be enforced by a scheduled job `getVerificationStatus` must treat expired records as `expired` even if the DB row still says `approved`.
+- Document references in `documents` must point to valid entries in the `storage` module orphan document references are a contract violation.
+- `listPendingVerifications` must only return records with status `pending` records expiring within the next hour must be returned with an `expires_soon` flag.
 
 **Providers:** Smile ID, Onfido, Jumio, Sumsub
 
@@ -155,7 +155,7 @@ blueprint_kyc_errors_total               { code }
 
 ### Breaking Change Policy
 - Adding a new document type enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
-- Removing a verification status enum value: breaking — requires major version bump and migration guide
+- Removing a verification status enum value: breaking requires major version bump and migration guide
 - Changing verification expiry from fixed to configurable: non-breaking
 - Adding a new required field to VerificationRequest: breaking
 

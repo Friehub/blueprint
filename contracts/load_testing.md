@@ -33,9 +33,9 @@ ComparisonRun { run_id, scenario, score, metrics: MetricSummary }
 ```
 
 **Invariants**
-- `runScenario` must execute stages in order (ramp_up -> steady -> ramp_down) -- stage order must not be altered
-- If any stage exceeds the scenario's SLA thresholds, the run must not be marked as passed -- SLA validation is per-stage and cumulative
-- `cancelRun` must stop the current stage gracefully and drop subsequent stages -- it must not kill in-flight requests
+- `runScenario` must execute stages in order (ramp_up -> steady -> ramp_down) stage order must not be altered
+- If any stage exceeds the scenario's SLA thresholds, the run must not be marked as passed SLA validation is per-stage and cumulative
+- `cancelRun` must stop the current stage gracefully and drop subsequent stages it must not kill in-flight requests
 - A scenario without defined `SlaThresholds` must execute but must not produce a passing or failing result for SLA-related metrics
 
 **Providers:** k6, Locust, Artillery, Gatling, custom
@@ -122,7 +122,7 @@ blueprint_load_testing_active_runs              gauge
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new stage type: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

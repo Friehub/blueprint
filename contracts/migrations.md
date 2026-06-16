@@ -32,7 +32,7 @@ MigrationOptions { dry_run?, timeout?, lock_timeout? }
 ```
 
 **Invariants**
-- Migrations must be applied in version order -- skipping a version is a contract violation
+- Migrations must be applied in version order skipping a version is a contract violation
 - `rollback` must revert migrations in reverse order of application, one step at a time
 - `validateDrift` must compare the current database schema against the cumulative expected schema, not just the latest migration
 
@@ -122,11 +122,11 @@ blueprint_migrations_applied_total              { result }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new migration record type enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Depends On:** (none -- infrastructure primitive)
+* **Depends On:** (none infrastructure primitive)
 * **Emits To:** events
 * **Recommends:** audit_log, connection_pool

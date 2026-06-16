@@ -28,7 +28,7 @@ ReconnectOptions { last_event_id, batch_size, since }
 
 **Invariants**
 - `pushUpdate` must deliver the delta to all active subscriptions matching the resource type and filter
-- `reconnect` must replay missed events starting from `last_event_id` -- no events before that ID must be replayed
+- `reconnect` must replay missed events starting from `last_event_id` no events before that ID must be replayed
 - A subscription that fails to acknowledge heartbeats within the timeout must be marked as `reconnecting`
 
 **Providers:** WebSocket, SSE, Phoenix Channels, Socket.IO, custom
@@ -103,7 +103,7 @@ blueprint_live_updates_active_subscriptions_total    { resource_type }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new event type to UpdateDelta: non-breaking if consumers handle unknown event types gracefully; breaking otherwise
 

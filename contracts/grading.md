@@ -30,11 +30,11 @@ GradeStatus = draft | graded | published | finalized | returned
 ```
 
 **Invariants**
-- `publishGrade` must reject if the grade status is already `published` and no audit trail exists — return `GRADE_CONFLICT` if grade_id already published.
-- `gradeSubmission` must validate total_score against rubric total_points at the DB level — if total_score > rubric.total_points, return `INVALID_SCORE`.
-- `finalizeGrades` must set `gradebook.status = finalized` atomically — once finalized, all `updateGrade` and `publishGrade` calls on that course_id return `GRADEBOOK_FINALIZED`.
+- `publishGrade` must reject if the grade status is already `published` and no audit trail exists return `GRADE_CONFLICT` if grade_id already published.
+- `gradeSubmission` must validate total_score against rubric total_points at the DB level if total_score > rubric.total_points, return `INVALID_SCORE`.
+- `finalizeGrades` must set `gradebook.status = finalized` atomically once finalized, all `updateGrade` and `publishGrade` calls on that course_id return `GRADEBOOK_FINALIZED`.
 - `getGradebook` must compute `averages` and `distribution` from the current finalized grades only, not from draft or archived grade records.
-- Quiz/exam auto-scoring must write a grade record attributable to `submission_id` and `rubric_id` — anonymous scores without a rubric reference are a contract violation.
+- Quiz/exam auto-scoring must write a grade record attributable to `submission_id` and `rubric_id` anonymous scores without a rubric reference are a contract violation.
 - `updateGrade` on a grade with status `finalized` must be rejected with `GRADE_CONFLICT`; updates to finalized grades require creating a grade revision via a separate `amendGrade` flow.
 
 **Providers:** LMS gradebooks, custom education platforms, Canvas grading, Moodle grade center, Blackboard gradebook
@@ -116,9 +116,9 @@ updateGrade        → grading.grade.updated       { grade_id, version }
 
 ### Breaking Change Policy
 - Adding a new optional field to Rubric/Grade types: non-breaking
-- Removing a grade status enum value: breaking — requires major version bump and migration guide
+- Removing a grade status enum value: breaking requires major version bump and migration guide
 - Changing total_score validation from advisory to strict: non-breaking if documented
-- Adding a new invariant on rubric criteria structure: breaking — existing rubrics must be backfilled
+- Adding a new invariant on rubric criteria structure: breaking existing rubrics must be backfilled
 
 **Errors:** `SUBMISSION_NOT_FOUND`, `RUBRIC_NOT_FOUND`, `GRADE_CONFLICT`, `GRADEBOOK_FINALIZED`, `INVALID_SCORE`, `GRADE_NOT_PUBLISHABLE`
 

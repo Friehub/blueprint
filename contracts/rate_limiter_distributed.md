@@ -5,7 +5,7 @@
 ---
 
 ### `rate_limiter_distributed`
-Distributed rate limiting using shared Redis counter or token bucket — correct across multiple application instances.
+Distributed rate limiting using shared Redis counter or token bucket correct across multiple application instances.
 
 **Functions**
 ```
@@ -26,7 +26,7 @@ FallbackMode = reject | allow_with_warning | allow_unlimited
 ```
 
 **Invariants**
-- Rate limit state must be shared across all instances — local counters are not acceptable
+- Rate limit state must be shared across all instances local counters are not acceptable
 - Redis unavailability must not crash the application; `fallback_mode` defines behaviour
 - Clock skew between instances must not exceed 1 second for sliding window accuracy
 - Token bucket refill must be atomic (Lua script or Redis transaction)
@@ -43,7 +43,7 @@ FallbackMode = reject | allow_with_warning | allow_unlimited
 * **Details:** Rate limit checks may over-allow during Redis failover; under-allow is preferred over over-allow
 
 ### Failure Modes
-* **Redis Unavailable:** Use `FallbackMode` — `allow_with_warning` recommended for read paths, `reject` for write paths
+* **Redis Unavailable:** Use `FallbackMode` `allow_with_warning` recommended for read paths, `reject` for write paths
 * **Network Partition:** Local rate limit cache with short TTL (100ms) prevents thundering herd on Redis recovery
 
 ### Observability

@@ -28,9 +28,9 @@ BreakingChange { api_id, from_version, to_version, change_type, migration_requir
 ```
 
 **Invariants**
-- `deprecateVersion` must set a `sunset_date` at least 90 days from the deprecation date -- shorter deprecation windows must require explicit override with a documented exception
-- A deprecated API version must continue to function identically until the sunset date -- degrading a deprecated API's behavior is a contract violation
-- `setVersioningStrategy` must not break existing clients -- strategy changes must be versioned and introduced as a new API version
+- `deprecateVersion` must set a `sunset_date` at least 90 days from the deprecation date shorter deprecation windows must require explicit override with a documented exception
+- A deprecated API version must continue to function identically until the sunset date degrading a deprecated API's behavior is a contract violation
+- `setVersioningStrategy` must not break existing clients strategy changes must be versioned and introduced as a new API version
 - A version that reaches its `sunset_date` must return a `410 Gone` response with a `Sunset` header pointing to the migration guide
 - Every breaking change must have an accompanying migration guide that documents the change, the migration path, and the fallback behavior
 

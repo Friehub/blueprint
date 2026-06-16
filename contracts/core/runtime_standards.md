@@ -120,7 +120,7 @@ Every module that exposes a publicly reachable endpoint must declare its DDoS mi
 
 ### 8.2 Mitigation Layer Availability
 
-The module must specify its behaviour when the mitigation layer is unavailable -- whether the module continues serving traffic at reduced capacity, enters a read-only mode, or shuts down non-critical endpoints. A module that continues serving must document the maximum sustained request rate it can handle without the mitigation layer.
+The module must specify its behaviour when the mitigation layer is unavailable whether the module continues serving traffic at reduced capacity, enters a read-only mode, or shuts down non-critical endpoints. A module that continues serving must document the maximum sustained request rate it can handle without the mitigation layer.
 
 ### 8.3 Unauthenticated Request Rate
 
@@ -128,8 +128,8 @@ Any module that exposes a publicly reachable endpoint must declare its maximum a
 
 ### 8.4 Unauthenticated Rate Limit Tier
 
-Requests without proven identity form a distinct rate limit scope from authenticated requests. The `rate_limiting` module must apply a more aggressive rate limit to this tier -- by default, unauthenticated limits must be at least 10x stricter than authenticated limits for the same endpoint. A module that cannot maintain this ratio must document the reason.
+Requests without proven identity form a distinct rate limit scope from authenticated requests. The `rate_limiting` module must apply a more aggressive rate limit to this tier by default, unauthenticated limits must be at least 10x stricter than authenticated limits for the same endpoint. A module that cannot maintain this ratio must document the reason.
 
 ### 8.5 Connection Flood Handling
 
-Modules that accept persistent connections (WebSocket, SSE, long-poll) must declare a maximum connection rate per source IP. Excess connections beyond the declared rate must be rejected with a `429` response before a connection is established. The module must not accept a connection only to close it after detecting overload -- rejection must happen before resource allocation.
+Modules that accept persistent connections (WebSocket, SSE, long-poll) must declare a maximum connection rate per source IP. Excess connections beyond the declared rate must be rejected with a `429` response before a connection is established. The module must not accept a connection only to close it after detecting overload rejection must happen before resource allocation.

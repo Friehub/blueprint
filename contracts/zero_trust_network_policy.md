@@ -30,9 +30,9 @@ TrustPolicyRule { effect: allow|deny, source, target, conditions, priority }
 ```
 
 **Invariants**
-- Every inter-service call must present a verifiable identity -- unauthenticated calls between services must be rejected at the network layer
+- Every inter-service call must present a verifiable identity unauthenticated calls between services must be rejected at the network layer
 - `verifyServiceIdentity` must check that the caller's identity is not expired or revoked before returning a positive verification
-- A service must not be able to call another service unless a `TrustPolicy` explicitly allows it -- implicit trust between any two services in the same deployment is a contract violation
+- A service must not be able to call another service unless a `TrustPolicy` explicitly allows it implicit trust between any two services in the same deployment is a contract violation
 - Identity rotation must provide a grace period during which both the old and new credentials are accepted to prevent rotation-related outages
 - All identity verification decisions must be logged to `audit_log` regardless of whether the verification passed or failed
 
@@ -133,7 +133,7 @@ The `service_mesh` module declares these parameters in its deployment configurat
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

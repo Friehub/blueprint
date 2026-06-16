@@ -114,6 +114,6 @@ blueprint_circuit_breaker_state_changes_total     { breaker_name, state }
 - Removing a breaker name or renaming: major version bump; all dependent callers must update
 
 ### Module Dependencies
-* **Depends On:** (none -- infrastructure primitive)
+* **Depends On:** (none infrastructure primitive)
 * **Emits To:** events
 * **Recommends:** metrics, alerting

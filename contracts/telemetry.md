@@ -33,7 +33,7 @@ TelemetryConfig { service_name, environment, sampling_rate, exporters }
 **Invariants**
 - `createSpan` without an active trace context must generate a new trace_id; with a context it must inherit it
 - `endSpan` with a pending span must compute duration automatically if no start_time was provided
-- Telemetry export must never block the calling function -- export failures must not propagate to the caller
+- Telemetry export must never block the calling function export failures must not propagate to the caller
 
 **Providers:** OpenTelemetry, Datadog, Honeycomb, Sentry, custom OTLP exporter
 
@@ -69,7 +69,7 @@ TelemetryConfig { service_name, environment, sampling_rate, exporters }
 
 ### Event Emission
 All events are emitted using at-least-once delivery with UUID v4 envelope.
-* None explicitly defined. Telemetry is the emission layer for other modules -- it does not emit its own business events.
+* None explicitly defined. Telemetry is the emission layer for other modules it does not emit its own business events.
 
 ### Temporal Constraints
 ```
@@ -102,11 +102,11 @@ blueprint_telemetry_spans_created_total         { status }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Depends On:** (none -- infrastructure primitive / wraps open telemetry SDK)
-* **Emits To:** (none -- exports to external telemetry backend)
+* **Depends On:** (none infrastructure primitive / wraps open telemetry SDK)
+* **Emits To:** (none exports to external telemetry backend)
 * **Recommends:** config, health

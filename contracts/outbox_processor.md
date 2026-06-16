@@ -5,7 +5,7 @@
 ---
 
 ### `outbox_processor`
-Transactional outbox pattern — background processor that publishes unpublished events with idempotent handling.
+Transactional outbox pattern background processor that publishes unpublished events with idempotent handling.
 
 **Functions**
 ```
@@ -29,10 +29,10 @@ OutboxStatus = pending | publishing | published | failed
 ```
 
 **Invariants**
-- The processor must be idempotent — running it twice produces the same result
+- The processor must be idempotent running it twice produces the same result
 - Optimistic locking must be used when marking entries as published (prevent double-publish)
 - Entries must never be deleted, only marked as published (audit trail requirement)
-- The processor must not block on a single failed entry — skip and continue the batch
+- The processor must not block on a single failed entry skip and continue the batch
 - Publishing order must be preserved per aggregate (FIFO within aggregate_id)
 - Poll interval must be configurable per deployment (default 1000ms)
 

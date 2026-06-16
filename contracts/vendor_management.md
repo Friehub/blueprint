@@ -47,10 +47,10 @@ VendorReport { vendor_id, name, contract_count, health_score, risk_flags, total_
 ## System-Level Integrations & Constraints
 
 ### Invariants
-- `registerVendor` with the same vendor `name` must return the existing vendor record — duplicate registration is idempotent
+- `registerVendor` with the same vendor `name` must return the existing vendor record duplicate registration is idempotent
 - A vendor with a `security` risk of `critical` severity must have its status set to `under_review` automatically
 - `initiateOffboarding` must fail with `VENDOR_HAS_ACTIVE_CONTRACTS` if any active contract references services still in production use
-- Health assessment scores must be between 0 and 100 inclusive — scores outside this range must be rejected
+- Health assessment scores must be between 0 and 100 inclusive scores outside this range must be rejected
 - A vendor whose `status` is `offboarded` must not accept any state-mutating operations
 
 ### Consistency Model
@@ -198,7 +198,7 @@ blueprint_vendor_management_offboardings_total      counter { status }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

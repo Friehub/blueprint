@@ -38,14 +38,14 @@ GiftCardStatus = active | partially_redeemed | redeemed | void | expired
 ```
 
 **Invariants**
-- `validateCoupon` must not mark the coupon as used -- that is `markCouponUsed`'s job
+- `validateCoupon` must not mark the coupon as used that is `markCouponUsed`'s job
 - `markCouponUsed` must be idempotent for the same `(code, order_id)` pair; a second call with the same pair must not increment `used_count`
-- Gift card redemptions must not exceed available balance -- the database must enforce `balance >= 0` via CHECK constraint
+- Gift card redemptions must not exceed available balance the database must enforce `balance >= 0` via CHECK constraint
 - Gift card redemption must be idempotent for the same `(code, order_id, amount)` tuple
-- Coupon codes and gift card codes must be unique within their respective tables -- enforced via UNIQUE constraint
-- A promotion's `end_at` must be in the future at the time of creation -- enforced at the application layer
+- Coupon codes and gift card codes must be unique within their respective tables enforced via UNIQUE constraint
+- A promotion's `end_at` must be in the future at the time of creation enforced at the application layer
 - `applyPromotionToCart` must reject a promotion that has reached its `usage_limit`
-- A flash sale's `sale_price` must be less than the catalog variant's current price -- validated at creation
+- A flash sale's `sale_price` must be less than the catalog variant's current price validated at creation
 
 ---
 

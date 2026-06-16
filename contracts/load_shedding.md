@@ -46,7 +46,7 @@ Priority = critical | high | medium | low | background
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_most_once` for shedding events.
-* **Details:** Duplicate shedding decisions must be safe -- rejecting an already-rejected request is a no-op.
+* **Details:** Duplicate shedding decisions must be safe rejecting an already-rejected request is a no-op.
 
 ### Worker Scaling
 * **Policy:** Admission control and capacity tracking must scale with request volume per instance.
@@ -58,7 +58,7 @@ Priority = critical | high | medium | low | background
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Backpressure
-* Shedding IS the backpressure mechanism -- when capacity is exceeded, requests are rejected with a `retry_after` hint rather than queued.
+* Shedding IS the backpressure mechanism when capacity is exceeded, requests are rejected with a `retry_after` hint rather than queued.
 
 ### Algorithm
 * **Recommended:** Token bucket for burst-tolerant admission control. Fixed-window counters for simple capacity tracking. Adaptive shedding based on SLO budget consumption.
@@ -113,10 +113,10 @@ blueprint_load_shedding_admitted_total          { workload, priority }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new priority level: non-breaking if consumers use priority hierarchy fallback; breaking otherwise
-- Changing SLO budget algorithm: breaking — existing budget windows must be migrated
+- Changing SLO budget algorithm: breaking existing budget windows must be migrated
 
 ### Module Dependencies
 * **Depends On:** rate_limiting

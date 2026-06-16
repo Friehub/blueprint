@@ -1,7 +1,7 @@
 # Module: calendar
 
 **Version:** 0.2.1
-**Part:** VIII -- Industry Verticals
+**Part:** VIII Industry Verticals
 
 ## Purpose
 
@@ -237,7 +237,7 @@ type UpdateOccurrenceInput = UpdateEventInput & {
 4. `rescheduleEvent` resets all non-organiser attendee RSVP statuses to `INVITED` and re-dispatches invitations.
 5. A recurring series `RRULE` must be parseable per RFC 5545; invalid RRULE strings return `INVALID_RRULE`.
 6. `createEvent` must check for attendee time conflicts before persisting. If a conflict is detected across the full [start_at, end_at) range for any attendee, return `conflict_detected` with `conflicting_event_ids[]`.
-7. `getAvailability` considers a slot busy if any event in `CONFIRMED` or `RESCHEDULED` state overlaps with it for a given user. The conflict window [start_at, end_at) is half-open — sharing an exact end/start time is not a conflict.
+7. `getAvailability` considers a slot busy if any event in `CONFIRMED` or `RESCHEDULED` state overlaps with it for a given user. The conflict window [start_at, end_at) is half-open sharing an exact end/start time is not a conflict.
 8. Recurring events must expand conflicts lazily per occurrence, not against the full series. `createRecurringEvent` must validate that no occurrence in the query window has a conflict, but must not materialise all occurrences to do so.
 9. `updateOccurrence` detaches the occurrence from the series permanently; the detached occurrence is a standalone `CalendarEvent` with no `seriesId`.
 10. Cancelled events and occurrences must remain queryable via `getEvent` and `listEvents`; they must not be physically deleted.
@@ -247,13 +247,13 @@ type UpdateOccurrenceInput = UpdateEventInput & {
 ## Events Emitted
 
 - `calendar.event.created`
-- `calendar.event.published` -- triggers invitation dispatch
+- `calendar.event.published` triggers invitation dispatch
 - `calendar.event.updated`
-- `calendar.event.rescheduled` -- triggers RSVP reset and re-invitation
-- `calendar.event.cancelled` -- triggers cancellation notices
+- `calendar.event.rescheduled` triggers RSVP reset and re-invitation
+- `calendar.event.cancelled` triggers cancellation notices
 - `calendar.attendee.added`
 - `calendar.attendee.removed`
-- `calendar.rsvp.responded` -- includes `attendeeId`, `response`
+- `calendar.rsvp.responded` includes `attendeeId`, `response`
 - `calendar.occurrence.cancelled`
 
 ---
@@ -279,7 +279,7 @@ type UpdateOccurrenceInput = UpdateEventInput & {
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

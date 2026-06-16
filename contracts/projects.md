@@ -32,7 +32,7 @@ ProjectRole = owner | manager | contributor | viewer
 - A project must always have exactly one owner. `changeProjectOwner` must atomically transfer ownership; the old owner must not remain as owner
 - Archived projects must not accept edits or membership changes until they are unarchived. `updateProject`, `addProjectMember`, `removeProjectMember` on an archived project must return `project_archived`
 - Project names must be unique within the same workspace. Enforced via UNIQUE constraint on `(workspace_id, name)`
-- `addProjectMember` must reject adding a user who is already a member of the project -- return `member_already_exists`
+- `addProjectMember` must reject adding a user who is already a member of the project return `member_already_exists`
 - `removeProjectMember` must not allow removing the sole owner of the project; transfer ownership first
 - `listProjects` filtered by workspace must only return projects within that workspace
 
@@ -136,7 +136,7 @@ changeProjectOwner  → projects.project.owner.changed   { project_id, old_owner
 ```
 Project archival retention:
     duration:       indefinite (archived projects are preserved)
-    on_expiry:      N/A -- must be explicitly deleted or permanently removed
+    on_expiry:      N/A must be explicitly deleted or permanently removed
 
   Project stale detection:
     threshold:      no updates for 90 days (configurable)

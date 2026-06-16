@@ -28,11 +28,11 @@ CacheStats { hits, misses, keys, memory_used }
 ```
 
 **Invariants**
-- `getOrSet` must be atomic -- concurrent calls with the same key must not invoke `factory` more than once (cache stampede prevention)
+- `getOrSet` must be atomic concurrent calls with the same key must not invoke `factory` more than once (cache stampede prevention)
 - `del` on a non-existent key must be a no-op; it must not throw or return an error
 - `invalidateByTag` must purge all keys that were set with the given tag, regardless of TTL; keys without the matching tag must not be affected
 - `increment` and `decrement` must be atomic; concurrent calls must not produce lost updates
-- `mget` must return partial results if some keys are missing -- a missing key must be `null` in the result map, not an error
+- `mget` must return partial results if some keys are missing a missing key must be `null` in the result map, not an error
 
 **Providers:** Redis, Memcached, Upstash, in-memory (node-cache)
 
@@ -44,7 +44,7 @@ CacheStats { hits, misses, keys, memory_used }
 
 ### Consistency Model
 * **Model:** `eventual`
-* **Details:** By definition -- cache invalidation is asynchronous
+* **Details:** By definition cache invalidation is asynchronous
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_least_once` for invalidation-triggering events.
@@ -83,8 +83,8 @@ Note: High-cardinality cache operations may sample event emission to avoid overw
 ```
 CacheEntry:
     ttl:            set by caller in CacheOptions
-    on_expiry:      evict silently -- next get() returns null
-    maximum_ttl:    24 hours -- entries with longer TTL must use explicit invalidation instead
+    on_expiry:      evict silently next get() returns null
+    maximum_ttl:    24 hours entries with longer TTL must use explicit invalidation instead
 ```
 
 ### Storage Model
@@ -107,7 +107,7 @@ blueprint_caching_tag_invalidations_total         counter
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none -- infrastructure primitive)
+* **Depends On:** (none infrastructure primitive)
 * **Emits To:** events
 * **Recommends:** (none)
 

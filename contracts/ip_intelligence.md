@@ -26,11 +26,11 @@ Signal = vpn_detected | tor_exit_node | datacenter_hosting | proxy | anonymous |
 ```
 
 **Invariants**
-- `lookup` must return a result for any valid IPv4 or IPv6 address — invalid or malformed IPs must return `ValidationError` rather than a partial result.
-- `isVpn` returning `true` implies `lookup(ip_address).vpn == true` — the two functions must agree on VPN status for the same IP within the same data window.
-- `getThreatScore` must compute the score from the union of all available signals (`vpn`, `tor`, `datacenter`, `proxy`) — an IP flagged by any single signal must have `level != "none"`.
-- All functions must return from the local cache or embedded database — network calls to the provider on the hot path are a contract violation. Cache refresh must happen asynchronously.
-- `isTor` returning `true` must cause `getThreatScore` to return `level >= "high"` — Tor exit nodes are always high-threat.
+- `lookup` must return a result for any valid IPv4 or IPv6 address invalid or malformed IPs must return `ValidationError` rather than a partial result.
+- `isVpn` returning `true` implies `lookup(ip_address).vpn == true` the two functions must agree on VPN status for the same IP within the same data window.
+- `getThreatScore` must compute the score from the union of all available signals (`vpn`, `tor`, `datacenter`, `proxy`) an IP flagged by any single signal must have `level != "none"`.
+- All functions must return from the local cache or embedded database network calls to the provider on the hot path are a contract violation. Cache refresh must happen asynchronously.
+- `isTor` returning `true` must cause `getThreatScore` to return `level >= "high"` Tor exit nodes are always high-threat.
 
 **Providers:** MaxMind, IPinfo, IP2Location
 
@@ -47,7 +47,7 @@ Signal = vpn_detected | tor_exit_node | datacenter_hosting | proxy | anonymous |
 * **Details:** IP intelligence data is read-only; duplicate lookups return the same cached result.
 
 ### Worker Scaling
-* **Policy:** IP lookups must be served from a local embedded database or cache — no backend coordination required. Database refresh is a background worker concern.
+* **Policy:** IP lookups must be served from a local embedded database or cache no backend coordination required. Database refresh is a background worker concern.
 
 ### Multi-Region Behavior
 * **Mode:** IP databases are replicated per-region; each region maintains its own local copy.
@@ -57,11 +57,11 @@ Signal = vpn_detected | tor_exit_node | datacenter_hosting | proxy | anonymous |
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Backpressure
-* IP intelligence lookups are local and sub-millisecond — backpressure is not required for read paths. Database refresh must use rate-limited batch fetches from the provider.
+* IP intelligence lookups are local and sub-millisecond backpressure is not required for read paths. Database refresh must use rate-limited batch fetches from the provider.
 
 ### Storage Model
 * **Model:** Embedded IP database (e.g. MaxMind GeoLite2) refreshed on a schedule.
-* **Details:** The database file must be atomic-swapped during refresh — a failed refresh must not leave a partial database. Refresh schedule is configurable per deployment (default: daily).
+* **Details:** The database file must be atomic-swapped during refresh a failed refresh must not leave a partial database. Refresh schedule is configurable per deployment (default: daily).
 
 ### Error Taxonomy
 ### Module-Specific Errors
@@ -119,11 +119,11 @@ blueprint_ip_intelligence_database_record_count   gauge
 
 ### Breaking Change Policy
 - Adding a new signal type to ThreatScore: non-breaking
-- Removing a signal type: breaking — requires major version bump and migration guide
+- Removing a signal type: breaking requires major version bump and migration guide
 - Changing threat level thresholds: non-breaking if documented
 - Adding a new function: non-breaking
 
 ### Module Dependencies
-* **Depends On:** (none -- infrastructure primitive / wraps external provider)
+* **Depends On:** (none infrastructure primitive / wraps external provider)
 * **Emits To:** events
 * **Recommends:** caching (for repeated lookups), telemetry

@@ -5,7 +5,7 @@
 ---
 
 ### `auth`
-Authentication -- who you are.
+Authentication who you are.
 
 **Functions**
 ```
@@ -34,7 +34,7 @@ AuthProvider = email | google | github | apple | microsoft | phone
 - `requestPasswordReset` must not reveal whether an email exists in the system
 - Any state-mutating function callable via a browser session must require a CSRF token in addition to the session token. The CSRF token must be validated before any state change occurs.
 - CSRF tokens must be cryptographically random, bound to the issuing session, and invalidated on session expiry or revocation
-- Completion of any authentication step that elevates privilege must trigger a new session identifier -- the pre-authentication session must be invalidated and replaced. This applies to initial authentication, MFA completion, role elevation, and tenant or workspace switches
+- Completion of any authentication step that elevates privilege must trigger a new session identifier the pre-authentication session must be invalidated and replaced. This applies to initial authentication, MFA completion, role elevation, and tenant or workspace switches
 - `signIn` must return the same error and response timing whether the failure is caused by an unknown identity or an incorrect credential. Both cases must be indistinguishable to the caller in response body, status code, and response time.
 - `signUp` must return a generic success response whether or not the provided email or identifier already exists in the system. Follow-up actions (such as account verification) must be handled out-of-band, not revealed in the sign-up response.
 - All credential comparisons in `signIn` must use a constant-time comparison function to prevent timing side-channel leaks of which validation step failed
@@ -102,11 +102,11 @@ signUp            → auth.user.registered      { user_id, email, provider }
 ```
 PasswordResetToken:
     max_duration:  1 hour
-    on_expiry:     token becomes invalid -- user must request new reset
+    on_expiry:     token becomes invalid user must request new reset
 
   EmailVerificationToken:
     max_duration:  24 hours
-    on_expiry:     token becomes invalid -- resendVerification available
+    on_expiry:     token becomes invalid resendVerification available
 
   Session (access_token):
     max_duration:  15 minutes (default, configurable)

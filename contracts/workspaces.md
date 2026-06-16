@@ -37,11 +37,11 @@ WorkspaceRole = owner | admin | editor | viewer
 ## System-Level Integrations & Constraints
 
 ### Invariants
-- `createWorkspace` with the same `name` and `owner_id` must be idempotent via idempotency_key — same name with different idempotency_key creates a new workspace
+- `createWorkspace` with the same `name` and `owner_id` must be idempotent via idempotency_key same name with different idempotency_key creates a new workspace
 - The last `owner` of a workspace cannot be removed or downgraded unless the workspace is archived
-- A workspace with status `archived` must not accept new members or resource modifications — viewing the workspace is permitted for members
-- `addWorkspaceMember` on an existing `(workspace_id, user_id)` pair with the same role must be a no-op — idempotent
-- A user must not be able to access resources belonging to a workspace they are not a member of — enforced at the query layer
+- A workspace with status `archived` must not accept new members or resource modifications viewing the workspace is permitted for members
+- `addWorkspaceMember` on an existing `(workspace_id, user_id)` pair with the same role must be a no-op idempotent
+- A user must not be able to access resources belonging to a workspace they are not a member of enforced at the query layer
 
 ### Consistency Model
 * **Model:** `strong`
@@ -158,7 +158,7 @@ blueprint_workspaces_created_total            counter
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

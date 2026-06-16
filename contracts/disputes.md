@@ -1,11 +1,11 @@
 # Module: disputes
 
 **Version:** 0.2.1
-**Part:** VII -- Security and Compliance
+**Part:** VII Security and Compliance
 
 ## Purpose
 
-Defines the interface for managing payment dispute and chargeback lifecycles. A dispute is initiated when a payer challenges a completed transaction -- either through their bank (chargeback) or through a direct merchant mediation process. This module owns the dispute record, evidence submission, decision tracking, and financial resolution. It does not initiate refunds directly -- resolution triggers a saga that coordinates with `payments` and `ledger`.
+Defines the interface for managing payment dispute and chargeback lifecycles. A dispute is initiated when a payer challenges a completed transaction either through their bank (chargeback) or through a direct merchant mediation process. This module owns the dispute record, evidence submission, decision tracking, and financial resolution. It does not initiate refunds directly resolution triggers a saga that coordinates with `payments` and `ledger`.
 
 ---
 
@@ -190,7 +190,7 @@ type DisputeStats = {
 ## Invariants
 
 ### Scope Clarification
-`disputes` is the comprehensive dispute management module. `chargebacks.md` is a convenience interface for provider-initiated card network chargebacks — every chargeback creates or updates a dispute record in this module. There is no separate chargeback state machine.
+`disputes` is the comprehensive dispute management module. `chargebacks.md` is a convenience interface for provider-initiated card network chargebacks every chargeback creates or updates a dispute record in this module. There is no separate chargeback state machine.
 
 1. At most one active (non-`CLOSED`) dispute may exist per `transactionId`. Attempting to open a second dispute returns the existing one.
 2. `submitEvidence` is only valid when dispute is in `EVIDENCE_REQUIRED` state; calling it in any other state returns `DISPUTE_NOT_IN_EVIDENCE_PHASE`.
@@ -205,13 +205,13 @@ type DisputeStats = {
 ## Events Emitted
 
 - `dispute.opened`
-- `dispute.evidence_required` -- includes `evidenceDeadline`
+- `dispute.evidence_required` includes `evidenceDeadline`
 - `dispute.evidence_submitted`
-- `dispute.accepted` -- merchant forfeited
-- `dispute.won` -- merchant prevailed
-- `dispute.lost` -- merchant lost; refund to be issued
-- `dispute.closed` -- financial settlement confirmed
-- `dispute.deadline_missed` -- evidence deadline elapsed with no submission
+- `dispute.accepted` merchant forfeited
+- `dispute.won` merchant prevailed
+- `dispute.lost` merchant lost; refund to be issued
+- `dispute.closed` financial settlement confirmed
+- `dispute.deadline_missed` evidence deadline elapsed with no submission
 
 ---
 
@@ -231,7 +231,7 @@ type DisputeStats = {
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

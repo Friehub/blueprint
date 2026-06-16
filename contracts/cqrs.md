@@ -32,11 +32,11 @@ ReadModelField { name, type, indexed, source_event, source_field }
 ```
 
 **Invariants**
-- Commands must write to the write model synchronously -- the command response must reflect the persisted state
-- Queries must read from the read model only -- they must not access the write model directly
-- A read model must be built from events (via event sourcing) or from write-model projections -- direct queries against the write model for read purposes are a contract violation
-- `synchronizeModel` must detect drift between the write model and the read model -- events not yet projected must be identified and processed
-- The write model must enforce optimistic concurrency via `expected_version` -- a command with a stale version must fail with a `concurrency_conflict` error
+- Commands must write to the write model synchronously the command response must reflect the persisted state
+- Queries must read from the read model only they must not access the write model directly
+- A read model must be built from events (via event sourcing) or from write-model projections direct queries against the write model for read purposes are a contract violation
+- `synchronizeModel` must detect drift between the write model and the read model events not yet projected must be identified and processed
+- The write model must enforce optimistic concurrency via `expected_version` a command with a stale version must fail with a `concurrency_conflict` error
 
 **Dependencies:** event_sourcing
 
@@ -54,7 +54,7 @@ ReadModelField { name, type, indexed, source_event, source_field }
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_least_once` for command-side events feeding projections.
-* **Details:** Projection processing must be idempotent -- duplicate events must produce the same read model state.
+* **Details:** Projection processing must be idempotent duplicate events must produce the same read model state.
 
 ### Worker Scaling
 * **Policy:** Command handling and read model serving must be independently scalable.

@@ -28,9 +28,9 @@ EventOptions { event_type?, id?, retry_ms? }
 ```
 
 **Invariants**
-- Every dispatched event must include a monotonically increasing `id` field -- the client uses `Last-Event-ID` to resume from the last received event
-- On reconnection, the stream must replay all events from `Last-Event-ID` onward -- events before that ID must not be replayed
-- `sendEvent` with a channel that has no active subscribers must be a no-op -- the event must not be buffered
+- Every dispatched event must include a monotonically increasing `id` field the client uses `Last-Event-ID` to resume from the last received event
+- On reconnection, the stream must replay all events from `Last-Event-ID` onward events before that ID must not be replayed
+- `sendEvent` with a channel that has no active subscribers must be a no-op the event must not be buffered
 - If a subscriber is slower than the publisher, backpressure must be applied: events must be buffered up to a configurable `max_buffer_size`, then dropped (oldest first) with a warning
 
 **Providers:** Express, Fastify, Cloudflare Workers, custom
@@ -106,11 +106,11 @@ blueprint_sse_connections_total               { channel, status }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
 * **Depends On:** (none)
-* **Emits To:** (none -- SSE is a push protocol)
+* **Emits To:** (none SSE is a push protocol)
 * **Recommends:** live_updates, event_bus (for cross-region bridging), telemetry

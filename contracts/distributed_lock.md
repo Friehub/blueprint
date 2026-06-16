@@ -25,7 +25,7 @@ LockStatus { name, holder_id, acquired_at, expires_at, is_expired }
 
 **Invariants**
 - `acquire` must block until the lock is obtained or a configurable timeout is reached
-- `tryAcquire` must return immediately -- it must not block even if the lock is held
+- `tryAcquire` must return immediately it must not block even if the lock is held
 - A lock acquired with fencing token `N` must guarantee that no other holder held the same lock with token `>= N`
 - `release` with a stale or invalid token must be a no-op rather than releasing someone else's lock
 
@@ -145,6 +145,6 @@ blueprint_distributed_lock_acquire_duration_ms    histogram { lock_name, result 
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none -- infrastructure primitive)
+* **Depends On:** (none infrastructure primitive)
 * **Emits To:** events
 * **Recommends:** circuit_breaker, health, telemetry

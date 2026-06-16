@@ -34,7 +34,7 @@ StreamConfig { checkpoint_interval?, max_parallelism?, error_handling?, exactly_
 
 **Invariants**
 - A stopped stream must checkpoint its current offset before shutdown so it can resume from the correct position
-- `applyTransformation` on a running stream must not affect in-flight events -- the new transform applies only to events received after activation
+- `applyTransformation` on a running stream must not affect in-flight events the new transform applies only to events received after activation
 - Events that fail processing must be sent to a dead-letter sink, not silently dropped
 
 **Providers:** Kafka Streams, Flink, Spark Streaming, Kinesis Data Analytics, custom
@@ -105,7 +105,7 @@ blueprint_stream_processing_events_in_total        { stream_id }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

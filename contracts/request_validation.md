@@ -29,16 +29,16 @@ ValidationOptions { max_payload_size?, strict_types?, strip_unknown?: bool }
 ```
 
 **Invariants**
-- Every module function that accepts external input must validate the payload size before processing -- payloads exceeding `max_payload_size` must be rejected with a `size_exceeded` error before any business logic runs
+- Every module function that accepts external input must validate the payload size before processing payloads exceeding `max_payload_size` must be rejected with a `size_exceeded` error before any business logic runs
 - Any input that fails validation must be rejected with a `validation_error` before it reaches the database, cache, or downstream service
-- Inputs used in database queries must pass through parameterised queries or prepared statements -- string concatenation of user input into SQL is a contract violation
+- Inputs used in database queries must pass through parameterised queries or prepared statements string concatenation of user input into SQL is a contract violation
 - Inputs used in HTML or XML output must be contextually escaped to prevent XSS
 - Inputs used in shell commands must be rejected unless they pass through an allowlist of permitted characters
-- `validatePayload` must return an error for every invalid field -- it must not silently drop fields from the payload
+- `validatePayload` must return an error for every invalid field it must not silently drop fields from the payload
 - `sanitizeForSql` must reject inputs containing SQL metacharacters, not merely escape them. Rejection must occur before the input reaches any query construction code
 - `sanitizeForShell` must reject any input containing shell metacharacters (`;`, `|`, `` ` ``, `$`, `\`, `'`, `"`, `*`, `?`, `[`, `]`, `~`, `<`, `>`, `(`, `)`, `{`, `}`, `!`, `^`, `#`) unless the deployment explicitly documents an allowlist override
 - The `max_payload_size` for an endpoint must be evaluated against the raw Content-Length header or an equivalent byte-accurate measurement, not against a pre-parsed representation. Character count or field count alone is not sufficient
-- Schema validation must use a declarative schema definition (Zod, Joi, Pydantic, etc.) -- imperative custom validation functions that bypass the schema are a contract violation unless explicitly declared in the module's adapter documentation
+- Schema validation must use a declarative schema definition (Zod, Joi, Pydantic, etc.) imperative custom validation functions that bypass the schema are a contract violation unless explicitly declared in the module's adapter documentation
 
 **Providers:** Zod, Joi, Pydantic, class-validator, custom
 
@@ -56,7 +56,7 @@ ValidationOptions { max_payload_size?, strict_types?, strip_unknown?: bool }
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_most_once` for validation.
-* **Details:** Validation is synchronous per-request; no retry semantics. Validation failures are deterministic -- the same input and schema must always produce the same result.
+* **Details:** Validation is synchronous per-request; no retry semantics. Validation failures are deterministic the same input and schema must always produce the same result.
 
 ### Worker Scaling
 * **Policy:** Validation is CPU-bound and must scale with request volume. CPU-intensive validation (regex, charset scanning, size checks) must not block the event loop.
@@ -69,7 +69,7 @@ ValidationOptions { max_payload_size?, strict_types?, strip_unknown?: bool }
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
 
 ### Backpressure
-* If payload size validation or schema parsing becomes a bottleneck, the module must reject excess requests with a `rate_limited` or `429` response rather than blocking. Validation is not backpressure-safe by default -- deployers must configure request concurrency limits.
+* If payload size validation or schema parsing becomes a bottleneck, the module must reject excess requests with a `rate_limited` or `429` response rather than blocking. Validation is not backpressure-safe by default deployers must configure request concurrency limits.
 
 ### Storage Model
 * **Model:** In-memory schema registry with optional persistent backup.
@@ -110,7 +110,7 @@ Schema cache TTL:
 
   Max payload size:
     duration:       persistent per endpoint configuration
-    on_expiry:      N/A -- does not expire; must be explicitly updated
+    on_expiry:      N/A does not expire; must be explicitly updated
 ```
 
 ### Observability

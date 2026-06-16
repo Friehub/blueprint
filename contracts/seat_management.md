@@ -29,10 +29,10 @@ SeatStatus = active | released | transferred
 
 **Invariants**
 - Seat counts must never exceed the configured limit unless overage is explicitly allowed. The database must enforce `assigned <= limit + COALESCE(overage_allowed, 0)` via a CHECK constraint or application-level atomic check
-- A user can hold at most one active seat of the same seat type per account -- enforced via UNIQUE constraint on `(account_id, user_id, seat_type)` WHERE status = 'active'
-- Released seats must become available immediately after durable commit -- the seat count decrement and availability update must be in the same transaction
+- A user can hold at most one active seat of the same seat type per account enforced via UNIQUE constraint on `(account_id, user_id, seat_type)` WHERE status = 'active'
+- Released seats must become available immediately after durable commit the seat count decrement and availability update must be in the same transaction
 - `transferSeat` must atomically release the from-user seat and assign the to-user seat in a single transaction; a partial transfer (release without reassign) is never permitted
-- `setSeatLimit` must not reduce the limit below the currently assigned count unless overage is explicitly allowed -- if assigned > new limit and overage_allowed is false, the operation must be rejected
+- `setSeatLimit` must not reduce the limit below the currently assigned count unless overage is explicitly allowed if assigned > new limit and overage_allowed is false, the operation must be rejected
 
 **Providers:** internal SaaS account stores, enterprise licensing systems, custom database-backed seat allocators
 
@@ -132,7 +132,7 @@ setSeatLimit      → seat.limit_changed            { account_id, seat_type, old
 ```
 Seat assignment:
     duration:       active until explicitly released or transferred
-    on_expiry:      N/A -- no automatic expiry
+    on_expiry:      N/A no automatic expiry
 
   Seat policy change:
     effective:      immediately upon commit

@@ -31,7 +31,7 @@ UserStatus = active | banned | suspended | pending_verification
 ```
 
 **Invariants**
-- `deleteUser` must not physically delete -- it must mark the record as deleted and anonymise PII
+- `deleteUser` must not physically delete it must mark the record as deleted and anonymise PII
 - `getUserByEmail` must be case-insensitive
 
 **Providers:** any user table, Clerk, Auth0 Management API
@@ -149,12 +149,12 @@ blueprint_users_active_total              gauge
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Depends On:** (none -- owns its own data)
+* **Depends On:** (none owns its own data)
 * **Emits To:** events
 * **Recommends:** audit_log, notifications, permissions
 * **Pagination Sort Key:** Uses cursor-based pagination sorting by `created_at DESC` on `searchUsers`.

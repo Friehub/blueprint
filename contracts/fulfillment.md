@@ -26,11 +26,11 @@ FulfillmentStatus = pending | allocated | packed | shipped | delivered | cancell
 ```
 
 **Invariants**
-- A shipped fulfillment cannot be cancelled -- `cancelFulfillment` on a shipped fulfillment must return `FULFILLMENT_ALREADY_SHIPPED`
+- A shipped fulfillment cannot be cancelled `cancelFulfillment` on a shipped fulfillment must return `FULFILLMENT_ALREADY_SHIPPED`
 - Fulfillment state must follow the declared progression: `pending → allocated → packed → shipped → delivered`. Skipping a state is a contract violation
-- Tracking details cannot be attached before the shipment state exists -- `markShipped` must be called before tracking is available
-- `createFulfillment` must be idempotent on `order_id` -- creating a fulfillment for an already-fulfilled order must return the existing fulfillment
-- `markDelivered` must not be called on a cancelled fulfillment -- return `FULFILLMENT_CANCELLED`
+- Tracking details cannot be attached before the shipment state exists `markShipped` must be called before tracking is available
+- `createFulfillment` must be idempotent on `order_id` creating a fulfillment for an already-fulfilled order must return the existing fulfillment
+- `markDelivered` must not be called on a cancelled fulfillment return `FULFILLMENT_CANCELLED`
 
 **Providers:** custom WMS orchestration, ShipBob, ShipHero, ERP fulfillment modules, warehouse middleware
 

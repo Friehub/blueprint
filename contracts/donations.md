@@ -28,10 +28,10 @@ Certificate { id, donation_id, donor_name?, amount, currency, issued_at }
 ```
 
 **Invariants**
-- `donate` must atomically increment the campaign's `raised` total within the same transaction as creating the donation record -- a donation without a corresponding total update is a data integrity violation
-- A donation to a campaign that has reached its `goal` must still be accepted unless the campaign status is `closed` -- campaigns may exceed their goal
+- `donate` must atomically increment the campaign's `raised` total within the same transaction as creating the donation record a donation without a corresponding total update is a data integrity violation
+- A donation to a campaign that has reached its `goal` must still be accepted unless the campaign status is `closed` campaigns may exceed their goal
 - `createCampaign` must reject a `goal` <= 0 with `invalid_goal` error
-- `issueCertificate` must only succeed for completed (non-refunded) donations -- issuing a certificate for a refunded donation is a compliance violation
+- `issueCertificate` must only succeed for completed (non-refunded) donations issuing a certificate for a refunded donation is a compliance violation
 
 ---
 

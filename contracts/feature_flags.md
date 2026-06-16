@@ -37,9 +37,9 @@ TargetingRule { segment_id | user_ids[] | percentage, variant?, serve: boolean|v
 **Invariants**
 - Flag evaluation must be consistent for the same `(flag_key, user_id)` pair within a request
 - Archived flags must always return `false` without error
-- Segment matchers must be evaluated in order and the first matching rule determines the segment membership -- a user must not match multiple overlapping segment rules
-- A `TargetingRule` referencing a deleted segment must be treated as `serve: false` -- the evaluation must not throw
-- When a flag has both `rollout_percentage` and `segments`, segment-matched users must bypass the percentage rollout -- segments take priority over percentage
+- Segment matchers must be evaluated in order and the first matching rule determines the segment membership a user must not match multiple overlapping segment rules
+- A `TargetingRule` referencing a deleted segment must be treated as `serve: false` the evaluation must not throw
+- When a flag has both `rollout_percentage` and `segments`, segment-matched users must bypass the percentage rollout segments take priority over percentage
 
 **Providers:** LaunchDarkly, Unleash, Flagsmith, Growthbook, Split, custom database
 
@@ -90,7 +90,7 @@ deleteSegment        → segment.deleted                  { segment_id }
 ### Temporal Constraints
 ```
 Flag evaluation cache:
-    max_age:        30 seconds (default) -- flag evaluation must not serve data older than this
+    max_age:        30 seconds (default) flag evaluation must not serve data older than this
     on_expiry:      refetch from source
 
   Flag (with time-based rollout rule):
@@ -123,7 +123,7 @@ blueprint_feature_flags_variant_distribution      counter { flag_key, variant }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

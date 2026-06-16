@@ -30,7 +30,7 @@ RotationConfig { max_age_days, grace_period_minutes, notify_before_days, auto_ro
 ```
 
 **Invariants**
-- Rotation must provide a grace period during which both the old and new credential values are accepted -- zero-downtime rotation must not require a deployment or restart
+- Rotation must provide a grace period during which both the old and new credential values are accepted zero-downtime rotation must not require a deployment or restart
 - A credential past `max_age_days` without rotation must be flagged as expired and emit an event
 - When a compromise is reported, the credential must be rotated immediately and the old version revoked at the end of the grace period
 - Rotation history must be append-only and preserved for audit purposes for a minimum of 1 year

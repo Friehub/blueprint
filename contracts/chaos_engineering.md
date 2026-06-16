@@ -34,10 +34,10 @@ InjectionResult { experiment_id, failure, injected: bool, error? }
 ```
 
 **Invariants**
-- `runExperiment` must verify the steady state BEFORE any failure is injected -- the experiment must not start unless all steady state checks pass
-- If any steady state check fails during the experiment, `rollbackExperiment` must be triggered automatically -- the experiment must not continue past a steady state violation
-- The blast radius must be validated before injection -- the experiment must not affect services or resources outside the declared blast radius
-- `stopExperiment` must immediately inject the rollback for all active failures -- stopping is not optional, it must restore the system to the pre-experiment state
+- `runExperiment` must verify the steady state BEFORE any failure is injected the experiment must not start unless all steady state checks pass
+- If any steady state check fails during the experiment, `rollbackExperiment` must be triggered automatically the experiment must not continue past a steady state violation
+- The blast radius must be validated before injection the experiment must not affect services or resources outside the declared blast radius
+- `stopExperiment` must immediately inject the rollback for all active failures stopping is not optional, it must restore the system to the pre-experiment state
 - A failure injection must have a hard `duration_ms` timeout after which it is automatically reverted, even if `stopExperiment` is not called
 
 **Dependencies:** health, telemetry

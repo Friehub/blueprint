@@ -5,7 +5,7 @@
 ---
 
 ### `webhook_ingestion`
-Incoming webhook ingestion — signature verification, deduplication, ordering, and routing.
+Incoming webhook ingestion signature verification, deduplication, ordering, and routing.
 
 **Functions**
 ```
@@ -30,10 +30,10 @@ WebhookStatus = pending | verified | processing | completed | failed | rejected
 **Invariants**
 - Signature verification must happen before any event data is read or parsed
 - Unverified events must be rejected without logging their payload (prevents log injection attacks)
-- Deduplication window must be at least 48 hours — well beyond provider retry windows
+- Deduplication window must be at least 48 hours well beyond provider retry windows
 - Event IDs are stored with 48-hour TTL for deduplication
 - Out-of-sequence events must be queued for ordering resolution, not dropped
-- Verified events are immutable — the raw payload and headers are stored as-received
+- Verified events are immutable the raw payload and headers are stored as-received
 
 **Providers:** Stripe, Paystack, Dodo, GitHub, any HMAC/JWT-signed webhook provider
 

@@ -34,7 +34,7 @@ ResizePolicy { type: fixed|dynamic|scheduled, min, max, scale_up_factor, scale_d
 ```
 
 **Invariants**
-- `acquire` must return a healthy connection or fail -- it must never return a stale or broken connection
+- `acquire` must return a healthy connection or fail it must never return a stale or broken connection
 - `release` must return the connection to the pool regardless of whether it is healthy (the pool decides eviction)
 - A connection idle longer than `max_idle_time` must be closed and removed from the pool
 
@@ -52,7 +52,7 @@ ResizePolicy { type: fixed|dynamic|scheduled, min, max, scale_up_factor, scale_d
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_most_once` for pool lifecycle events.
-* **Details:** Duplicate release events must be safe -- releasing an already-released connection is a no-op.
+* **Details:** Duplicate release events must be safe releasing an already-released connection is a no-op.
 
 ### Worker Scaling
 * **Policy:** Each worker process or thread should maintain its own pool; pool sharing across processes requires an external broker.
@@ -65,22 +65,22 @@ ResizePolicy { type: fixed|dynamic|scheduled, min, max, scale_up_factor, scale_d
 
 ### Backpressure
 * When all connections are active and `max_active` is reached, `acquire` must block up to `acquire_timeout_ms` then return a timeout error.
-* The pool must apply backpressure to new acquire requests when `leak_count` exceeds 10% of `max_active` -- new acquires should either fail fast or queue with a reduced timeout.
+* The pool must apply backpressure to new acquire requests when `leak_count` exceeds 10% of `max_active` new acquires should either fail fast or queue with a reduced timeout.
 
 ### Connection Validation
 * `validateConnection` must run the configured `validation_query` against the connection and mark it `dead` on failure.
-* When `test_on_borrow` is enabled, `acquire` must validate the connection before returning it to the caller -- a validation failure must trigger eviction and a retry.
-* When `test_on_return` is enabled, `release` must validate the connection before returning it to the pool -- a validation failure must evict the connection rather than pooling it.
+* When `test_on_borrow` is enabled, `acquire` must validate the connection before returning it to the caller a validation failure must trigger eviction and a retry.
+* When `test_on_return` is enabled, `release` must validate the connection before returning it to the pool a validation failure must evict the connection rather than pooling it.
 * `test_while_idle` must run scheduled health checks on idle connections at the `eviction_interval_ms` interval.
 
 ### Leak Detection
-* A connection borrowed for longer than `leak_detection_threshold_ms` must be flagged as a potential leak -- the pool must emit a warning event and track the stack trace at acquisition time.
+* A connection borrowed for longer than `leak_detection_threshold_ms` must be flagged as a potential leak the pool must emit a warning event and track the stack trace at acquisition time.
 * `registerConnectionLeak` creates a monitor that watches a specific connection; if the borrow exceeds `threshold_ms` without release, the monitor fires a `connection.leaked` event.
 * A leaked connection that exceeds 2x the leak detection threshold must be forcibly evicted (`evictConnection`).
 
 ### Dynamic Pool Resize
-* With `resizePolicy = dynamic`, the pool must automatically scale up when `utilization_pct` exceeds 70% for more than 30 seconds, up to `max` -- scale up is multiplicative by `scale_up_factor`.
-* With `resizePolicy = dynamic`, the pool must automatically scale down when `utilization_pct` is below 30% for more than 60 seconds, down to `min` -- scale down respects a `cooldown_ms` to prevent thrashing.
+* With `resizePolicy = dynamic`, the pool must automatically scale up when `utilization_pct` exceeds 70% for more than 30 seconds, up to `max` scale up is multiplicative by `scale_up_factor`.
+* With `resizePolicy = dynamic`, the pool must automatically scale down when `utilization_pct` is below 30% for more than 60 seconds, down to `min` scale down respects a `cooldown_ms` to prevent thrashing.
 
 ### Error Taxonomy
 ### Pool Throttling
@@ -151,6 +151,6 @@ blueprint_connection_pool_active_current          gauge { pool_name }
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none -- infrastructure primitive)
+* **Depends On:** (none infrastructure primitive)
 * **Emits To:** (none)
 * **Recommends:** circuit_breaker, health, telemetry

@@ -40,9 +40,9 @@ SettlementStatus = open | closing | closed | settled | failed | disputed
 - **Runtime Standards:** Inherits `contracts/core/runtime_standards.md`.
 - **Consistency:** Batch closure and settlement confirmation must be strongly consistent.
 - **Idempotency:**
-  - `createSettlementBatch`: idempotent on `(source, period)` — returns existing batch if already created
-  - `addSettlementItem`: idempotent on `(batch_id, reference)` — duplicate item returns existing item
-  - `confirmSettlement`: idempotent on `(batch_id, reference)` — confirming twice is a no-op
+  - `createSettlementBatch`: idempotent on `(source, period)` returns existing batch if already created
+  - `addSettlementItem`: idempotent on `(batch_id, reference)` duplicate item returns existing item
+  - `confirmSettlement`: idempotent on `(batch_id, reference)` confirming twice is a no-op
   - Keys retained for 7 days (financial operation per global standard)
 - **Storage Model:** Durable batch settlement register with reconciliation history.
 - **Dependencies:** `ledger`, `payments`, `transfers`, `reconciliation`, `audit_log`, `jobs`.
@@ -59,7 +59,7 @@ SettlementStatus = open | closing | closed | settled | failed | disputed
 ```
 Step 1: closeSettlementBatch(batch_id)
     Action: Transition batch to closing, compute gross/net totals
-    Compensate: reopenSettlementBatch(batch_id) — revert to open, recompute totals
+    Compensate: reopenSettlementBatch(batch_id) revert to open, recompute totals
     Error: item_in_transit → wait and retry; manual override may force close
 
 Step 2: reconcileBatch(batch_id)
@@ -69,7 +69,7 @@ Step 2: reconcileBatch(batch_id)
 
 Step 3: confirmSettlement(batch_id, reference)
     Action: Record settlement confirmation, transition to settled
-    Compensate: reverseSettlement(batch_id) — post compensating journal entries
+    Compensate: reverseSettlement(batch_id) post compensating journal entries
     Error: settlement_failed → execute compensate(Step 2 → Step 1)
 ```
 
@@ -84,7 +84,7 @@ Step 3: confirmSettlement(batch_id, reference)
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

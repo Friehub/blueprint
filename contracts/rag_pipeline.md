@@ -35,7 +35,7 @@ ChunkStrategy = fixed_size | recursive | semantic | sentence
 ```
 
 **Invariants**
-- `search` must return results ordered by descending relevance score -- it must never return results without a score
+- `search` must return results ordered by descending relevance score it must never return results without a score
 - A document must be fully chunked and embedded before it appears in search results
 - `rerank` must not return more results than were provided; it may return fewer
 

@@ -8,7 +8,7 @@
 
 ### Purpose
 
-`incident_response` describes the operational procedures that implement the `incident_management` contract. It covers how teams respond to incidents in practice — the human processes, communication channels, and escalation paths.
+`incident_response` describes the operational procedures that implement the `incident_management` contract. It covers how teams respond to incidents in practice the human processes, communication channels, and escalation paths.
 
 ### Relationship to `incident_management`
 
@@ -26,11 +26,11 @@
 The following procedures supplement the `incident_management` contract:
 
 **Incident Response Runbook:**
-1. **Triage** — Responder acknowledges the incident via `acknowledgeIncident`. If no acknowledgement within SLA window (sev1: 15min, sev2: 30min), auto-escalation triggers via `escalateIncident`.
-2. **Investigation** — Responder adds timeline events and notes via `addIncidentNote`. Status transitions to `investigating`.
-3. **Mitigation** — Responder applies mitigation and transitions status to `mitigated` via `resolveIncident` with `resolution.status = mitigated`.
-4. **Resolution** — Root cause is fixed; incident transitions to `resolved` via `resolveIncident`.
-5. **Postmortem** — Incident commander creates a postmortem via `createPostmortem` within 7 days.
+1. **Triage** Responder acknowledges the incident via `acknowledgeIncident`. If no acknowledgement within SLA window (sev1: 15min, sev2: 30min), auto-escalation triggers via `escalateIncident`.
+2. **Investigation** Responder adds timeline events and notes via `addIncidentNote`. Status transitions to `investigating`.
+3. **Mitigation** Responder applies mitigation and transitions status to `mitigated` via `resolveIncident` with `resolution.status = mitigated`.
+4. **Resolution** Root cause is fixed; incident transitions to `resolved` via `resolveIncident`.
+5. **Postmortem** Incident commander creates a postmortem via `createPostmortem` within 7 days.
 
 **Communication Channels:**
 - sev1: PagerDuty push + SMS + phone call to primary and secondary

@@ -28,7 +28,7 @@ DataPoint { timestamp, value }
 ```
 
 **Invariants**
-- `trackEvent` must never throw -- analytics must not cause application errors
+- `trackEvent` must never throw analytics must not cause application errors
 - Events must be buffered and sent asynchronously
 - `identifyUser` must merge traits deterministically: later trait values overwrite earlier ones for the same key; arrays are unioned
 - `getFunnel` must return steps in the order provided in the input; a step with zero count must still appear in the result with `conversion_rate: 0`
@@ -103,7 +103,7 @@ blueprint_analytics_buffer_flush_size_bytes       histogram
 * **SLO Targets:** Latency P99 is bounded per standards (see global standards for details).
 
 ### Module Dependencies
-* **Depends On:** (none -- fire and forget)
+* **Depends On:** (none fire and forget)
 * **Emits To:** events
 * **Recommends:** queues (for buffered ingestion), data_warehouse (for long-term aggregation)
 

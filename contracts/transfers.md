@@ -111,7 +111,7 @@ This saga orchestrates the multi-step transfer flow. If any step fails, compensa
 ```
 Step 1: reserveFunds(source_account_id, amount)
     Action: Debit ledger source account (pending state)
-    Compensate: releaseFunds(source_account_id, amount) — reverse the pending debit
+    Compensate: releaseFunds(source_account_id, amount) reverse the pending debit
     Error: insufficient_balance → abort saga, return error
 
 Step 2: validateRouting(routing_details)
@@ -121,18 +121,18 @@ Step 2: validateRouting(routing_details)
 
 Step 3: submitToClearing(transfer_id, routing_details, amount)
     Action: Submit to external clearing network (ACH/Wire/SEPA adapter)
-    Compensate: cancelClearingSubmission(transfer_id) — request cancellation from clearing network
+    Compensate: cancelClearingSubmission(transfer_id) request cancellation from clearing network
     Error: compliance_blocked → abort saga, execute compensate(Step 1)
 
 Step 4: confirmSettlement(transfer_id, reference)
     Action: Final debit source account, credit destination account, mark settled
-    Compensate: reverseSettlement(transfer_id) — post compensating ledger entry
+    Compensate: reverseSettlement(transfer_id) post compensating ledger entry
     Error: settlement_failed → execute compensate(Step 3 → Step 1)
 ```
 
 **Idempotency table:**
 - `initiateTransfer`: idempotency key retained 7 days
-- `transitionTransferStatus`: idempotent on `(transfer_id, to_status)` — duplicate transition to same status is a no-op
+- `transitionTransferStatus`: idempotent on `(transfer_id, to_status)` duplicate transition to same status is a no-op
 
 **Outbox pattern:**
 - Transfer lifecycle events are written to an outbox table in the same transaction as the state change
@@ -157,7 +157,7 @@ blueprint_transfers_clearing_duration_sec    histogram { method }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

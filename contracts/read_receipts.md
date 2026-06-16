@@ -26,12 +26,12 @@ UnreadSummary { total, by_thread: Record<string, number>, by_channel: Record<str
 ```
 
 **Invariants**
-- `markRead` for an already-read message must be a no-op -- it must not update the `read_at` timestamp. The database must enforce idempotent insert via UNIQUE or ON CONFLICT DO NOTHING
+- `markRead` for an already-read message must be a no-op it must not update the `read_at` timestamp. The database must enforce idempotent insert via UNIQUE or ON CONFLICT DO NOTHING
 - A user must not be able to mark messages as read in a thread they are not a participant of. The module must verify thread membership before inserting any read receipt
 - `getUnreadCount` must count messages that were created after the user's last read marker and that the user has access to. Messages the user cannot access must be excluded from the count
-- `markBulkRead` must be atomic -- if any message ID in the batch fails validation (not a participant), the entire batch must be rejected
+- `markBulkRead` must be atomic if any message ID in the batch fails validation (not a participant), the entire batch must be rejected
 - `subscribeReadReceipts` must deliver receipts in the order they were created per thread; replaying the subscription must not miss receipts
-- `getLastReadMessage` must return null when the user has no read receipt in the thread -- it must not return a stale or incorrect value
+- `getLastReadMessage` must return null when the user has no read receipt in the thread it must not return a stale or incorrect value
 
 **Providers:** custom (database-backed), Stream Chat, Sendbird
 
@@ -122,7 +122,7 @@ Read receipt retention:
 
   Last-read cursor:
     duration:       persistent until new markRead in the same thread
-    on_expiry:      N/A -- updated on every read operation
+    on_expiry:      N/A updated on every read operation
 ```
 
 ### Observability

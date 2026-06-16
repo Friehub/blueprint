@@ -35,11 +35,11 @@ ProtobufOneof { name, fields: string[] }
 ```
 
 **Invariants**
-- A unary or server-streaming method must return a response within the set deadline -- exceeding the deadline must cancel the in-flight call and return a `DEADLINE_EXCEEDED` error
-- Deadline must propagate from client to server -- a client-set deadline must be sent via the `grpc-timeout` metadata and honored by the receiving server
-- A bidirectional streaming method must handle half-close gracefully -- the server must continue processing client messages until the client closes the send stream, then respond
+- A unary or server-streaming method must return a response within the set deadline exceeding the deadline must cancel the in-flight call and return a `DEADLINE_EXCEEDED` error
+- Deadline must propagate from client to server a client-set deadline must be sent via the `grpc-timeout` metadata and honored by the receiving server
+- A bidirectional streaming method must handle half-close gracefully the server must continue processing client messages until the client closes the send stream, then respond
 - `healthCheck` must return `NOT_SERVING` if any dependency service is unavailable
-- Protobuf field numbers must never be reused after a field is deleted -- deleted fields must be marked as `reserved`
+- Protobuf field numbers must never be reused after a field is deleted deleted fields must be marked as `reserved`
 
 **Providers:** gRPC-Go, gRPC-Node, gRPC-Python, Tonic (Rust), gRPC-Java
 
@@ -96,12 +96,12 @@ blueprint_grpc_active_streams                gauge { service, method }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
-- Renaming a protobuf field number: breaking — deleted fields must be marked as reserved
+- Renaming a protobuf field number: breaking deleted fields must be marked as reserved
 
 ### Module Dependencies
-* **Depends On:** (none -- wraps external gRPC library or provider)
+* **Depends On:** (none wraps external gRPC library or provider)
 * **Emits To:** events
 * **Recommends:** service_mesh (for traffic routing and mTLS), circuit_breaker, telemetry

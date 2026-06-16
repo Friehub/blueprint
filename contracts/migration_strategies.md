@@ -33,11 +33,11 @@ MigrationStrategy = expand_contract | dual_write | background_backfill | no_down
 ```
 
 **Invariants**
-- The expand phase must add new columns/tables without removing or altering existing ones -- backward compatibility must be maintained throughout the expand phase
-- The contract phase must only remove old columns/tables after the migrate phase has completed and been verified -- removing before verification is a contract violation
+- The expand phase must add new columns/tables without removing or altering existing ones backward compatibility must be maintained throughout the expand phase
+- The contract phase must only remove old columns/tables after the migrate phase has completed and been verified removing before verification is a contract violation
 - A dual-write migration must verify that both the old and new paths produce the same result for at least `sample_pct` of writes before the cutover
-- A migration with `dry_run: true` must not modify any data -- it must only validate the plan against the current schema
-- `rollbackPhase` must return the schema to its pre-migration state -- it must not leave partial modifications
+- A migration with `dry_run: true` must not modify any data it must only validate the plan against the current schema
+- `rollbackPhase` must return the schema to its pre-migration state it must not leave partial modifications
 
 **Dependencies:** migrations
 
@@ -121,7 +121,7 @@ blueprint_migration_strategies_total          { strategy, result }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new migration strategy: non-breaking if existing strategies remain supported; breaking otherwise
 

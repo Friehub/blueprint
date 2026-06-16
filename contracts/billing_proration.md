@@ -28,7 +28,7 @@ ProrationStatus = pending | applied | voided | expired
 
 **Invariants**
 - `calculateProration` must compute the exact ratio of remaining days in the current billing period: `credit = (remaining_days / total_days) * period_price`. The remaining days count excludes the effective date (the new plan starts on the effective date).
-- `applyProration` is idempotent — applying the same proration twice must not double-credit or double-charge
+- `applyProration` is idempotent applying the same proration twice must not double-credit or double-charge
 - Proration is always calculated from the current plan's billing period, not from the subscription start date
 - A proration with `net_amount = 0` (credit equals charge exactly) must still be recorded as a zero-value adjustment for audit purposes
 - Credits expire according to the policy's `credit_expiry_days`; expired credits are reversed and recorded in audit_log
@@ -177,6 +177,6 @@ blueprint_billing_proration_net_revenue_impact     gauge { currency }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise

@@ -31,10 +31,10 @@ ProjectionHandler { handle(event), reset(), getState() }
 ```
 
 **Invariants**
-- `appendEvent` must assign monotonically increasing version numbers per stream -- no version gaps are permitted within a stream
-- A projection must process events in version order -- processing a version `N+1` event before version `N` is a contract violation
+- `appendEvent` must assign monotonically increasing version numbers per stream no version gaps are permitted within a stream
+- A projection must process events in version order processing a version `N+1` event before version `N` is a contract violation
 - `rebuildProjection` must reset the projection state and replay all events from the beginning of the stream, or from the latest snapshot if one exists
-- A snapshot must store the complete stream state up to the snapshot's version -- replaying from a snapshot must produce the same projection as replaying all events from the beginning
+- A snapshot must store the complete stream state up to the snapshot's version replaying from a snapshot must produce the same projection as replaying all events from the beginning
 
 **Dependencies:** event_bus
 
@@ -52,7 +52,7 @@ ProjectionHandler { handle(event), reset(), getState() }
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_least_once` for event delivery to projections.
-* **Details:** Projections must be idempotent -- processing the same event twice must produce the same state.
+* **Details:** Projections must be idempotent processing the same event twice must produce the same state.
 
 ### Worker Scaling
 * **Policy:** Event append, projection building, and snapshot management must be independently scalable per stream.

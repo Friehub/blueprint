@@ -108,6 +108,6 @@ The service mesh must expose the following configuration parameters for mTLS enf
 These parameters must be declared in the module's deployment configuration and must be readable by the `zero_trust_network_policy` module at enforcement time.
 
 ### Module Dependencies
-* **Depends On:** (none -- infrastructure primitive)
+* **Depends On:** (none infrastructure primitive)
 * **Emits To:** events
 * **Recommends:** circuit_breaker, telemetry, zero_trust_network_policy

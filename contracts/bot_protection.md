@@ -29,9 +29,9 @@ BotDetectionFeature = user_agent | rate | behavior | fingerprint | ip_reputation
 
 **Invariants**
 - A challenge must be required for account creation, password reset, and payment initiation when the request has not been scored as `human` with high confidence
-- A failed challenge response must not advance the underlying operation -- returning a failed result must be idempotent
-- Challenge bypass must not be possible through replay of a previously valid challenge token -- tokens must be single-use and expire after `ttl_seconds`
-- `scoreRequest` must not block or materially delay the request -- it must complete within a per-request budget
+- A failed challenge response must not advance the underlying operation returning a failed result must be idempotent
+- Challenge bypass must not be possible through replay of a previously valid challenge token tokens must be single-use and expire after `ttl_seconds`
+- `scoreRequest` must not block or materially delay the request it must complete within a per-request budget
 - A request that exceeds `failure_threshold` consecutive failed challenges for the same endpoint must be escalated to `fraud_detection` for review
 
 **Providers:** Cloudflare Turnstile, reCAPTCHA, hCaptcha, Proof of Work (custom), custom

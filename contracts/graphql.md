@@ -32,9 +32,9 @@ GraphQLError { message, path, locations?, extensions }
 ```
 
 **Invariants**
-- `executeQuery` must resolve fields in order of declaration within a single type -- field ordering must be deterministic
-- A resolver that uses `DataLoader` must batch all keys from a single parent selection before resolving -- N+1 queries are a contract violation
-- `createSubscription` must support backpressure -- if the subscriber is slower than the publisher, the buffer must fill before dropping events rather than unbounded memory growth
+- `executeQuery` must resolve fields in order of declaration within a single type field ordering must be deterministic
+- A resolver that uses `DataLoader` must batch all keys from a single parent selection before resolving N+1 queries are a contract violation
+- `createSubscription` must support backpressure if the subscriber is slower than the publisher, the buffer must fill before dropping events rather than unbounded memory growth
 - Schema changes that remove a field must be preceded by a deprecation period of at least one major version
 
 **Providers:** Apollo Server, Yoga GraphQL, GraphQL.js, codegen, custom
@@ -97,11 +97,11 @@ blueprint_graphql_query_complexity_score      gauge { operation_name }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Depends On:** (none -- wraps external GraphQL library or provider)
+* **Depends On:** (none wraps external GraphQL library or provider)
 * **Emits To:** events
 * **Recommends:** caching (for DataLoader memoization), rate_limiting (for query complexity limits), telemetry

@@ -5,7 +5,7 @@
 ---
 
 ### `incident_management`
-Operational incident capture, severity classification, acknowledgement tracking, automatic escalation, resolution management, and postmortem tracking. This is the canonical incident contract — see `incident_response.md` for operational procedures that reference this contract.
+Operational incident capture, severity classification, acknowledgement tracking, automatic escalation, resolution management, and postmortem tracking. This is the canonical incident contract see `incident_response.md` for operational procedures that reference this contract.
 
 **Functions**
 ```
@@ -39,7 +39,7 @@ Schedule { id, primary, secondary, start, end, escalation_path }
 ```
 
 **Invariants**
-- A `sev1` incident must be acknowledged within 15 minutes of creation — exceeding this without acknowledgement must trigger automatic escalation
+- A `sev1` incident must be acknowledged within 15 minutes of creation exceeding this without acknowledgement must trigger automatic escalation
 - A `sev2` incident must be acknowledged within 30 minutes
 - A `sev3` incident must be acknowledged within 1 hour
 - A `sev4` incident must be acknowledged within 4 hours
@@ -48,7 +48,7 @@ Schedule { id, primary, secondary, start, end, escalation_path }
   - sev2: 4 hours
   - sev3: 24 hours
   - sev4: 72 hours
-- A postmortem must be published within 7 days of incident resolution — failing to publish within this window is a contract violation
+- A postmortem must be published within 7 days of incident resolution failing to publish within this window is a contract violation
 - Every action item in a postmortem must have an assigned owner and a deadline
 - Incidents must preserve an immutable timeline of state changes and notes
 - Closed incidents must not be edited except by an explicit reopen flow if supported
@@ -241,6 +241,6 @@ blueprint_incident_open_total                  gauge { severity }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise

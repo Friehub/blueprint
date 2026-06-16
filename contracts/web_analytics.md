@@ -40,14 +40,14 @@ SessionReplay { session_id, events, created_at }
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `best_effort` for tracking events; `at_least_once` for derived aggregates.
-* **Details:** Tracking must never block the calling application — fire-and-forget with local batching.
+* **Details:** Tracking must never block the calling application fire-and-forget with local batching.
 
 ### Worker Scaling
 * **Policy:** Event ingestion, session processing, and aggregation must be independently scalable.
 
 ### Multi-Region Behavior
 * **Mode:** Event ingestion is per-region; aggregates are global.
-* **Details:** Cross-region session stitching uses a stable session_id — same session_id across regions is merged at aggregation time.
+* **Details:** Cross-region session stitching uses a stable session_id same session_id across regions is merged at aggregation time.
 
 ### Idempotency Requirements
 * **Standard:** All state-mutating functions with external side effects accept an optional `idempotency_key: string` parameter as the last argument (retained for 24 hours).
@@ -158,7 +158,7 @@ blueprint_web_analytics_aggregation_latency_ms    histogram
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

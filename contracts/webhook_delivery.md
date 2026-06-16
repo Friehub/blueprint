@@ -5,7 +5,7 @@
 ---
 
 ### `webhook_delivery`
-Outgoing webhook delivery pipeline — queue, retry, dead-letter, and delivery receipts.
+Outgoing webhook delivery pipeline queue, retry, dead-letter, and delivery receipts.
 
 **Functions**
 ```
@@ -31,10 +31,10 @@ DeliveryStatus = pending | delivered | failed | retrying | dead_lettered
 ```
 
 **Invariants**
-- Delivery must be at-least-once — a successful HTTP response (2xx) is the only confirmation
+- Delivery must be at-least-once a successful HTTP response (2xx) is the only confirmation
 - Retry schedule uses exponential backoff with jitter: 1min → 5min → 30min → 2hr → 8hr (repeating until deadline)
 - Signature on retry attempts must use the same timestamp as the original attempt to prevent replay attacks
-- Dead-letter threshold defaults to 72 hours with 10 max attempts — configurable per endpoint
+- Dead-letter threshold defaults to 72 hours with 10 max attempts configurable per endpoint
 - Delivery status must always be queryable by the receiving system via a status endpoint
 - Failed deliveries must not block new deliveries to the same endpoint
 

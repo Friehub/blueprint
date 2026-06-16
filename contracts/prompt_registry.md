@@ -33,7 +33,7 @@ ABTestResult { test_id, winner: a|b|tie, metrics: { a: MetricSummary, b: MetricS
 ```
 
 **Invariants**
-- `getPrompt` without a version must return the active version -- never a draft or deprecated version
+- `getPrompt` without a version must return the active version never a draft or deprecated version
 - A prompt that is referenced by an active A/B test must not be archived until the test completes
 - `activateVersion` must atomically mark the previous active as deprecated and the new version as active
 
@@ -51,7 +51,7 @@ ABTestResult { test_id, winner: a|b|tie, metrics: { a: MetricSummary, b: MetricS
 
 ### Runtime Delivery Model
 * **Delivery Guarantee:** `at_least_once` for prompt lifecycle events.
-* **Details:** Duplicate activation events must be idempotent -- activating an already-active version is a no-op.
+* **Details:** Duplicate activation events must be idempotent activating an already-active version is a no-op.
 
 ### Worker Scaling
 * **Policy:** Prompt retrieval and evaluation execution must be independently scalable.

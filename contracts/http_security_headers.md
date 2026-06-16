@@ -27,12 +27,12 @@ EndpointType = browser | api | mixed
 ```
 
 **Invariants**
-- A `browser` endpoint must send Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy headers on every response — `validateResponse` must return `valid: false` and list missing headers in `missing[]` if any are absent.
-- An `api` endpoint must send CORS headers but is not required to send CSP or HSTS — `getHeaders(endpoint_type: "api")` must include `Access-Control-Allow-Origin` at minimum.
-- `getHeaders` with no explicit policy must return the minimum required defaults defined in global standards — if global defaults are not configured, return an error rather than sending no headers.
-- A CORS policy with `credentials: true` must not use `*` as the allowed origin — `setCorsPolicy` must reject with `INVALID_CORS_ORIGIN` if the origin is `*` and credentials is true.
+- A `browser` endpoint must send Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy headers on every response `validateResponse` must return `valid: false` and list missing headers in `missing[]` if any are absent.
+- An `api` endpoint must send CORS headers but is not required to send CSP or HSTS `getHeaders(endpoint_type: "api")` must include `Access-Control-Allow-Origin` at minimum.
+- `getHeaders` with no explicit policy must return the minimum required defaults defined in global standards if global defaults are not configured, return an error rather than sending no headers.
+- A CORS policy with `credentials: true` must not use `*` as the allowed origin `setCorsPolicy` must reject with `INVALID_CORS_ORIGIN` if the origin is `*` and credentials is true.
 - `getHstsPolicy` must return a policy with `max_age >= 31536000` (1 year minimum) when HSTS is enabled for the endpoint.
-- Header values must be sanitised against header injection (CRLF sequences `\r\n`) — `validateResponse` must flag any header value containing `%0d` or `%0a` as a warning.
+- Header values must be sanitised against header injection (CRLF sequences `\r\n`) `validateResponse` must flag any header value containing `%0d` or `%0a` as a warning.
 
 **Dependencies:** auth, sessions
 
@@ -94,7 +94,7 @@ blueprint_http_security_headers_validation_warnings     gauge { warning_type }
 
 ### Breaking Change Policy
 - Adding a new optional header: non-breaking
-- Removing a required header from default policy: breaking — requires major version bump and migration guide
+- Removing a required header from default policy: breaking requires major version bump and migration guide
 - Changing a header value format: breaking
 - Tightening CSP default policy: non-breaking (safer by default)
 

@@ -47,7 +47,7 @@ PayoutStatus = pending | queued | processing | paid | failed | cancelled | rever
 
 **Failed Payout Retry:**
 - Automatic retries: 3 attempts total (initial + 2 retries)
-- Backoff strategy: exponential with jitter — 2^attempt seconds (2s, 4s, 8s)
+- Backoff strategy: exponential with jitter 2^attempt seconds (2s, 4s, 8s)
 - Maximum retry window: 72 hours from first failure
 - After exhaustion: transition to `failed`, move to dead-letter queue
 
@@ -73,7 +73,7 @@ PayoutStatus = pending | queued | processing | paid | failed | cancelled | rever
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

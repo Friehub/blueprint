@@ -34,8 +34,8 @@ PushError { device_id, reason: invalid_token|rate_limited|payload_too_large|prov
 ```
 
 **Invariants**
-- `sendEmail` must respect `NotificationPreferences` -- if email is disabled, it must not deliver
-- `sendPush` must not throw if the user has no registered push tokens -- it must return a no-op result
+- `sendEmail` must respect `NotificationPreferences` if email is disabled, it must not deliver
+- `sendPush` must not throw if the user has no registered push tokens it must return a no-op result
 
 **Providers:** Resend/SendGrid (email), Twilio/Termii (SMS), FCM/APNs (push)
 
@@ -193,7 +193,7 @@ blueprint_notifications_sent_total           { channel, result }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

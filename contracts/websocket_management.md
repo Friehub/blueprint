@@ -34,11 +34,11 @@ CloseCode = normal | going_away | protocol_error | unsupported | no_status | abn
 ```
 
 **Invariants**
-- `broadcastToRoom` must deliver the event to every connection in the room except the sender -- sending to the sender is a contract violation
+- `broadcastToRoom` must deliver the event to every connection in the room except the sender sending to the sender is a contract violation
 - A user with multiple connections to the same room must receive each event once per connection
 - `leaveRoom` must close the WebSocket connection for all user's connections in that room within 5 seconds
 - Rooms that have had zero members for more than the configured idle timeout must be garbage collected
-- `sendToUser` must deliver the event to ALL active connections for that user -- filtering to a subset is not permitted
+- `sendToUser` must deliver the event to ALL active connections for that user filtering to a subset is not permitted
 
 **Providers:** WebSocket, Socket.IO, Phoenix Channels, uWebSockets, custom
 
@@ -115,7 +115,7 @@ blueprint_websocket_management_connection_duration_ms    histogram
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 

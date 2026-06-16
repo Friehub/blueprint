@@ -30,7 +30,7 @@ IndexStats { document_count, index_size, last_updated }
 ```
 
 **Invariants**
-- `indexDocument` must be idempotent -- re-indexing the same document must update, not duplicate
+- `indexDocument` must be idempotent re-indexing the same document must update, not duplicate
 - Facet values in `search` must reflect the document state at index time; stale facet counts are acceptable within the index freshness window
 - `multiSearch` must execute all queries within the same index snapshot; results across queries are consistent within a single point-in-time
 - Filter values in `SearchOptions.filters` must use exact match semantics unless a wildcard or range operator is explicitly specified in the filter definition
@@ -93,12 +93,12 @@ Index freshness:
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
 ### Module Dependencies
-* **Depends On:** (none -- wraps external provider)
+* **Depends On:** (none wraps external provider)
 * **Emits To:** (none)
 * **Recommends:** (none)
 * **Pagination Sort Key:** Uses cursor-based pagination sorting by `score DESC` (relevance first) on `search`.

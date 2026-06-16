@@ -30,7 +30,7 @@ SeedOptions { truncate_first?, order?, dependencies? }
 ```
 
 **Invariants**
-- `resetToBaseline` must truncate all application tables before applying seed data -- cascading deletes are insufficient
+- `resetToBaseline` must truncate all application tables before applying seed data cascading deletes are insufficient
 - A seed must not be applied to a production environment unless the seed explicitly declares production_safe: true
 - `restoreSnapshot` must be atomic at the transaction level where the backend supports it
 

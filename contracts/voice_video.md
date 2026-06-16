@@ -37,7 +37,7 @@ RoomConfig { max_participants, max_duration, recording_enabled, transcription_en
 ```
 
 **Invariants**
-- `joinRoom` must return a ParticipantToken with a valid JWT that expires -- tokens cannot have infinite validity
+- `joinRoom` must return a ParticipantToken with a valid JWT that expires tokens cannot have infinite validity
 - A participant must not be able to join a room that has already ended
 - Recording and transcription must not start without explicit consent (if consent enforcement is enabled for the room)
 
@@ -127,7 +127,7 @@ blueprint_voice_video_rooms_created_total            { status }
 
 ### Breaking Change Policy
 - Adding a new optional parameter: non-breaking
-- Removing a parameter: breaking — requires major version bump and migration guide
+- Removing a parameter: breaking requires major version bump and migration guide
 - Changing a type from nullable to required: breaking
 - Adding a new enum value: non-breaking if consumers use exhaustive enum handling; breaking otherwise
 
