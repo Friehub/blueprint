@@ -1,0 +1,28 @@
+name: postgres
+module: credential_rotation_policy
+version: 0.1.0
+description: Custom Postgres adapter for credential_rotation_policy
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - registerCredential
+  - getCredential
+  - listCredentials
+  - rotateCredential
+  - scheduleRotation
+  - getRotationHistory
+  - getExpiringCredentials
+  - notifyExpiry
+  - reportCompromise
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

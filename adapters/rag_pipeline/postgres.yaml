@@ -1,0 +1,28 @@
+name: postgres
+module: rag_pipeline
+version: 0.1.0
+description: Custom Postgres adapter for rag_pipeline
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - ingestDocument
+  - chunkDocument
+  - embedChunk
+  - indexDocument
+  - search
+  - rerank
+  - getDocument
+  - deleteDocument
+  - getIndexStats
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

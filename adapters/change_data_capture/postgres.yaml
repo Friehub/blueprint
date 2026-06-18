@@ -1,0 +1,29 @@
+name: postgres
+module: change_data_capture
+version: 0.1.0
+description: Custom Postgres adapter for change_data_capture
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - configureCDC
+  - getCDCStream
+  - listCDCStreams
+  - startStream
+  - stopStream
+  - getChanges
+  - filterOperations
+  - getStreamLag
+  - replayChanges
+  - handleSchemaChange
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

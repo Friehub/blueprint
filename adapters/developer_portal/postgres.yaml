@@ -1,0 +1,28 @@
+name: postgres
+module: developer_portal
+version: 0.1.0
+description: Custom Postgres adapter for developer_portal
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - getDashboard
+  - getApiKeys
+  - generateApiKey
+  - revokeApiKey
+  - getDocumentation
+  - searchDocumentation
+  - getUsageDashboard
+  - getChangelog
+  - publishChangelog
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

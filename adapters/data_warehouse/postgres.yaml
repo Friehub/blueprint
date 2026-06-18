@@ -1,0 +1,28 @@
+name: postgres
+module: data_warehouse
+version: 0.1.0
+description: Custom Postgres adapter for data_warehouse
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createTable
+  - getTable
+  - listTables
+  - createView
+  - runQuery
+  - getQueryHistory
+  - addPartition
+  - getStorageUsage
+  - setQueryBudget
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

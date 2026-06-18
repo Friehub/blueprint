@@ -1,0 +1,28 @@
+name: postgres
+module: event_sourcing
+version: 0.1.0
+description: Custom Postgres adapter for event_sourcing
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - appendEvent
+  - appendEvents
+  - readStream
+  - readStreamFrom
+  - buildProjection
+  - rebuildProjection
+  - createSnapshot
+  - getSnapshot
+  - subscribeToStream
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

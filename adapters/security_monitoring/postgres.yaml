@@ -1,0 +1,28 @@
+name: postgres
+module: security_monitoring
+version: 0.1.0
+description: Custom Postgres adapter for security_monitoring
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - recordSecurityEvent
+  - getSecurityEvent
+  - listSecurityEvents
+  - createSecurityAlertRule
+  - getSecurityAlertRule
+  - listSecurityAlertRules
+  - createSecurityCase
+  - getSecurityCase
+  - resolveSecurityCase
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

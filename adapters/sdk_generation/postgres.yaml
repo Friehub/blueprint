@@ -1,0 +1,26 @@
+name: postgres
+module: sdk_generation
+version: 0.1.0
+description: Custom Postgres adapter for sdk_generation
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - generateSDK
+  - getSDK
+  - listSDKs
+  - publishSDK
+  - versionSDK
+  - getSDKUsage
+  - deprecateSDK
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

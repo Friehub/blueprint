@@ -1,0 +1,26 @@
+name: postgres
+module: health_check_advanced
+version: 0.1.0
+description: Custom Postgres adapter for health_check_advanced
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - getLiveness
+  - getReadiness
+  - getStartupStatus
+  - checkDependency
+  - getFullHealth
+  - registerHealthCheck
+  - getHealthHistory
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

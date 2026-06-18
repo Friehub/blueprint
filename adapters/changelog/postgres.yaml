@@ -1,0 +1,27 @@
+name: postgres
+module: changelog
+version: 0.1.0
+description: Custom Postgres adapter for changelog
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - recordEntry
+  - getEntry
+  - listEntries
+  - getBreakingChanges
+  - addMigrationGuide
+  - notifySubscribers
+  - subscribe
+  - unsubscribe
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

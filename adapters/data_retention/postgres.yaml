@@ -1,0 +1,28 @@
+name: postgres
+module: data_retention
+version: 0.1.0
+description: Custom Postgres adapter for data_retention
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - definePolicy
+  - getPolicy
+  - listPolicies
+  - updatePolicy
+  - deletePolicy
+  - runPurge
+  - previewPurge
+  - getPurgeHistory
+  - exportBeforePurge
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

@@ -1,0 +1,28 @@
+name: postgres
+module: posts
+version: 0.1.0
+description: Custom Postgres adapter for posts
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createPost
+  - getPost
+  - updatePost
+  - deletePost
+  - getFeed
+  - getPostsByUser
+  - pinPost
+  - unpinPost
+  - moderatePost
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

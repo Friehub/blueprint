@@ -1,0 +1,25 @@
+name: postgres
+module: distributed_lock
+version: 0.1.0
+description: Custom Postgres adapter for distributed_lock
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - acquire
+  - tryAcquire
+  - release
+  - extend
+  - getLockStatus
+  - forceRelease
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

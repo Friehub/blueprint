@@ -1,0 +1,26 @@
+name: postgres
+module: outbox_processor
+version: 0.1.0
+description: Custom Postgres adapter for outbox_processor
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - publishPending
+  - getOutboxEntry
+  - listOutboxEntries
+  - markPublished
+  - reprocessFailed
+  - getPublisherStats
+  - configurePublisher
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

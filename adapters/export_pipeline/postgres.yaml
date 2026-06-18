@@ -1,0 +1,27 @@
+name: postgres
+module: export_pipeline
+version: 0.1.0
+description: Custom Postgres adapter for export_pipeline
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - defineExport
+  - getExport
+  - listExports
+  - runExport
+  - getRunHistory
+  - cancelExport
+  - getExportFormats
+  - validateDestination
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

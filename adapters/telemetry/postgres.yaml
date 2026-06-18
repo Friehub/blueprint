@@ -1,0 +1,28 @@
+name: postgres
+module: telemetry
+version: 0.1.0
+description: Custom Postgres adapter for telemetry
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createSpan
+  - endSpan
+  - addSpanEvent
+  - recordMetric
+  - incrementCounter
+  - recordHistogram
+  - setGauge
+  - setLogLevel
+  - log
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

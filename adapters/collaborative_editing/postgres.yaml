@@ -1,0 +1,28 @@
+name: postgres
+module: collaborative_editing
+version: 0.1.0
+description: Custom Postgres adapter for collaborative_editing
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - openDocument
+  - getDocument
+  - closeDocument
+  - applyOperation
+  - getOperations
+  - getCursors
+  - updateCursor
+  - getDocumentHistory
+  - resolveConflict
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

@@ -1,0 +1,29 @@
+name: postgres
+module: data_pipeline
+version: 0.1.0
+description: Custom Postgres adapter for data_pipeline
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - definePipeline
+  - getPipeline
+  - listPipelines
+  - runPipeline
+  - getRun
+  - getRunHistory
+  - retryStage
+  - pausePipeline
+  - resumePipeline
+  - deletePipeline
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

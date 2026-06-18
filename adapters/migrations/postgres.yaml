@@ -1,0 +1,28 @@
+name: postgres
+module: migrations
+version: 0.1.0
+description: Custom Postgres adapter for migrations
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createMigration
+  - applyPending
+  - rollback
+  - getStatus
+  - getHistory
+  - validateDrift
+  - baseline
+  - lockMigrations
+  - unlockMigrations
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

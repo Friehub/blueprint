@@ -1,0 +1,30 @@
+name: postgres
+module: voice_video
+version: 0.1.0
+description: Custom Postgres adapter for voice_video
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createRoom
+  - getRoom
+  - listRooms
+  - joinRoom
+  - leaveRoom
+  - getParticipants
+  - startRecording
+  - stopRecording
+  - startTranscription
+  - stopTranscription
+  - getRoomMetrics
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

@@ -1,0 +1,27 @@
+name: postgres
+module: loyalty
+version: 0.1.0
+description: Custom Postgres adapter for loyalty
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - getBalance
+  - earnPoints
+  - redeemPoints
+  - getTransactions
+  - getTier
+  - calculateTierProgress
+  - getRewards
+  - redeemReward
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

@@ -1,0 +1,28 @@
+name: postgres
+module: storage
+version: 0.1.0
+description: Custom Postgres adapter for storage
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - uploadFile
+  - downloadFile
+  - deleteFile
+  - getSignedUrl
+  - getSignedUploadUrl
+  - listFiles
+  - moveFile
+  - copyFile
+  - getMetadata
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

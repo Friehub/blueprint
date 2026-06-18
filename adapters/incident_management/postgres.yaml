@@ -1,0 +1,32 @@
+name: postgres
+module: incident_management
+version: 0.1.0
+description: Custom Postgres adapter for incident_management
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createIncident
+  - getIncident
+  - listIncidents
+  - acknowledgeIncident
+  - assignIncident
+  - updateIncidentSeverity
+  - escalateIncident
+  - addIncidentNote
+  - resolveIncident
+  - createRunbookLink
+  - createPostmortem
+  - getPostmortem
+  - getOnCallSchedule
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

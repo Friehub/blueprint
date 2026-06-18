@@ -1,0 +1,26 @@
+name: postgres
+module: follows
+version: 0.1.0
+description: Custom Postgres adapter for follows
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - follow
+  - unfollow
+  - isFollowing
+  - getFollowers
+  - getFollowing
+  - getFollowCounts
+  - getMutualFollowers
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

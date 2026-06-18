@@ -1,0 +1,27 @@
+name: postgres
+module: returns
+version: 0.1.0
+description: Custom Postgres adapter for returns
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - requestReturn
+  - getReturn
+  - listReturns
+  - approveReturn
+  - rejectReturn
+  - receiveReturn
+  - inspectReturn
+  - closeReturn
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

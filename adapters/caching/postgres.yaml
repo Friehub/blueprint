@@ -1,0 +1,25 @@
+name: postgres
+module: caching
+version: 0.1.0
+description: Custom Postgres adapter for caching
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - del
+  - invalidateByTag
+  - invalidateByPrefix
+  - mset
+  - increment
+  - decrement
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

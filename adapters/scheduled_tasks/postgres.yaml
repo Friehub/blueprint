@@ -1,0 +1,28 @@
+name: postgres
+module: scheduled_tasks
+version: 0.1.0
+description: Custom Postgres adapter for scheduled_tasks
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createSchedule
+  - getSchedule
+  - listSchedules
+  - pauseSchedule
+  - resumeSchedule
+  - triggerManually
+  - updateSchedule
+  - deleteSchedule
+  - getExecutionHistory
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

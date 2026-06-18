@@ -1,0 +1,27 @@
+name: postgres
+module: background_jobs
+version: 0.1.0
+description: Custom Postgres adapter for background_jobs
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - enqueueJob
+  - getJob
+  - listJobs
+  - cancelJob
+  - retryJob
+  - getJobStatus
+  - getDeadLetterJobs
+  - retryDeadLetterJob
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

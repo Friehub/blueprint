@@ -1,0 +1,25 @@
+name: postgres
+module: ip_intelligence
+version: 0.1.0
+description: Custom Postgres adapter for ip_intelligence
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - lookup
+  - isVpn
+  - isTor
+  - isDatacenter
+  - getGeolocation
+  - getThreatScore
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org
