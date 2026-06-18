@@ -48,3 +48,18 @@ dependencies:
 metadata:
   provider_url: https://stripe.com
   docs_url: https://stripe.com/docs
+# Rust newtype generation — used by Rust generator
+rust_extensions:
+  newtypes:
+    - field: payment_id
+      type: Uuid
+      newtype: PaymentId
+    - field: amount
+      type: Decimal
+      newtype: PositiveAmount
+      validation: "value > Decimal::ZERO"
+  error_derives: [Debug, Display, thiserror::Error]
+
+# Java package prefix — used by Java generator
+java_extensions:
+  package_prefix: com.acme.payments
