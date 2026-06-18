@@ -1,0 +1,25 @@
+name: postgres
+module: approvals
+version: 0.1.0
+description: Custom Postgres adapter for approvals
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - PENDING → IN_REVIEW → APPROVED
+  - → REJECTED
+  - → WITHDRAWN
+  - IN_REVIEW → ESCALATED → IN_REVIEW
+  - → APPROVED
+  - → REJECTED
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

@@ -1,0 +1,23 @@
+name: postgres
+module: onboarding
+version: 0.1.0
+description: Custom Postgres adapter for onboarding
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - PENDING → IN_PROGRESS → COMPLETED
+  - → ABANDONED
+  - IN_PROGRESS → BLOCKED
+  - BLOCKED → IN_PROGRESS
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org

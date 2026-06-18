@@ -12,8 +12,40 @@ const MONGO_TYPE_MAP: Record<string, string> = {
   i64_decicents: "Long",
 };
 
+const MONGOOSE_TS_TYPE_MAP: Record<string, string> = {
+  uuid: "string",
+  timestamp: "Date",
+  date: "Date",
+  integer: "number",
+  decimal: "number",
+  float: "number",
+  boolean: "boolean",
+  string: "string",
+  i64_decicents: "number",
+};
+
+const MONGOOSE_SCHEMA_TYPE_MAP: Record<string, string> = {
+  uuid: "String",
+  timestamp: "Date",
+  date: "Date",
+  integer: "Number",
+  decimal: "Decimal128",
+  float: "Number",
+  boolean: "Boolean",
+  string: "String",
+  i64_decicents: "Number",
+};
+
 function mongoType(field: EntityField): string {
   return MONGO_TYPE_MAP[field.type] || "String";
+}
+
+function mongooseTsType(field: EntityField): string {
+  return MONGOOSE_TS_TYPE_MAP[field.type] || "string";
+}
+
+function mongooseSchemaType(field: EntityField): string {
+  return MONGOOSE_SCHEMA_TYPE_MAP[field.type] || "String";
 }
 
 function mongoValidator(entity: Entity): string {
@@ -104,3 +136,55 @@ export const mongoDbRenderer: DatabaseRenderer = {
     return lines.join("\n");
   },
 };
+
+function toPascalCase(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+export function generateMongooseSchema(entities: Entity[], moduleName?: string): string {
+  const filtered = moduleName
+    ? entities.filter((e) => e.module === moduleName)
+    : entities;
+
+  const lines: string[] = [];
+  lines.push("import mongoose, { Schema, Document } from 'mongoose';");
+  lines.push("");
+
+  for (const entity of filtered) {
+    const entityName = toPascalCase(entity.entity);
+
+    lines.push(`export interface I${entityName} {`);
+    for (const field of entity.fields) {
+      lines.push(`  ${field.name}${field.optional ? "?" : ""}: ${mongooseTsType(field)};`);
+    }
+    lines.push("}");
+    lines.push("");
+
+    const schemaName = `${entity.entity}Schema`;
+    lines.push(`const ${schemaName} = new Schema<I${entityName}>({`);
+
+    for (let i = 0; i < entity.fields.length; i++) {
+      const field = entity.fields[i];
+      if (!field) continue;
+      const mType = mongooseSchemaType(field);
+      const isLast = i === entity.fields.length - 1;
+      const required = field.primaryKey || !field.optional;
+      const comma = isLast && entity.foreignKeys.length === 0 ? "" : ",";
+      lines.push(`  ${field.name}: { type: ${mType}, required: ${required} }${comma}`);
+    }
+
+    for (const [i, fk] of entity.foreignKeys.entries()) {
+      const refName = toPascalCase(fk.refEntity);
+      const isLast = i === entity.foreignKeys.length - 1;
+      lines.push(`  ${fk.field}: { type: Schema.Types.ObjectId, ref: '${refName}' }${isLast ? "" : ","}`);
+    }
+
+    lines.push(`}, { timestamps: true });`);
+    lines.push("");
+
+    lines.push(`export const ${entityName}Model = mongoose.model<I${entityName}>('${entityName}', ${schemaName});`);
+    lines.push("");
+  }
+
+  return lines.join("\n");
+}

@@ -1,0 +1,40 @@
+name: postgres
+module: catalog
+version: 0.1.0
+description: Custom Postgres adapter for catalog
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - getProduct
+  - getProducts
+  - searchProducts
+  - createProduct
+  - updateProduct
+  - archiveProduct
+  - getVariant
+  - getVariantsByProduct
+  - createVariant
+  - updateVariant
+  - getPricing
+  - createPricingRule
+  - getPricingRule
+  - listPricingRules
+  - updatePricingRule
+  - archivePricingRule
+  - createBundle
+  - getBundle
+  - listBundles
+  - updateBundle
+  - archiveBundle
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection string
+      secret: true
+
+metadata:
+  provider_url: https://postgresql.org
