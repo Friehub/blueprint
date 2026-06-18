@@ -1,0 +1,42 @@
+name: postgres
+module: api_keys
+version: 0.1.0
+description: Custom Postgres adapter with hashing strategy for API key storage using slow hash algorithms and prefix-based key identification
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createApiKey
+  - getApiKey
+  - listApiKeys
+  - revokeApiKey
+  - validateApiKey
+  - rotateApiKey
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection URL for API key database
+      secret: true
+    - name: hash_salt
+      type: string
+      description: Salt used for key hashing
+      secret: true
+  optional:
+    - name: schema
+      type: string
+      description: Database schema for API key tables
+      default: api_keys
+    - name: key_prefix
+      type: string
+      description: Prefix for generated API keys
+      default: bp_
+
+dependencies:
+  - database/migrations
+
+metadata:
+  provider_url: https://postgresql.org
+  docs_url: https://postgresql.org/docs

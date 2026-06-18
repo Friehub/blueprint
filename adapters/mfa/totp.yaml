@@ -1,0 +1,36 @@
+name: totp
+module: mfa
+version: 0.1.0
+description: TOTP-based multi-factor authentication with Postgres storage
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - setupTotp
+  - verifyTotp
+  - generateBackupCodes
+  - verifyBackupCode
+  - getMFAStatus
+  - disableMFA
+  - disableAllMFA
+  - listMFAMethods
+
+does_not_implement:
+  - setupSmsOtp
+  - sendSmsOtp
+  - verifySmsOtp
+  - setupEmailOtp
+  - sendEmailOtp
+  - verifyEmailOtp
+  - setupFido2
+  - verifyFido2
+
+config:
+  required:
+    - name: totp_issuer
+      type: string
+      description: TOTP issuer name (displayed in authenticator app)
+      secret: false
+    - name: totp_window
+      type: integer
+      default: 1
+      description: TOTP verification window (steps before/after)

@@ -1,6 +1,6 @@
 name: postgresql
 module: sessions
-version: 1.0.0
+version: 0.1.0
 description: PostgreSQL session store adapter for durable session management
 languages: [typescript, python, go, rust, java]
 
@@ -26,6 +26,14 @@ config:
       type: integer
       default: 10
       description: Database connection pool size
+    - name: table_name
+      type: string
+      default: sessions
+      description: Session storage table name
+    - name: ttl_seconds
+      type: integer
+      default: 86400
+      description: Session TTL in seconds
 
 metadata:
   provider_url: https://www.postgresql.org

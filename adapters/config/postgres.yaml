@@ -1,0 +1,64 @@
+name: postgres
+module: config
+version: 0.1.0
+description: Custom Postgres-backed config storage adapter
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - setConfig
+  - getConfig
+  - getConfigs
+  - listConfigs
+  - approveChange
+  - rejectChange
+  - rollback
+  - getHistory
+  - deleteConfig
+  - validateConfig
+
+does_not_implement: []
+
+config:
+  required:
+    - name: connection_string
+      type: string
+      description: Postgres connection string
+      secret: true
+  optional:
+    - name: table_name
+      type: string
+      default: app_config
+      description: Config table name
+    - name: cache_ttl
+      type: number
+      default: 5
+      description: Local cache TTL in seconds
+    - name: pool_size
+      type: number
+      default: 10
+      description: Database connection pool size
+    - name: schema
+      type: string
+      default: public
+      description: Database schema name
+
+dependencies:
+  - module: audit_log
+    purpose: Log config changes and access
+    required: true
+  - module: caching
+    purpose: Hot-path read cache for getConfig
+    required: false
+  - module: events
+    purpose: Cache invalidation broadcast on config change
+    required: false
+  - module: approvals
+    purpose: Approval workflows for configs that require approval
+    required: false
+  - module: encryption
+    purpose: Encrypt SECRET type config values at rest
+    required: false
+
+metadata:
+  provider_url: https://www.postgresql.org
+  docs_url: https://www.postgresql.org/docs

@@ -1,0 +1,40 @@
+name: postgres
+module: tenants
+version: 0.1.0
+description: Custom Postgres adapter for multi-tenant SaaS with slug-based tenant lookup, membership management, and tenant-level config store
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - createTenant
+  - getTenant
+  - getTenantBySlug
+  - updateTenant
+  - suspendTenant
+  - reactivateTenant
+  - deleteTenant
+  - getTenantMembers
+  - inviteMember
+  - removeMember
+  - getTenantConfig
+  - updateTenantConfig
+
+does_not_implement: []
+
+config:
+  required:
+    - name: database_url
+      type: string
+      description: Postgres connection URL for tenant database
+      secret: true
+  optional:
+    - name: schema
+      type: string
+      description: Database schema for tenant tables
+      default: tenants
+
+dependencies:
+  - database/migrations
+
+metadata:
+  provider_url: https://postgresql.org
+  docs_url: https://postgresql.org/docs

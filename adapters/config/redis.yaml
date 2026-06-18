@@ -1,0 +1,48 @@
+name: redis
+module: config
+version: 0.1.0
+description: Redis config cache adapter for hot-path reads
+languages: [typescript, python, go, rust, java]
+
+implements:
+  - getConfig
+  - getConfigs
+  - listConfigs
+  - deleteConfig
+
+does_not_implement:
+  - setConfig
+  - approveChange
+  - rejectChange
+  - rollback
+  - getHistory
+  - validateConfig
+
+config:
+  required:
+    - name: url
+      type: string
+      description: Redis connection URL
+      secret: true
+  optional:
+    - name: prefix
+      type: string
+      default: "config:"
+      description: Key prefix for config entries
+    - name: ttl
+      type: number
+      default: 5
+      description: Config entry TTL in seconds
+    - name: key_pattern
+      type: string
+      default: "*"
+      description: Redis key pattern for listing configs
+
+dependencies:
+  - module: caching
+    purpose: Redis acts as cache layer on top of durable config store
+    required: false
+
+metadata:
+  provider_url: https://redis.io
+  docs_url: https://redis.io/docs
