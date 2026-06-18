@@ -1,6 +1,0 @@
-{
-  "adapters": {
-    "payments": "stripe",
-    "caching": "redis"
-  }
-}
