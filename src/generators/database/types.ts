@@ -22,7 +22,7 @@ export interface Entity {
   accessPatterns: string[];
 }
 
-export type DatabaseEngine = "postgresql" | "mysql" | "mongodb" | "sqlite";
+export type DatabaseEngine = "postgresql" | "mysql" | "mongodb" | "sqlite" | "timescaledb";
 
 export interface DatabaseRenderer {
   engine: DatabaseEngine;
